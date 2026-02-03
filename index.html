@@ -1,88 +1,3 @@
-
-  // ========================================
-  // GOOGLE SHEETS CONFIGURATION
-  // ========================================
-  const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRrl7XNihStokkflZZ2gfCKtnh3woP_Z-WphBEQziue2SgygVeAOESNAygsCDY6hGnc0-9tbE-m9dA/pub?output=csv';
-  
-  // Auto-load data on page load
-  window.addEventListener('DOMContentLoaded', function() {
-    loadDataFromGoogleSheets();
-  });
-  
-  // Function to load data from Google Sheets
-  async function loadDataFromGoogleSheets() {
-    try {
-      console.log('Fetching data from Google Sheets...');
-      
-      const response = await fetch(GOOGLE_SHEETS_CSV_URL);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch data from Google Sheets');
-      }
-      
-      const csvText = await response.text();
-      
-      console.log('Data fetched successfully, parsing CSV...');
-      
-      // Parse CSV using PapaParse
-      Papa.parse(csvText, {
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-          console.log('CSV parsed successfully, processing data...');
-          processData(results.data);
-          
-          // Hide upload section and show dashboard
-          document.getElementById('uploadSection').style.display = 'none';
-          document.getElementById('tabNavigation').style.display = 'flex';
-          
-          // Update last updated date
-          document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString();
-          
-          console.log('Dashboard loaded successfully!');
-        },
-        error: function(error) {
-          console.error('Error parsing CSV:', error);
-          showError('Error parsing CSV data: ' + error.message);
-        }
-      });
-      
-    } catch (error) {
-      console.error('Error loading data:', error);
-      showError('Failed to load data from Google Sheets. Please check your internet connection and try again.');
-    }
-  }
-  
-  // Function to show error message
-  function showError(message) {
-    const uploadSection = document.getElementById('uploadSection');
-    uploadSection.innerHTML = `
-      <i class="bi bi-exclamation-triangle upload-icon" style="color: var(--danger);"></i>
-      <h2>Error Loading Data</h2>
-      <p style="color: var(--danger); margin-bottom: 1rem;">${message}</p>
-      <button class="upload-button" onclick="location.reload()">
-        <i class="bi bi-arrow-clockwise"></i>
-        Retry
-      </button>
-    `;
-  }
-  
-  // Function to manually refresh data
-  function refreshData() {
-    // Show loading
-    document.getElementById('uploadSection').style.display = 'block';
-    document.getElementById('uploadSection').innerHTML = `
-      <div class="spinner"></div>
-      <h2>Refreshing Data...</h2>
-      <p>Loading latest data from Google Sheets</p>
-    `;
-    document.getElementById('tabNavigation').style.display = 'none';
-    
-    // Reload data
-    loadDataFromGoogleSheets();
-  }
-
-<script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1775,7 +1690,7 @@
           <i class="bi bi-arrow-clockwise"></i>
           Refresh Data
         </button>
-      </div></div>
+      </div>
     </div>
     <div class="header-main">
       <h1>
@@ -2250,6 +2165,84 @@
 </footer>
 
 <script>
+  // ========================================
+  // GOOGLE SHEETS CONFIGURATION
+  // ========================================
+  const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRrl7XNihStokkflZZ2gfCKtnh3woP_Z-WphBEQziue2SgygVeAOESNAygsCDY6hGnc0-9tbE-m9dA/pub?output=csv';
+
+  // Auto-load data on page load
+  window.addEventListener('DOMContentLoaded', function() {
+    loadDataFromGoogleSheets();
+  });
+
+  // Function to load data from Google Sheets
+  async function loadDataFromGoogleSheets() {
+    try {
+      console.log('Fetching data from Google Sheets...');
+
+      const response = await fetch(GOOGLE_SHEETS_CSV_URL);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data from Google Sheets');
+      }
+
+      const csvText = await response.text();
+
+      console.log('Data fetched successfully, parsing CSV...');
+
+      // Parse CSV using PapaParse — header:false gives a 2D array (row 0 = headers)
+      // which is exactly what prepare() expects
+      Papa.parse(csvText, {
+        header: false,
+        skipEmptyLines: true,
+        complete: function(results) {
+          console.log('CSV parsed successfully, processing data...');
+          prepare(results.data);
+          console.log('Dashboard loaded successfully!');
+        },
+        error: function(error) {
+          console.error('Error parsing CSV:', error);
+          showError('Error parsing CSV data: ' + error.message);
+        }
+      });
+
+    } catch (error) {
+      console.error('Error loading data:', error);
+      showError('Failed to load data from Google Sheets. Please check your internet connection and try again.');
+    }
+  }
+
+  // Function to show error message
+  function showError(message) {
+    const uploadSection = document.getElementById('uploadSection');
+    uploadSection.style.display = 'flex';
+    uploadSection.innerHTML = `
+      <i class="bi bi-exclamation-triangle upload-icon" style="color: var(--danger); font-size: 3rem; margin-bottom: 1rem;"></i>
+      <h2>Error Loading Data</h2>
+      <p style="color: var(--danger); margin-bottom: 1rem;">${message}</p>
+      <button onclick="location.reload()" style="background: var(--primary); color: white; border: none; padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
+        <i class="bi bi-arrow-clockwise"></i>
+        Retry
+      </button>
+    `;
+  }
+
+  // Function to manually refresh data
+  function refreshData() {
+    document.getElementById('uploadSection').style.display = 'flex';
+    document.getElementById('uploadSection').innerHTML = `
+      <div class="spinner"></div>
+      <h2>Refreshing Data...</h2>
+      <p>Loading latest data from Google Sheets</p>
+    `;
+    document.getElementById('tabNavigation').style.display = 'none';
+    document.getElementById('dataSection').classList.remove('visible');
+    document.getElementById('planActualDataSection').classList.remove('visible');
+
+    // Reload data
+    loadDataFromGoogleSheets();
+  }
+
   // Update date/time
   function updateDateTime() {
     const now = new Date();
@@ -2312,32 +2305,34 @@
     HANDOVER_ACTUAL: 51  // Column AZ (index 51)
   };
 
-  // File handling
+  // File handling (only wire up if upload elements exist in the DOM)
   const csvFile = document.getElementById("csvFile");
   const dropZone = document.getElementById("dropZone");
 
-  dropZone.addEventListener("click", () => csvFile.click());
-  csvFile.addEventListener("change", loadCSV);
+  if (dropZone && csvFile) {
+    dropZone.addEventListener("click", () => csvFile.click());
+    csvFile.addEventListener("change", loadCSV);
 
-  dropZone.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    dropZone.classList.add("dragover");
-  });
+    dropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropZone.classList.add("dragover");
+    });
 
-  dropZone.addEventListener("dragleave", () => {
-    dropZone.classList.remove("dragover");
-  });
+    dropZone.addEventListener("dragleave", () => {
+      dropZone.classList.remove("dragover");
+    });
 
-  dropZone.addEventListener("drop", (e) => {
-    e.preventDefault();
-    dropZone.classList.remove("dragover");
-    const file = e.dataTransfer.files[0];
-    if (file && (file.name.endsWith('.csv') || file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) {
-      processFile(file);
-    } else {
-      alert('Please upload a CSV or Excel file (.csv, .xlsx, .xls)');
-    }
-  });
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      const file = e.dataTransfer.files[0];
+      if (file && (file.name.endsWith('.csv') || file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) {
+        processFile(file);
+      } else {
+        alert('Please upload a CSV or Excel file (.csv, .xlsx, .xls)');
+      }
+    });
+  }
 
   function loadCSV(e) {
     processFile(e.target.files[0]);
@@ -2407,12 +2402,14 @@
 
     // Update UI
     const statusBadge = document.getElementById("statusBadge");
-    statusBadge.classList.add("success");
-    document.getElementById("statusText").innerHTML = 
+    if (statusBadge) statusBadge.classList.add("success");
+    const statusText = document.getElementById("statusText");
+    if (statusText) statusText.innerHTML = 
       `<i class="bi bi-check-circle-fill"></i> Loaded ${raw.length.toLocaleString()} units successfully`;
 
     document.getElementById("uploadSection").style.display = "none";
-    document.getElementById("emptyState").style.display = "none";
+    const emptyState = document.getElementById("emptyState");
+    if (emptyState) emptyState.style.display = "none";
     document.getElementById("tabNavigation").style.display = "flex";
     document.getElementById("dataSection").classList.add("visible");
     document.getElementById("planActualDataSection").classList.add("visible");
