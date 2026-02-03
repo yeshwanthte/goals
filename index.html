@@ -1665,10 +1665,301 @@
         min-width: 800px;
       }
     }
+
+    /* ===== LOGIN SCREEN ===== */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 30%, #4c1d95 60%, #6d28d9 100%);
+      overflow: hidden;
+    }
+
+    /* animated ambient orbs */
+    .login-overlay .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .login-overlay .orb-1 {
+      width: 500px; height: 500px;
+      background: #6366f1;
+      top: -120px; left: -100px;
+      animation: orbDrift 8s ease-in-out infinite alternate;
+    }
+    .login-overlay .orb-2 {
+      width: 380px; height: 380px;
+      background: #a855f7;
+      bottom: -80px; right: -60px;
+      animation: orbDrift 10s ease-in-out infinite alternate-reverse;
+    }
+    .login-overlay .orb-3 {
+      width: 260px; height: 260px;
+      background: #0ea5e9;
+      top: 40%; left: 55%;
+      animation: orbDrift 12s ease-in-out infinite alternate;
+    }
+    @keyframes orbDrift {
+      0%   { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(40px, -30px) scale(1.08); }
+    }
+
+    /* grid overlay texture */
+    .login-overlay::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    .login-card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 1rem;
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 24px;
+      box-shadow:
+        0 25px 60px rgba(0,0,0,0.35),
+        0 0 0 1px rgba(255,255,255,0.08) inset;
+      padding: 2.8rem 2rem 2.2rem;
+      animation: cardSlideUp 0.55s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes cardSlideUp {
+      from { opacity: 0; transform: translateY(32px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-logo-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 0.4rem;
+    }
+    .login-logo-row img {
+      height: 42px;
+      background: rgba(255,255,255,0.92);
+      padding: 5px 10px;
+      border-radius: 8px;
+    }
+
+    .login-title {
+      text-align: center;
+      color: #fff;
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 0.25rem;
+    }
+    .login-subtitle {
+      text-align: center;
+      color: rgba(255,255,255,0.45);
+      font-size: 0.82rem;
+      margin-bottom: 1.8rem;
+      font-weight: 400;
+    }
+
+    .login-field {
+      margin-bottom: 1rem;
+    }
+    .login-field label {
+      display: block;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 0.4rem;
+    }
+    .login-input-wrap {
+      position: relative;
+    }
+    .login-input-wrap .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.35);
+      font-size: 1.05rem;
+      pointer-events: none;
+    }
+    .login-input-wrap input {
+      width: 100%;
+      padding: 0.8rem 1rem 0.8rem 2.6rem;
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid rgba(255,255,255,0.14);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.92rem;
+      font-family: inherit;
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+      outline: none;
+    }
+    .login-input-wrap input::placeholder {
+      color: rgba(255,255,255,0.28);
+    }
+    .login-input-wrap input:focus {
+      border-color: rgba(163,180,252,0.6);
+      background: rgba(255,255,255,0.11);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
+    }
+    /* password toggle eye */
+    .login-input-wrap .eye-toggle {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.35);
+      font-size: 1.05rem;
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .login-input-wrap .eye-toggle:hover {
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* error toast */
+    .login-error {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(239,68,68,0.18);
+      border: 1px solid rgba(239,68,68,0.35);
+      border-radius: 10px;
+      padding: 0.65rem 0.85rem;
+      margin-bottom: 1rem;
+      color: #fca5a5;
+      font-size: 0.8rem;
+      font-weight: 500;
+      animation: shake 0.4s ease;
+    }
+    .login-error.visible { display: flex; }
+    .login-error i { font-size: 1rem; color: #ef4444; flex-shrink: 0; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%     { transform: translateX(-6px); }
+      40%     { transform: translateX(6px); }
+      60%     { transform: translateX(-4px); }
+      80%     { transform: translateX(4px); }
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 0.82rem;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: transform 0.18s, box-shadow 0.18s;
+      box-shadow: 0 4px 18px rgba(99,102,241,0.4);
+      margin-top: 0.4rem;
+    }
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(99,102,241,0.5);
+    }
+    .login-btn:active {
+      transform: translateY(0);
+    }
+    .login-btn i { font-size: 1.1rem; }
+
+    .login-footer-note {
+      text-align: center;
+      margin-top: 1.6rem;
+      color: rgba(255,255,255,0.22);
+      font-size: 0.72rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+    .login-footer-note i { font-size: 0.78rem; }
   </style>
 </head>
 
 <body>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div class="login-overlay" id="loginOverlay">
+  <!-- ambient orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="login-card">
+    <!-- logo -->
+    <div class="login-logo-row">
+      <img src="https://www.propeve.com/images/uploads/builders/1585296933513logo(1).png"
+           alt="Logo"
+           onerror="this.style.display='none'">
+    </div>
+
+    <h2 class="login-title">Business Intelligence</h2>
+    <p class="login-subtitle">Sign in to access the dashboard</p>
+
+    <!-- error toast -->
+    <div class="login-error" id="loginError">
+      <i class="bi bi-exclamation-circle-fill"></i>
+      <span id="loginErrorMsg">Invalid credentials</span>
+    </div>
+
+    <!-- username -->
+    <div class="login-field">
+      <label for="loginUsername">Username</label>
+      <div class="login-input-wrap">
+        <i class="bi bi-person-fill input-icon"></i>
+        <input type="text" id="loginUsername" placeholder="Enter username" autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+
+    <!-- password -->
+    <div class="login-field">
+      <label for="loginPassword">Password</label>
+      <div class="login-input-wrap">
+        <i class="bi bi-lock-fill input-icon"></i>
+        <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="off">
+        <button class="eye-toggle" id="eyeToggle" type="button" title="Show / hide password">
+          <i class="bi bi-eye-fill" id="eyeIcon"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- sign-in button -->
+    <button class="login-btn" id="loginBtn">
+      <i class="bi bi-box-arrow-in-right"></i>
+      Sign In
+    </button>
+
+    <div class="login-footer-note">
+      <i class="bi bi-lock"></i> Secure &middot; Local access only
+    </div>
+  </div>
+</div>
+
 
 <!-- Header -->
 <header class="dashboard-header">
@@ -1682,13 +1973,19 @@
       <div class="header-meta">
         <span><i class="bi bi-calendar3"></i> <span id="currentDate"></span></span>
         <span><i class="bi bi-clock"></i> <span id="currentTime"></span></span>
-        <span><i class="bi bi-person-circle"></i> Welcome, User</span>
+        <span><i class="bi bi-person-circle"></i> Welcome, Admin</span>
       
       </div>
-      <div style="display: flex; align-items: center; gap: 1rem;">
-        <button onclick="refreshData()" style="background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); color: white; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s;">
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <button onclick="refreshData()" style="background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); color: white; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
           <i class="bi bi-arrow-clockwise"></i>
           Refresh Data
+        </button>
+        <button onclick="logoutAdmin()" style="background: rgba(239,68,68,0.25); border: 2px solid rgba(239,68,68,0.45); color: #fca5a5; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; white-space: nowrap;"
+                onmouseover="this.style.background='rgba(239,68,68,0.38)'" onmouseout="this.style.background='rgba(239,68,68,0.25)'">
+          <i class="bi bi-box-arrow-right"></i>
+          Logout
         </button>
       </div>
     </div>
@@ -2170,9 +2467,17 @@
   // ========================================
   const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRrl7XNihStokkflZZ2gfCKtnh3woP_Z-WphBEQziue2SgygVeAOESNAygsCDY6hGnc0-9tbE-m9dA/pub?output=csv';
 
-  // Auto-load data on page load
+  // ========================================
+  // AUTH GATE — credentials
+  // ========================================
+  const AUTH_USER = 'Admin';
+  const AUTH_PASS = '3458';
+  let isAuthenticated = false;
+
+  // Auto-load data ONLY after login
   window.addEventListener('DOMContentLoaded', function() {
-    loadDataFromGoogleSheets();
+    // keep everything hidden; login screen is visible by default
+    // data loads only when handleLogin() succeeds
   });
 
   // Function to load data from Google Sheets
@@ -3554,6 +3859,122 @@
     const filename = `${currentPlanActualActivity.replace(/\s+/g, '_')}_Plan_Actual_${timestamp}.xlsx`;
     
     XLSX.writeFile(wb, filename);
+  }
+
+  // ===== LOGIN / LOGOUT LOGIC =====
+  (function() {
+    const overlay  = document.getElementById('loginOverlay');
+    const userEl   = document.getElementById('loginUsername');
+    const passEl   = document.getElementById('loginPassword');
+    const errBox   = document.getElementById('loginError');
+    const errMsg   = document.getElementById('loginErrorMsg');
+    const btn      = document.getElementById('loginBtn');
+    const eyeBtn   = document.getElementById('eyeToggle');
+    const eyeIcon  = document.getElementById('eyeIcon');
+
+    // allow Enter key
+    userEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') btn.click(); });
+    passEl.addEventListener('keydown', function(e) { if (e.key === 'Enter') btn.click(); });
+
+    // clear error on any input change
+    userEl.addEventListener('input', hideError);
+    passEl.addEventListener('input', hideError);
+
+    // password visibility toggle
+    eyeBtn.addEventListener('click', function() {
+      if (passEl.type === 'password') {
+        passEl.type = 'text';
+        eyeIcon.classList.replace('bi-eye-fill','bi-eye-slash-fill');
+      } else {
+        passEl.type = 'password';
+        eyeIcon.classList.replace('bi-eye-slash-fill','bi-eye-fill');
+      }
+      passEl.focus();
+    });
+
+    btn.addEventListener('click', handleLogin);
+
+    function handleLogin() {
+      const u = userEl.value.trim();
+      const p = passEl.value;
+
+      if (!u && !p) {
+        showErr('Please enter your username and password.');
+        userEl.focus();
+        return;
+      }
+      if (!u) {
+        showErr('Username is required.');
+        userEl.focus();
+        return;
+      }
+      if (!p) {
+        showErr('Password is required.');
+        passEl.focus();
+        return;
+      }
+
+      if (u === AUTH_USER && p === AUTH_PASS) {
+        // success – hide login, show dashboard, kick off data load
+        isAuthenticated = true;
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.4s ease';
+        setTimeout(function() { overlay.style.display = 'none'; }, 400);
+        loadDataFromGoogleSheets();
+      } else {
+        // wrong creds
+        if (u !== AUTH_USER) {
+          showErr('Invalid username or password.');
+          userEl.value = '';
+          passEl.value = '';
+          userEl.focus();
+        } else {
+          showErr('Invalid username or password.');
+          passEl.value = '';
+          passEl.focus();
+        }
+      }
+    }
+
+    function showErr(msg) {
+      errMsg.textContent = msg;
+      errBox.classList.remove('visible');
+      // force re-trigger animation
+      void errBox.offsetWidth;
+      errBox.classList.add('visible');
+    }
+
+    function hideError() {
+      errBox.classList.remove('visible');
+    }
+  })();
+
+  // Logout: show login screen again, reset everything
+  function logoutAdmin() {
+    isAuthenticated = false;
+    const overlay = document.getElementById('loginOverlay');
+    overlay.style.display = 'flex';
+    overlay.style.opacity = '0';
+    void overlay.offsetWidth;
+    overlay.style.transition = 'opacity 0.35s ease';
+    overlay.style.opacity = '1';
+
+    // clear inputs
+    document.getElementById('loginUsername').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginPassword').type = 'password';
+    document.getElementById('eyeIcon').classList.replace('bi-eye-slash-fill','bi-eye-fill');
+    document.getElementById('loginError').classList.remove('visible');
+
+    // reset dashboard state so it reloads fresh on next login
+    document.getElementById('uploadSection').style.display = 'flex';
+    document.getElementById('uploadSection').innerHTML = '<div class="spinner"></div><h2>Loading Data from Google Sheets...</h2><p>Please wait while we fetch the latest data</p>';
+    document.getElementById('tabNavigation').style.display = 'none';
+    document.getElementById('dataSection').classList.remove('visible');
+    document.getElementById('planActualDataSection').classList.remove('visible');
+
+    // focus username on next tick so it's ready
+    setTimeout(function() { document.getElementById('loginUsername').focus(); }, 450);
   }
 </script>
 
