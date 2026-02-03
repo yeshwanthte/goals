@@ -1,3 +1,19 @@
+
+  // ========================================
+  // GITHUB API CONFIGURATION
+  // ========================================
+  // IMPORTANT: Replace these values with your own
+  const GITHUB_CONFIG = {
+    username: 'yeshwanthte',           // Replace with your GitHub username
+    repo: 'goals',                // Replace with your repository name
+    branch: 'main',                              // Replace if using different branch (e.g., 'master')
+    folder: 'data',                              // Replace with your folder name for CSV files
+    token: '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'   // Replace with your token from Step 1
+  };
+  
+  // GitHub API Base URL
+  const GITHUB_API_BASE = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}`;
+  
 <!DOCTYP
 
     <div id="fileNameDisplay" class="file-name-display" style="display: none;">
@@ -7619,11 +7635,11 @@
   }
 
   // Initialize on page load
-  window.addEventListener('DOMContentLoaded', function() {
+  window.addEventListener('DOMContentLoaded', async function() {
     loadSavedFiles();
     const activeFileName = localStorage.getItem(ACTIVE_FILE_KEY);
     if (activeFileName) {
-      const savedFiles = getSavedFiles();
+      const savedFiles = await getSavedFiles();
       const activeFile = savedFiles.find(f => f.name === activeFileName);
       if (activeFile) {
         loadSavedFile(activeFileName);
@@ -7633,7 +7649,7 @@
 </script>
 
 </body>
-</html>function saveCurrentFile() {
+</html>async function saveCurrentFile() {
     const fileName = document.getElementById('saveFileName').value.trim();
     
     if (!fileName) {
@@ -7646,109 +7662,112 @@
       return;
     }
     
+    // Show loading state
+    const saveBtn = document.querySelector('.btn-save-file');
+    const originalText = saveBtn.innerHTML;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 2px; margin: 0;"></div> Saving...';
+    
     try {
-      const savedFiles = getSavedFiles();
+      const csvFileName = fileName.endsWith('.csv') ? fileName : fileName + '.csv';
+      const filePath = `${GITHUB_CONFIG.folder}/${csvFileName}`;
       
-      if (savedFiles.some(f => f.name === fileName)) {
-        if (!confirm(`A file named "${fileName}" already exists. Do you want to replace it?`)) {
-          return;
+      // Check if file already exists
+      let existingSha = null;
+      try {
+        const checkResponse = await fetch(
+          `${GITHUB_API_BASE}/contents/${filePath}?ref=${GITHUB_CONFIG.branch}`,
+          {
+            headers: {
+              'Authorization': `token ${GITHUB_CONFIG.token}`,
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          }
+        );
+        
+        if (checkResponse.ok) {
+          const existingFile = await checkResponse.json();
+          existingSha = existingFile.sha;
+          
+          if (!confirm(`A file named "${fileName}" already exists. Do you want to replace it?`)) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = originalText;
+            return;
+          }
         }
-        const filtered = savedFiles.filter(f => f.name !== fileName);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+      } catch (e) {
+        // File doesn't exist, which is fine
       }
       
-      const fileObject = {
-        name: fileName,
-        data: currentFileData,
-        uploadDate: new Date().toISOString(),
-        rowCount: raw.length
+      // Encode content to base64
+      const encodedContent = btoa(unescape(encodeURIComponent(currentFileData)));
+      
+      // Create or update file on GitHub
+      const payload = {
+        message: existingSha ? `Update ${csvFileName}` : `Add ${csvFileName}`,
+        content: encodedContent,
+        branch: GITHUB_CONFIG.branch
       };
       
-      savedFiles.push(fileObject);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedFiles));
+      if (existingSha) {
+        payload.sha = existingSha;
+      }
+      
+      const response = await fetch(
+        `${GITHUB_API_BASE}/contents/${filePath}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${GITHUB_CONFIG.token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        }
+      );
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to save file to GitHub');
+      }
+      
+      // Set as active file
       localStorage.setItem(ACTIVE_FILE_KEY, fileName);
       
+      // Clear form
       document.getElementById('saveFileName').value = '';
       document.getElementById('saveFileSection').style.display = 'none';
       
+      // Reload file list
       loadSavedFiles();
-      alert(`File "${fileName}" saved successfully!`);
+      
+      alert(`File "${fileName}" saved successfully to GitHub!`);
+      
     } catch (e) {
-      if (e.name === 'QuotaExceededError') {
-        alert('Storage quota exceeded. Please delete some saved files and try again.');
-      } else {
-        alert('Error saving file: ' + e.message);
+      console.error('Error saving file:', e);
+      alert('Error saving file to GitHub: ' + e.message + '\n\nPlease check your GitHub token and repository settings.');
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = originalText;
+    }
+  }
+  
+  async function getSavedFiles() {  async function loadSavedFile(fileName) {
+    try {
+      // Show loading
+      const container = document.getElementById('filesContainer');
+      const originalContent = container.innerHTML;
+      container.innerHTML = '<div style="text-align: center; padding: 2rem;"><div class="spinner"></div><p>Loading file from GitHub...</p></div>';
+      
+      const savedFiles = await getSavedFiles();
+      const file = savedFiles.find(f => f.name === fileName);
+      
+      if (!file) {
+        alert('File not found');
+        container.innerHTML = originalContent;
+        return;
       }
-    }
-  }
-  
-  function getSavedFiles() {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      console.error('Error loading saved files:', e);
-      return [];
-    }
-  }
-  
-  function loadSavedFiles() {
-    const container = document.getElementById('filesContainer');
-    const savedFiles = getSavedFiles();
-    const activeFileName = localStorage.getItem(ACTIVE_FILE_KEY);
-    
-    if (savedFiles.length === 0) {
-      container.innerHTML = `
-        <div class="no-files-message">
-          <i class="bi bi-inbox"></i>
-          <p>No saved files yet. Upload and save a CSV file to get started.</p>
-        </div>`;
-      return;
-    }
-    
-    container.innerHTML = '';
-    
-    savedFiles.forEach(file => {
-      const isActive = file.name === activeFileName;
-      const uploadDate = new Date(file.uploadDate);
-      const formattedDate = uploadDate.toLocaleDateString() + ' ' + uploadDate.toLocaleTimeString();
       
-      const fileItem = document.createElement('div');
-      fileItem.className = 'saved-file-item' + (isActive ? ' active' : '');
-      fileItem.innerHTML = `
-        <div class="file-item-name">
-          <i class="bi bi-file-earmark-spreadsheet"></i>
-          ${file.name}
-        </div>
-        <div class="file-item-meta">
-          <div><i class="bi bi-calendar3"></i> ${formattedDate}</div>
-          <div><i class="bi bi-list-ol"></i> ${file.rowCount} rows</div>
-        </div>
-        <div class="file-item-actions">
-          <button class="btn-file-action btn-select" onclick="loadSavedFile('${file.name.replace(/'/g, "\'")}')">
-            <i class="bi bi-check-circle"></i>
-            ${isActive ? 'Active' : 'Load'}
-          </button>
-          <button class="btn-file-action btn-delete" onclick="deleteSavedFile('${file.name.replace(/'/g, "\'")}')">
-            <i class="bi bi-trash"></i>
-            Delete
-          </button>
-        </div>`;
-      
-      container.appendChild(fileItem);
-    });
-  }
-  
-  function loadSavedFile(fileName) {
-    const savedFiles = getSavedFiles();
-    const file = savedFiles.find(f => f.name === fileName);
-    
-    if (!file) {
-      alert('File not found');
-      return;
-    }
-    
-    try {
       localStorage.setItem(ACTIVE_FILE_KEY, fileName);
       
       currentFileData = file.data;
@@ -7763,8 +7782,7 @@
           document.getElementById('uploadSection').style.display = 'none';
           document.getElementById('tabNavigation').style.display = 'flex';
           
-          const uploadDate = new Date(file.uploadDate);
-          document.getElementById('lastUpdated').textContent = uploadDate.toLocaleDateString();
+          document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString();
           
           loadSavedFiles();
         }
@@ -7774,39 +7792,67 @@
     }
   }
   
-  function deleteSavedFile(fileName) {
-    if (!confirm(`Are you sure you want to delete "${fileName}"?`)) {
+  async function deleteSavedFile(  async function deleteSavedFile(fileName) {
+    if (!confirm(`Are you sure you want to delete "${fileName}" from GitHub?`)) {
       return;
     }
     
     try {
-      const savedFiles = getSavedFiles();
-      const filtered = savedFiles.filter(f => f.name !== fileName);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+      const csvFileName = fileName.endsWith('.csv') ? fileName : fileName + '.csv';
+      const filePath = `${GITHUB_CONFIG.folder}/${csvFileName}`;
       
+      // Get file SHA (required for deletion)
+      const getResponse = await fetch(
+        `${GITHUB_API_BASE}/contents/${filePath}?ref=${GITHUB_CONFIG.branch}`,
+        {
+          headers: {
+            'Authorization': `token ${GITHUB_CONFIG.token}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        }
+      );
+      
+      if (!getResponse.ok) {
+        throw new Error('File not found on GitHub');
+      }
+      
+      const fileData = await getResponse.json();
+      
+      // Delete the file
+      const deleteResponse = await fetch(
+        `${GITHUB_API_BASE}/contents/${filePath}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `token ${GITHUB_CONFIG.token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: `Delete ${csvFileName}`,
+            sha: fileData.sha,
+            branch: GITHUB_CONFIG.branch
+          })
+        }
+      );
+      
+      if (!deleteResponse.ok) {
+        throw new Error('Failed to delete file from GitHub');
+      }
+      
+      // Clear active file if it was deleted
       const activeFileName = localStorage.getItem(ACTIVE_FILE_KEY);
       if (activeFileName === fileName) {
         localStorage.removeItem(ACTIVE_FILE_KEY);
       }
       
       loadSavedFiles();
+      alert(`File "${fileName}" deleted successfully from GitHub!`);
+      
     } catch (e) {
-      alert('Error deleting file: ' + e.message);
+      console.error('Error deleting file:', e);
+      alert('Error deleting file from GitHub: ' + e.message);
     }
   }
   
   function toggleFileManager() {
-    const filesList = document.getElementById('savedFilesList');
-    const toggleIcon = document.getElementById('fileManagerToggleIcon');
-    const toggleText = document.getElementById('fileManagerToggleText');
-    
-    if (filesList.style.display === 'none') {
-      filesList.style.display = 'block';
-      toggleIcon.className = 'bi bi-chevron-up';
-      toggleText.textContent = 'Hide Files';
-    } else {
-      filesList.style.display = 'none';
-      toggleIcon.className = 'bi bi-chevron-down';
-      toggleText.textContent = 'Show Files';
-    }
-  }
