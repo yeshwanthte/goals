@@ -3372,11 +3372,11 @@
       right: 0;
       background: white;
       border-radius: var(--radius-md);
-      box-shadow: var(--shadow-lg);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.1);
       min-width: 200px;
       padding: 0.5rem;
       display: none;
-      z-index: 1000;
+      z-index: 10000;
     }
     
     .admin-dropdown-menu.active {
@@ -4235,6 +4235,34 @@
   const AUTH_USER = 'Admin';
   const AUTH_PASS = '3458';
   let isAuthenticated = false;
+
+  // ========================================
+  // SESSION-BASED AUTHENTICATION
+  // ========================================
+  const DEFAULT_ADMIN = {
+    username: 'Admin',
+    password: '3458',
+    role: 'admin'
+  };
+  
+  let currentSession = null;
+  let inactivityTimer = null;
+  let timeoutCountdown = null;
+  const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+  
+  // User account management functions
+  function getUserAccounts() {
+    try {
+      const accountsStr = localStorage.getItem('userAccounts');
+      return accountsStr ? JSON.parse(accountsStr) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+  
+  function saveUserAccounts(accounts) {
+    localStorage.setItem('userAccounts', JSON.stringify(accounts));
+  }
 
   // Auto-load data ONLY after login
   window.addEventListener('DOMContentLoaded', function() {
@@ -6660,21 +6688,6 @@
   // AUTHENTICATION & SESSION MANAGEMENT SYSTEM
   // ═══════════════════════════════════════════════════════════════════════════════
   
-  // Default admin credentials (easily changeable)
-  const DEFAULT_ADMIN = {
-    username: 'Admin',
-    password: '3458',
-    role: 'admin'
-  };
-  
-  // Session timeout: 30 minutes (in milliseconds)
-  const SESSION_TIMEOUT = 30 * 60 * 1000;
-  
-  // Session state
-  let currentSession = null;
-  let inactivityTimer = null;
-  let timeoutCountdown = null;
-  
   // Initialize authentication on page load
   window.addEventListener('DOMContentLoaded', function() {
     // Check if there's an active session
@@ -6900,19 +6913,6 @@
   // ═══════════════════════════════════════════════════════════════════════════════
   // USER MANAGEMENT (ADMIN ONLY)
   // ═══════════════════════════════════════════════════════════════════════════════
-  
-  function getUserAccounts() {
-    try {
-      const accountsStr = localStorage.getItem('userAccounts');
-      return accountsStr ? JSON.parse(accountsStr) : [];
-    } catch (e) {
-      return [];
-    }
-  }
-  
-  function saveUserAccounts(accounts) {
-    localStorage.setItem('userAccounts', JSON.stringify(accounts));
-  }
   
   function toggleAdminDropdown() {
     const menu = document.getElementById('adminDropdownMenu');
