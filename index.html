@@ -6789,38 +6789,24 @@
   
   function showLogin() {
     const loginOverlay = document.getElementById('loginOverlay');
-    loginOverlay.style.display = 'flex';
-    loginOverlay.style.animation = 'fadeIn 0.5s';
-    
-    // Clear form
-    document.getElementById('loginForm').reset();
-    document.getElementById('loginError').classList.remove('show');
-    
-    // Hide admin dropdown
-    document.getElementById('adminDropdown').style.display = 'none';
-    
-    // Reset welcome text
-    document.getElementById('welcomeText').textContent = 'Welcome, User';
-    
-    // Focus username
-    setTimeout(() => {
-      document.getElementById('loginUsername').focus();
-    }, 600);
-  }
-  
-  function togglePasswordVisibility() {
-    const passwordInput = document.getElementById('loginPassword');
-    const icon = document.getElementById('passwordToggleIcon');
-    
-    if (passwordInput.type === 'password') {
-      passwordInput.type = 'text';
-      icon.classList.remove('bi-eye-fill');
-      icon.classList.add('bi-eye-slash-fill');
-    } else {
-      passwordInput.type = 'password';
-      icon.classList.remove('bi-eye-slash-fill');
-      icon.classList.add('bi-eye-fill');
+    if (loginOverlay) {
+      loginOverlay.style.display = 'flex';
+      loginOverlay.style.opacity = '1';
     }
+    
+    // Clear form fields
+    const usernameField = document.getElementById('loginUsername');
+    const passwordField = document.getElementById('loginPassword');
+    const errorBox = document.getElementById('loginError');
+    
+    if (usernameField) usernameField.value = '';
+    if (passwordField) passwordField.value = '';
+    if (errorBox) errorBox.classList.remove('visible', 'show');
+    
+    // Focus username after a brief delay
+    setTimeout(() => {
+      if (usernameField) usernameField.focus();
+    }, 300);
   }
   
   // ═══════════════════════════════════════════════════════════════════════════════
