@@ -2758,10 +2758,830 @@
       font-size: 0.9rem;
       color: var(--gray-400);
     }
+
+    /* ═══════════════════════════════════════════════════════════════════════════════
+       LOGIN & AUTHENTICATION SYSTEM
+       ═══════════════════════════════════════════════════════════════════════════════ */
+    
+    /* Login Overlay */
+    .login-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      animation: fadeIn 0.5s;
+    }
+    
+    .login-overlay::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    
+    /* Animated orbs */
+    .login-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.4;
+      animation: float 20s infinite ease-in-out;
+    }
+    
+    .login-orb-1 {
+      width: 400px;
+      height: 400px;
+      background: rgba(99, 102, 241, 0.3);
+      top: -100px;
+      left: -100px;
+      animation-delay: 0s;
+    }
+    
+    .login-orb-2 {
+      width: 350px;
+      height: 350px;
+      background: rgba(245, 158, 11, 0.3);
+      bottom: -100px;
+      right: -100px;
+      animation-delay: 5s;
+    }
+    
+    .login-orb-3 {
+      width: 300px;
+      height: 300px;
+      background: rgba(14, 165, 233, 0.3);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: 10s;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(50px, -50px) scale(1.1); }
+      66% { transform: translate(-50px, 50px) scale(0.9); }
+    }
+    
+    /* Login Card */
+    .login-card {
+      position: relative;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      padding: 3rem;
+      border-radius: var(--radius-xl);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+      max-width: 420px;
+      width: 90%;
+      animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .login-logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .login-logo i {
+      font-size: 4rem;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .login-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .login-subtitle {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .login-form-group {
+      margin-bottom: 1.25rem;
+    }
+    
+    .login-form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+    }
+    
+    .login-input-wrapper {
+      position: relative;
+    }
+    
+    .login-input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-400);
+      font-size: 1.1rem;
+      pointer-events: none;
+    }
+    
+    .login-input {
+      width: 100%;
+      padding: 0.85rem 1rem 0.85rem 3rem;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      transition: var(--transition);
+      background: white;
+    }
+    
+    .login-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    .login-input::placeholder {
+      color: var(--gray-400);
+    }
+    
+    .password-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--gray-400);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 0.25rem;
+      transition: var(--transition);
+    }
+    
+    .password-toggle:hover {
+      color: var(--gray-600);
+    }
+    
+    .login-btn {
+      width: 100%;
+      padding: 0.9rem;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+    }
+    
+    .login-btn:active {
+      transform: translateY(0);
+    }
+    
+    .login-error {
+      background: var(--danger-light);
+      color: var(--danger);
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      display: none;
+      animation: shake 0.5s;
+    }
+    
+    .login-error.show {
+      display: block;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+    
+    /* User Management Modal */
+    .user-management-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s;
+    }
+    
+    .user-management-overlay.active {
+      display: flex;
+    }
+    
+    .user-management-modal {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xl);
+      max-width: 700px;
+      width: 90%;
+      max-height: 80vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .user-management-header {
+      padding: 1.5rem 2rem;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .user-management-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .close-modal-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    
+    .close-modal-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .user-management-body {
+      padding: 2rem;
+      overflow-y: auto;
+    }
+    
+    .create-user-section {
+      background: var(--gray-50);
+      padding: 1.5rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 2rem;
+    }
+    
+    .create-user-section h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 0.4rem;
+    }
+    
+    .form-group input {
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    .create-user-btn {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .create-user-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    
+    .users-list-section h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .users-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .users-table thead {
+      background: var(--gray-100);
+    }
+    
+    .users-table th {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .users-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--gray-200);
+      font-size: 0.9rem;
+    }
+    
+    .users-table tbody tr:hover {
+      background: var(--gray-50);
+    }
+    
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    
+    .role-badge.viewer {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+    }
+    
+    .delete-user-btn {
+      background: var(--danger);
+      color: white;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    
+    .delete-user-btn:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+    }
+    
+    /* Active Sessions Modal */
+    .sessions-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    
+    .sessions-table th {
+      background: var(--gray-100);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .sessions-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--gray-200);
+      font-size: 0.9rem;
+    }
+    
+    .sessions-table tbody tr:hover {
+      background: var(--gray-50);
+    }
+    
+    .sessions-table tbody tr.current-session {
+      background: rgba(99, 102, 241, 0.05);
+    }
+    
+    .force-logout-btn {
+      background: var(--danger);
+      color: white;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    
+    .force-logout-btn:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+    }
+    
+    .force-logout-btn:disabled {
+      background: var(--gray-300);
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Session Timeout Modal */
+    .timeout-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 10001;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s;
+    }
+    
+    .timeout-modal-overlay.active {
+      display: flex;
+    }
+    
+    .timeout-modal {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: var(--shadow-xl);
+      animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .timeout-modal i {
+      font-size: 4rem;
+      color: var(--warning);
+      margin-bottom: 1rem;
+    }
+    
+    .timeout-modal h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 0.5rem;
+    }
+    
+    .timeout-modal p {
+      color: var(--gray-600);
+      margin-bottom: 1.5rem;
+    }
+    
+    .timeout-countdown {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--danger);
+      margin-bottom: 1.5rem;
+    }
+    
+    .timeout-modal-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .timeout-modal-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    
+    /* Admin Dropdown in Header */
+    .admin-dropdown {
+      position: relative;
+    }
+    
+    .admin-dropdown-btn {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      color: var(--primary);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    
+    .admin-dropdown-btn:hover {
+      background: rgba(99, 102, 241, 0.15);
+    }
+    
+    .admin-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      right: 0;
+      background: white;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      min-width: 200px;
+      padding: 0.5rem;
+      display: none;
+      z-index: 1000;
+    }
+    
+    .admin-dropdown-menu.active {
+      display: block;
+      animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .admin-dropdown-item {
+      padding: 0.65rem 1rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      color: var(--gray-700);
+    }
+    
+    .admin-dropdown-item:hover {
+      background: var(--gray-100);
+    }
+    
+    .admin-dropdown-item i {
+      width: 20px;
+      color: var(--primary);
+    }
+
   </style>
 </head>
 
 <body>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════════
+       LOGIN OVERLAY
+       ═══════════════════════════════════════════════════════════════════════════════ -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-orb login-orb-1"></div>
+    <div class="login-orb login-orb-2"></div>
+    <div class="login-orb login-orb-3"></div>
+    
+    <div class="login-card">
+      <div class="login-logo">
+        <i class="bi bi-shield-lock-fill"></i>
+      </div>
+      <h1 class="login-title">Welcome Back</h1>
+      <p class="login-subtitle">Please sign in to continue</p>
+      
+      <div class="login-error" id="loginError">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span id="loginErrorText">Invalid credentials</span>
+      </div>
+      
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="login-form-group">
+          <label for="loginUsername">Username</label>
+          <div class="login-input-wrapper">
+            <i class="bi bi-person-fill login-input-icon"></i>
+            <input 
+              type="text" 
+              id="loginUsername" 
+              class="login-input" 
+              placeholder="Enter username"
+              autocomplete="username"
+            >
+          </div>
+        </div>
+        
+        <div class="login-form-group">
+          <label for="loginPassword">Password</label>
+          <div class="login-input-wrapper">
+            <i class="bi bi-lock-fill login-input-icon"></i>
+            <input 
+              type="password" 
+              id="loginPassword" 
+              class="login-input" 
+              placeholder="Enter password"
+              autocomplete="current-password"
+            >
+            <button type="button" class="password-toggle" onclick="togglePasswordVisibility()">
+              <i class="bi bi-eye-fill" id="passwordToggleIcon"></i>
+            </button>
+          </div>
+        </div>
+        
+        <button type="submit" class="login-btn">
+          <span>Sign In</span>
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════════
+       USER MANAGEMENT MODAL (ADMIN ONLY)
+       ═══════════════════════════════════════════════════════════════════════════════ -->
+  <div class="user-management-overlay" id="userManagementOverlay">
+    <div class="user-management-modal">
+      <div class="user-management-header">
+        <h2><i class="bi bi-people-fill"></i> Manage Users</h2>
+        <button class="close-modal-btn" onclick="closeUserManagement()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      
+      <div class="user-management-body">
+        <!-- Create New Viewer -->
+        <div class="create-user-section">
+          <h3><i class="bi bi-person-plus-fill"></i> Create New Viewer Account</h3>
+          <form id="createUserForm" onsubmit="createViewerAccount(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="newUsername">Username</label>
+                <input type="text" id="newUsername" placeholder="Enter username" required>
+              </div>
+              <div class="form-group">
+                <label for="newPassword">Password</label>
+                <input type="text" id="newPassword" placeholder="Enter password" required>
+              </div>
+            </div>
+            <button type="submit" class="create-user-btn">
+              <i class="bi bi-plus-circle-fill"></i>
+              Create Viewer Account
+            </button>
+          </form>
+        </div>
+        
+        <!-- Existing Users List -->
+        <div class="users-list-section">
+          <h3><i class="bi bi-list-ul"></i> Existing Viewer Accounts</h3>
+          <table class="users-table">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Created By</th>
+                <th>Created At</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr>
+                <td colspan="5" style="text-align: center; color: var(--gray-400); padding: 2rem;">
+                  No viewer accounts created yet
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════════
+       ACTIVE SESSIONS MODAL (ADMIN ONLY)
+       ═══════════════════════════════════════════════════════════════════════════════ -->
+  <div class="user-management-overlay" id="activeSessionsOverlay">
+    <div class="user-management-modal">
+      <div class="user-management-header">
+        <h2><i class="bi bi-activity"></i> Active Sessions</h2>
+        <button class="close-modal-btn" onclick="closeActiveSessions()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      
+      <div class="user-management-body">
+        <table class="sessions-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Login Time</th>
+              <th>Last Activity</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="sessionsTableBody">
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--gray-400); padding: 2rem;">
+                No active sessions
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════════
+       SESSION TIMEOUT MODAL
+       ═══════════════════════════════════════════════════════════════════════════════ -->
+  <div class="timeout-modal-overlay" id="timeoutModalOverlay">
+    <div class="timeout-modal">
+      <i class="bi bi-clock-fill"></i>
+      <h3>Session Expired</h3>
+      <p>Your session has expired due to inactivity</p>
+      <div class="timeout-countdown" id="timeoutCountdown">5</div>
+      <button class="timeout-modal-btn" onclick="handleTimeoutLogout()">OK</button>
+    </div>
+  </div>
+
+
 
 <!-- ===== LOGIN SCREEN ===== -->
 <div class="login-overlay" id="loginOverlay">
@@ -5860,6 +6680,565 @@
     kpiItems.forEach(item => item.classList.remove('active'));
     if (clearBtn) clearBtn.classList.remove('visible');
   }
+
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // AUTHENTICATION & SESSION MANAGEMENT SYSTEM
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  // Default admin credentials (easily changeable)
+  const DEFAULT_ADMIN = {
+    username: 'Admin',
+    password: '3458',
+    role: 'admin'
+  };
+  
+  // Session timeout: 30 minutes (in milliseconds)
+  const SESSION_TIMEOUT = 30 * 60 * 1000;
+  
+  // Session state
+  let currentSession = null;
+  let inactivityTimer = null;
+  let timeoutCountdown = null;
+  
+  // Initialize authentication on page load
+  window.addEventListener('DOMContentLoaded', function() {
+    // Check if there's an active session
+    const session = getSession();
+    if (session) {
+      // Verify session is still valid
+      if (isSessionValid(session)) {
+        currentSession = session;
+        onLoginSuccess(session);
+        startInactivityTimer();
+      } else {
+        // Session expired, clear it
+        clearSession();
+        showLogin();
+      }
+    } else {
+      showLogin();
+    }
+    
+    // Set up activity tracking
+    setupActivityTracking();
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.admin-dropdown')) {
+        const menu = document.getElementById('adminDropdownMenu');
+        if (menu) menu.classList.remove('active');
+      }
+    });
+  });
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // SESSION MANAGEMENT
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  function getSession() {
+    try {
+      const sessionStr = localStorage.getItem('currentSession');
+      return sessionStr ? JSON.parse(sessionStr) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  
+  function saveSession(session) {
+    localStorage.setItem('currentSession', JSON.stringify(session));
+    
+    // Also add to active sessions list
+    let activeSessions = getActiveSessions();
+    const existingIndex = activeSessions.findIndex(s => s.sessionId === session.sessionId);
+    if (existingIndex >= 0) {
+      activeSessions[existingIndex] = session;
+    } else {
+      activeSessions.push(session);
+    }
+    localStorage.setItem('activeSessions', JSON.stringify(activeSessions));
+  }
+  
+  function clearSession() {
+    const session = getSession();
+    if (session) {
+      // Remove from active sessions
+      let activeSessions = getActiveSessions();
+      activeSessions = activeSessions.filter(s => s.sessionId !== session.sessionId);
+      localStorage.setItem('activeSessions', JSON.stringify(activeSessions));
+    }
+    localStorage.removeItem('currentSession');
+    currentSession = null;
+  }
+  
+  function getActiveSessions() {
+    try {
+      const sessionsStr = localStorage.getItem('activeSessions');
+      return sessionsStr ? JSON.parse(sessionsStr) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+  
+  function isSessionValid(session) {
+    if (!session || !session.lastActivity) return false;
+    const now = Date.now();
+    const elapsed = now - session.lastActivity;
+    return elapsed < SESSION_TIMEOUT;
+  }
+  
+  function generateSessionId() {
+    return 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  }
+  
+  function updateSessionActivity() {
+    if (!currentSession) return;
+    currentSession.lastActivity = Date.now();
+    saveSession(currentSession);
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // LOGIN & LOGOUT
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  function handleLogin(event) {
+    event.preventDefault();
+    
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+    const errorText = document.getElementById('loginErrorText');
+    
+    // Validate empty fields
+    if (!username) {
+      errorText.textContent = 'Username is required';
+      errorEl.classList.add('show');
+      document.getElementById('loginUsername').focus();
+      return;
+    }
+    
+    if (!password) {
+      errorText.textContent = 'Password is required';
+      errorEl.classList.add('show');
+      document.getElementById('loginPassword').focus();
+      return;
+    }
+    
+    // Check credentials
+    let user = null;
+    
+    // Check admin
+    if (username === DEFAULT_ADMIN.username && password === DEFAULT_ADMIN.password) {
+      user = DEFAULT_ADMIN;
+    } else {
+      // Check viewer accounts
+      const userAccounts = getUserAccounts();
+      const foundUser = userAccounts.find(u => u.username === username && u.password === password);
+      if (foundUser) {
+        user = foundUser;
+      }
+    }
+    
+    if (!user) {
+      errorText.textContent = 'Invalid username or password';
+      errorEl.classList.add('show');
+      // Clear password field
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginPassword').focus();
+      return;
+    }
+    
+    // Create session
+    const session = {
+      sessionId: generateSessionId(),
+      username: user.username,
+      role: user.role,
+      loginTime: Date.now(),
+      lastActivity: Date.now()
+    };
+    
+    currentSession = session;
+    saveSession(session);
+    
+    // Success
+    onLoginSuccess(session);
+  }
+  
+  function onLoginSuccess(session) {
+    // Hide login overlay
+    const loginOverlay = document.getElementById('loginOverlay');
+    loginOverlay.style.animation = 'fadeOut 0.5s';
+    setTimeout(() => {
+      loginOverlay.style.display = 'none';
+    }, 500);
+    
+    // Update header
+    document.getElementById('welcomeText').textContent = `Welcome, ${session.username}`;
+    
+    // Show admin dropdown if admin
+    if (session.role === 'admin') {
+      document.getElementById('adminDropdown').style.display = 'block';
+    }
+    
+    // Load data
+    loadDataFromGoogleSheets();
+    
+    // Start inactivity timer
+    startInactivityTimer();
+  }
+  
+  function handleLogout() {
+    if (!confirm('Are you sure you want to logout?')) return;
+    
+    performLogout();
+  }
+  
+  function performLogout() {
+    // Stop timers
+    if (inactivityTimer) clearTimeout(inactivityTimer);
+    if (timeoutCountdown) clearInterval(timeoutCountdown);
+    
+    // Clear session
+    clearSession();
+    
+    // Reset UI
+    showLogin();
+  }
+  
+  function showLogin() {
+    const loginOverlay = document.getElementById('loginOverlay');
+    loginOverlay.style.display = 'flex';
+    loginOverlay.style.animation = 'fadeIn 0.5s';
+    
+    // Clear form
+    document.getElementById('loginForm').reset();
+    document.getElementById('loginError').classList.remove('show');
+    
+    // Hide admin dropdown
+    document.getElementById('adminDropdown').style.display = 'none';
+    
+    // Reset welcome text
+    document.getElementById('welcomeText').textContent = 'Welcome, User';
+    
+    // Focus username
+    setTimeout(() => {
+      document.getElementById('loginUsername').focus();
+    }, 600);
+  }
+  
+  function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('loginPassword');
+    const icon = document.getElementById('passwordToggleIcon');
+    
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      icon.classList.remove('bi-eye-fill');
+      icon.classList.add('bi-eye-slash-fill');
+    } else {
+      passwordInput.type = 'password';
+      icon.classList.remove('bi-eye-slash-fill');
+      icon.classList.add('bi-eye-fill');
+    }
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // INACTIVITY TIMER & AUTO TIMEOUT
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  function setupActivityTracking() {
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    
+    events.forEach(event => {
+      document.addEventListener(event, function() {
+        if (currentSession) {
+          updateSessionActivity();
+          resetInactivityTimer();
+        }
+      }, true);
+    });
+  }
+  
+  function startInactivityTimer() {
+    resetInactivityTimer();
+  }
+  
+  function resetInactivityTimer() {
+    if (inactivityTimer) {
+      clearTimeout(inactivityTimer);
+    }
+    
+    inactivityTimer = setTimeout(function() {
+      showTimeoutModal();
+    }, SESSION_TIMEOUT);
+  }
+  
+  function showTimeoutModal() {
+    const overlay = document.getElementById('timeoutModalOverlay');
+    overlay.classList.add('active');
+    
+    let countdown = 5;
+    document.getElementById('timeoutCountdown').textContent = countdown;
+    
+    timeoutCountdown = setInterval(function() {
+      countdown--;
+      document.getElementById('timeoutCountdown').textContent = countdown;
+      
+      if (countdown <= 0) {
+        clearInterval(timeoutCountdown);
+        handleTimeoutLogout();
+      }
+    }, 1000);
+  }
+  
+  function handleTimeoutLogout() {
+    const overlay = document.getElementById('timeoutModalOverlay');
+    overlay.classList.remove('active');
+    
+    if (timeoutCountdown) {
+      clearInterval(timeoutCountdown);
+    }
+    
+    performLogout();
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // USER MANAGEMENT (ADMIN ONLY)
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  function getUserAccounts() {
+    try {
+      const accountsStr = localStorage.getItem('userAccounts');
+      return accountsStr ? JSON.parse(accountsStr) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+  
+  function saveUserAccounts(accounts) {
+    localStorage.setItem('userAccounts', JSON.stringify(accounts));
+  }
+  
+  function toggleAdminDropdown() {
+    const menu = document.getElementById('adminDropdownMenu');
+    menu.classList.toggle('active');
+  }
+  
+  function openUserManagement() {
+    // Close admin dropdown
+    document.getElementById('adminDropdownMenu').classList.remove('active');
+    
+    // Show modal
+    document.getElementById('userManagementOverlay').classList.add('active');
+    
+    // Refresh users list
+    refreshUsersList();
+    
+    // Clear form
+    document.getElementById('createUserForm').reset();
+  }
+  
+  function closeUserManagement() {
+    document.getElementById('userManagementOverlay').classList.remove('active');
+  }
+  
+  function createViewerAccount(event) {
+    event.preventDefault();
+    
+    const username = document.getElementById('newUsername').value.trim();
+    const password = document.getElementById('newPassword').value.trim();
+    
+    // Validate
+    if (!username || !password) {
+      alert('Please enter both username and password');
+      return;
+    }
+    
+    if (password.length < 4) {
+      alert('Password must be at least 4 characters');
+      return;
+    }
+    
+    // Check if username already exists
+    if (username === DEFAULT_ADMIN.username) {
+      alert('This username is reserved for admin');
+      return;
+    }
+    
+    const userAccounts = getUserAccounts();
+    if (userAccounts.find(u => u.username === username)) {
+      alert('Username already exists');
+      return;
+    }
+    
+    // Create account
+    const newUser = {
+      username: username,
+      password: password,
+      role: 'viewer',
+      createdBy: currentSession.username,
+      createdAt: Date.now()
+    };
+    
+    userAccounts.push(newUser);
+    saveUserAccounts(userAccounts);
+    
+    // Clear form
+    document.getElementById('createUserForm').reset();
+    
+    // Refresh list
+    refreshUsersList();
+    
+    // Show success message
+    alert(`Viewer account created for ${username}`);
+  }
+  
+  function refreshUsersList() {
+    const userAccounts = getUserAccounts();
+    const tbody = document.getElementById('usersTableBody');
+    
+    if (userAccounts.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align: center; color: var(--gray-400); padding: 2rem;">
+            No viewer accounts created yet
+          </td>
+        </tr>
+      `;
+      return;
+    }
+    
+    tbody.innerHTML = userAccounts.map(user => `
+      <tr>
+        <td><strong>${user.username}</strong></td>
+        <td><span class="role-badge viewer"><i class="bi bi-eye-fill"></i> Viewer</span></td>
+        <td>${user.createdBy}</td>
+        <td>${new Date(user.createdAt).toLocaleString()}</td>
+        <td>
+          <button class="delete-user-btn" onclick="deleteUser('${user.username}')">
+            <i class="bi bi-trash-fill"></i>
+            Delete
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+  
+  function deleteUser(username) {
+    if (!confirm(`Are you sure you want to delete user "${username}"?`)) return;
+    
+    let userAccounts = getUserAccounts();
+    userAccounts = userAccounts.filter(u => u.username !== username);
+    saveUserAccounts(userAccounts);
+    
+    // Also force logout if they're currently logged in
+    let activeSessions = getActiveSessions();
+    const sessionToRemove = activeSessions.find(s => s.username === username);
+    if (sessionToRemove) {
+      activeSessions = activeSessions.filter(s => s.sessionId !== sessionToRemove.sessionId);
+      localStorage.setItem('activeSessions', JSON.stringify(activeSessions));
+    }
+    
+    refreshUsersList();
+  }
+  
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // ACTIVE SESSIONS TRACKING (ADMIN ONLY)
+  // ═══════════════════════════════════════════════════════════════════════════════
+  
+  function openActiveSessions() {
+    // Close admin dropdown
+    document.getElementById('adminDropdownMenu').classList.remove('active');
+    
+    // Show modal
+    document.getElementById('activeSessionsOverlay').classList.add('active');
+    
+    // Refresh sessions list
+    refreshSessionsList();
+  }
+  
+  function closeActiveSessions() {
+    document.getElementById('activeSessionsOverlay').classList.remove('active');
+  }
+  
+  function refreshSessionsList() {
+    const activeSessions = getActiveSessions();
+    const tbody = document.getElementById('sessionsTableBody');
+    
+    if (activeSessions.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align: center; color: var(--gray-400); padding: 2rem;">
+            No active sessions
+          </td>
+        </tr>
+      `;
+      return;
+    }
+    
+    tbody.innerHTML = activeSessions.map(session => {
+      const isCurrentSession = session.sessionId === currentSession.sessionId;
+      const rowClass = isCurrentSession ? 'current-session' : '';
+      
+      return `
+        <tr class="${rowClass}">
+          <td>
+            <strong>${session.username}</strong>
+            ${isCurrentSession ? ' <span style="color: var(--primary); font-size: 0.75rem;">(You)</span>' : ''}
+          </td>
+          <td><span class="role-badge ${session.role}">${session.role}</span></td>
+          <td>${new Date(session.loginTime).toLocaleString()}</td>
+          <td>${new Date(session.lastActivity).toLocaleString()}</td>
+          <td>
+            <button 
+              class="force-logout-btn" 
+              onclick="forceLogout('${session.sessionId}')"
+              ${isCurrentSession ? 'disabled' : ''}
+            >
+              <i class="bi bi-box-arrow-right"></i>
+              Force Logout
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+  
+  function forceLogout(sessionId) {
+    const session = getActiveSessions().find(s => s.sessionId === sessionId);
+    if (!session) return;
+    
+    if (!confirm(`Force logout ${session.username}? They will be logged out immediately.`)) return;
+    
+    // Remove from active sessions
+    let activeSessions = getActiveSessions();
+    activeSessions = activeSessions.filter(s => s.sessionId !== sessionId);
+    localStorage.setItem('activeSessions', JSON.stringify(activeSessions));
+    
+    // Refresh list
+    refreshSessionsList();
+    
+    alert(`${session.username} has been logged out`);
+  }
+  
+  // Check periodically for forced logouts
+  setInterval(function() {
+    if (!currentSession) return;
+    
+    const activeSessions = getActiveSessions();
+    const stillActive = activeSessions.find(s => s.sessionId === currentSession.sessionId);
+    
+    if (!stillActive) {
+      // User was force logged out
+      alert('You have been logged out by an administrator');
+      performLogout();
+    }
+  }, 5000); // Check every 5 seconds
+  
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
 </script>
 
 </body>
