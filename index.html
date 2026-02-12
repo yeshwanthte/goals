@@ -3414,66 +3414,6 @@
 <body>
 
   <!-- ═══════════════════════════════════════════════════════════════════════════════
-       LOGIN OVERLAY
-       ═══════════════════════════════════════════════════════════════════════════════ -->
-  <div class="login-overlay" id="loginOverlay">
-    <div class="login-orb login-orb-1"></div>
-    <div class="login-orb login-orb-2"></div>
-    <div class="login-orb login-orb-3"></div>
-    
-    <div class="login-card">
-      <div class="login-logo">
-        <i class="bi bi-shield-lock-fill"></i>
-      </div>
-      <h1 class="login-title">Welcome Back</h1>
-      <p class="login-subtitle">Please sign in to continue</p>
-      
-      <div class="login-error" id="loginError">
-        <i class="bi bi-exclamation-triangle-fill"></i>
-        <span id="loginErrorText">Invalid credentials</span>
-      </div>
-      
-      <form id="loginForm" onsubmit="handleLogin(event)">
-        <div class="login-form-group">
-          <label for="loginUsername">Username</label>
-          <div class="login-input-wrapper">
-            <i class="bi bi-person-fill login-input-icon"></i>
-            <input 
-              type="text" 
-              id="loginUsername" 
-              class="login-input" 
-              placeholder="Enter username"
-              autocomplete="username"
-            >
-          </div>
-        </div>
-        
-        <div class="login-form-group">
-          <label for="loginPassword">Password</label>
-          <div class="login-input-wrapper">
-            <i class="bi bi-lock-fill login-input-icon"></i>
-            <input 
-              type="password" 
-              id="loginPassword" 
-              class="login-input" 
-              placeholder="Enter password"
-              autocomplete="current-password"
-            >
-            <button type="button" class="password-toggle" onclick="togglePasswordVisibility()">
-              <i class="bi bi-eye-fill" id="passwordToggleIcon"></i>
-            </button>
-          </div>
-        </div>
-        
-        <button type="submit" class="login-btn">
-          <span>Sign In</span>
-          <i class="bi bi-arrow-right"></i>
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════════════════════════════════
        USER MANAGEMENT MODAL (ADMIN ONLY)
        ═══════════════════════════════════════════════════════════════════════════════ -->
   <div class="user-management-overlay" id="userManagementOverlay">
@@ -5700,49 +5640,61 @@
       passEl.focus();
     });
 
-    btn.addEventListener('click', handleLogin);
-
-    function handleLogin() {
-      const u = userEl.value.trim();
-      const p = passEl.value;
-
-      if (!u && !p) {
-        showErr('Please enter your username and password.');
+    // Connect to the proper session-based login handler
+    btn.addEventListener('click', function() {
+      const username = userEl.value.trim();
+      const password = passEl.value;
+      
+      // Validate empty fields
+      if (!username) {
+        showErr('Username is required');
         userEl.focus();
         return;
       }
-      if (!u) {
-        showErr('Username is required.');
-        userEl.focus();
-        return;
-      }
-      if (!p) {
-        showErr('Password is required.');
+      
+      if (!password) {
+        showErr('Password is required');
         passEl.focus();
         return;
       }
-
-      if (u === AUTH_USER && p === AUTH_PASS) {
-        // success – hide login, show dashboard, kick off data load
-        isAuthenticated = true;
-        overlay.style.opacity = '0';
-        overlay.style.transition = 'opacity 0.4s ease';
-        setTimeout(function() { overlay.style.display = 'none'; }, 400);
-        loadDataFromGoogleSheets();
+      
+      // Check credentials
+      let user = null;
+      
+      // Check admin
+      if (username === DEFAULT_ADMIN.username && password === DEFAULT_ADMIN.password) {
+        user = DEFAULT_ADMIN;
       } else {
-        // wrong creds
-        if (u !== AUTH_USER) {
-          showErr('Invalid username or password.');
-          userEl.value = '';
-          passEl.value = '';
-          userEl.focus();
-        } else {
-          showErr('Invalid username or password.');
-          passEl.value = '';
-          passEl.focus();
+        // Check viewer accounts
+        const userAccounts = getUserAccounts();
+        const foundUser = userAccounts.find(u => u.username === username && u.password === password);
+        if (foundUser) {
+          user = foundUser;
         }
       }
-    }
+      
+      if (!user) {
+        showErr('Invalid username or password');
+        passEl.value = '';
+        passEl.focus();
+        return;
+      }
+      
+      // Create session
+      const session = {
+        sessionId: generateSessionId(),
+        username: user.username,
+        role: user.role,
+        loginTime: Date.now(),
+        lastActivity: Date.now()
+      };
+      
+      currentSession = session;
+      saveSession(session);
+      
+      // Success
+      onLoginSuccess(session);
+    });
 
     function showErr(msg) {
       errMsg.textContent = msg;
@@ -6801,84 +6753,14 @@
   // LOGIN & LOGOUT
   // ═══════════════════════════════════════════════════════════════════════════════
   
-  function handleLogin(event) {
-    event.preventDefault();
-    
-    const username = document.getElementById('loginUsername').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    const errorEl = document.getElementById('loginError');
-    const errorText = document.getElementById('loginErrorText');
-    
-    // Validate empty fields
-    if (!username) {
-      errorText.textContent = 'Username is required';
-      errorEl.classList.add('show');
-      document.getElementById('loginUsername').focus();
-      return;
-    }
-    
-    if (!password) {
-      errorText.textContent = 'Password is required';
-      errorEl.classList.add('show');
-      document.getElementById('loginPassword').focus();
-      return;
-    }
-    
-    // Check credentials
-    let user = null;
-    
-    // Check admin
-    if (username === DEFAULT_ADMIN.username && password === DEFAULT_ADMIN.password) {
-      user = DEFAULT_ADMIN;
-    } else {
-      // Check viewer accounts
-      const userAccounts = getUserAccounts();
-      const foundUser = userAccounts.find(u => u.username === username && u.password === password);
-      if (foundUser) {
-        user = foundUser;
-      }
-    }
-    
-    if (!user) {
-      errorText.textContent = 'Invalid username or password';
-      errorEl.classList.add('show');
-      // Clear password field
-      document.getElementById('loginPassword').value = '';
-      document.getElementById('loginPassword').focus();
-      return;
-    }
-    
-    // Create session
-    const session = {
-      sessionId: generateSessionId(),
-      username: user.username,
-      role: user.role,
-      loginTime: Date.now(),
-      lastActivity: Date.now()
-    };
-    
-    currentSession = session;
-    saveSession(session);
-    
-    // Success
-    onLoginSuccess(session);
-  }
-  
   function onLoginSuccess(session) {
     // Hide login overlay
     const loginOverlay = document.getElementById('loginOverlay');
-    loginOverlay.style.animation = 'fadeOut 0.5s';
+    loginOverlay.style.opacity = '0';
+    loginOverlay.style.transition = 'opacity 0.4s ease';
     setTimeout(() => {
       loginOverlay.style.display = 'none';
-    }, 500);
-    
-    // Update header
-    document.getElementById('welcomeText').textContent = `Welcome, ${session.username}`;
-    
-    // Show admin dropdown if admin
-    if (session.role === 'admin') {
-      document.getElementById('adminDropdown').style.display = 'block';
-    }
+    }, 400);
     
     // Load data
     loadDataFromGoogleSheets();
