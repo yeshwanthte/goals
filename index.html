@@ -10,6 +10,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
     :root {
@@ -2142,104 +2143,69 @@
       }
     }
 
-    /* Stage KPI Grid for Tower Tab */
-    .stage-kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-    }
-    
-    @media (max-width: 1200px) {
-      .stage-kpi-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    
-    @media (max-width: 576px) {
-      .stage-kpi-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    .stage-kpi-card {
+    /* Compact Stage KPI Bar for Tower Tab */
+    .stage-kpi-bar {
       background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(20px);
       border-radius: var(--radius-lg);
-      padding: 1rem;
+      padding: 1rem 1.5rem;
       box-shadow: 
         0 8px 32px rgba(99, 102, 241, 0.1),
         0 2px 8px rgba(0, 0, 0, 0.05),
         0 0 0 1px rgba(99, 102, 241, 0.08) inset;
-      position: relative;
-      overflow: hidden;
-      transition: var(--transition);
       border: 1px solid rgba(255, 255, 255, 0.8);
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
     }
     
-    .stage-kpi-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 
-        0 12px 48px rgba(99, 102, 241, 0.15),
-        0 4px 16px rgba(0, 0, 0, 0.08);
-    }
-    
-    .stage-kpi-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-    }
-    
-    .stage-kpi-card.stage-1::before { background: #FFC000; }
-    .stage-kpi-card.stage-2::before { background: #A5A5A5; }
-    .stage-kpi-card.stage-3::before { background: #FFE699; }
-    .stage-kpi-card.stage-4::before { background: #FFF2CC; }
-    .stage-kpi-card.stage-5::before { background: #E2EFDA; }
-    .stage-kpi-card.stage-6::before { background: #A9D08E; }
-    .stage-kpi-card.stage-7::before { background: #70AD47; }
-    
-    .stage-kpi-header {
+    .stage-kpi-grid {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 1rem;
-    }
-    
-    .stage-kpi-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: var(--radius-md);
-      display: flex;
+      gap: 1rem;
       align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
+      justify-content: space-around;
+      min-width: 900px;
     }
     
-    .stage-kpi-card.stage-1 .stage-kpi-icon { background: rgba(255, 192, 0, 0.15); color: #CC9900; }
-    .stage-kpi-card.stage-2 .stage-kpi-icon { background: rgba(165, 165, 165, 0.15); color: #7F7F7F; }
-    .stage-kpi-card.stage-3 .stage-kpi-icon { background: rgba(255, 230, 153, 0.15); color: #CC9900; }
-    .stage-kpi-card.stage-4 .stage-kpi-icon { background: rgba(255, 242, 204, 0.15); color: #CC9900; }
-    .stage-kpi-card.stage-5 .stage-kpi-icon { background: rgba(226, 239, 218, 0.15); color: #5A8A39; }
-    .stage-kpi-card.stage-6 .stage-kpi-icon { background: rgba(169, 208, 142, 0.15); color: #5A8A39; }
-    .stage-kpi-card.stage-7 .stage-kpi-icon { background: rgba(112, 173, 71, 0.15); color: #70AD47; }
+    .stage-kpi-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      flex: 1;
+      min-width: 85px;
+    }
     
-    .stage-kpi-value {
-      font-size: 1.8rem;
-      font-weight: 800;
+    .stage-kpi-color-box {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      margin-bottom: 0.2rem;
+    }
+    
+    .stage-kpi-color-box.scope { background: white; border: 2px solid var(--gray-300); }
+    .stage-kpi-color-box.sold { background: #833C0C; }
+    .stage-kpi-color-box.stage-1 { background: #FFC000; }
+    .stage-kpi-color-box.stage-2 { background: #A5A5A5; }
+    .stage-kpi-color-box.stage-3 { background: #FFE699; }
+    .stage-kpi-color-box.stage-4 { background: #FFF2CC; }
+    .stage-kpi-color-box.stage-5 { background: #E2EFDA; }
+    .stage-kpi-color-box.stage-6 { background: #A9D08E; }
+    .stage-kpi-color-box.stage-7 { background: #70AD47; }
+    
+    .stage-kpi-value-compact {
+      font-size: 1.4rem;
+      font-weight: 700;
       color: var(--gray-900);
       line-height: 1;
-      margin-bottom: 0.25rem;
     }
     
-    .stage-kpi-label {
-      font-size: 0.8rem;
-      color: var(--gray-500);
+    .stage-kpi-label-compact {
+      font-size: 0.65rem;
+      color: var(--gray-600);
+      text-align: center;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 500;
+      letter-spacing: 0.3px;
     }
     
     /* Villa layout specific styles */
@@ -2306,6 +2272,492 @@
     .villa-unit.stage-5 { background: #E2EFDA; color: #000; border-color: #B5BFAE; }
     .villa-unit.stage-6 { background: #A9D08E; color: #000; border-color: #87A672; }
     .villa-unit.stage-7 { background: #70AD47; color: #fff; border-color: #5A8A39; }
+
+    /* ===== UNIT DETAIL POPUP ===== */
+    .unit-detail-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    
+    .unit-detail-overlay.visible {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .unit-detail-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s ease;
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .unit-detail-header {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    
+    .unit-detail-header-left {
+      flex: 1;
+    }
+    
+    .unit-detail-project {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .unit-detail-unit-no {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    
+    .unit-detail-customer {
+      font-size: 1rem;
+      opacity: 0.95;
+      font-weight: 500;
+    }
+    
+    .unit-detail-logo {
+      width: 80px;
+      height: auto;
+      background: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    
+    .unit-detail-meta {
+      padding: 1rem 1.5rem;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    .unit-detail-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    
+    .unit-detail-meta-label {
+      font-size: 0.7rem;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    
+    .unit-detail-meta-value {
+      font-size: 0.95rem;
+      color: var(--gray-900);
+      font-weight: 600;
+    }
+    
+    .unit-detail-body {
+      padding: 1.5rem;
+    }
+    
+    .unit-detail-section-title {
+      font-size: 0.85rem;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--gray-200);
+    }
+    
+    .unit-activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .unit-activity-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: var(--gray-50);
+      border-radius: var(--radius-md);
+      border-left: 4px solid var(--gray-300);
+      transition: var(--transition);
+    }
+    
+    .unit-activity-item:hover {
+      background: var(--gray-100);
+    }
+    
+    .unit-activity-item.completed {
+      background: rgba(16, 185, 129, 0.08);
+      border-left-color: var(--success);
+    }
+    
+    .unit-activity-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+    
+    .unit-activity-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .unit-activity-status.completed {
+      color: var(--success);
+    }
+    
+    .unit-activity-status.pending {
+      color: var(--gray-400);
+    }
+    
+    .unit-detail-footer {
+      padding: 1rem 1.5rem;
+      background: var(--gray-50);
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+    
+    .unit-detail-btn {
+      padding: 0.65rem 1.25rem;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .unit-detail-btn-close {
+      background: var(--gray-200);
+      color: var(--gray-700);
+    }
+    
+    .unit-detail-btn-close:hover {
+      background: var(--gray-300);
+    }
+    
+    .unit-detail-btn-download {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+    
+    .unit-detail-btn-download:hover {
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+      transform: translateY(-2px);
+    }
+
+    /* ===== SEARCH FUNCTIONALITY ===== */
+    .search-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+      .search-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .search-box {
+      position: relative;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      box-shadow: 
+        0 8px 32px rgba(99, 102, 241, 0.1),
+        0 2px 8px rgba(0, 0, 0, 0.05),
+        0 0 0 1px rgba(99, 102, 241, 0.08) inset;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      z-index: 100;
+    }
+    
+    .search-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .search-input-wrapper {
+      position: relative;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 0.65rem 2.5rem 0.65rem 1rem;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      transition: var(--transition);
+      background: white;
+      color: var(--gray-900);
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    .search-input::placeholder {
+      color: var(--gray-400);
+    }
+    
+    .search-clear-btn {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      border: none;
+      background: var(--gray-200);
+      color: var(--gray-600);
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      transition: var(--transition);
+    }
+    
+    .search-clear-btn:hover {
+      background: var(--gray-300);
+      color: var(--gray-800);
+    }
+    
+    .search-clear-btn.visible {
+      display: flex;
+    }
+    
+    .search-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 2px solid var(--primary);
+      border-top: none;
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 10000;
+      display: none;
+      margin-top: -2px;
+    }
+    
+    .search-dropdown.visible {
+      display: block;
+    }
+    
+    .search-dropdown-item {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      border-bottom: 1px solid var(--gray-100);
+    }
+    
+    .search-dropdown-item:last-child {
+      border-bottom: none;
+    }
+    
+    .search-dropdown-item:hover {
+      background: var(--gray-50);
+    }
+    
+    .search-dropdown-item.active {
+      background: rgba(99, 102, 241, 0.1);
+    }
+    
+    .search-dropdown-item-main {
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 0.25rem;
+      font-size: 0.9rem;
+    }
+    
+    .search-dropdown-item-meta {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      display: flex;
+      gap: 0.75rem;
+    }
+    
+    .search-dropdown-item-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    
+    .search-no-results {
+      padding: 1.5rem 1rem;
+      text-align: center;
+      color: var(--gray-400);
+      font-size: 0.85rem;
+    }
+    
+    .search-result-highlight {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+      animation: highlightPulse 2s ease-in-out 3;
+    }
+    
+    @keyframes highlightPulse {
+      0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+        transform: scale(1);
+      }
+      50% { 
+        box-shadow: 0 0 0 8px rgba(99, 102, 241, 0);
+        transform: scale(1.05);
+      }
+    }
+
+    /* Clickable KPI legends */
+    .stage-kpi-item {
+      cursor: pointer;
+      transition: var(--transition);
+      padding: 0.5rem;
+      border-radius: var(--radius-md);
+    }
+    
+    .stage-kpi-item:hover {
+      background: rgba(99, 102, 241, 0.05);
+      transform: scale(1.02);
+    }
+    
+    .stage-kpi-item.active {
+      background: rgba(99, 102, 241, 0.1);
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+    
+    /* Unit highlighting when stage is selected */
+    .tower-unit.stage-highlighted,
+    .villa-unit.stage-highlighted {
+      box-shadow: 0 0 0 3px #fbbf24, 0 0 20px rgba(251, 191, 36, 0.6) !important;
+      transform: scale(1.1) !important;
+      z-index: 100 !important;
+      animation: stagePulse 1.5s ease-in-out infinite;
+    }
+    
+    .tower-unit.stage-dimmed,
+    .villa-unit.stage-dimmed {
+      opacity: 0.2;
+      filter: grayscale(80%);
+    }
+    
+    @keyframes stagePulse {
+      0%, 100% { 
+        box-shadow: 0 0 0 3px #fbbf24, 0 0 20px rgba(251, 191, 36, 0.6);
+      }
+      50% { 
+        box-shadow: 0 0 0 5px #fbbf24, 0 0 30px rgba(251, 191, 36, 0.8);
+      }
+    }
+    
+    /* Clear filter button */
+    .clear-filter-btn {
+      display: none;
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+      transition: var(--transition);
+      margin-left: auto;
+    }
+    
+    .clear-filter-btn.visible {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    
+    .clear-filter-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+    }
+    
+    /* Empty state */
+    .tower-empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--gray-400);
+    }
+    
+    .tower-empty-state i {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      display: block;
+      opacity: 0.5;
+    }
+    
+    .tower-empty-state h3 {
+      font-size: 1.2rem;
+      color: var(--gray-500);
+      margin-bottom: 0.5rem;
+    }
+    
+    .tower-empty-state p {
+      font-size: 0.9rem;
+      color: var(--gray-400);
+    }
   </style>
 </head>
 
@@ -2869,6 +3321,49 @@
         </div>
       </section>
 
+
+      <!-- Search Section -->
+      <div class="search-container">
+        <!-- Unit Number Search -->
+        <div class="search-box">
+          <label class="search-label">
+            <i class="bi bi-hash"></i>
+            Search by Unit Number
+          </label>
+          <div class="search-input-wrapper">
+            <input 
+              type="text" 
+              class="search-input" 
+              id="unitSearchInput"
+              placeholder="Type unit number..."
+              autocomplete="off">
+            <button class="search-clear-btn" id="unitSearchClear">
+              <i class="bi bi-x"></i>
+            </button>
+            <div class="search-dropdown" id="unitSearchDropdown"></div>
+          </div>
+        </div>
+        
+        <!-- Customer Name Search -->
+        <div class="search-box">
+          <label class="search-label">
+            <i class="bi bi-person"></i>
+            Search by Customer Name
+          </label>
+          <div class="search-input-wrapper">
+            <input 
+              type="text" 
+              class="search-input" 
+              id="customerSearchInput"
+              placeholder="Type customer name..."
+              autocomplete="off">
+            <button class="search-clear-btn" id="customerSearchClear">
+              <i class="bi bi-x"></i>
+            </button>
+            <div class="search-dropdown" id="customerSearchDropdown"></div>
+          </div>
+        </div>
+      </div>
       <!-- Stage KPIs -->
       <section class="stage-kpi-grid" id="stageKpiGrid">
         <!-- KPI cards will be inserted here dynamically -->
@@ -2892,6 +3387,45 @@
     <p>Upload a CSV file to visualize your project milestones</p>
   </div>
 
+
+<!-- Unit Detail Popup Modal -->
+<div class="unit-detail-overlay" id="unitDetailOverlay" onclick="if(event.target===this) closeUnitDetail()">
+  <div class="unit-detail-card" id="unitDetailCard">
+    <div class="unit-detail-header">
+      <div class="unit-detail-header-left">
+        <div class="unit-detail-project" id="popupProject"></div>
+        <div class="unit-detail-unit-no" id="popupUnitNo"></div>
+        <div class="unit-detail-customer" id="popupCustomer"></div>
+      </div>
+      <img class="unit-detail-logo" 
+           src="https://www.propeve.com/images/uploads/builders/1585296933513logo(1).png" 
+           alt="Logo" 
+           onerror="this.style.display='none'">
+    </div>
+    
+    <div class="unit-detail-meta" id="popupMeta">
+      <!-- Tower and Phase will be inserted here if not 0 -->
+    </div>
+    
+    <div class="unit-detail-body">
+      <div class="unit-detail-section-title">
+        <i class="bi bi-list-check"></i> Construction Activities
+      </div>
+      <div class="unit-activity-list" id="popupActivityList">
+        <!-- Activities will be inserted here -->
+      </div>
+    </div>
+    
+    <div class="unit-detail-footer">
+      <button class="unit-detail-btn unit-detail-btn-close" onclick="closeUnitDetail()">
+        <i class="bi bi-x-lg"></i> Close
+      </button>
+      <button class="unit-detail-btn unit-detail-btn-download" onclick="downloadUnitDetailPDF()">
+        <i class="bi bi-file-pdf"></i> Download PDF
+      </button>
+    </div>
+  </div>
+</div>
 </main>
 
 <!-- Footer -->
@@ -3038,6 +3572,7 @@
     UNIT_NO: "Unit No",
     CUSTOMER: 4, // Column E (index 4)
     OC: 28,
+    SOLD: 30, // Column AE (index 30)
     GFC: 33,
     PLASTER: 36,
     FLOOR: 39,
@@ -3133,6 +3668,7 @@
       UnitNo: r[h.indexOf(COL.UNIT_NO)] || "N/A",
       Customer: r[COL.CUSTOMER] || "N/A",
       OC: r[COL.OC],
+      Sold: (r[COL.SOLD] || '').toLowerCase() === 'sold',
       GFC: validDate(r[COL.GFC]),
       Plaster: validDate(r[COL.PLASTER]),
       Floor: validDate(r[COL.FLOOR]),
@@ -4431,7 +4967,7 @@
 
   // ===== TOWER VISUALIZATION MODULE =====
   
-  let selectedProjectTower = 'TMFT'; // Default to TMFT
+  let selectedProjectTower = null; // Default to none (empty state)
   
   // Build tower project slicer
   function buildTowerProjectSlicer() {
@@ -4443,14 +4979,6 @@
       const btn = document.createElement('button');
       btn.textContent = proj;
       btn.dataset.value = proj;
-      btn.classList.add('active');
-      
-      // Make TMFT selected by default
-      if (proj === 'TMFT') {
-        btn.classList.add('active');
-      } else {
-        btn.classList.remove('active');
-      }
       
       btn.onclick = function() {
         // Single-select behavior for tower viz
@@ -4463,18 +4991,52 @@
       el.appendChild(btn);
     });
     
-    // Render for default project
-    renderTowerVisualization();
+    // Show empty state by default and initialize cross-project search
+    showEmptyState();
+  }
+  
+  function showEmptyState() {
+    const container = document.getElementById('towerVizContainer');
+    const kpiGrid = document.getElementById('stageKpiGrid');
+    
+    container.innerHTML = `
+      <div class="tower-empty-state">
+        <i class="bi bi-building"></i>
+        <h3>Select a Project</h3>
+        <p>Please select a project from the options above to view the graphical representation</p>
+      </div>
+    `;
+    
+    if (kpiGrid) {
+      kpiGrid.innerHTML = '';
+      const parentBar = kpiGrid.parentElement;
+      if (parentBar && parentBar.classList.contains('stage-kpi-bar')) {
+        parentBar.style.display = 'none';
+      }
+    }
+    
+    // Initialize search for all projects when in empty state
+    initializeSearch();
   }
   
   // Parse unit number: XXXX -> tower, floor, flat
   function parseUnitNumber(unitNo) {
     if (!unitNo) return null;
-    const str = unitNo.toString().padStart(4, '0');
-    const tower = parseInt(str[0], 10);
-    const floor = parseInt(str.substring(1, 3), 10);
-    const flat = parseInt(str[3], 10);
-    return { tower, floor, flat, original: unitNo };
+    
+    // Handle units with alphabetic suffixes (e.g., 1011a, 1011b)
+    const unitStr = unitNo.toString();
+    const numericPart = unitStr.replace(/[a-zA-Z]/g, '');
+    const suffix = unitStr.replace(/[0-9]/g, '').toLowerCase();
+    
+    const str = numericPart.padStart(4, '0');
+    return {
+      tower: parseInt(str[0], 10) || 0,
+      floor: parseInt(str.substring(1, 3), 10) || 0,
+      flat: parseInt(str[3], 10) || 0,
+      suffix: suffix || '',
+      original: unitNo,
+      numericValue: parseInt(numericPart, 10)
+    };
   }
   
   // Determine completion stage for a unit (1-7, skip 0 for Scope)
@@ -4493,6 +5055,12 @@
   }
   
   function renderTowerVisualization() {
+    // Show empty state if no project selected
+    if (!selectedProjectTower) {
+      showEmptyState();
+      return;
+    }
+    
     const projectData = raw.filter(r => r.Project === selectedProjectTower);
     
     if (projectData.length === 0) {
@@ -4505,8 +5073,18 @@
       return;
     }
     
+    // Show KPI bar
+    const kpiGrid = document.getElementById('stageKpiGrid');
+    const parentBar = kpiGrid.parentElement;
+    if (parentBar && parentBar.classList.contains('stage-kpi-bar')) {
+      parentBar.style.display = 'block';
+    }
+    
     // Render Stage KPIs
     renderStageKPIs(projectData);
+    
+    // Initialize search
+    initializeSearch();
     
     // Parse all units and organize by tower/floor/flat
     const parsed = projectData.map(u => ({
@@ -4530,15 +5108,36 @@
     const container = document.getElementById('towerVizContainer');
     container.innerHTML = '';
     
-    // Check if villa project
+    // Check if villa project — render villa (tower=0) units, then still render any tower units
     if (isVillaProject(selectedProjectTower)) {
-      renderVillaLayout(container, parsed, selectedProjectTower);
+      const villaUnits  = parsed.filter(u => u.parsed.tower === 0);
+      const towerOnlyUnits = parsed.filter(u => u.parsed.tower !== 0);
+
+      // Render villa blocks first
+      if (villaUnits.length > 0) {
+        renderVillaLayout(container, villaUnits, selectedProjectTower);
+      }
+
+      // Then render remaining towers (non-zero tower number)
+      if (towerOnlyUnits.length > 0) {
+        const towerOnlyMap = {};
+        towerOnlyUnits.forEach(u => {
+          const t = u.parsed.tower;
+          if (!towerOnlyMap[t]) towerOnlyMap[t] = [];
+          towerOnlyMap[t].push(u);
+        });
+        const towerNums = Object.keys(towerOnlyMap).map(Number).sort((a, b) => a - b);
+        towerNums.forEach(tNum => renderSingleTower(container, tNum, towerOnlyMap[tNum]));
+      }
       return;
     }
     
     towerNumbers.forEach(towerNum => {
-      const towerUnits = towerMap[towerNum];
-      
+      renderSingleTower(container, towerNum, towerMap[towerNum]);
+    });
+  }
+
+  function renderSingleTower(container, towerNum, towerUnits) {
       // Get floor range for this tower
       const floors = [...new Set(towerUnits.map(u => u.parsed.floor))].sort((a, b) => a - b);
       const minFloor = Math.min(...floors);
@@ -4555,18 +5154,12 @@
       const maxFlats = Math.max(...Object.values(flatsPerFloor));
       
       // Build tower HTML
+      const headerTitle = towerNum === 0 ? 'Villas' : `Tower - ${towerNum}`;
+      
       let towerHTML = `
         <div class="tower-column">
-          <div class="tower-header">Tower - ${towerNum}</div>
+          <div class="tower-header">${headerTitle}</div>
           <div class="tower-stats">
-            <div class="tower-stat">
-              <span class="tower-stat-value">${towerNum}</span>
-              <span class="tower-stat-label">Tower</span>
-            </div>
-            <div class="tower-stat">
-              <span class="tower-stat-value">${maxFloor - minFloor + 1}</span>
-              <span class="tower-stat-label">Floors</span>
-            </div>
             <div class="tower-stat">
               <span class="tower-stat-value">${towerUnits.length}</span>
               <span class="tower-stat-label">Units</span>
@@ -4574,11 +5167,22 @@
           </div>
           <div class="tower-floors">`;
       
-      // Create a map for quick unit lookup
+      // Create a map for quick unit lookup, grouping units by floor-flat (handling a/b suffixes)
       const unitMap = {};
       towerUnits.forEach(u => {
         const key = `${u.parsed.floor}-${u.parsed.flat}`;
-        unitMap[key] = u;
+        if (!unitMap[key]) unitMap[key] = [];
+        unitMap[key].push(u);
+      });
+      
+      // Sort units with same floor-flat by suffix (no suffix first, then 'a', then 'b')
+      Object.keys(unitMap).forEach(key => {
+        unitMap[key].sort((a, b) => {
+          if (!a.parsed.suffix && !b.parsed.suffix) return 0;
+          if (!a.parsed.suffix) return -1;
+          if (!b.parsed.suffix) return 1;
+          return a.parsed.suffix.localeCompare(b.parsed.suffix);
+        });
       });
       
       // Render floors from bottom to top
@@ -4592,19 +5196,22 @@
         
         for (let flat = 1; flat <= floorFlats; flat++) {
           const key = `${floor}-${flat}`;
-          const unit = unitMap[key];
+          const units = unitMap[key] || [];
           
-          if (unit) {
-            const stageClass = unit.stage >= 0 ? `stage-${unit.stage}` : '';
-            const unitNoDisplay = unit.UnitNo || `${towerNum}${floor.toString().padStart(2, '0')}${flat}`;
-            towerHTML += `
-              <div class="tower-unit ${stageClass}" 
-                   data-unit="${unitNoDisplay}"
-                   title="${unitNoDisplay}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}">
-                ${unitNoDisplay}
-              </div>`;
+          if (units.length > 0) {
+            units.forEach(unit => {
+              const stageClass = unit.stage >= 0 ? `stage-${unit.stage}` : '';
+              const unitNoDisplay = unit.UnitNo || `${towerNum}${floor.toString().padStart(2, '0')}${flat}${unit.parsed.suffix}`;
+              const unitJson = JSON.stringify(unit).replace(/'/g, "&apos;");
+              towerHTML += `
+                <div class="tower-unit ${stageClass}" 
+                     data-unit="${unitNoDisplay}"
+                     onclick='showUnitDetail(${unitJson})'
+                     title="${unitNoDisplay}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}">
+                  ${unitNoDisplay}
+                </div>`;
+            });
           } else {
-            // Empty slot (white striped)
             towerHTML += `<div class="tower-unit empty">—</div>`;
           }
         }
@@ -4619,7 +5226,6 @@
         </div>`;
       
       container.innerHTML += towerHTML;
-    });
   }
   
   function getStageName(stage) {
@@ -4637,38 +5243,62 @@
   
   function renderStageKPIs(data) {
     const stages = [
-      { id: 1, name: 'GFC Released', icon: 'file-check', count: data.filter(u => u.GFC).length },
-      { id: 2, name: 'Plaster', icon: 'paint-bucket', count: data.filter(u => u.Plaster).length },
-      { id: 3, name: 'Flooring & Dado', icon: 'grid-3x3', count: data.filter(u => u.Floor).length },
-      { id: 4, name: 'HVAC Installed', icon: 'wind', count: data.filter(u => u.HVAC).length },
-      { id: 5, name: 'False Ceiling', icon: 'square', count: data.filter(u => u.False).length },
-      { id: 6, name: 'Fenestration', icon: 'window', count: data.filter(u => u.Fenest).length },
-      { id: 7, name: 'Ready for Handover', icon: 'check-circle', count: data.filter(u => u.Hand).length }
+      { id: 'scope', name: 'Scope', count: data.length },
+      { id: 'sold', name: 'Sold', count: data.filter(u => u.Sold).length },
+      { id: 'stage-1', name: 'GFC Released', count: data.filter(u => u.GFC).length },
+      { id: 'stage-2', name: 'Plaster', count: data.filter(u => u.Plaster).length },
+      { id: 'stage-3', name: 'Flooring & Dado', count: data.filter(u => u.Floor).length },
+      { id: 'stage-4', name: 'HVAC Installed', count: data.filter(u => u.HVAC).length },
+      { id: 'stage-5', name: 'False Ceiling', count: data.filter(u => u.False).length },
+      { id: 'stage-6', name: 'Fenestration', count: data.filter(u => u.Fenest).length },
+      { id: 'stage-7', name: 'Ready for Handover', count: data.filter(u => u.Hand).length }
     ];
     
-    const el = document.getElementById('stageKpiGrid');
-    el.innerHTML = stages.map(s => `
-      <div class="stage-kpi-card stage-${s.id}">
-        <div class="stage-kpi-header">
-          <div class="stage-kpi-icon"><i class="bi bi-${s.icon}"></i></div>
-        </div>
-        <div class="stage-kpi-value">${s.count.toLocaleString()}</div>
-        <div class="stage-kpi-label">${s.name}</div>
+    const container = document.getElementById('stageKpiGrid');
+    const parentBar = container.parentElement;
+    
+    if (!parentBar.classList.contains('stage-kpi-bar')) {
+      const bar = document.createElement('div');
+      bar.className = 'stage-kpi-bar';
+      const parent = container.parentElement;
+      parent.insertBefore(bar, container);
+      bar.appendChild(container);
+    }
+    
+    container.innerHTML = stages.map(s => `
+      <div class="stage-kpi-item" data-stage="${s.id}" onclick="filterByStage('${s.id}')">
+        <div class="stage-kpi-color-box ${s.id}"></div>
+        <div class="stage-kpi-value-compact">${s.count.toLocaleString()}</div>
+        <div class="stage-kpi-label-compact">${s.name}</div>
       </div>
     `).join('');
+    
+    // Add clear filter button if not exists
+    if (!parentBar.querySelector('.clear-filter-btn')) {
+      const clearBtn = document.createElement('button');
+      clearBtn.className = 'clear-filter-btn';
+      clearBtn.innerHTML = '<i class="bi bi-x-circle"></i> Clear Filter';
+      clearBtn.onclick = clearStageFilter;
+      parentBar.appendChild(clearBtn);
+    }
   }
   
-  // Check if project is a villa project (TMD or AtR)
+  // Check if project is a villa project (TMD, AtR, or POARR)
   function isVillaProject(projectName) {
-    return projectName === '0056 TMD' || projectName === '0072 AtR';
+    if (!projectName) return false;
+    const name = projectName.toUpperCase().trim();
+    return name.includes('TMD') || name.includes('ATR') || name.includes('POARR');
   }
 
-  // Render villa layout for TMD and AtR projects
+  // Render villa layout for TMD, AtR, and POARR projects
   function renderVillaLayout(container, units, projectName) {
-    if (projectName === '0056 TMD') {
+    const name = projectName.toUpperCase().trim();
+    if (name.includes('TMD')) {
       renderTMDLayout(container, units);
-    } else if (projectName === '0072 AtR') {
+    } else if (name.includes('ATR')) {
       renderAtRLayout(container, units);
+    } else if (name.includes('POARR')) {
+      renderPOARRLayout(container, units);
     }
   }
   
@@ -4691,43 +5321,69 @@
   }
   
   function renderAtRLayout(container, units) {
-    // AtR Layout: More complex with various blocks
+    // AtR Layout: Automatically include all units from data
+    // Group units into blocks based on unit number ranges
     const blocks = [
-      { name: '1EW', units: [1,2,3,4,5,6,7,8,9,10,11,16,18,20,22,24,26,28,30,32,33,34,36,38,40] },
-      { name: '2EW', units: [106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,134,247,248,249,250,251,252] },
-      { name: '3EW', units: [14,15,17,19,21,23,25,27,29,31,35,37,39,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79] },
-      { name: '4EW', units: [12,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,246,245,244,243,242,241,240,239,238,237,236,235,277,278,279,280,281,282] },
-      { name: '5EW', units: [] },
-      { name: '6EW', units: [91,92,93,94,95,96,97,98,99,100,275,273,270,271,272,276,274] },
-      { name: '1NS', units: [43,45,47,49,51,53,55,57,59,61,63,65,67,69,71,73,75,77,78,79] },
-      { name: '2NS', units: [15,105,264,265,266,267,268,269,270,271,272,273,274,275,276] },
-      { name: '3NS', units: [12,14,101,102,103,104,109] },
-      { name: '4NS', units: [112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128] },
-      { name: '5NS', units: [222,223,224,225,226,227,228,229,230,231,232,233,234] },
-      { name: '6NS', units: [129,130,131,132,133,134,135,136,137,138,139,140,141,142] },
-      { name: '7NS', units: [143,144,145,146,147,148,149,150,151,152,153,154] },
-      { name: '8NS', units: [232,233,234,235,236,237,238,239] },
-      { name: '9NS', units: [8,9,138,139,140,141,142,145,147,149] },
-      { name: '1sEW', units: [155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176] },
-      { name: '2aEW', units: [] },
-      { name: '3aEW', units: [177,178,179,180,181,182,183,184,185] },
-      { name: '4aEW', units: [186,187,188,189,190,191,192,193,194,195,196,197,198,199] },
-      { name: '5aEW', units: [200,201,202,203,204,205,206,207,208,209,210,211,212,213,214] },
-      { name: '6aNS', units: [215,216,217,218,219,220,221,222,223,224,225,226] },
-      { name: '7aNS', units: [227,228,229,230] }
+      { name: '1EW', units: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40] },
+      { name: '2EW', units: [41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80] },
+      { name: '3EW', units: [81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120] },
+      { name: '4EW', units: [121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160] },
+      { name: '5EW', units: [161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200] },
+      { name: '6EW', units: [201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240] },
+      { name: '7EW', units: [241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280] },
+      { name: '8EW', units: [281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300] }
     ];
     
-    renderBlockLayout(container, units, blocks);
+    // Filter blocks to only show units that exist in the data
+    const unitNumbers = new Set(units.map(u => parseInt(u.UnitNo, 10)));
+    const filteredBlocks = blocks.map(block => ({
+      name: block.name,
+      units: block.units.filter(unitNo => unitNumbers.has(unitNo))
+    })).filter(block => block.units.length > 0);
+    
+    renderBlockLayout(container, units, filteredBlocks);
   }
   
+
+  function renderPOARRLayout(container, units) {
+    // POARR Layout: 12 blocks as per new screenshot
+    // Top row: 49,48 | 47,46 | 45,44 | 43,42 | 41,40 | 39,38 | 37,36 | 35,34 | 33,32 | 31,30 | 29,28 | 27,26
+    // Bottom row: 1,2 | 3,4 | 5,6 | 7,8 | 9,10 | 11,12 | 14,15 | 16,17 | 18,19 | 20,21 | 22,23 | 24,25
+    const blocks = [
+      { name: 'Block-1', units: [49,48,1,2] },
+      { name: 'Block-2', units: [47,46,3,4] },
+      { name: 'Block-3', units: [45,44,5,6] },
+      { name: 'Block-4', units: [43,42,7,8] },
+      { name: 'Block-5', units: [41,40,9,10] },
+      { name: 'Block-6', units: [39,38,11,12] },
+      { name: 'Block-7', units: [37,36,14,15] },
+      { name: 'Block-8', units: [35,34,16,17] },
+      { name: 'Block-9', units: [33,32,18,19] },
+      { name: 'Block-10', units: [31,30,20,21] },
+      { name: 'Block-11', units: [29,28,22,23] },
+      { name: 'Block-12', units: [27,26,24,25] }
+    ];
+    
+    // Filter blocks to only show units that exist in the data
+    const unitNumbers = new Set(units.map(u => parseInt(u.UnitNo, 10)));
+    const filteredBlocks = blocks.map(block => ({
+      name: block.name,
+      units: block.units.filter(unitNo => unitNumbers.has(unitNo))
+    })).filter(block => block.units.length > 0);
+    
+    renderBlockLayout(container, units, filteredBlocks);
+  }
+
   function renderBlockLayout(container, units, blocks) {
     container.classList.add('tower-villa-layout');
     container.innerHTML = '';
     
+    // Build unit map - handle both raw units and parsed units (with .parsed property)
     const unitMap = {};
     units.forEach(u => {
-      const unitNo = parseInt(u.UnitNo, 10);
-      unitMap[unitNo] = u;
+      const rawUnit = u.UnitNo !== undefined ? u : (u.original || u);
+      const unitNo = parseInt(rawUnit.UnitNo, 10);
+      if (!isNaN(unitNo)) unitMap[unitNo] = rawUnit;
     });
     
     blocks.forEach(block => {
@@ -4742,10 +5398,13 @@
         const unit = unitMap[unitNo];
         if (unit) {
           const stageClass = unit.stage >= 0 ? `stage-${unit.stage}` : '';
+          const unitJson = JSON.stringify(unit).replace(/'/g, "&apos;");
           blockHTML += `
             <div class="villa-unit ${stageClass}" 
-                 title="${unitNo}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}">
-              ${unitNo}
+                 data-unit="${unit.UnitNo}"
+                 onclick='showUnitDetail(${unitJson})'
+                 title="${unit.UnitNo}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}">
+              ${unit.UnitNo}
             </div>`;
         }
       });
@@ -4756,6 +5415,450 @@
       
       container.innerHTML += blockHTML;
     });
+  }
+
+  // ===== UNIT DETAIL POPUP =====
+  let currentUnitData = null;
+  
+  function showUnitDetail(unit) {
+    currentUnitData = unit;
+    
+    // Populate popup
+    document.getElementById('popupProject').textContent = selectedProjectTower;
+    document.getElementById('popupUnitNo').textContent = 'Unit ' + unit.UnitNo;
+    document.getElementById('popupCustomer').textContent = unit.Customer || 'N/A';
+    
+    // Meta (Tower and Phase) - only show if not 0
+    const metaHTML = [];
+    const parsed = parseUnitNumber(unit.UnitNo);
+    
+    if (parsed && parsed.tower !== 0) {
+      metaHTML.push(`
+        <div class="unit-detail-meta-item">
+          <span class="unit-detail-meta-label">Tower</span>
+          <span class="unit-detail-meta-value">${parsed.tower}</span>
+        </div>
+      `);
+    }
+    
+    if (unit.Phase && unit.Phase !== '0') {
+      metaHTML.push(`
+        <div class="unit-detail-meta-item">
+          <span class="unit-detail-meta-label">Phase</span>
+          <span class="unit-detail-meta-value">${unit.Phase}</span>
+        </div>
+      `);
+    }
+    
+    document.getElementById('popupMeta').innerHTML = metaHTML.join('');
+    document.getElementById('popupMeta').style.display = metaHTML.length > 0 ? 'flex' : 'none';
+    
+    // Activities
+    const activities = [
+      { name: 'GFC Released', completed: !!unit.GFC },
+      { name: 'Plaster', completed: !!unit.Plaster },
+      { name: 'Flooring & Dado', completed: !!unit.Floor },
+      { name: 'HVAC Installed', completed: !!unit.HVAC },
+      { name: 'False Ceiling', completed: !!unit.False },
+      { name: 'Fenestration', completed: !!unit.Fenest },
+      { name: 'Ready for Handover', completed: !!unit.Hand }
+    ];
+    
+    const activityHTML = activities.map(a => `
+      <div class="unit-activity-item ${a.completed ? 'completed' : ''}">
+        <span class="unit-activity-name">${a.name}</span>
+        <span class="unit-activity-status ${a.completed ? 'completed' : 'pending'}">
+          <i class="bi bi-${a.completed ? 'check-circle-fill' : 'circle'}"></i>
+          ${a.completed ? 'Completed' : 'Pending'}
+        </span>
+      </div>
+    `).join('');
+    
+    document.getElementById('popupActivityList').innerHTML = activityHTML;
+    
+    // Show overlay
+    document.getElementById('unitDetailOverlay').classList.add('visible');
+  }
+  
+  function closeUnitDetail() {
+    document.getElementById('unitDetailOverlay').classList.remove('visible');
+    currentUnitData = null;
+  }
+  
+  function downloadUnitDetailPDF() {
+    if (!currentUnitData) return;
+    
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(selectedProjectTower, 15, 20);
+    
+    // Try to add logo (may fail due to CORS)
+    try {
+      const logoUrl = 'https://www.propeve.com/images/uploads/builders/1585296933513logo(1).png';
+      // Note: This will likely fail due to CORS, but we try anyway
+      doc.text('TotalEnvironment', 160, 20);
+    } catch(e) {
+      doc.setFontSize(8);
+      doc.text('TotalEnvironment', 160, 20);
+    }
+    
+    // Unit Number
+    doc.setFontSize(22);
+    doc.setTextColor(0);
+    doc.text('Unit ' + currentUnitData.UnitNo, 15, 35);
+    
+    // Customer Name
+    doc.setFontSize(12);
+    doc.setTextColor(60);
+    doc.text(currentUnitData.Customer || 'N/A', 15, 45);
+    
+    // Tower & Phase
+    let yPos = 55;
+    const parsed = parseUnitNumber(currentUnitData.UnitNo);
+    if (parsed && parsed.tower !== 0) {
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text('Tower:', 15, yPos);
+      doc.setTextColor(0);
+      doc.text(String(parsed.tower), 35, yPos);
+      yPos += 7;
+    }
+    
+    if (currentUnitData.Phase && currentUnitData.Phase !== '0') {
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text('Phase:', 15, yPos);
+      doc.setTextColor(0);
+      doc.text(currentUnitData.Phase, 35, yPos);
+      yPos += 7;
+    }
+    
+    // Construction Activities
+    yPos += 10;
+    doc.setFontSize(14);
+    doc.setTextColor(0);
+    doc.text('Construction Activities', 15, yPos);
+    
+    yPos += 10;
+    doc.setLineWidth(0.5);
+    doc.line(15, yPos, 195, yPos);
+    yPos += 8;
+    
+    const activities = [
+      { name: 'GFC Released', completed: !!currentUnitData.GFC },
+      { name: 'Plaster', completed: !!currentUnitData.Plaster },
+      { name: 'Flooring & Dado', completed: !!currentUnitData.Floor },
+      { name: 'HVAC Installed', completed: !!currentUnitData.HVAC },
+      { name: 'False Ceiling', completed: !!currentUnitData.False },
+      { name: 'Fenestration', completed: !!currentUnitData.Fenest },
+      { name: 'Ready for Handover', completed: !!currentUnitData.Hand }
+    ];
+    
+    doc.setFontSize(10);
+    activities.forEach(a => {
+      doc.setTextColor(a.completed ? 0 : 150);
+      doc.text('• ' + a.name, 20, yPos);
+      if (a.completed) {
+        doc.setTextColor(34, 197, 94);
+      } else {
+        doc.setTextColor(150);
+      }
+      doc.text(a.completed ? 'Completed' : 'Pending', 120, yPos);
+      yPos += 7;
+    });
+    
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text('Generated on ' + new Date().toLocaleString(), 15, 285);
+    
+    // Save
+    doc.save(`Unit_${currentUnitData.UnitNo}_${selectedProjectTower}.pdf`);
+  }
+
+  // ===== SEARCH FUNCTIONALITY =====
+  
+  let searchData = [];
+  let currentSearchSelection = -1;
+  
+  function initializeSearch() {
+    // Clone inputs to remove stale event listeners before re-attaching
+    ['unitSearchInput','customerSearchInput'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { const clone = el.cloneNode(true); el.parentNode.replaceChild(clone, el); }
+    });
+    
+    const unitInput    = document.getElementById('unitSearchInput');
+    const customerInput = document.getElementById('customerSearchInput');
+    const unitClear    = document.getElementById('unitSearchClear');
+    const customerClear = document.getElementById('customerSearchClear');
+    const unitDropdown    = document.getElementById('unitSearchDropdown');
+    const customerDropdown = document.getElementById('customerSearchDropdown');
+    
+    // Prepare search data - all projects if none selected, otherwise current project
+    const projectData = selectedProjectTower 
+      ? raw.filter(r => r.Project === selectedProjectTower)
+      : raw;
+    searchData = projectData.map(u => ({
+      unitNo: u.UnitNo,
+      customer: u.Customer || 'N/A',
+      project: u.Project,
+      phase: u.Phase,
+      tower: parseUnitNumber(u.UnitNo)?.tower || 0,
+      data: u
+    }));
+    
+    // Unit Number Search
+    unitInput.addEventListener('input', function(e) {
+      const query = e.target.value.trim();
+      unitClear.classList.toggle('visible', query.length > 0);
+      
+      if (query.length === 0) {
+        unitDropdown.classList.remove('visible');
+        return;
+      }
+      
+      const results = searchData.filter(item => 
+        item.unitNo.toString().toLowerCase().includes(query.toLowerCase())
+      ).sort((a, b) => {
+        // Villa units (tower === 0) first, then tower units
+        const aIsVilla = a.tower === 0 ? 0 : 1;
+        const bIsVilla = b.tower === 0 ? 0 : 1;
+        if (aIsVilla !== bIsVilla) return aIsVilla - bIsVilla;
+        // Within same group, sort numerically by unit number
+        return parseInt(a.unitNo) - parseInt(b.unitNo);
+      }).slice(0, 10);
+      
+      displaySearchResults(results, unitDropdown, 'unit');
+    });
+    
+    // Customer Name Search
+    customerInput.addEventListener('input', function(e) {
+      const query = e.target.value.trim();
+      customerClear.classList.toggle('visible', query.length > 0);
+      
+      if (query.length === 0) {
+        customerDropdown.classList.remove('visible');
+        return;
+      }
+      
+      const results = searchData.filter(item => 
+        item.customer.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 10);
+      
+      displaySearchResults(results, customerDropdown, 'customer');
+    });
+    
+    // Clear buttons
+    unitClear.addEventListener('click', function() {
+      unitInput.value = '';
+      unitClear.classList.remove('visible');
+      unitDropdown.classList.remove('visible');
+      clearSearchHighlight();
+    });
+    
+    customerClear.addEventListener('click', function() {
+      customerInput.value = '';
+      customerClear.classList.remove('visible');
+      customerDropdown.classList.remove('visible');
+      clearSearchHighlight();
+    });
+    
+    // Keyboard navigation
+    unitInput.addEventListener('keydown', (e) => handleSearchKeydown(e, unitDropdown));
+    customerInput.addEventListener('keydown', (e) => handleSearchKeydown(e, customerDropdown));
+    
+    // Click outside to close
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.search-box')) {
+        unitDropdown.classList.remove('visible');
+        customerDropdown.classList.remove('visible');
+      }
+    });
+  }
+  
+  function displaySearchResults(results, dropdown, type) {
+    if (results.length === 0) {
+      dropdown.innerHTML = '<div class="search-no-results"><i class="bi bi-search"></i><br>No results found</div>';
+      dropdown.classList.add('visible');
+      return;
+    }
+    
+    const html = results.map((item, index) => {
+      let mainText, secondaryText;
+      
+      if (type === 'unit') {
+        // Unit search: show Unit Number as main, Customer Name as secondary
+        mainText = `Unit ${item.unitNo}`;
+        secondaryText = `<span><i class="bi bi-person"></i> ${item.customer}</span>`;
+      } else {
+        // Customer search: show Customer Name as main, Unit Number as secondary
+        mainText = item.customer;
+        secondaryText = `<span><i class="bi bi-hash"></i> Unit ${item.unitNo}</span>`;
+      }
+      
+      const towerText = item.tower !== 0 ? `Tower ${item.tower}` : 'Villas';
+      const phaseText = item.phase && item.phase !== '0' ? `Phase ${item.phase}` : '';
+      
+      return `
+        <div class="search-dropdown-item" data-index="${index}" onclick='selectSearchResult(${JSON.stringify(item.data).replace(/'/g, "&apos;")})'>
+          <div class="search-dropdown-item-main">${mainText}</div>
+          <div class="search-dropdown-item-meta">
+            ${secondaryText}
+            <span><i class="bi bi-building"></i> ${item.project}</span>
+            <span><i class="bi bi-geo-alt"></i> ${towerText}</span>
+            ${phaseText ? `<span><i class="bi bi-diagram-3"></i> ${phaseText}</span>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    dropdown.innerHTML = html;
+    dropdown.classList.add('visible');
+    currentSearchSelection = -1;
+  }
+  
+  function handleSearchKeydown(e, dropdown) {
+    const items = dropdown.querySelectorAll('.search-dropdown-item');
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      currentSearchSelection = Math.min(currentSearchSelection + 1, items.length - 1);
+      updateSearchSelection(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      currentSearchSelection = Math.max(currentSearchSelection - 1, -1);
+      updateSearchSelection(items);
+    } else if (e.key === 'Enter' && currentSearchSelection >= 0) {
+      e.preventDefault();
+      items[currentSearchSelection].click();
+    } else if (e.key === 'Escape') {
+      dropdown.classList.remove('visible');
+      currentSearchSelection = -1;
+    }
+  }
+  
+  function updateSearchSelection(items) {
+    items.forEach((item, index) => {
+      if (index === currentSearchSelection) {
+        item.classList.add('active');
+        item.scrollIntoView({ block: 'nearest' });
+      } else {
+        item.classList.remove('active');
+      }
+    });
+  }
+  
+  function selectSearchResult(unit) {
+    // Hide dropdowns
+    document.getElementById('unitSearchDropdown').classList.remove('visible');
+    document.getElementById('customerSearchDropdown').classList.remove('visible');
+    
+    // If unit is from a different project, switch to that project first
+    if (unit.Project && unit.Project !== selectedProjectTower) {
+      selectedProjectTower = unit.Project;
+      // Update slicer buttons
+      const slicerBtns = document.querySelectorAll('#projectSlicerTower button');
+      slicerBtns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.value === selectedProjectTower);
+      });
+      // Render the visualization for that project
+      renderTowerVisualization();
+    }
+    
+    // Clear previous highlights
+    clearSearchHighlight();
+    
+    // After rendering, find and highlight the unit
+    setTimeout(() => {
+      const unitElements = document.querySelectorAll(`[data-unit="${unit.UnitNo}"]`);
+      
+      if (unitElements.length > 0) {
+        const element = unitElements[0];
+        element.classList.add('search-result-highlight');
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => element.classList.remove('search-result-highlight'), 6000);
+      }
+      
+      // Enrich unit with stage before showing detail popup
+      const enriched = Object.assign({}, unit, { stage: getUnitStage(unit) });
+      showUnitDetail(enriched);
+    }, 300);
+  }
+  
+  function clearSearchHighlight() {
+    document.querySelectorAll('.search-result-highlight').forEach(el => {
+      el.classList.remove('search-result-highlight');
+    });
+  }
+
+  // ===== STAGE FILTERING =====
+  
+  let selectedStageFilter = null;
+  
+  function filterByStage(stageId) {
+    const kpiItems = document.querySelectorAll('.stage-kpi-item');
+    const clearBtn = document.querySelector('.clear-filter-btn');
+    
+    // Toggle selection
+    if (selectedStageFilter === stageId) {
+      // Deselect
+      selectedStageFilter = null;
+      kpiItems.forEach(item => item.classList.remove('active'));
+      clearBtn.classList.remove('visible');
+      clearStageFilter();
+      return;
+    }
+    
+    // Select new stage
+    selectedStageFilter = stageId;
+    kpiItems.forEach(item => {
+      if (item.dataset.stage === stageId) {
+        item.classList.add('active');
+      } else {
+        item.classList.remove('active');
+      }
+    });
+    
+    clearBtn.classList.add('visible');
+    
+    // Highlight units
+    highlightUnitsByStage(stageId);
+  }
+  
+  function highlightUnitsByStage(stageId) {
+    const allUnits = document.querySelectorAll('.tower-unit, .villa-unit');
+    
+    allUnits.forEach(unit => {
+      unit.classList.remove('stage-highlighted', 'stage-dimmed');
+      
+      // Check if unit matches the selected stage
+      const unitMatches = unit.classList.contains(stageId);
+      
+      if (unitMatches) {
+        unit.classList.add('stage-highlighted');
+      } else if (!unit.classList.contains('empty')) {
+        unit.classList.add('stage-dimmed');
+      }
+    });
+  }
+  
+  function clearStageFilter() {
+    selectedStageFilter = null;
+    const allUnits = document.querySelectorAll('.tower-unit, .villa-unit');
+    const kpiItems = document.querySelectorAll('.stage-kpi-item');
+    const clearBtn = document.querySelector('.clear-filter-btn');
+    
+    allUnits.forEach(unit => {
+      unit.classList.remove('stage-highlighted', 'stage-dimmed');
+    });
+    
+    kpiItems.forEach(item => item.classList.remove('active'));
+    if (clearBtn) clearBtn.classList.remove('visible');
   }
 </script>
 
