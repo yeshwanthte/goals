@@ -1794,29 +1794,28 @@
       left: 14px;
       top: 50%;
       transform: translateY(-50%);
-      color: rgba(31,41,55,0.6);
+      color: rgba(255,255,255,0.35);
       font-size: 1.05rem;
       pointer-events: none;
     }
     .login-input-wrap input {
       width: 100%;
       padding: 0.8rem 1rem 0.8rem 2.6rem;
-      background: rgba(255,255,255,0.25);
-      border: 2px solid rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid rgba(255,255,255,0.14);
       border-radius: 12px;
-      color: #1f2937;
+      color: #fff;
       font-size: 0.92rem;
       font-family: inherit;
-      font-weight: 500;
       transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
       outline: none;
     }
     .login-input-wrap input::placeholder {
-      color: rgba(31,41,55,0.5);
+      color: rgba(255,255,255,0.28);
     }
     .login-input-wrap input:focus {
-      border-color: rgba(99,102,241,0.8);
-      background: rgba(255,255,255,0.35);
+      border-color: rgba(163,180,252,0.6);
+      background: rgba(255,255,255,0.11);
       box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
     }
     /* password toggle eye */
@@ -1827,14 +1826,14 @@
       transform: translateY(-50%);
       background: none;
       border: none;
-      color: rgba(31,41,55,0.6);
+      color: rgba(255,255,255,0.35);
       font-size: 1.05rem;
       cursor: pointer;
       padding: 4px;
       transition: color 0.2s;
     }
     .login-input-wrap .eye-toggle:hover {
-      color: rgba(31,41,55,0.9);
+      color: rgba(255,255,255,0.7);
     }
 
     /* error toast */
@@ -3347,23 +3346,22 @@
     }
     
     .admin-dropdown-btn {
-      background: rgba(255,255,255,0.2);
-      border: 2px solid rgba(255,255,255,0.4);
-      color: white;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      color: var(--primary);
       padding: 0.5rem 1rem;
-      border-radius: 8px;
-      font-weight: 600;
+      border-radius: var(--radius-md);
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      font-size: 0.9rem;
-      transition: all 0.3s;
-      white-space: nowrap;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: var(--transition);
     }
     
     .admin-dropdown-btn:hover {
-      background: rgba(255,255,255,0.3);
+      background: rgba(99, 102, 241, 0.15);
     }
     
     .admin-dropdown-menu {
@@ -3372,11 +3370,11 @@
       right: 0;
       background: white;
       border-radius: var(--radius-md);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.1);
+      box-shadow: var(--shadow-lg);
       min-width: 200px;
       padding: 0.5rem;
       display: none;
-      z-index: 10000;
+      z-index: 99999;
     }
     
     .admin-dropdown-menu.active {
@@ -3414,6 +3412,66 @@
 </head>
 
 <body>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════════
+       LOGIN OVERLAY
+       ═══════════════════════════════════════════════════════════════════════════════ -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-orb login-orb-1"></div>
+    <div class="login-orb login-orb-2"></div>
+    <div class="login-orb login-orb-3"></div>
+    
+    <div class="login-card">
+      <div class="login-logo">
+        <i class="bi bi-shield-lock-fill"></i>
+      </div>
+      <h1 class="login-title">Welcome Back</h1>
+      <p class="login-subtitle">Please sign in to continue</p>
+      
+      <div class="login-error" id="loginError">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span id="loginErrorText">Invalid credentials</span>
+      </div>
+      
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="login-form-group">
+          <label for="loginUsername">Username</label>
+          <div class="login-input-wrapper">
+            <i class="bi bi-person-fill login-input-icon"></i>
+            <input 
+              type="text" 
+              id="loginUsername" 
+              class="login-input" 
+              placeholder="Enter username"
+              autocomplete="username"
+            >
+          </div>
+        </div>
+        
+        <div class="login-form-group">
+          <label for="loginPassword">Password</label>
+          <div class="login-input-wrapper">
+            <i class="bi bi-lock-fill login-input-icon"></i>
+            <input 
+              type="password" 
+              id="loginPassword" 
+              class="login-input" 
+              placeholder="Enter password"
+              autocomplete="current-password"
+            >
+            <button type="button" class="password-toggle" onclick="togglePasswordVisibility()">
+              <i class="bi bi-eye-fill" id="passwordToggleIcon"></i>
+            </button>
+          </div>
+        </div>
+        
+        <button type="submit" class="login-btn">
+          <span>Sign In</span>
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </form>
+    </div>
+  </div>
 
   <!-- ═══════════════════════════════════════════════════════════════════════════════
        USER MANAGEMENT MODAL (ADMIN ONLY)
@@ -3604,26 +3662,6 @@
           <i class="bi bi-arrow-clockwise"></i>
           Refresh Data
         </button>
-        
-        <!-- Admin Dropdown -->
-        <div class="admin-dropdown" id="adminDropdown" style="display: none;">
-          <button class="admin-dropdown-btn" onclick="toggleAdminDropdown()">
-            <i class="bi bi-gear-fill"></i>
-            Admin
-            <i class="bi bi-chevron-down"></i>
-          </button>
-          <div class="admin-dropdown-menu" id="adminDropdownMenu">
-            <div class="admin-dropdown-item" onclick="openUserManagement()">
-              <i class="bi bi-people-fill"></i>
-              Manage Users
-            </div>
-            <div class="admin-dropdown-item" onclick="openActiveSessions()">
-              <i class="bi bi-activity"></i>
-              Active Sessions
-            </div>
-          </div>
-        </div>
-        
         <button onclick="logoutAdmin()" style="background: rgba(239,68,68,0.25); border: 2px solid rgba(239,68,68,0.45); color: #fca5a5; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; white-space: nowrap;"
                 onmouseover="this.style.background='rgba(239,68,68,0.38)'" onmouseout="this.style.background='rgba(239,68,68,0.25)'">
           <i class="bi bi-box-arrow-right"></i>
@@ -4235,34 +4273,6 @@
   const AUTH_USER = 'Admin';
   const AUTH_PASS = '3458';
   let isAuthenticated = false;
-
-  // ========================================
-  // SESSION-BASED AUTHENTICATION
-  // ========================================
-  const DEFAULT_ADMIN = {
-    username: 'Admin',
-    password: '3458',
-    role: 'admin'
-  };
-  
-  let currentSession = null;
-  let inactivityTimer = null;
-  let timeoutCountdown = null;
-  const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
-  
-  // User account management functions
-  function getUserAccounts() {
-    try {
-      const accountsStr = localStorage.getItem('userAccounts');
-      return accountsStr ? JSON.parse(accountsStr) : [];
-    } catch (e) {
-      return [];
-    }
-  }
-  
-  function saveUserAccounts(accounts) {
-    localStorage.setItem('userAccounts', JSON.stringify(accounts));
-  }
 
   // Auto-load data ONLY after login
   window.addEventListener('DOMContentLoaded', function() {
@@ -5690,61 +5700,49 @@
       passEl.focus();
     });
 
-    // Connect to the proper session-based login handler
-    btn.addEventListener('click', function() {
-      const username = userEl.value.trim();
-      const password = passEl.value;
-      
-      // Validate empty fields
-      if (!username) {
-        showErr('Username is required');
+    btn.addEventListener('click', handleLogin);
+
+    function handleLogin() {
+      const u = userEl.value.trim();
+      const p = passEl.value;
+
+      if (!u && !p) {
+        showErr('Please enter your username and password.');
         userEl.focus();
         return;
       }
-      
-      if (!password) {
-        showErr('Password is required');
+      if (!u) {
+        showErr('Username is required.');
+        userEl.focus();
+        return;
+      }
+      if (!p) {
+        showErr('Password is required.');
         passEl.focus();
         return;
       }
-      
-      // Check credentials
-      let user = null;
-      
-      // Check admin
-      if (username === DEFAULT_ADMIN.username && password === DEFAULT_ADMIN.password) {
-        user = DEFAULT_ADMIN;
+
+      if (u === AUTH_USER && p === AUTH_PASS) {
+        // success – hide login, show dashboard, kick off data load
+        isAuthenticated = true;
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.4s ease';
+        setTimeout(function() { overlay.style.display = 'none'; }, 400);
+        loadDataFromGoogleSheets();
       } else {
-        // Check viewer accounts
-        const userAccounts = getUserAccounts();
-        const foundUser = userAccounts.find(u => u.username === username && u.password === password);
-        if (foundUser) {
-          user = foundUser;
+        // wrong creds
+        if (u !== AUTH_USER) {
+          showErr('Invalid username or password.');
+          userEl.value = '';
+          passEl.value = '';
+          userEl.focus();
+        } else {
+          showErr('Invalid username or password.');
+          passEl.value = '';
+          passEl.focus();
         }
       }
-      
-      if (!user) {
-        showErr('Invalid username or password');
-        passEl.value = '';
-        passEl.focus();
-        return;
-      }
-      
-      // Create session
-      const session = {
-        sessionId: generateSessionId(),
-        username: user.username,
-        role: user.role,
-        loginTime: Date.now(),
-        lastActivity: Date.now()
-      };
-      
-      currentSession = session;
-      saveSession(session);
-      
-      // Success
-      onLoginSuccess(session);
-    });
+    }
 
     function showErr(msg) {
       errMsg.textContent = msg;
@@ -6688,6 +6686,21 @@
   // AUTHENTICATION & SESSION MANAGEMENT SYSTEM
   // ═══════════════════════════════════════════════════════════════════════════════
   
+  // Default admin credentials (easily changeable)
+  const DEFAULT_ADMIN = {
+    username: 'Admin',
+    password: '3458',
+    role: 'admin'
+  };
+  
+  // Session timeout: 30 minutes (in milliseconds)
+  const SESSION_TIMEOUT = 30 * 60 * 1000;
+  
+  // Session state
+  let currentSession = null;
+  let inactivityTimer = null;
+  let timeoutCountdown = null;
+  
   // Initialize authentication on page load
   window.addEventListener('DOMContentLoaded', function() {
     // Check if there's an active session
@@ -6788,19 +6801,86 @@
   // LOGIN & LOGOUT
   // ═══════════════════════════════════════════════════════════════════════════════
   
+  function handleLogin(event) {
+    event.preventDefault();
+    
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+    const errorText = document.getElementById('loginErrorText');
+    
+    // Validate empty fields
+    if (!username) {
+      errorText.textContent = 'Username is required';
+      errorEl.classList.add('show');
+      document.getElementById('loginUsername').focus();
+      return;
+    }
+    
+    if (!password) {
+      errorText.textContent = 'Password is required';
+      errorEl.classList.add('show');
+      document.getElementById('loginPassword').focus();
+      return;
+    }
+    
+    // Check credentials
+    let user = null;
+    
+    // Check admin
+    if (username === DEFAULT_ADMIN.username && password === DEFAULT_ADMIN.password) {
+      user = DEFAULT_ADMIN;
+    } else {
+      // Check viewer accounts
+      const userAccounts = getUserAccounts();
+      const foundUser = userAccounts.find(u => u.username === username && u.password === password);
+      if (foundUser) {
+        user = foundUser;
+      }
+    }
+    
+    if (!user) {
+      errorText.textContent = 'Invalid username or password';
+      errorEl.classList.add('show');
+      // Clear password field
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginPassword').focus();
+      return;
+    }
+    
+    // Create session
+    const session = {
+      sessionId: generateSessionId(),
+      username: user.username,
+      role: user.role,
+      loginTime: Date.now(),
+      lastActivity: Date.now()
+    };
+    
+    currentSession = session;
+    saveSession(session);
+    
+    // Success
+    onLoginSuccess(session);
+  }
+  
   function onLoginSuccess(session) {
     // Hide login overlay
     const loginOverlay = document.getElementById('loginOverlay');
-    loginOverlay.style.opacity = '0';
-    loginOverlay.style.transition = 'opacity 0.4s ease';
+    loginOverlay.style.animation = 'fadeOut 0.5s';
     setTimeout(() => {
       loginOverlay.style.display = 'none';
-    }, 400);
+    }, 500);
     
-    // Show admin dropdown if admin
+    // Update header
+    document.getElementById('welcomeText').textContent = `Welcome, ${session.username}`;
+    
+    // Show admin dropdown ONLY if admin role, hide for viewers
     const adminDropdown = document.getElementById('adminDropdown');
-    if (session.role === 'admin' && adminDropdown) {
+    if (session.role === 'admin') {
       adminDropdown.style.display = 'block';
+    } else {
+      adminDropdown.style.display = 'none';
     }
     
     // Load data
@@ -6830,24 +6910,38 @@
   
   function showLogin() {
     const loginOverlay = document.getElementById('loginOverlay');
-    if (loginOverlay) {
-      loginOverlay.style.display = 'flex';
-      loginOverlay.style.opacity = '1';
-    }
+    loginOverlay.style.display = 'flex';
+    loginOverlay.style.animation = 'fadeIn 0.5s';
     
-    // Clear form fields
-    const usernameField = document.getElementById('loginUsername');
-    const passwordField = document.getElementById('loginPassword');
-    const errorBox = document.getElementById('loginError');
+    // Clear form
+    document.getElementById('loginForm').reset();
+    document.getElementById('loginError').classList.remove('show');
     
-    if (usernameField) usernameField.value = '';
-    if (passwordField) passwordField.value = '';
-    if (errorBox) errorBox.classList.remove('visible', 'show');
+    // Hide admin dropdown
+    document.getElementById('adminDropdown').style.display = 'none';
     
-    // Focus username after a brief delay
+    // Reset welcome text
+    document.getElementById('welcomeText').textContent = 'Welcome, User';
+    
+    // Focus username
     setTimeout(() => {
-      if (usernameField) usernameField.focus();
-    }, 300);
+      document.getElementById('loginUsername').focus();
+    }, 600);
+  }
+  
+  function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('loginPassword');
+    const icon = document.getElementById('passwordToggleIcon');
+    
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      icon.classList.remove('bi-eye-fill');
+      icon.classList.add('bi-eye-slash-fill');
+    } else {
+      passwordInput.type = 'password';
+      icon.classList.remove('bi-eye-slash-fill');
+      icon.classList.add('bi-eye-fill');
+    }
   }
   
   // ═══════════════════════════════════════════════════════════════════════════════
@@ -6913,6 +7007,19 @@
   // ═══════════════════════════════════════════════════════════════════════════════
   // USER MANAGEMENT (ADMIN ONLY)
   // ═══════════════════════════════════════════════════════════════════════════════
+  
+  function getUserAccounts() {
+    try {
+      const accountsStr = localStorage.getItem('userAccounts');
+      return accountsStr ? JSON.parse(accountsStr) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+  
+  function saveUserAccounts(accounts) {
+    localStorage.setItem('userAccounts', JSON.stringify(accounts));
+  }
   
   function toggleAdminDropdown() {
     const menu = document.getElementById('adminDropdownMenu');
@@ -7129,6 +7236,11 @@
       performLogout();
     }
   }, 5000); // Check every 5 seconds
+  
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
 
 </script>
 
