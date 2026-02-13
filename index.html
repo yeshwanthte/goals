@@ -1794,28 +1794,29 @@
       left: 14px;
       top: 50%;
       transform: translateY(-50%);
-      color: rgba(255,255,255,0.35);
+      color: rgba(31,41,55,0.6);
       font-size: 1.05rem;
       pointer-events: none;
     }
     .login-input-wrap input {
       width: 100%;
       padding: 0.8rem 1rem 0.8rem 2.6rem;
-      background: rgba(255,255,255,0.08);
-      border: 1.5px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.25);
+      border: 2px solid rgba(255,255,255,0.4);
       border-radius: 12px;
-      color: #fff;
+      color: #1f2937;
       font-size: 0.92rem;
       font-family: inherit;
+      font-weight: 500;
       transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
       outline: none;
     }
     .login-input-wrap input::placeholder {
-      color: rgba(255,255,255,0.28);
+      color: rgba(31,41,55,0.5);
     }
     .login-input-wrap input:focus {
-      border-color: rgba(163,180,252,0.6);
-      background: rgba(255,255,255,0.11);
+      border-color: rgba(99,102,241,0.8);
+      background: rgba(255,255,255,0.35);
       box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
     }
     /* password toggle eye */
@@ -1826,11 +1827,14 @@
       transform: translateY(-50%);
       background: none;
       border: none;
-      color: rgba(255,255,255,0.35);
+      color: rgba(31,41,55,0.6);
       font-size: 1.05rem;
       cursor: pointer;
       padding: 4px;
       transition: color 0.2s;
+    }
+    .login-input-wrap .eye-toggle:hover {
+      color: rgba(31,41,55,0.9);
     }
     .login-input-wrap .eye-toggle:hover {
       color: rgba(255,255,255,0.7);
