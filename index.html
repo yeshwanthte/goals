@@ -4844,10 +4844,24 @@
     currentPlanActualActivity = activityName;
     currentPlanActualRevField = revenueField;
     
-    // Sort by revenue descending by default (column index 6 now)
-    sortColumnPA = 6;
-    sortAscendingPA = false;
-    currentPlanActualData.sort((a, b) => (b[revenueField] || 0) - (a[revenueField] || 0));
+    // Default sort by Actual Date (column 7) - oldest to newest
+    sortColumnPA = 7;
+    sortAscendingPA = true;
+    
+    // Get actual field name
+    let actualField;
+    if (revenueField === 'PlasterRev') actualField = 'PlasterActual';
+    else if (revenueField === 'FloorRev') actualField = 'FlooringActual';
+    else actualField = 'HandoverActual';
+    
+    // Sort by actual date ascending (oldest first)
+    currentPlanActualData.sort((a, b) => {
+      const actualDateA = parseDate(a[actualField]);
+      const actualDateB = parseDate(b[actualField]);
+      const valA = actualDateA ? actualDateA.getTime() : 0;
+      const valB = actualDateB ? actualDateB.getTime() : 0;
+      return valA - valB;
+    });
     
     // Update header
     document.getElementById("planActualActivityName").textContent = activityName;
