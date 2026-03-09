@@ -3441,8 +3441,10 @@
                     <th class="sortable" onclick="sortPlanActualTable(2)">Tower</th>
                     <th class="sortable" onclick="sortPlanActualTable(3)">Unit No.</th>
                     <th class="sortable" onclick="sortPlanActualTable(4)">Customer Name</th>
-                    <th class="sortable" onclick="sortPlanActualTable(5)">Plan</th>
-                    <th class="sortable" onclick="sortPlanActualTable(6)">Revenue (₹ Cr)</th>
+                    <th class="sortable" onclick="sortPlanActualTable(5)">Plan Date</th>
+                    <th class="sortable" onclick="sortPlanActualTable(6)">Plan Amt (₹ Cr)</th>
+                    <th class="sortable" onclick="sortPlanActualTable(7)">Actual Date</th>
+                    <th class="sortable" onclick="sortPlanActualTable(8)">Actual Amt (₹ Cr)</th>
                   </tr>
                 </thead>
                 <tbody id="planActualDetailsTableBody"></tbody>
@@ -4590,6 +4592,16 @@
     }
     return null;
   }
+  
+  // Format date as DDMMMYY (e.g., 15Jan25)
+  function formatDateDDMMMYY(date) {
+    if (!date) return 'N/A';
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = months[date.getMonth()];
+    const year = String(date.getFullYear()).slice(-2);
+    return `${day}${month}${year}`;
+  }
 
   // Get quarter from date
   function getQuarter(date) {
@@ -4862,7 +4874,7 @@
     if (currentPlanActualData.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="7" style="text-align: center; padding: 2rem; color: var(--gray-400);">
+          <td colspan="9" style="text-align: center; padding: 2rem; color: var(--gray-400);">
             <i class="bi bi-info-circle" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
             No units found for this activity
           </td>
@@ -4870,39 +4882,57 @@
       return;
     }
     
-    // Calculate total revenue
-    const totalRevenue = currentPlanActualData.reduce((sum, unit) => sum + (unit[currentPlanActualRevField] || 0), 0) / 10000000;
+    // Get plan and actual field names
+    let planField, actualField;
+    if (currentPlanActualRevField === 'PlasterRev') {
+      planField = 'PlasterPlan';
+      actualField = 'PlasterActual';
+    } else if (currentPlanActualRevField === 'FloorRev') {
+      planField = 'FlooringPlan';
+      actualField = 'FlooringActual';
+    } else {
+      planField = 'HandoverPlan';
+      actualField = 'HandoverActual';
+    }
     
-    // Get plan field name
-    let planField;
-    if (currentPlanActualRevField === 'PlasterRev') planField = 'PlasterPlan';
-    else if (currentPlanActualRevField === 'FloorRev') planField = 'FlooringPlan';
-    else planField = 'HandoverPlan';
+    // Calculate totals
+    const totalPlanAmt = currentPlanActualData.reduce((sum, unit) => {
+      const planDate = parseDate(unit[planField]);
+      return planDate ? sum + (unit[currentPlanActualRevField] || 0) : sum;
+    }, 0) / 10000000;
+    
+    const totalActualAmt = currentPlanActualData.reduce((sum, unit) => {
+      const actualDate = parseDate(unit[actualField]);
+      return actualDate ? sum + (unit[currentPlanActualRevField] || 0) : sum;
+    }, 0) / 10000000;
     
     // Add total row at top
     tbody.innerHTML = `
       <tr class="total-row">
-        <td colspan="6">
+        <td colspan="5">
           <span class="total-label">
             <i class="bi bi-calculator"></i>
             <strong>TOTAL - ${currentPlanActualData.length} Units</strong>
           </span>
         </td>
-        <td class="revenue-cell" style="font-size: 1.1rem;">
-          <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
+        <td colspan="2" class="revenue-cell" style="font-size: 1rem;">
+          <strong>₹${totalPlanAmt.toFixed(2)} Cr</strong>
+        </td>
+        <td colspan="2" class="revenue-cell" style="font-size: 1rem;">
+          <strong>₹${totalActualAmt.toFixed(2)} Cr</strong>
         </td>
       </tr>`;
     
     // Add individual rows
     currentPlanActualData.forEach(unit => {
-      const revenue = ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2);
       const planDate = parseDate(unit[planField]);
-      let planText = 'N/A';
-      if (planDate) {
-        const year = planDate.getFullYear();
-        const quarter = getQuarter(planDate);
-        planText = `${year} Q${quarter}`;
-      }
+      const actualDate = parseDate(unit[actualField]);
+      
+      const planDateText = formatDateDDMMMYY(planDate);
+      const actualDateText = formatDateDDMMMYY(actualDate);
+      
+      const planAmt = planDate ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
+      const actualAmt = actualDate ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
       
       tbody.innerHTML += `
         <tr>
@@ -4911,8 +4941,10 @@
           <td>${unit.Tower || 'N/A'}</td>
           <td class="unit-number">${unit.UnitNo}</td>
           <td class="customer-name">${unit.Customer}</td>
-          <td>${planText}</td>
-          <td class="revenue-cell">₹${revenue}</td>
+          <td>${planDateText}</td>
+          <td class="revenue-cell">${planAmt !== '-' ? '₹' + planAmt : '-'}</td>
+          <td>${actualDateText}</td>
+          <td class="revenue-cell">${actualAmt !== '-' ? '₹' + actualAmt : '-'}</td>
         </tr>`;
     });
     
@@ -4933,11 +4965,18 @@
       sortAscendingPA = true;
     }
     
-    // Get plan field name
-    let planField;
-    if (currentPlanActualRevField === 'PlasterRev') planField = 'PlasterPlan';
-    else if (currentPlanActualRevField === 'FloorRev') planField = 'FlooringPlan';
-    else planField = 'HandoverPlan';
+    // Get plan and actual field names
+    let planField, actualField;
+    if (currentPlanActualRevField === 'PlasterRev') {
+      planField = 'PlasterPlan';
+      actualField = 'PlasterActual';
+    } else if (currentPlanActualRevField === 'FloorRev') {
+      planField = 'FlooringPlan';
+      actualField = 'FlooringActual';
+    } else {
+      planField = 'HandoverPlan';
+      actualField = 'HandoverActual';
+    }
     
     currentPlanActualData.sort((a, b) => {
       let valA, valB;
@@ -4948,17 +4987,30 @@
         case 2: valA = a.Tower || ''; valB = b.Tower || ''; break;
         case 3: valA = a.UnitNo || ''; valB = b.UnitNo || ''; break;
         case 4: valA = a.Customer || ''; valB = b.Customer || ''; break;
-        case 5: // Plan column
-          const dateA = parseDate(a[planField]);
-          const dateB = parseDate(b[planField]);
-          valA = dateA ? dateA.getTime() : 0;
-          valB = dateB ? dateB.getTime() : 0;
+        case 5: // Plan Date
+          const planDateA = parseDate(a[planField]);
+          const planDateB = parseDate(b[planField]);
+          valA = planDateA ? planDateA.getTime() : 0;
+          valB = planDateB ? planDateB.getTime() : 0;
           break;
-        case 6: valA = a[currentPlanActualRevField] || 0; valB = b[currentPlanActualRevField] || 0; break;
+        case 6: // Plan Amount
+          valA = parseDate(a[planField]) ? (a[currentPlanActualRevField] || 0) : 0;
+          valB = parseDate(b[planField]) ? (b[currentPlanActualRevField] || 0) : 0;
+          break;
+        case 7: // Actual Date
+          const actualDateA = parseDate(a[actualField]);
+          const actualDateB = parseDate(b[actualField]);
+          valA = actualDateA ? actualDateA.getTime() : 0;
+          valB = actualDateB ? actualDateB.getTime() : 0;
+          break;
+        case 8: // Actual Amount
+          valA = parseDate(a[actualField]) ? (a[currentPlanActualRevField] || 0) : 0;
+          valB = parseDate(b[actualField]) ? (b[currentPlanActualRevField] || 0) : 0;
+          break;
         default: return 0;
       }
       
-      if (columnIndex === 5 || columnIndex === 6) {
+      if (columnIndex >= 5 && columnIndex <= 8) {
         return sortAscendingPA ? valA - valB : valB - valA;
       }
       
@@ -4981,27 +5033,52 @@
       return;
     }
     
-    // Get plan field name
-    let planField;
-    if (currentPlanActualRevField === 'PlasterRev') planField = 'PlasterPlan';
-    else if (currentPlanActualRevField === 'FloorRev') planField = 'FlooringPlan';
-    else planField = 'HandoverPlan';
+    // Get plan and actual field names
+    let planField, actualField;
+    if (currentPlanActualRevField === 'PlasterRev') {
+      planField = 'PlasterPlan';
+      actualField = 'PlasterActual';
+    } else if (currentPlanActualRevField === 'FloorRev') {
+      planField = 'FlooringPlan';
+      actualField = 'FlooringActual';
+    } else {
+      planField = 'HandoverPlan';
+      actualField = 'HandoverActual';
+    }
     
     const excelData = [];
-    excelData.push(['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Plan', `Revenue - ${currentPlanActualActivity} (₹ Cr)`]);
+    excelData.push([
+      'Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 
+      'Plan Date', `Plan Amt - ${currentPlanActualActivity} (₹ Cr)`,
+      'Actual Date', `Actual Amt - ${currentPlanActualActivity} (₹ Cr)`
+    ]);
     
-    const totalRevenue = currentPlanActualData.reduce((sum, unit) => sum + (unit[currentPlanActualRevField] || 0), 0) / 10000000;
-    excelData.push(['TOTAL', '', '', `${currentPlanActualData.length} Units`, '', '', totalRevenue.toFixed(2)]);
+    // Calculate totals
+    const totalPlanAmt = currentPlanActualData.reduce((sum, unit) => {
+      const planDate = parseDate(unit[planField]);
+      return planDate ? sum + (unit[currentPlanActualRevField] || 0) : sum;
+    }, 0) / 10000000;
+    
+    const totalActualAmt = currentPlanActualData.reduce((sum, unit) => {
+      const actualDate = parseDate(unit[actualField]);
+      return actualDate ? sum + (unit[currentPlanActualRevField] || 0) : sum;
+    }, 0) / 10000000;
+    
+    excelData.push([
+      'TOTAL', '', '', `${currentPlanActualData.length} Units`, '', 
+      '', totalPlanAmt.toFixed(2),
+      '', totalActualAmt.toFixed(2)
+    ]);
     
     currentPlanActualData.forEach(unit => {
-      const revenue = ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2);
       const planDate = parseDate(unit[planField]);
-      let planText = 'N/A';
-      if (planDate) {
-        const year = planDate.getFullYear();
-        const quarter = getQuarter(planDate);
-        planText = `${year} Q${quarter}`;
-      }
+      const actualDate = parseDate(unit[actualField]);
+      
+      const planDateText = formatDateDDMMMYY(planDate);
+      const actualDateText = formatDateDDMMMYY(actualDate);
+      
+      const planAmt = planDate ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
+      const actualAmt = actualDate ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
       
       excelData.push([
         unit.Project || 'N/A',
@@ -5009,8 +5086,10 @@
         unit.Tower || 'N/A',
         unit.UnitNo,
         unit.Customer,
-        planText,
-        revenue
+        planDateText,
+        planAmt,
+        actualDateText,
+        actualAmt
       ]);
     });
     
@@ -5018,13 +5097,15 @@
     const ws = XLSX.utils.aoa_to_sheet(excelData);
     
     ws['!cols'] = [
-      { wch: 20 },
-      { wch: 15 },
-      { wch: 15 },
-      { wch: 15 },
-      { wch: 25 },
-      { wch: 15 },
-      { wch: 20 }
+      { wch: 20 },  // Project
+      { wch: 15 },  // Phase
+      { wch: 15 },  // Tower
+      { wch: 15 },  // Unit No
+      { wch: 25 },  // Customer Name
+      { wch: 12 },  // Plan Date
+      { wch: 18 },  // Plan Amt
+      { wch: 12 },  // Actual Date
+      { wch: 18 }   // Actual Amt
     ];
     
     XLSX.utils.book_append_sheet(wb, ws, currentPlanActualActivity);
