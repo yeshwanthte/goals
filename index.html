@@ -4728,14 +4728,21 @@
     return null;
   }
   
-  // Format date as DDMMMYY (e.g., 15Jan25)
+  // Format date as DD-MMM-YY (e.g., 15-Jan-25)
   function formatDateDDMMMYY(date) {
     if (!date) return 'N/A';
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const day = String(date.getDate()).padStart(2, '0');
     const month = months[date.getMonth()];
     const year = String(date.getFullYear()).slice(-2);
-    return `${day}${month}${year}`;
+    return `${day}-${month}-${year}`;
+  }
+
+  // Format a raw DD-MM-YYYY date string as DD-MMM-YY
+  function formatRawDate(dateStr) {
+    if (!dateStr || dateStr === '' || dateStr === 'N/A') return 'N/A';
+    const d = parseDate(dateStr);
+    return d ? formatDateDDMMMYY(d) : (dateStr || 'N/A');
   }
 
   // Get quarter from date
@@ -5932,19 +5939,11 @@
     const totalReceived = unit.TotalReceived || 0;
     const balanceReceivables = totalReceivables - totalReceived;
     
-    // Helper function to format currency in Lakhs/Crores
+    // Helper function to format currency always in Crores
     function formatCurrency(value) {
-      if (!value || value === 0) return '₹0';
+      if (!value || value === 0) return '₹0.00 Cr';
       const crores = value / 10000000;
-      const lakhs = value / 100000;
-      
-      if (crores >= 1) {
-        return `₹${crores.toFixed(2)} Cr`;
-      } else if (lakhs >= 1) {
-        return `₹${lakhs.toFixed(2)} L`;
-      } else {
-        return `₹${(value / 1000).toFixed(2)} K`;
-      }
+      return `₹${crores.toFixed(2)} Cr`;
     }
     
     const financialHTML = `
@@ -5976,19 +5975,19 @@
     const datesHTML = `
       <div class="date-item">
         <div class="date-label">AFS Date</div>
-        <div class="date-value">${unit.AFSDate || 'N/A'}</div>
+        <div class="date-value">${formatRawDate(unit.AFSDate)}</div>
       </div>
       <div class="date-item">
         <div class="date-label">HO as per AFS</div>
-        <div class="date-value">${unit.HOasPerAFS || 'N/A'}</div>
+        <div class="date-value">${formatRawDate(unit.HOasPerAFS)}</div>
       </div>
       <div class="date-item">
         <div class="date-label">IDSA Date</div>
-        <div class="date-value">${unit.IDSADate || 'N/A'}</div>
+        <div class="date-value">${formatRawDate(unit.IDSADate)}</div>
       </div>
       <div class="date-item">
         <div class="date-label">HO as per IDSA</div>
-        <div class="date-value">${unit.HOasPerIDSA || 'N/A'}</div>
+        <div class="date-value">${formatRawDate(unit.HOasPerIDSA)}</div>
       </div>
     `;
     
@@ -6033,19 +6032,11 @@
     const doc = new jsPDF();
     const unit = currentUnitData;
     
-    // Helper function to format currency
+    // Helper function to format currency (ASCII-safe for jsPDF)
     function formatCurrency(value) {
-      if (!value || value === 0) return '₹0';
+      if (!value || value === 0) return 'Rs. 0.00 Cr';
       const crores = value / 10000000;
-      const lakhs = value / 100000;
-      
-      if (crores >= 1) {
-        return `₹${crores.toFixed(2)} Cr`;
-      } else if (lakhs >= 1) {
-        return `₹${lakhs.toFixed(2)} L`;
-      } else {
-        return `₹${(value / 1000).toFixed(2)} K`;
-      }
+      return `Rs. ${crores.toFixed(2)} Cr`;
     }
     
     // === HEADER ===
@@ -6232,25 +6223,25 @@
     
     doc.text('AFS Date:', 15, yPos);
     doc.setTextColor(0);
-    doc.text(unit.AFSDate || 'N/A', 50, yPos);
+    doc.text(formatDateDDMMMYY(parseDate(unit.AFSDate)) || unit.AFSDate || 'N/A', 50, yPos);
     doc.setTextColor(100);
     yPos += 6;
     
     doc.text('HO as per AFS:', 15, yPos);
     doc.setTextColor(0);
-    doc.text(unit.HOasPerAFS || 'N/A', 50, yPos);
+    doc.text(formatDateDDMMMYY(parseDate(unit.HOasPerAFS)) || unit.HOasPerAFS || 'N/A', 50, yPos);
     doc.setTextColor(100);
     yPos += 6;
     
     doc.text('IDSA Date:', 15, yPos);
     doc.setTextColor(0);
-    doc.text(unit.IDSADate || 'N/A', 50, yPos);
+    doc.text(formatDateDDMMMYY(parseDate(unit.IDSADate)) || unit.IDSADate || 'N/A', 50, yPos);
     doc.setTextColor(100);
     yPos += 6;
     
     doc.text('HO as per IDSA:', 15, yPos);
     doc.setTextColor(0);
-    doc.text(unit.HOasPerIDSA || 'N/A', 50, yPos);
+    doc.text(formatDateDDMMMYY(parseDate(unit.HOasPerIDSA)) || unit.HOasPerIDSA || 'N/A', 50, yPos);
     doc.setTextColor(100);
     yPos += 6;
     
@@ -6279,9 +6270,9 @@
     
     doc.setFontSize(9);
     activities.forEach(a => {
-      // Bullet
+      // Bullet (ASCII dash - avoids Unicode rendering issues in jsPDF)
       doc.setTextColor(a.completed ? 16 : 150, a.completed ? 185 : 150, a.completed ? 129 : 150);
-      doc.text('●', 17, yPos);
+      doc.text('-', 17, yPos);
       
       // Activity name
       doc.setTextColor(0);
