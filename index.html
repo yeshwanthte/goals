@@ -2392,132 +2392,224 @@
       to { opacity: 1; transform: translateY(0); }
     }
     
+    /* ===== PREMIUM UNIT DETAIL POPUP ===== */
     .unit-detail-header {
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
       color: white;
-      padding: 1.5rem;
+      padding: 2rem 2.5rem;
       border-radius: var(--radius-lg) var(--radius-lg) 0 0;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
+      gap: 2rem;
     }
     
-    .unit-detail-header-left {
+    .unit-detail-header-content {
       flex: 1;
     }
     
-    .unit-detail-project {
-      font-size: 0.85rem;
-      opacity: 0.9;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
+    .unit-detail-project-name {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.75;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    
+    .unit-detail-main-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
     }
     
     .unit-detail-unit-no {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
+      font-size: 2.25rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.5px;
     }
     
     .unit-detail-customer {
-      font-size: 1rem;
-      opacity: 0.95;
+      font-size: 1.1rem;
+      opacity: 0.9;
       font-weight: 500;
     }
     
     .unit-detail-logo {
-      width: 80px;
+      width: 110px;
       height: auto;
       background: white;
-      padding: 4px 8px;
-      border-radius: 6px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     
-    .unit-detail-meta {
-      padding: 1rem 1.5rem;
-      background: var(--gray-50);
+    /* Sections */
+    .unit-detail-section {
+      padding: 1.75rem 2.5rem;
       border-bottom: 1px solid var(--gray-200);
-      display: flex;
-      gap: 1.5rem;
     }
     
-    .unit-detail-meta-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-    
-    .unit-detail-meta-label {
-      font-size: 0.7rem;
-      color: var(--gray-500);
+    .unit-section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
       text-transform: uppercase;
-      font-weight: 600;
       letter-spacing: 0.5px;
-    }
-    
-    .unit-detail-meta-value {
-      font-size: 0.95rem;
-      color: var(--gray-900);
-      font-weight: 600;
-    }
-    
-    /* Additional Unit Information Grid */
-    .unit-detail-info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-      padding: 1.25rem 1.5rem;
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(139, 92, 246, 0.03) 100%);
-      border-bottom: 1px solid var(--gray-200);
-    }
-    
-    .unit-info-item {
+      color: var(--gray-700);
+      margin-bottom: 1.25rem;
       display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-      padding: 0.75rem;
-      background: white;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--gray-200);
+      align-items: center;
+      gap: 0.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--gray-200);
+    }
+    
+    .unit-section-title i {
+      color: var(--primary);
+      font-size: 1rem;
+    }
+    
+    /* Unit Details Grid */
+    .unit-info-grid-premium {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+    
+    .unit-info-item-premium {
+      background: var(--gray-50);
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      border-left: 3px solid var(--primary);
       transition: all 0.2s ease;
     }
     
-    .unit-info-item:hover {
-      border-color: var(--primary);
-      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
-      transform: translateY(-1px);
+    .unit-info-item-premium:hover {
+      background: rgba(99, 102, 241, 0.05);
+      transform: translateX(2px);
     }
     
-    .unit-info-label {
-      font-size: 0.65rem;
-      color: var(--gray-500);
+    .unit-info-label-premium {
+      font-size: 0.7rem;
       text-transform: uppercase;
       font-weight: 700;
       letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
+      color: var(--gray-500);
+      margin-bottom: 0.4rem;
     }
     
-    .unit-info-label i {
-      font-size: 0.75rem;
-      color: var(--primary);
-    }
-    
-    .unit-info-value {
-      font-size: 0.9rem;
-      color: var(--gray-900);
+    .unit-info-value-premium {
+      font-size: 1rem;
       font-weight: 600;
+      color: var(--gray-900);
       line-height: 1.3;
     }
     
-    .unit-info-value.badge {
+    .unit-info-value-premium.badge-oc {
       display: inline-block;
-      padding: 0.25rem 0.6rem;
-      border-radius: 12px;
-      font-size: 0.75rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
       font-weight: 700;
-      width: fit-content;
+    }
+    
+    .badge-oc.completed {
+      background: rgba(16, 185, 129, 0.15);
+      color: #059669;
+    }
+    
+    .badge-oc.pending {
+      background: rgba(245, 158, 11, 0.15);
+      color: #d97706;
+    }
+    
+    /* Financial Grid */
+    .unit-financial-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+    }
+    
+    .financial-item {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 150, 105, 0.05) 100%);
+      padding: 1.25rem;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    
+    .financial-item.total {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+    
+    .financial-item.balance {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.08) 100%);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+    
+    .financial-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--gray-600);
+      margin-bottom: 0.5rem;
+    }
+    
+    .financial-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      line-height: 1;
+    }
+    
+    .financial-value.positive {
+      color: #059669;
+    }
+    
+    .financial-value.negative {
+      color: #dc2626;
+    }
+    
+    /* Dates Grid */
+    .unit-dates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    
+    .date-item {
+      background: var(--gray-50);
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--gray-200);
+    }
+    
+    .date-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    
+    .date-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      font-family: 'Courier New', monospace;
+    }
+    
+    /* Activities */
+    .unit-activity-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 0.75rem;
+    }
     }
     
     .unit-info-value.badge.oc-completed {
@@ -3561,11 +3653,14 @@
 <!-- Unit Detail Popup Modal -->
 <div class="unit-detail-overlay" id="unitDetailOverlay" onclick="if(event.target===this) closeUnitDetail()">
   <div class="unit-detail-card" id="unitDetailCard">
+    <!-- Premium Header -->
     <div class="unit-detail-header">
-      <div class="unit-detail-header-left">
-        <div class="unit-detail-project" id="popupProject"></div>
-        <div class="unit-detail-unit-no" id="popupUnitNo"></div>
-        <div class="unit-detail-customer" id="popupCustomer"></div>
+      <div class="unit-detail-header-content">
+        <div class="unit-detail-project-name" id="popupProject"></div>
+        <div class="unit-detail-main-info">
+          <div class="unit-detail-unit-no" id="popupUnitNo"></div>
+          <div class="unit-detail-customer" id="popupCustomer"></div>
+        </div>
       </div>
       <img class="unit-detail-logo" 
            src="https://www.propeve.com/images/uploads/builders/1585296933513logo(1).png" 
@@ -3573,18 +3668,44 @@
            onerror="this.style.display='none'">
     </div>
     
-    <div class="unit-detail-meta" id="popupMeta">
-      <!-- Tower and Phase will be inserted here if not 0 -->
+    <!-- Section 1: Unit Details -->
+    <div class="unit-detail-section">
+      <div class="unit-section-title">
+        <i class="bi bi-info-circle"></i>
+        Unit Details
+      </div>
+      <div class="unit-info-grid-premium" id="popupUnitDetailsGrid">
+        <!-- Phase, Tower, Inventory, Saleable Area, Specification, Product Type, OC Status -->
+      </div>
     </div>
     
-    <!-- Additional Unit Information -->
-    <div class="unit-detail-info-grid" id="popupInfoGrid">
-      <!-- Inventory, Saleable Area, Specification, Product Type, OC Status will be inserted here -->
+    <!-- Section 2: Financial Details -->
+    <div class="unit-detail-section" id="popupFinancialSection">
+      <div class="unit-section-title">
+        <i class="bi bi-currency-rupee"></i>
+        Financial Details
+      </div>
+      <div class="unit-financial-grid" id="popupFinancialGrid">
+        <!-- Agreement Value, Interior Design Value, Total Receivables, Total Received, Balance Receivables -->
+      </div>
     </div>
     
-    <div class="unit-detail-body">
-      <div class="unit-detail-section-title">
-        <i class="bi bi-list-check"></i> Construction Activities
+    <!-- Section 3: Dates & Handover -->
+    <div class="unit-detail-section" id="popupDatesSection">
+      <div class="unit-section-title">
+        <i class="bi bi-calendar-event"></i>
+        Handover Schedule
+      </div>
+      <div class="unit-dates-grid" id="popupDatesGrid">
+        <!-- AFS Date, HO as per AFS, IDSA Date, HO as per IDSA -->
+      </div>
+    </div>
+    
+    <!-- Section 4: Construction Activities -->
+    <div class="unit-detail-section">
+      <div class="unit-section-title">
+        <i class="bi bi-tools"></i>
+        Construction Activities
       </div>
       <div class="unit-activity-list" id="popupActivityList">
         <!-- Activities will be inserted here -->
@@ -3766,7 +3887,14 @@
     HANDOVER_ACTUAL: 51,  // Column AZ (index 51)
     SALEABLE_AREA: 53, // Column BB (index 53)
     SPECIFICATION: 54, // Column BC (index 54)
-    PRODUCT_TYPE: 55   // Column BD (index 55)
+    PRODUCT_TYPE: 55,   // Column BD (index 55)
+    AGREEMENT_VALUE: 56, // Column BE (index 56)
+    INTERIOR_VALUE: 57, // Column BF (index 57)
+    TOTAL_RECEIVED: 59, // Column BH (index 59)
+    AFS_DATE: 61, // Column BJ (index 61)
+    HO_AFS: 62, // Column BK (index 62)
+    IDSA_DATE: 63, // Column BL (index 63)
+    HO_IDSA: 64  // Column BM (index 64)
   };
 
   // File handling (only wire up if upload elements exist in the DOM)
@@ -3865,7 +3993,14 @@
       HandoverActual: r[COL.HANDOVER_ACTUAL] || "",
       SaleableArea: r[COL.SALEABLE_AREA] || "N/A",
       Specification: r[COL.SPECIFICATION] || "N/A",
-      ProductType: r[COL.PRODUCT_TYPE] || "N/A"
+      ProductType: r[COL.PRODUCT_TYPE] || "N/A",
+      AgreementValue: +r[COL.AGREEMENT_VALUE] || 0,
+      InteriorValue: +r[COL.INTERIOR_VALUE] || 0,
+      TotalReceived: +r[COL.TOTAL_RECEIVED] || 0,
+      AFSDate: r[COL.AFS_DATE] || "",
+      HOasPerAFS: r[COL.HO_AFS] || "",
+      IDSADate: r[COL.IDSA_DATE] || "",
+      HOasPerIDSA: r[COL.HO_IDSA] || ""
     }));
 
     // Update UI
@@ -5704,75 +5839,71 @@
   function showUnitDetail(unit) {
     currentUnitData = unit;
     
-    // Populate popup
+    // === HEADER ===
     document.getElementById('popupProject').textContent = selectedProjectTower;
     document.getElementById('popupUnitNo').textContent = 'Unit ' + unit.UnitNo;
     document.getElementById('popupCustomer').textContent = unit.Customer || 'N/A';
     
-    // Meta (Tower and Phase) - only show if not 0
-    const metaHTML = [];
-    const parsed = parseUnitNumber(unit.UnitNo);
+    // === SECTION 1: UNIT DETAILS ===
+    const unitDetailsHTML = [];
     
-    if (parsed && parsed.tower !== 0) {
-      metaHTML.push(`
-        <div class="unit-detail-meta-item">
-          <span class="unit-detail-meta-label">Tower</span>
-          <span class="unit-detail-meta-value">${parsed.tower}</span>
-        </div>
-      `);
-    }
-    
+    // Phase (if available and not 0)
     if (unit.Phase && unit.Phase !== '0') {
-      metaHTML.push(`
-        <div class="unit-detail-meta-item">
-          <span class="unit-detail-meta-label">Phase</span>
-          <span class="unit-detail-meta-value">${unit.Phase}</span>
+      unitDetailsHTML.push(`
+        <div class="unit-info-item-premium">
+          <div class="unit-info-label-premium">Phase</div>
+          <div class="unit-info-value-premium">${unit.Phase}</div>
         </div>
       `);
     }
     
-    document.getElementById('popupMeta').innerHTML = metaHTML.join('');
-    document.getElementById('popupMeta').style.display = metaHTML.length > 0 ? 'flex' : 'none';
-    
-    // Additional Unit Information Grid
-    const infoHTML = [];
+    // Tower (if available and not 0)
+    const parsed = parseUnitNumber(unit.UnitNo);
+    if (parsed && parsed.tower !== 0) {
+      unitDetailsHTML.push(`
+        <div class="unit-info-item-premium">
+          <div class="unit-info-label-premium">Tower</div>
+          <div class="unit-info-value-premium">${parsed.tower}</div>
+        </div>
+      `);
+    }
     
     // Inventory
     if (unit.Inventory && unit.Inventory !== 'N/A') {
-      infoHTML.push(`
-        <div class="unit-info-item">
-          <div class="unit-info-label"><i class="bi bi-tag"></i> Inventory</div>
-          <div class="unit-info-value">${unit.Inventory}</div>
+      unitDetailsHTML.push(`
+        <div class="unit-info-item-premium">
+          <div class="unit-info-label-premium">Inventory</div>
+          <div class="unit-info-value-premium">${unit.Inventory}</div>
         </div>
       `);
     }
     
     // Saleable Area
     if (unit.SaleableArea && unit.SaleableArea !== 'N/A') {
-      infoHTML.push(`
-        <div class="unit-info-item">
-          <div class="unit-info-label"><i class="bi bi-rulers"></i> Saleable Area</div>
-          <div class="unit-info-value">${unit.SaleableArea}</div>
+      unitDetailsHTML.push(`
+        <div class="unit-info-item-premium">
+          <div class="unit-info-label-premium">Saleable Area</div>
+          <div class="unit-info-value-premium">${unit.SaleableArea} sq.ft.</div>
         </div>
       `);
     }
     
     // Specification
     if (unit.Specification && unit.Specification !== 'N/A') {
-      infoHTML.push(`
-        <div class="unit-info-item">
-          <div class="unit-info-label"><i class="bi bi-file-text"></i> Specification</div>
-          <div class="unit-info-value">${unit.Specification}</div>
+      unitDetailsHTML.push(`
+        <div class="unit-info-item-premium">
+          <div class="unit-info-label-premium">Specification</div>
+          <div class="unit-info-value-premium">${unit.Specification}</div>
         </div>
       `);
     }
     
     // Product Type
     if (unit.ProductType && unit.ProductType !== 'N/A') {
-      infoHTML.push(`
-        <div class="unit-info-item">
-          <div class="unit-info-label"><i class="bi bi-building"></i> Product Type</div>
-          <div class="unit-info-value">${unit.ProductType}</div>
+      unitDetailsHTML.push(`
+        <div class="unit-info-item-premium">
+          <div class="unit-info-label-premium">Product Type</div>
+          <div class="unit-info-value-premium">${unit.ProductType}</div>
         </div>
       `);
     }
@@ -5781,21 +5912,89 @@
     if (unit.OC && unit.OC !== 'N/A') {
       const ocCompleted = (unit.OC || '').toLowerCase().includes('completed') || 
                           (unit.OC || '').toLowerCase().includes('yes');
-      const badgeClass = ocCompleted ? 'oc-completed' : 'oc-pending';
+      const badgeClass = ocCompleted ? 'completed' : 'pending';
       const badgeText = ocCompleted ? 'Completed' : unit.OC;
       
-      infoHTML.push(`
-        <div class="unit-info-item">
-          <div class="unit-info-label"><i class="bi bi-shield-check"></i> OC Status</div>
-          <div class="unit-info-value badge ${badgeClass}">${badgeText}</div>
+      unitDetailsHTML.push(`
+        <div class="unit-info-item-premium">
+          <div class="unit-info-label-premium">OC Status</div>
+          <div class="unit-info-value-premium badge-oc ${badgeClass}">${badgeText}</div>
         </div>
       `);
     }
     
-    document.getElementById('popupInfoGrid').innerHTML = infoHTML.join('');
-    document.getElementById('popupInfoGrid').style.display = infoHTML.length > 0 ? 'grid' : 'none';
+    document.getElementById('popupUnitDetailsGrid').innerHTML = unitDetailsHTML.join('');
     
-    // Activities
+    // === SECTION 2: FINANCIAL DETAILS ===
+    const agreementValue = unit.AgreementValue || 0;
+    const interiorValue = unit.InteriorValue || 0;
+    const totalReceivables = agreementValue + interiorValue;
+    const totalReceived = unit.TotalReceived || 0;
+    const balanceReceivables = totalReceivables - totalReceived;
+    
+    // Helper function to format currency in Lakhs/Crores
+    function formatCurrency(value) {
+      if (!value || value === 0) return '₹0';
+      const crores = value / 10000000;
+      const lakhs = value / 100000;
+      
+      if (crores >= 1) {
+        return `₹${crores.toFixed(2)} Cr`;
+      } else if (lakhs >= 1) {
+        return `₹${lakhs.toFixed(2)} L`;
+      } else {
+        return `₹${(value / 1000).toFixed(2)} K`;
+      }
+    }
+    
+    const financialHTML = `
+      <div class="financial-item">
+        <div class="financial-label">Agreement Value</div>
+        <div class="financial-value">${formatCurrency(agreementValue)}</div>
+      </div>
+      <div class="financial-item">
+        <div class="financial-label">Interior Design Value</div>
+        <div class="financial-value">${formatCurrency(interiorValue)}</div>
+      </div>
+      <div class="financial-item total">
+        <div class="financial-label">Total Receivables</div>
+        <div class="financial-value">${formatCurrency(totalReceivables)}</div>
+      </div>
+      <div class="financial-item">
+        <div class="financial-label">Total Received</div>
+        <div class="financial-value positive">${formatCurrency(totalReceived)}</div>
+      </div>
+      <div class="financial-item balance">
+        <div class="financial-label">Balance Receivables</div>
+        <div class="financial-value ${balanceReceivables > 0 ? 'negative' : 'positive'}">${formatCurrency(balanceReceivables)}</div>
+      </div>
+    `;
+    
+    document.getElementById('popupFinancialGrid').innerHTML = financialHTML;
+    
+    // === SECTION 3: HANDOVER SCHEDULE ===
+    const datesHTML = `
+      <div class="date-item">
+        <div class="date-label">AFS Date</div>
+        <div class="date-value">${unit.AFSDate || 'N/A'}</div>
+      </div>
+      <div class="date-item">
+        <div class="date-label">HO as per AFS</div>
+        <div class="date-value">${unit.HOasPerAFS || 'N/A'}</div>
+      </div>
+      <div class="date-item">
+        <div class="date-label">IDSA Date</div>
+        <div class="date-value">${unit.IDSADate || 'N/A'}</div>
+      </div>
+      <div class="date-item">
+        <div class="date-label">HO as per IDSA</div>
+        <div class="date-value">${unit.HOasPerIDSA || 'N/A'}</div>
+      </div>
+    `;
+    
+    document.getElementById('popupDatesGrid').innerHTML = datesHTML;
+    
+    // === SECTION 4: CONSTRUCTION ACTIVITIES ===
     const activities = [
       { name: 'GFC Released', completed: !!unit.GFC },
       { name: 'Plaster', completed: !!unit.Plaster },
@@ -5832,144 +6031,287 @@
     
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
+    const unit = currentUnitData;
     
-    // Header
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(selectedProjectTower, 15, 20);
-    
-    // Try to add logo (may fail due to CORS)
-    try {
-      const logoUrl = 'https://www.propeve.com/images/uploads/builders/1585296933513logo(1).png';
-      // Note: This will likely fail due to CORS, but we try anyway
-      doc.text('TotalEnvironment', 160, 20);
-    } catch(e) {
-      doc.setFontSize(8);
-      doc.text('TotalEnvironment', 160, 20);
+    // Helper function to format currency
+    function formatCurrency(value) {
+      if (!value || value === 0) return '₹0';
+      const crores = value / 10000000;
+      const lakhs = value / 100000;
+      
+      if (crores >= 1) {
+        return `₹${crores.toFixed(2)} Cr`;
+      } else if (lakhs >= 1) {
+        return `₹${lakhs.toFixed(2)} L`;
+      } else {
+        return `₹${(value / 1000).toFixed(2)} K`;
+      }
     }
     
+    // === HEADER ===
+    // Dark header background
+    doc.setFillColor(30, 41, 59);
+    doc.rect(0, 0, 210, 45, 'F');
+    
+    // Project name
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(8);
+    doc.text(selectedProjectTower.toUpperCase(), 15, 12);
+    
+    // Logo text (right side)
+    doc.setFontSize(9);
+    doc.text('TotalEnvironment', 160, 12);
+    
     // Unit Number
-    doc.setFontSize(22);
-    doc.setTextColor(0);
-    doc.text('Unit ' + currentUnitData.UnitNo, 15, 35);
+    doc.setFontSize(24);
+    doc.setFont(undefined, 'bold');
+    doc.text('Unit ' + unit.UnitNo, 15, 27);
     
     // Customer Name
     doc.setFontSize(12);
-    doc.setTextColor(60);
-    doc.text(currentUnitData.Customer || 'N/A', 15, 45);
+    doc.setFont(undefined, 'normal');
+    doc.text(unit.Customer || 'N/A', 15, 38);
     
-    // Tower & Phase
     let yPos = 55;
-    const parsed = parseUnitNumber(currentUnitData.UnitNo);
-    if (parsed && parsed.tower !== 0) {
-      doc.setFontSize(10);
-      doc.setTextColor(100);
-      doc.text('Tower:', 15, yPos);
-      doc.setTextColor(0);
-      doc.text(String(parsed.tower), 35, yPos);
-      yPos += 7;
-    }
     
-    if (currentUnitData.Phase && currentUnitData.Phase !== '0') {
-      doc.setFontSize(10);
-      doc.setTextColor(100);
-      doc.text('Phase:', 15, yPos);
-      doc.setTextColor(0);
-      doc.text(currentUnitData.Phase, 35, yPos);
-      yPos += 7;
-    }
+    // === SECTION 1: UNIT DETAILS ===
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.text('UNIT DETAILS', 15, yPos);
+    yPos += 2;
     
-    // Additional Unit Information
-    yPos += 5;
-    doc.setFontSize(12);
-    doc.setTextColor(0);
-    doc.text('Unit Information', 15, yPos);
+    // Underline
+    doc.setDrawColor(99, 102, 241);
+    doc.setLineWidth(0.8);
+    doc.line(15, yPos, 45, yPos);
     yPos += 8;
     
     doc.setFontSize(9);
-    doc.setTextColor(100);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100, 100, 100);
     
-    if (currentUnitData.Inventory && currentUnitData.Inventory !== 'N/A') {
+    const parsed = parseUnitNumber(unit.UnitNo);
+    
+    // Phase
+    if (unit.Phase && unit.Phase !== '0') {
+      doc.text('Phase:', 15, yPos);
+      doc.setTextColor(0);
+      doc.text(unit.Phase, 50, yPos);
+      doc.setTextColor(100);
+      yPos += 6;
+    }
+    
+    // Tower
+    if (parsed && parsed.tower !== 0) {
+      doc.text('Tower:', 15, yPos);
+      doc.setTextColor(0);
+      doc.text(String(parsed.tower), 50, yPos);
+      doc.setTextColor(100);
+      yPos += 6;
+    }
+    
+    // Inventory
+    if (unit.Inventory && unit.Inventory !== 'N/A') {
       doc.text('Inventory:', 15, yPos);
       doc.setTextColor(0);
-      doc.text(currentUnitData.Inventory, 45, yPos);
+      doc.text(unit.Inventory, 50, yPos);
       doc.setTextColor(100);
       yPos += 6;
     }
     
-    if (currentUnitData.SaleableArea && currentUnitData.SaleableArea !== 'N/A') {
+    // Saleable Area
+    if (unit.SaleableArea && unit.SaleableArea !== 'N/A') {
       doc.text('Saleable Area:', 15, yPos);
       doc.setTextColor(0);
-      doc.text(String(currentUnitData.SaleableArea), 45, yPos);
+      doc.text(unit.SaleableArea + ' sq.ft.', 50, yPos);
       doc.setTextColor(100);
       yPos += 6;
     }
     
-    if (currentUnitData.Specification && currentUnitData.Specification !== 'N/A') {
+    // Specification
+    if (unit.Specification && unit.Specification !== 'N/A') {
       doc.text('Specification:', 15, yPos);
       doc.setTextColor(0);
-      doc.text(currentUnitData.Specification, 45, yPos);
+      doc.text(unit.Specification, 50, yPos);
       doc.setTextColor(100);
       yPos += 6;
     }
     
-    if (currentUnitData.ProductType && currentUnitData.ProductType !== 'N/A') {
+    // Product Type
+    if (unit.ProductType && unit.ProductType !== 'N/A') {
       doc.text('Product Type:', 15, yPos);
       doc.setTextColor(0);
-      doc.text(currentUnitData.ProductType, 45, yPos);
+      doc.text(unit.ProductType, 50, yPos);
       doc.setTextColor(100);
       yPos += 6;
     }
     
-    if (currentUnitData.OC && currentUnitData.OC !== 'N/A') {
+    // OC Status
+    if (unit.OC && unit.OC !== 'N/A') {
       doc.text('OC Status:', 15, yPos);
       doc.setTextColor(0);
-      doc.text(currentUnitData.OC, 45, yPos);
+      doc.text(unit.OC, 50, yPos);
       doc.setTextColor(100);
       yPos += 6;
     }
     
-    // Construction Activities
-    yPos += 10;
-    doc.setFontSize(14);
-    doc.setTextColor(0);
-    doc.text('Construction Activities', 15, yPos);
+    // === SECTION 2: FINANCIAL DETAILS ===
+    yPos += 8;
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.text('FINANCIAL DETAILS', 15, yPos);
+    yPos += 2;
     
-    yPos += 10;
-    doc.setLineWidth(0.5);
-    doc.line(15, yPos, 195, yPos);
+    doc.setDrawColor(99, 102, 241);
+    doc.setLineWidth(0.8);
+    doc.line(15, yPos, 55, yPos);
+    yPos += 8;
+    
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100);
+    
+    const agreementValue = unit.AgreementValue || 0;
+    const interiorValue = unit.InteriorValue || 0;
+    const totalReceivables = agreementValue + interiorValue;
+    const totalReceived = unit.TotalReceived || 0;
+    const balanceReceivables = totalReceivables - totalReceived;
+    
+    doc.text('Agreement Value:', 15, yPos);
+    doc.setTextColor(0);
+    doc.text(formatCurrency(agreementValue), 60, yPos);
+    doc.setTextColor(100);
+    yPos += 6;
+    
+    doc.text('Interior Design Value:', 15, yPos);
+    doc.setTextColor(0);
+    doc.text(formatCurrency(interiorValue), 60, yPos);
+    doc.setTextColor(100);
+    yPos += 6;
+    
+    doc.text('Total Receivables:', 15, yPos);
+    doc.setTextColor(0);
+    doc.setFont(undefined, 'bold');
+    doc.text(formatCurrency(totalReceivables), 60, yPos);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100);
+    yPos += 6;
+    
+    doc.text('Total Received:', 15, yPos);
+    doc.setTextColor(5, 150, 105);
+    doc.text(formatCurrency(totalReceived), 60, yPos);
+    doc.setTextColor(100);
+    yPos += 6;
+    
+    doc.text('Balance Receivables:', 15, yPos);
+    doc.setTextColor(balanceReceivables > 0 ? 220 : 5, balanceReceivables > 0 ? 38 : 150, balanceReceivables > 0 ? 38 : 105);
+    doc.setFont(undefined, 'bold');
+    doc.text(formatCurrency(balanceReceivables), 60, yPos);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100);
+    yPos += 6;
+    
+    // === SECTION 3: HANDOVER SCHEDULE ===
+    yPos += 8;
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.text('HANDOVER SCHEDULE', 15, yPos);
+    yPos += 2;
+    
+    doc.setDrawColor(99, 102, 241);
+    doc.setLineWidth(0.8);
+    doc.line(15, yPos, 58, yPos);
+    yPos += 8;
+    
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100);
+    
+    doc.text('AFS Date:', 15, yPos);
+    doc.setTextColor(0);
+    doc.text(unit.AFSDate || 'N/A', 50, yPos);
+    doc.setTextColor(100);
+    yPos += 6;
+    
+    doc.text('HO as per AFS:', 15, yPos);
+    doc.setTextColor(0);
+    doc.text(unit.HOasPerAFS || 'N/A', 50, yPos);
+    doc.setTextColor(100);
+    yPos += 6;
+    
+    doc.text('IDSA Date:', 15, yPos);
+    doc.setTextColor(0);
+    doc.text(unit.IDSADate || 'N/A', 50, yPos);
+    doc.setTextColor(100);
+    yPos += 6;
+    
+    doc.text('HO as per IDSA:', 15, yPos);
+    doc.setTextColor(0);
+    doc.text(unit.HOasPerIDSA || 'N/A', 50, yPos);
+    doc.setTextColor(100);
+    yPos += 6;
+    
+    // === SECTION 4: CONSTRUCTION ACTIVITIES ===
+    yPos += 8;
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.text('CONSTRUCTION ACTIVITIES', 15, yPos);
+    yPos += 2;
+    
+    doc.setDrawColor(99, 102, 241);
+    doc.setLineWidth(0.8);
+    doc.line(15, yPos, 70, yPos);
     yPos += 8;
     
     const activities = [
-      { name: 'GFC Released', completed: !!currentUnitData.GFC },
-      { name: 'Plaster', completed: !!currentUnitData.Plaster },
-      { name: 'Flooring & Dado', completed: !!currentUnitData.Floor },
-      { name: 'HVAC Installed', completed: !!currentUnitData.HVAC },
-      { name: 'False Ceiling', completed: !!currentUnitData.False },
-      { name: 'Fenestration', completed: !!currentUnitData.Fenest },
-      { name: 'Ready for Handover', completed: !!currentUnitData.Hand }
+      { name: 'GFC Released', completed: !!unit.GFC },
+      { name: 'Plaster', completed: !!unit.Plaster },
+      { name: 'Flooring & Dado', completed: !!unit.Floor },
+      { name: 'HVAC Installed', completed: !!unit.HVAC },
+      { name: 'False Ceiling', completed: !!unit.False },
+      { name: 'Fenestration', completed: !!unit.Fenest },
+      { name: 'Ready for Handover', completed: !!unit.Hand }
     ];
     
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     activities.forEach(a => {
-      doc.setTextColor(a.completed ? 0 : 150);
-      doc.text('• ' + a.name, 20, yPos);
+      // Bullet
+      doc.setTextColor(a.completed ? 16 : 150, a.completed ? 185 : 150, a.completed ? 129 : 150);
+      doc.text('●', 17, yPos);
+      
+      // Activity name
+      doc.setTextColor(0);
+      doc.text(a.name, 23, yPos);
+      
+      // Status
       if (a.completed) {
-        doc.setTextColor(34, 197, 94);
+        doc.setTextColor(5, 150, 105);
+        doc.setFont(undefined, 'bold');
       } else {
-        doc.setTextColor(150);
+        doc.setTextColor(156, 163, 175);
+        doc.setFont(undefined, 'normal');
       }
-      doc.text(a.completed ? 'Completed' : 'Pending', 120, yPos);
-      yPos += 7;
+      doc.text(a.completed ? 'Completed' : 'Pending', 100, yPos);
+      doc.setFont(undefined, 'normal');
+      yPos += 6;
     });
     
     // Footer
-    doc.setFontSize(8);
+    doc.setFontSize(7);
     doc.setTextColor(150);
-    doc.text('Generated on ' + new Date().toLocaleString(), 15, 285);
+    const now = new Date().toLocaleString('en-IN', { 
+      dateStyle: 'medium', 
+      timeStyle: 'short' 
+    });
+    doc.text('Generated on ' + now, 15, 285);
+    doc.text('TotalEnvironment Realty Pvt. Ltd.', 145, 285);
     
     // Save
-    doc.save(`Unit_${currentUnitData.UnitNo}_${selectedProjectTower}.pdf`);
+    doc.save(`Unit_${unit.UnitNo}_Details.pdf`);
   }
 
   // ===== SEARCH FUNCTIONALITY =====
