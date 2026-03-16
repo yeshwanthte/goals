@@ -1459,18 +1459,21 @@
     .plan-actual-table {
       width: 100%;
       border-collapse: collapse;
+      table-layout: fixed;
     }
 
     .plan-actual-table thead th {
       background: var(--gray-50);
-      padding: 0.65rem 0.75rem;
-      font-size: 0.7rem;
-      font-weight: 600;
+      padding: 0.45rem 0.35rem;
+      font-size: 0.62rem;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.2px;
       color: var(--gray-600);
       border-bottom: 2px solid var(--gray-200);
       text-align: center;
+      word-break: break-word;
+      line-height: 1.3;
     }
 
     .plan-actual-table thead th:first-child,
@@ -1479,8 +1482,8 @@
     }
 
     .plan-actual-table tbody td {
-      padding: 0.65rem 0.75rem;
-      font-size: 0.8rem;
+      padding: 0.45rem 0.35rem;
+      font-size: 0.75rem;
       border-bottom: 1px solid var(--gray-100);
       vertical-align: middle;
       text-align: center;
@@ -1505,44 +1508,44 @@
       background: rgba(99, 102, 241, 0.1);
       color: var(--primary);
       font-weight: 600;
-      padding: 0.25rem 0.5rem;
+      padding: 0.2rem 0.3rem;
       border-radius: var(--radius-sm);
       display: inline-block;
-      min-width: 40px;
-      font-size: 0.75rem;
+      min-width: 32px;
+      font-size: 0.72rem;
     }
 
     .plan-amt {
       background: rgba(14, 165, 233, 0.1);
       color: var(--secondary);
       font-weight: 600;
-      padding: 0.25rem 0.5rem;
+      padding: 0.2rem 0.3rem;
       border-radius: var(--radius-sm);
       display: inline-block;
-      min-width: 60px;
-      font-size: 0.75rem;
+      min-width: 48px;
+      font-size: 0.72rem;
     }
 
     .actual-nos {
       background: var(--success-light);
       color: var(--success);
       font-weight: 600;
-      padding: 0.25rem 0.5rem;
+      padding: 0.2rem 0.3rem;
       border-radius: var(--radius-sm);
       display: inline-block;
-      min-width: 40px;
-      font-size: 0.75rem;
+      min-width: 32px;
+      font-size: 0.72rem;
     }
 
     .actual-amt {
       background: rgba(5, 150, 105, 0.1);
       color: #059669;
       font-weight: 600;
-      padding: 0.25rem 0.5rem;
+      padding: 0.2rem 0.3rem;
       border-radius: var(--radius-sm);
       display: inline-block;
-      min-width: 60px;
-      font-size: 0.75rem;
+      min-width: 48px;
+      font-size: 0.72rem;
     }
 
     .total-row-plan {
@@ -1553,8 +1556,8 @@
 
     .total-row-plan td {
       color: #c56a3f;
-      font-size: 0.8rem;
-      padding: 0.75rem !important;
+      font-size: 0.75rem;
+      padding: 0.5rem 0.35rem !important;
     }
 
     /* Plan vs Actuals Tables Grid */
@@ -4290,7 +4293,13 @@
   }
 
   function buildPlanActualSlicers() {
-    buildSlicerPA("projectSlicerPA", [...new Set(raw.map(r => r.Project))], projectSelPA);
+    // Merge projects from main sheet + Shell Master so new projects (0082 OTR, 0093 DBTW) appear
+    const allProjects = [...new Set([
+      ...raw.map(r => r.Project),
+      ...rawShell.map(r => r.Project)
+    ].filter(Boolean))].sort();
+
+    buildSlicerPA("projectSlicerPA", allProjects, projectSelPA);
     buildSlicerPA("towerSlicerPA", [...new Set(raw.map(r => r.Tower))], towerSelPA);
     buildSlicerPA("phaseSlicerPA", [...new Set(raw.map(r => r.Phase))], phaseSelPA);
     buildSlicerPA("inventorySlicerPA", [...new Set(raw.map(r => r.Inventory))], inventorySelPA);
@@ -5143,17 +5152,20 @@
       if (handoverActual && (!selectedYearPA || handoverActual.getFullYear().toString() === selectedYearPA)) totalActual += row.HandRev;
     });
 
-    // Add Structure revenue from Shell Master
+    // Add Structure revenue from Shell Master (DetailAmt = Col E has actual money values)
     const slabRowsKpi = rawShell.filter(r => (r.Category || '').toLowerCase().includes('slab'));
-    const shellSourceKpi = slabRowsKpi.length > 0 ? slabRowsKpi : rawShell;
+    const baseKpi = slabRowsKpi.length > 0 ? slabRowsKpi : rawShell;
+    const shellSourceKpi = projectSelPA.size > 0
+      ? baseKpi.filter(r => projectSelPA.has(r.Project))
+      : baseKpi;
     shellSourceKpi.forEach(row => {
       const planDate = parseDate(row.PlanDate);
       if (planDate && (!selectedYearPA || planDate.getFullYear().toString() === selectedYearPA)) {
-        totalPlan += row.SummaryAmt;
+        totalPlan += row.DetailAmt;
       }
       const actualDate = parseDate(row.ActualDate);
       if (actualDate && (!selectedYearPA || actualDate.getFullYear().toString() === selectedYearPA)) {
-        totalActual += row.SummaryAmt;
+        totalActual += row.DetailAmt;
       }
     });
     
@@ -5415,8 +5427,12 @@
     let totalActualRevenue = 0;
 
     // Determine which rows to use: prefer "slab" rows; if none match, use ALL Shell rows
+    // Also apply project slicer filter if any projects are selected
     const slabRows = rawShell.filter(r => (r.Category || '').toLowerCase().includes('slab'));
-    const sourceRows = slabRows.length > 0 ? slabRows : rawShell;
+    const baseRows = slabRows.length > 0 ? slabRows : rawShell;
+    const sourceRows = projectSelPA.size > 0
+      ? baseRows.filter(r => projectSelPA.has(r.Project))
+      : baseRows;
 
     if (rawShell.length === 0) {
       console.warn('generateStructuresTable: rawShell is empty — Shell Master may not have loaded.');
@@ -5430,28 +5446,28 @@
       // Plan date aggregation
       const planDate = parseDate(row.PlanDate);
       if (planDate) {
-        const year  = planDate.getFullYear().toString();
+        const year    = planDate.getFullYear().toString();
         const quarter = getQuarter(planDate);
         if (!selectedYearPA || year === selectedYearPA) {
           const key = `${year}-Q${quarter}`;
           if (!data[key]) data[key] = { year, quarter, planNos: 0, planAmt: 0, actualNos: 0, actualAmt: 0 };
           data[key].planNos++;
-          data[key].planAmt += row.SummaryAmt;
-          totalPlanRevenue += row.SummaryAmt;
+          data[key].planAmt   += row.DetailAmt;   // Col E has the actual money values
+          totalPlanRevenue    += row.DetailAmt;
         }
       }
 
       // Actual date aggregation
       const actualDate = parseDate(row.ActualDate);
       if (actualDate) {
-        const year  = actualDate.getFullYear().toString();
+        const year    = actualDate.getFullYear().toString();
         const quarter = getQuarter(actualDate);
         if (!selectedYearPA || year === selectedYearPA) {
           const key = `${year}-Q${quarter}`;
           if (!data[key]) data[key] = { year, quarter, planNos: 0, planAmt: 0, actualNos: 0, actualAmt: 0 };
           data[key].actualNos++;
-          data[key].actualAmt += row.SummaryAmt;
-          totalActualRevenue += row.SummaryAmt;
+          data[key].actualAmt  += row.DetailAmt;  // Col E has the actual money values
+          totalActualRevenue   += row.DetailAmt;
         }
       }
     });
@@ -5507,11 +5523,14 @@
     // Close Plaster/Flooring/Handover details if open
     document.getElementById('planActualDetailsSection').classList.remove('visible');
 
-    // Build detail rows: use slab rows if any, else all Shell rows
+    // Build detail rows: use slab rows if any, else all Shell rows; apply project filter
     const slabRows = rawShell.filter(r => (r.Category || '').toLowerCase().includes('slab'));
-    const sourceRows = slabRows.length > 0 ? slabRows : rawShell;
+    const baseRows = slabRows.length > 0 ? slabRows : rawShell;
+    const projectFiltered = projectSelPA.size > 0
+      ? baseRows.filter(r => projectSelPA.has(r.Project))
+      : baseRows;
 
-    currentStructureData = sourceRows.filter(row => {
+    currentStructureData = projectFiltered.filter(row => {
       if (!selectedYearPA) return true;
       const planDate   = parseDate(row.PlanDate);
       const actualDate = parseDate(row.ActualDate);
