@@ -1560,12 +1560,12 @@
     /* Plan vs Actuals Tables Grid */
     .plan-actual-tables-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
       margin-bottom: 1rem;
     }
 
-    @media (max-width: 1400px) {
+    @media (max-width: 1100px) {
       .plan-actual-tables-grid {
         grid-template-columns: 1fr;
       }
@@ -3502,6 +3502,29 @@
           </div>
         </div>
 
+        <!-- Structures Plan vs Actuals Table (Shell - Master sheet) -->
+        <div class="plan-actual-card" id="structureCard" onclick="showStructureDetails()">
+          <div class="plan-actual-header" style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);">
+            <h5><i class="bi bi-building-gear"></i> Structures</h5>
+            <span class="badge bg-white bg-opacity-20" id="structurePlanCount">0</span>
+          </div>
+          <div style="padding: 0;">
+            <table class="plan-actual-table">
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Quarter</th>
+                  <th>Plan (Nos.)</th>
+                  <th>Plan (₹ Cr)</th>
+                  <th>Actual (Nos.)</th>
+                  <th>Actual (₹ Cr)</th>
+                </tr>
+              </thead>
+              <tbody id="structurePlanActualBody"></tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
 
       <!-- Plan Actual Unit Details Section -->
@@ -3540,6 +3563,46 @@
                   </tr>
                 </thead>
                 <tbody id="planActualDetailsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Structure Details Section -->
+      <section class="details-section" id="structureDetailsSection">
+        <div class="card">
+          <div class="card-header-custom">
+            <div class="details-header" style="width: 100%;">
+              <h5>
+                <i class="bi bi-building-gear"></i>
+                Slab Details - <span class="activity-badge" style="background:rgba(124,58,237,0.12);color:#7c3aed;">Structures</span>
+              </h5>
+              <div class="details-actions">
+                <button class="btn-download-excel" onclick="downloadStructureExcel()">
+                  <i class="bi bi-file-earmark-excel"></i> Download Excel
+                </button>
+                <button class="btn-close-details" onclick="closeStructureDetails()">
+                  <i class="bi bi-x-lg"></i> Close
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body-custom" style="padding: 0;">
+            <div class="details-table-container">
+              <table class="details-table">
+                <thead>
+                  <tr>
+                    <th class="sortable" onclick="sortStructureTable(0)">Project</th>
+                    <th class="sortable" onclick="sortStructureTable(1)">Villa / Tower</th>
+                    <th class="sortable" onclick="sortStructureTable(2)">Category</th>
+                    <th class="sortable" onclick="sortStructureTable(3)">Plan Date</th>
+                    <th class="sortable" onclick="sortStructureTable(4)">Plan Amt (₹ Cr)</th>
+                    <th class="sortable" onclick="sortStructureTable(5)">Actual Date</th>
+                    <th class="sortable" onclick="sortStructureTable(6)">Actual Amt (₹ Cr)</th>
+                  </tr>
+                </thead>
+                <tbody id="structureDetailsTableBody"></tbody>
               </table>
             </div>
           </div>
@@ -3742,6 +3805,9 @@
   // GOOGLE SHEETS CONFIGURATION
   // ========================================
   const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRrl7XNihStokkflZZ2gfCKtnh3woP_Z-WphBEQziue2SgygVeAOESNAygsCDY6hGnc0-9tbE-m9dA/pub?output=csv';
+  // Shell - Master sheet: append &gid=<SHEET_GID> for the correct tab
+  // Replace SHELL_GID_HERE with the numeric gid of the "Shell - Master" tab
+  const SHELL_MASTER_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRrl7XNihStokkflZZ2gfCKtnh3woP_Z-WphBEQziue2SgygVeAOESNAygsCDY6hGnc0-9tbE-m9dA/pub?output=csv&gid=1913984627';
 
   // ========================================
   // AUTH GATE — credentials
@@ -3761,31 +3827,47 @@
     try {
       console.log('Fetching data from Google Sheets...');
 
-      const response = await fetch(GOOGLE_SHEETS_CSV_URL);
+      // Fetch both sheets in parallel
+      const [mainResponse, shellResponse] = await Promise.all([
+        fetch(GOOGLE_SHEETS_CSV_URL),
+        fetch(SHELL_MASTER_CSV_URL).catch(() => null) // Shell sheet is optional - fail gracefully
+      ]);
 
-      if (!response.ok) {
+      if (!mainResponse.ok) {
         throw new Error('Failed to fetch data from Google Sheets');
       }
 
-      const csvText = await response.text();
+      const mainCsvText = await mainResponse.text();
+      const shellCsvText = shellResponse && shellResponse.ok ? await shellResponse.text() : null;
 
       console.log('Data fetched successfully, parsing CSV...');
 
-      // Parse CSV using PapaParse — header:false gives a 2D array (row 0 = headers)
-      // which is exactly what prepare() expects
-      Papa.parse(csvText, {
-        header: false,
-        skipEmptyLines: true,
-        complete: function(results) {
-          console.log('CSV parsed successfully, processing data...');
-          prepare(results.data);
-          console.log('Dashboard loaded successfully!');
-        },
-        error: function(error) {
-          console.error('Error parsing CSV:', error);
-          showError('Error parsing CSV data: ' + error.message);
-        }
+      // Parse main sheet
+      const mainPromise = new Promise((resolve, reject) => {
+        Papa.parse(mainCsvText, {
+          header: false,
+          skipEmptyLines: true,
+          complete: res => resolve(res.data),
+          error: err => reject(err)
+        });
       });
+
+      // Parse shell sheet if available
+      const shellPromise = shellCsvText ? new Promise((resolve, reject) => {
+        Papa.parse(shellCsvText, {
+          header: false,
+          skipEmptyLines: true,
+          complete: res => resolve(res.data),
+          error: err => reject(err)
+        });
+      }) : Promise.resolve(null);
+
+      const [mainData, shellData] = await Promise.all([mainPromise, shellPromise]);
+
+      console.log('CSV parsed successfully, processing data...');
+      if (shellData) prepareShell(shellData);
+      prepare(mainData);
+      console.log('Dashboard loaded successfully!');
 
     } catch (error) {
       console.error('Error loading data:', error);
@@ -3839,6 +3921,7 @@
 
   // Data storage
   let raw = [];
+  let rawShell = [];          // Shell - Master sheet data
   let currentFilteredData = [];
   let currentDetailsData = [];
   let currentActivityName = '';
@@ -3853,12 +3936,17 @@
       inventorySelPA = new Set(), gfcSelPA = new Set(), ocSelPA = new Set();
   let selectedYearPA = '2026'; // Default year
   
-  // Plan Actual Details
+  // Plan Actual Details (Plaster / Flooring / Handover)
   let currentPlanActualData = [];
   let currentPlanActualActivity = '';
   let currentPlanActualRevField = '';
   let sortColumnPA = -1;
   let sortAscendingPA = true;
+
+  // Structure Details state
+  let currentStructureData = [];
+  let sortColumnStruct = -1;
+  let sortAscendingStruct = true;
 
   const COL = {
     PROJECT: "Project",
@@ -4030,6 +4118,27 @@
     document.getElementById('towerDataSection').classList.add('visible');
   }
 
+  // ===== SHELL MASTER SHEET PARSER =====
+  // Columns (0-indexed):
+  //   A(0):Project  B(1):Tower  C(2):Category  D(3):MilestoneAmt(summary)
+  //   E(4):MilestoneAmt(detail)  F(5):PlanDate  G(6):ActualDate  H(7):VillaIdentifier
+  function prepareShell(rows) {
+    if (!rows || rows.length < 2) { rawShell = []; return; }
+    // Skip header row (index 0)
+    rawShell = rows.slice(1).map(r => ({
+      Project:    (r[0] || '').toString().trim(),
+      Tower:      (r[1] || '').toString().trim(),
+      Category:   (r[2] || '').toString().trim(),
+      SummaryAmt: parseFloat(r[3]) || 0,   // Col D — used for summary Plan/Actual Crs
+      DetailAmt:  parseFloat(r[4]) || 0,   // Col E — used in details row display
+      PlanDate:   (r[5] || '').toString().trim(),
+      ActualDate: (r[6] || '').toString().trim(),
+      Villa:      (r[7] || '').toString().trim()   // Col H — villa identifier
+    })).filter(r => r.Project); // skip blank rows
+    console.log(`Shell Master: loaded ${rawShell.length} rows`);
+  }
+
+
   function buildSlicer(id, vals, store) {
     const el = document.getElementById(id);
     el.innerHTML = "";
@@ -4141,10 +4250,17 @@
     buildSlicerPA("gfcSlicerPA", ["Yes", "No"], gfcSelPA);
     buildSlicerPA("ocSlicerPA", ["OC recvd", "OC not recvd"], ocSelPA);
     
-    // Build Year dropdown from all plan/actual dates
+    // Build Year dropdown from all plan/actual dates (main sheet + shell master)
     const years = new Set();
     raw.forEach(r => {
       [r.PlasterPlan, r.PlasterActual, r.FlooringPlan, r.FlooringActual, r.HandoverPlan, r.HandoverActual].forEach(dateStr => {
+        const date = parseDate(dateStr);
+        if (date) years.add(date.getFullYear().toString());
+      });
+    });
+    // Include Shell Master dates
+    rawShell.forEach(r => {
+      [r.PlanDate, r.ActualDate].forEach(dateStr => {
         const date = parseDate(dateStr);
         if (date) years.add(date.getFullYear().toString());
       });
@@ -4163,6 +4279,9 @@
 
   function onYearChange() {
     selectedYearPA = document.getElementById('yearDropdownPA').value || '';
+    document.getElementById('structureDetailsSection').classList.remove('visible');
+    document.getElementById('planActualDetailsSection').classList.remove('visible');
+    document.querySelectorAll('.plan-actual-card').forEach(c => c.classList.remove('selected'));
     generatePlanVsActuals();
   }
 
@@ -4270,6 +4389,11 @@
     // Reset year dropdown to 2026
     selectedYearPA = '2026';
     document.getElementById('yearDropdownPA').value = '2026';
+
+    // Close any open detail sections
+    document.getElementById('structureDetailsSection').classList.remove('visible');
+    document.getElementById('planActualDetailsSection').classList.remove('visible');
+    document.querySelectorAll('.plan-actual-card').forEach(c => c.classList.remove('selected'));
     
     generatePlanVsActuals();
   }
@@ -4768,6 +4892,7 @@
     generateActivityTable(filteredData, 'PlasterPlan', 'PlasterActual', 'PlasterRev', 'plasterPlanActualBody', 'plasterPlanCount');
     generateActivityTable(filteredData, 'FlooringPlan', 'FlooringActual', 'FloorRev', 'flooringPlanActualBody', 'flooringPlanCount');
     generateActivityTable(filteredData, 'HandoverPlan', 'HandoverActual', 'HandRev', 'handoverPlanActualBody', 'handoverPlanCount');
+    generateStructuresTable();
     
     // Update KPIs
     updatePlanActualKPIs();
@@ -4903,36 +5028,34 @@
     
     let totalPlan = 0, totalActual = 0;
     
-    // Calculate from all three activities
+    // Calculate from Plaster, Flooring, Handover (raw values in rupees)
     filteredData.forEach(row => {
-      // Plaster
       const plasterPlan = parseDate(row.PlasterPlan);
-      if (plasterPlan && (!selectedYearPA || plasterPlan.getFullYear().toString() === selectedYearPA)) {
-        totalPlan += row.PlasterRev;
-      }
+      if (plasterPlan && (!selectedYearPA || plasterPlan.getFullYear().toString() === selectedYearPA)) totalPlan += row.PlasterRev;
       const plasterActual = parseDate(row.PlasterActual);
-      if (plasterActual && (!selectedYearPA || plasterActual.getFullYear().toString() === selectedYearPA)) {
-        totalActual += row.PlasterRev;
-      }
+      if (plasterActual && (!selectedYearPA || plasterActual.getFullYear().toString() === selectedYearPA)) totalActual += row.PlasterRev;
       
-      // Flooring
       const flooringPlan = parseDate(row.FlooringPlan);
-      if (flooringPlan && (!selectedYearPA || flooringPlan.getFullYear().toString() === selectedYearPA)) {
-        totalPlan += row.FloorRev;
-      }
+      if (flooringPlan && (!selectedYearPA || flooringPlan.getFullYear().toString() === selectedYearPA)) totalPlan += row.FloorRev;
       const flooringActual = parseDate(row.FlooringActual);
-      if (flooringActual && (!selectedYearPA || flooringActual.getFullYear().toString() === selectedYearPA)) {
-        totalActual += row.FloorRev;
-      }
+      if (flooringActual && (!selectedYearPA || flooringActual.getFullYear().toString() === selectedYearPA)) totalActual += row.FloorRev;
       
-      // Handover
       const handoverPlan = parseDate(row.HandoverPlan);
-      if (handoverPlan && (!selectedYearPA || handoverPlan.getFullYear().toString() === selectedYearPA)) {
-        totalPlan += row.HandRev;
-      }
+      if (handoverPlan && (!selectedYearPA || handoverPlan.getFullYear().toString() === selectedYearPA)) totalPlan += row.HandRev;
       const handoverActual = parseDate(row.HandoverActual);
-      if (handoverActual && (!selectedYearPA || handoverActual.getFullYear().toString() === selectedYearPA)) {
-        totalActual += row.HandRev;
+      if (handoverActual && (!selectedYearPA || handoverActual.getFullYear().toString() === selectedYearPA)) totalActual += row.HandRev;
+    });
+
+    // Add Structure revenue from Shell Master (SummaryAmt is already in rupees like other sheets)
+    rawShell.forEach(row => {
+      if (!(row.Category || '').toLowerCase().includes('slab')) return;
+      const planDate = parseDate(row.PlanDate);
+      if (planDate && (!selectedYearPA || planDate.getFullYear().toString() === selectedYearPA)) {
+        totalPlan += row.SummaryAmt;
+      }
+      const actualDate = parseDate(row.ActualDate);
+      if (actualDate && (!selectedYearPA || actualDate.getFullYear().toString() === selectedYearPA)) {
+        totalActual += row.SummaryAmt;
       }
     });
     
@@ -4947,6 +5070,9 @@
     
     // Add selection to clicked card
     event.currentTarget.classList.add('selected');
+    
+    // Close structure details if open
+    document.getElementById('structureDetailsSection').classList.remove('visible');
     
     const filteredData = raw.filter(r =>
       (!projectSelPA.size || projectSelPA.has(r.Project)) &&
@@ -5182,6 +5308,258 @@
     document.getElementById("planActualDetailsSection").classList.remove("visible");
     document.querySelectorAll('.plan-actual-card').forEach(card => card.classList.remove('selected'));
   }
+
+  // ===== STRUCTURES (SHELL MASTER) =====
+
+  function generateStructuresTable() {
+    const data = {};
+    let totalPlanRevenue = 0;
+    let totalActualRevenue = 0;
+
+    rawShell.forEach(row => {
+      // Only count rows where Category contains "slab" (case-insensitive)
+      if (!(row.Category || '').toLowerCase().includes('slab')) return;
+
+      // Plan date aggregation
+      const planDate = parseDate(row.PlanDate);
+      if (planDate) {
+        const year  = planDate.getFullYear().toString();
+        const quarter = getQuarter(planDate);
+        if (!selectedYearPA || year === selectedYearPA) {
+          const key = `${year}-Q${quarter}`;
+          if (!data[key]) data[key] = { year, quarter, planNos: 0, planAmt: 0, actualNos: 0, actualAmt: 0 };
+          data[key].planNos++;
+          data[key].planAmt += row.SummaryAmt;
+          totalPlanRevenue += row.SummaryAmt;
+        }
+      }
+
+      // Actual date aggregation
+      const actualDate = parseDate(row.ActualDate);
+      if (actualDate) {
+        const year  = actualDate.getFullYear().toString();
+        const quarter = getQuarter(actualDate);
+        if (!selectedYearPA || year === selectedYearPA) {
+          const key = `${year}-Q${quarter}`;
+          if (!data[key]) data[key] = { year, quarter, planNos: 0, planAmt: 0, actualNos: 0, actualAmt: 0 };
+          data[key].actualNos++;
+          data[key].actualAmt += row.SummaryAmt;
+          totalActualRevenue += row.SummaryAmt;
+        }
+      }
+    });
+
+    const dataArray = Object.values(data).sort((a, b) => {
+      if (a.year !== b.year) return a.year - b.year;
+      return a.quarter - b.quarter;
+    });
+
+    const tbody = document.getElementById('structurePlanActualBody');
+    tbody.innerHTML = '';
+
+    let totalPlanNos = 0, totalPlanAmt = 0, totalActualNos = 0, totalActualAmt = 0;
+
+    dataArray.forEach(item => {
+      totalPlanNos   += item.planNos;
+      totalPlanAmt   += item.planAmt;
+      totalActualNos += item.actualNos;
+      totalActualAmt += item.actualAmt;
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${item.year}</td>
+          <td>Q${item.quarter}</td>
+          <td><span class="plan-nos">${item.planNos}</span></td>
+          <td><span class="plan-amt">₹${(item.planAmt / 10000000).toFixed(2)}</span></td>
+          <td><span class="actual-nos">${item.actualNos}</span></td>
+          <td><span class="actual-amt">₹${(item.actualAmt / 10000000).toFixed(2)}</span></td>
+        </tr>`;
+    });
+
+    if (dataArray.length > 0) {
+      tbody.innerHTML += `
+        <tr class="total-row-plan">
+          <td colspan="2"><strong>TOTAL</strong></td>
+          <td><strong>${totalPlanNos}</strong></td>
+          <td><strong>₹${(totalPlanAmt / 10000000).toFixed(2)}</strong></td>
+          <td><strong>${totalActualNos}</strong></td>
+          <td><strong>₹${(totalActualAmt / 10000000).toFixed(2)}</strong></td>
+        </tr>`;
+    }
+
+    document.getElementById('structurePlanCount').textContent = `${dataArray.length}`;
+  }
+
+  function showStructureDetails() {
+    // Highlight selected card
+    document.querySelectorAll('.plan-actual-card').forEach(c => c.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+
+    // Close Plaster/Flooring/Handover details if open
+    document.getElementById('planActualDetailsSection').classList.remove('visible');
+
+    // Build detail rows: all Shell rows where Category contains "slab" and date falls in selected year
+    currentStructureData = rawShell.filter(row => {
+      if (!(row.Category || '').toLowerCase().includes('slab')) return false;
+      if (!selectedYearPA) return true;
+      const planDate   = parseDate(row.PlanDate);
+      const actualDate = parseDate(row.ActualDate);
+      return (planDate   && planDate.getFullYear().toString()   === selectedYearPA) ||
+             (actualDate && actualDate.getFullYear().toString() === selectedYearPA);
+    });
+
+    // Default sort: Actual date ascending
+    sortColumnStruct = 5;
+    sortAscendingStruct = true;
+    currentStructureData.sort((a, b) => {
+      const dA = parseDate(a.ActualDate);
+      const dB = parseDate(b.ActualDate);
+      return (dA ? dA.getTime() : 0) - (dB ? dB.getTime() : 0);
+    });
+
+    renderStructureDetailsTable();
+    document.getElementById('structureDetailsSection').classList.add('visible');
+    setTimeout(() => {
+      document.getElementById('structureDetailsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+
+  function renderStructureDetailsTable() {
+    const tbody = document.getElementById('structureDetailsTableBody');
+    tbody.innerHTML = '';
+
+    if (currentStructureData.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align:center;padding:2rem;color:var(--gray-400);">
+            <i class="bi bi-info-circle" style="font-size:2rem;display:block;margin-bottom:.5rem;"></i>
+            No structure slabs found for the selected period
+          </td>
+        </tr>`;
+      return;
+    }
+
+    // Totals
+    const totalPlanAmt = currentStructureData.reduce((s, r) => {
+      return parseDate(r.PlanDate) ? s + r.DetailAmt : s;
+    }, 0);
+    const totalActualAmt = currentStructureData.reduce((s, r) => {
+      return parseDate(r.ActualDate) ? s + r.DetailAmt : s;
+    }, 0);
+
+    tbody.innerHTML = `
+      <tr class="total-row">
+        <td colspan="3">
+          <span class="total-label">
+            <i class="bi bi-calculator"></i>
+            <strong>TOTAL - ${currentStructureData.length} Slabs</strong>
+          </span>
+        </td>
+        <td class="revenue-cell" style="font-size:1rem;"><strong>₹${(totalPlanAmt / 10000000).toFixed(2)} Cr</strong></td>
+        <td></td>
+        <td class="revenue-cell" style="font-size:1rem;"><strong>₹${(totalActualAmt / 10000000).toFixed(2)} Cr</strong></td>
+        <td></td>
+      </tr>`;
+
+    currentStructureData.forEach(row => {
+      const villaTower = row.Tower ? row.Tower : row.Villa;
+      const planDate   = parseDate(row.PlanDate);
+      const actualDate = parseDate(row.ActualDate);
+      const planDateTxt   = planDate   ? formatDateDDMMMYY(planDate)   : '-';
+      const actualDateTxt = actualDate ? formatDateDDMMMYY(actualDate) : '-';
+      const planAmt   = planDate   ? '₹' + (row.DetailAmt / 10000000).toFixed(2) : '-';
+      const actualAmt = actualDate ? '₹' + (row.DetailAmt / 10000000).toFixed(2) : '-';
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${row.Project || 'N/A'}</td>
+          <td>${villaTower || 'N/A'}</td>
+          <td>${row.Category || 'N/A'}</td>
+          <td>${planDateTxt}</td>
+          <td class="revenue-cell">${planAmt}</td>
+          <td>${actualDateTxt}</td>
+          <td class="revenue-cell">${actualAmt}</td>
+        </tr>`;
+    });
+
+    // Update sort indicators
+    document.querySelectorAll('#structureDetailsSection .details-table thead th.sortable').forEach((th, idx) => {
+      th.classList.remove('asc', 'desc');
+      if (idx === sortColumnStruct) th.classList.add(sortAscendingStruct ? 'asc' : 'desc');
+    });
+  }
+
+  function sortStructureTable(colIndex) {
+    if (sortColumnStruct === colIndex) {
+      sortAscendingStruct = !sortAscendingStruct;
+    } else {
+      sortColumnStruct  = colIndex;
+      sortAscendingStruct = true;
+    }
+
+    currentStructureData.sort((a, b) => {
+      let vA, vB;
+      switch (colIndex) {
+        case 0: vA = a.Project  || ''; vB = b.Project  || ''; break;
+        case 1: vA = (a.Tower || a.Villa || ''); vB = (b.Tower || b.Villa || ''); break;
+        case 2: vA = a.Category || ''; vB = b.Category || ''; break;
+        case 3: { const dA = parseDate(a.PlanDate), dB = parseDate(b.PlanDate);
+                  vA = dA ? dA.getTime() : 0; vB = dB ? dB.getTime() : 0; break; }
+        case 4: vA = parseDate(a.PlanDate)   ? a.DetailAmt : 0;
+                vB = parseDate(b.PlanDate)   ? b.DetailAmt : 0; break;
+        case 5: { const dA = parseDate(a.ActualDate), dB = parseDate(b.ActualDate);
+                  vA = dA ? dA.getTime() : 0; vB = dB ? dB.getTime() : 0; break; }
+        case 6: vA = parseDate(a.ActualDate) ? a.DetailAmt : 0;
+                vB = parseDate(b.ActualDate) ? b.DetailAmt : 0; break;
+        default: return 0;
+      }
+      if (colIndex >= 3) return sortAscendingStruct ? vA - vB : vB - vA;
+      if (vA < vB) return sortAscendingStruct ? -1 : 1;
+      if (vA > vB) return sortAscendingStruct ?  1 : -1;
+      return 0;
+    });
+    renderStructureDetailsTable();
+  }
+
+  function closeStructureDetails() {
+    document.getElementById('structureDetailsSection').classList.remove('visible');
+    document.querySelectorAll('.plan-actual-card').forEach(c => c.classList.remove('selected'));
+  }
+
+  function downloadStructureExcel() {
+    if (currentStructureData.length === 0) { alert('No data to download'); return; }
+
+    const excelData = [
+      ['Project', 'Villa / Tower', 'Category', 'Plan Date', 'Plan Amt (₹ Cr)', 'Actual Date', 'Actual Amt (₹ Cr)']
+    ];
+
+    const totalPlanAmt   = currentStructureData.reduce((s,r) => parseDate(r.PlanDate)   ? s + r.DetailAmt : s, 0) / 10000000;
+    const totalActualAmt = currentStructureData.reduce((s,r) => parseDate(r.ActualDate) ? s + r.DetailAmt : s, 0) / 10000000;
+    excelData.push(['TOTAL', `${currentStructureData.length} Slabs`, '', '', totalPlanAmt.toFixed(2), '', totalActualAmt.toFixed(2)]);
+
+    currentStructureData.forEach(row => {
+      const villaTower   = row.Tower ? row.Tower : row.Villa;
+      const planDate     = parseDate(row.PlanDate);
+      const actualDate   = parseDate(row.ActualDate);
+      excelData.push([
+        row.Project || 'N/A',
+        villaTower  || 'N/A',
+        row.Category || 'N/A',
+        planDate   ? formatDateDDMMMYY(planDate)   : '-',
+        planDate   ? (row.DetailAmt / 10000000).toFixed(2) : '-',
+        actualDate ? formatDateDDMMMYY(actualDate) : '-',
+        actualDate ? (row.DetailAmt / 10000000).toFixed(2) : '-'
+      ]);
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    ws['!cols'] = [{ wch:22 },{ wch:18 },{ wch:20 },{ wch:14 },{ wch:18 },{ wch:14 },{ wch:18 }];
+    XLSX.utils.book_append_sheet(wb, ws, 'Structures');
+    XLSX.writeFile(wb, `Structures_Plan_Actual_${new Date().toISOString().slice(0,10)}.xlsx`);
+  }
+
+
 
   function downloadPlanActualExcel() {
     if (currentPlanActualData.length === 0) {
