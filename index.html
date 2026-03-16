@@ -3833,18 +3833,31 @@
     try {
       console.log('Fetching data from Google Sheets...');
 
-      // Fetch both sheets in parallel
+      // Fetch both sheets in parallel; shell failure is surfaced via console but won't block main sheet
       const [mainResponse, shellResponse] = await Promise.all([
         fetch(GOOGLE_SHEETS_CSV_URL),
-        fetch(SHELL_MASTER_CSV_URL).catch(() => null) // Shell sheet is optional - fail gracefully
+        fetch(SHELL_MASTER_CSV_URL).catch(err => {
+          console.warn('Shell Master fetch error:', err);
+          return null;
+        })
       ]);
 
       if (!mainResponse.ok) {
         throw new Error('Failed to fetch data from Google Sheets');
       }
 
+      if (!shellResponse) {
+        console.warn('Shell Master sheet could not be reached (network error).');
+      } else if (!shellResponse.ok) {
+        console.warn('Shell Master sheet returned HTTP', shellResponse.status, '— check the GID and that the sheet is published.');
+      }
+
       const mainCsvText = await mainResponse.text();
-      const shellCsvText = shellResponse && shellResponse.ok ? await shellResponse.text() : null;
+      const shellCsvText = (shellResponse && shellResponse.ok) ? await shellResponse.text() : null;
+
+      if (!shellCsvText) {
+        console.warn('No Shell Master CSV text received — Structures table will be empty.');
+      }
 
       console.log('Data fetched successfully, parsing CSV...');
 
@@ -3871,7 +3884,12 @@
       const [mainData, shellData] = await Promise.all([mainPromise, shellPromise]);
 
       console.log('CSV parsed successfully, processing data...');
-      if (shellData) prepareShell(shellData);
+      if (shellData) {
+        prepareShell(shellData);
+      } else {
+        rawShell = [];
+        console.warn('Shell Master data is null — Structures will show no data.');
+      }
       prepare(mainData);
       console.log('Dashboard loaded successfully!');
 
@@ -4129,19 +4147,42 @@
   //   A(0):Project  B(1):Tower  C(2):Category  D(3):MilestoneAmt(summary)
   //   E(4):MilestoneAmt(detail)  F(5):PlanDate  G(6):ActualDate  H(7):VillaIdentifier
   function prepareShell(rows) {
-    if (!rows || rows.length < 2) { rawShell = []; return; }
-    // Skip header row (index 0)
+    if (!rows || rows.length < 2) {
+      console.warn('Shell Master: no data rows (only header or empty).');
+      rawShell = [];
+      return;
+    }
+
+    // Log header row so we can verify column mapping
+    console.log('Shell Master header row:', rows[0]);
+    // Log first 3 data rows for inspection
+    console.log('Shell Master sample rows (1-3):', rows.slice(1, 4));
+
     rawShell = rows.slice(1).map(r => ({
       Project:    (r[0] || '').toString().trim(),
       Tower:      (r[1] || '').toString().trim(),
       Category:   (r[2] || '').toString().trim(),
-      SummaryAmt: parseFloat(r[3]) || 0,   // Col D — used for summary Plan/Actual Crs
-      DetailAmt:  parseFloat(r[4]) || 0,   // Col E — used in details row display
+      SummaryAmt: parseFloat(String(r[3] || '').replace(/,/g, '')) || 0,  // Col D — quarterly table
+      DetailAmt:  parseFloat(String(r[4] || '').replace(/,/g, '')) || 0,  // Col E — detail rows
       PlanDate:   (r[5] || '').toString().trim(),
       ActualDate: (r[6] || '').toString().trim(),
       Villa:      (r[7] || '').toString().trim()   // Col H — villa identifier
     })).filter(r => r.Project); // skip blank rows
-    console.log(`Shell Master: loaded ${rawShell.length} rows`);
+
+    // Log all unique Category values so we can verify the slab filter
+    const uniqueCategories = [...new Set(rawShell.map(r => r.Category))].sort();
+    console.log(`Shell Master: loaded ${rawShell.length} rows. Unique Category values in Col C:`, uniqueCategories);
+
+    // Log sample dates so we can verify format parsing
+    const sampleDates = rawShell.slice(0, 5).map(r => ({
+      PlanDate: r.PlanDate, parsedPlan: parseDate(r.PlanDate),
+      ActualDate: r.ActualDate, parsedActual: parseDate(r.ActualDate)
+    }));
+    console.log('Shell Master sample date parsing:', sampleDates);
+
+    // Count how many rows match the slab filter
+    const slabRows = rawShell.filter(r => r.Category.toLowerCase().includes('slab'));
+    console.log(`Shell Master: ${slabRows.length} rows match "slab" filter in Category.`);
   }
 
 
@@ -4849,14 +4890,64 @@
   }
 
   // Parse date from DD-MM-YYYY format
+  // Robust date parser — handles DD-MM-YYYY, DD/MM/YYYY, YYYY-MM-DD, MM/DD/YYYY, Excel serials
   function parseDate(dateStr) {
-    if (!dateStr || dateStr === "00-01-1900") return null;
-    const parts = dateStr.split('-');
-    if (parts.length === 3) {
-      return new Date(parts[2], parts[1] - 1, parts[0]);
+    if (!dateStr && dateStr !== 0) return null;
+
+    // Excel serial number (Google Sheets sometimes exports these)
+    const asNum = Number(dateStr);
+    if (!isNaN(asNum) && asNum > 1000 && asNum < 99999) {
+      // Excel epoch is 1 Jan 1900, JS epoch is 1 Jan 1970
+      // Excel serial 1 = 1 Jan 1900, but Excel wrongly treats 1900 as leap year, so offset = 25569 days to JS epoch
+      const excelOffset = 25569;
+      const msPerDay = 86400000;
+      return new Date((asNum - excelOffset) * msPerDay);
     }
-    return null;
+
+    const s = String(dateStr).trim();
+    if (!s || s === '00-01-1900' || s === '01/00/1900' || s === '' || s.toLowerCase() === 'n/a') return null;
+
+    // DD-MM-YYYY or DD-MM-YY
+    let m = s.match(/^(\d{1,2})-(\d{1,2})-(\d{2,4})$/);
+    if (m) {
+      const y = m[3].length === 2 ? 2000 + parseInt(m[3]) : parseInt(m[3]);
+      return new Date(y, parseInt(m[2]) - 1, parseInt(m[1]));
+    }
+
+    // DD/MM/YYYY or DD/MM/YY  (most common from Google Sheets CSV export)
+    m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+    if (m) {
+      const y = m[3].length === 2 ? 2000 + parseInt(m[3]) : parseInt(m[3]);
+      // Assume DD/MM/YYYY (Indian/UK format); if day > 12 it must be DD first
+      const d1 = parseInt(m[1]), d2 = parseInt(m[2]);
+      if (d1 > 12) return new Date(y, d2 - 1, d1); // definitely DD/MM
+      return new Date(y, d2 - 1, d1);               // treat as DD/MM
+    }
+
+    // YYYY-MM-DD (ISO)
+    m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (m) return new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
+
+    // YYYY/MM/DD
+    m = s.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+    if (m) return new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
+
+    // DD-MMM-YYYY or DD-MMM-YY  (e.g. 15-Jan-25)
+    const monthNames = { jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11 };
+    m = s.match(/^(\d{1,2})[-\/]([a-zA-Z]{3})[-\/](\d{2,4})$/);
+    if (m) {
+      const mon = monthNames[m[2].toLowerCase()];
+      if (mon !== undefined) {
+        const y = m[3].length === 2 ? 2000 + parseInt(m[3]) : parseInt(m[3]);
+        return new Date(y, mon, parseInt(m[1]));
+      }
+    }
+
+    // Last resort: native Date parse (handles many locale strings)
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? null : d;
   }
+
   
   // Format date as DD-MMM-YY (e.g., 15-Jan-25)
   function formatDateDDMMMYY(date) {
@@ -5052,9 +5143,10 @@
       if (handoverActual && (!selectedYearPA || handoverActual.getFullYear().toString() === selectedYearPA)) totalActual += row.HandRev;
     });
 
-    // Add Structure revenue from Shell Master (SummaryAmt is already in rupees like other sheets)
-    rawShell.forEach(row => {
-      if (!(row.Category || '').toLowerCase().includes('slab')) return;
+    // Add Structure revenue from Shell Master
+    const slabRowsKpi = rawShell.filter(r => (r.Category || '').toLowerCase().includes('slab'));
+    const shellSourceKpi = slabRowsKpi.length > 0 ? slabRowsKpi : rawShell;
+    shellSourceKpi.forEach(row => {
       const planDate = parseDate(row.PlanDate);
       if (planDate && (!selectedYearPA || planDate.getFullYear().toString() === selectedYearPA)) {
         totalPlan += row.SummaryAmt;
@@ -5322,10 +5414,19 @@
     let totalPlanRevenue = 0;
     let totalActualRevenue = 0;
 
-    rawShell.forEach(row => {
-      // Only count rows where Category contains "slab" (case-insensitive)
-      if (!(row.Category || '').toLowerCase().includes('slab')) return;
+    // Determine which rows to use: prefer "slab" rows; if none match, use ALL Shell rows
+    const slabRows = rawShell.filter(r => (r.Category || '').toLowerCase().includes('slab'));
+    const sourceRows = slabRows.length > 0 ? slabRows : rawShell;
 
+    if (rawShell.length === 0) {
+      console.warn('generateStructuresTable: rawShell is empty — Shell Master may not have loaded.');
+    } else if (slabRows.length === 0) {
+      console.warn('generateStructuresTable: no rows match "slab" in Category. Showing all Shell rows instead. Categories found:', [...new Set(rawShell.map(r => r.Category))]);
+    } else {
+      console.log(`generateStructuresTable: using ${slabRows.length} slab rows out of ${rawShell.length} total.`);
+    }
+
+    sourceRows.forEach(row => {
       // Plan date aggregation
       const planDate = parseDate(row.PlanDate);
       if (planDate) {
@@ -5359,6 +5460,8 @@
       if (a.year !== b.year) return a.year - b.year;
       return a.quarter - b.quarter;
     });
+
+    console.log(`generateStructuresTable: ${dataArray.length} quarter-rows for year "${selectedYearPA || 'All'}".`);
 
     const tbody = document.getElementById('structurePlanActualBody');
     tbody.innerHTML = '';
@@ -5404,9 +5507,11 @@
     // Close Plaster/Flooring/Handover details if open
     document.getElementById('planActualDetailsSection').classList.remove('visible');
 
-    // Build detail rows: all Shell rows where Category contains "slab" and date falls in selected year
-    currentStructureData = rawShell.filter(row => {
-      if (!(row.Category || '').toLowerCase().includes('slab')) return false;
+    // Build detail rows: use slab rows if any, else all Shell rows
+    const slabRows = rawShell.filter(r => (r.Category || '').toLowerCase().includes('slab'));
+    const sourceRows = slabRows.length > 0 ? slabRows : rawShell;
+
+    currentStructureData = sourceRows.filter(row => {
       if (!selectedYearPA) return true;
       const planDate   = parseDate(row.PlanDate);
       const actualDate = parseDate(row.ActualDate);
