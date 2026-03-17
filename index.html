@@ -1560,6 +1560,98 @@
       padding: 0.5rem 0.35rem !important;
     }
 
+    /* ===== PLAN vs ACTUALS KPI SECTION ===== */
+    .pa-kpi-section {
+      margin-bottom: 1rem;
+    }
+    .pa-kpi-row-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--gray-500);
+      margin-bottom: 0.45rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .pa-kpi-row-label i { color: var(--primary); font-size: 0.85rem; }
+    .pa-kpi-row {
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+    .pa-multi-card {
+      flex: 1;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: rgba(255,255,255,0.98);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(99,102,241,0.07) inset;
+      border: 1px solid rgba(255,255,255,0.8);
+      transition: var(--transition);
+      min-width: 0;
+    }
+    .pa-multi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.1), 0 0 0 1px rgba(99,102,241,0.12) inset;
+    }
+    .pa-multi-header {
+      padding: 0.42rem 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pa-multi-header i { font-size: 0.85rem; opacity: 0.9; flex-shrink: 0; }
+    .pa-multi-total    .pa-multi-header { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+    .pa-multi-plaster  .pa-multi-header { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .pa-multi-flooring .pa-multi-header { background: linear-gradient(135deg, #0d9488, #0f766e); }
+    .pa-multi-handover .pa-multi-header { background: linear-gradient(135deg, #10b981, #059669); }
+    .pa-multi-structure .pa-multi-header { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+    .pa-multi-body {
+      display: flex;
+      align-items: stretch;
+    }
+    .pa-kpi-item {
+      flex: 1;
+      padding: 0.55rem 0.6rem;
+      text-align: center;
+      min-width: 0;
+    }
+    .pa-kpi-item-label {
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray-400);
+      margin-bottom: 0.2rem;
+    }
+    .pa-kpi-item-value {
+      font-size: 1.05rem;
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pa-kpi-item.plan   .pa-kpi-item-value { color: var(--primary); }
+    .pa-kpi-item.actual .pa-kpi-item-value { color: var(--success); }
+    .pa-kpi-item-value.nos { font-size: 1.2rem; }
+    .pa-kpi-divider {
+      width: 1px;
+      background: var(--gray-100);
+      margin: 0.4rem 0;
+      flex-shrink: 0;
+    }
+    /* ===== END PA KPI SECTION ===== */
+
     /* Plan vs Actuals Tables Grid */
     .plan-actual-tables-grid {
       display: grid;
@@ -3373,25 +3465,175 @@
     <!-- Plan vs Actuals Content (Hidden until data loads) -->
     <div class="data-section" id="planActualDataSection">
       
-      <!-- KPI Cards -->
-      <section class="kpi-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 1rem;">
-        <div class="kpi-card primary">
-          <div class="kpi-header">
-            <div class="kpi-icon"><i class="bi bi-calendar-check"></i></div>
-            <span class="kpi-trend up">Plan</span>
+      <!-- ===== PLAN VS ACTUALS KPI SECTION ===== -->
+      <section class="pa-kpi-section">
+
+        <!-- Row 1: Revenue KPIs -->
+        <div class="pa-kpi-row-label"><i class="bi bi-currency-rupee"></i> Revenue (₹ Cr)</div>
+        <div class="pa-kpi-row">
+
+          <!-- Total Plan + Actual Revenue -->
+          <div class="pa-multi-card pa-multi-total">
+            <div class="pa-multi-header">
+              <i class="bi bi-bar-chart-fill"></i>
+              <span>Total Revenue</span>
+            </div>
+            <div class="pa-multi-body">
+              <div class="pa-kpi-item plan">
+                <div class="pa-kpi-item-label">Plan</div>
+                <div class="pa-kpi-item-value" id="kpiPlanRevenue">₹0</div>
+              </div>
+              <div class="pa-kpi-divider"></div>
+              <div class="pa-kpi-item actual">
+                <div class="pa-kpi-item-label">Actual</div>
+                <div class="pa-kpi-item-value" id="kpiActualRevenue">₹0</div>
+              </div>
+            </div>
           </div>
-          <div class="kpi-value" id="kpiPlanRevenue">₹0</div>
-          <div class="kpi-label">Plan Revenue (Cr)</div>
-        </div>
-        <div class="kpi-card success">
-          <div class="kpi-header">
-            <div class="kpi-icon"><i class="bi bi-check-circle"></i></div>
-            <span class="kpi-trend up">Actual</span>
+
+          <!-- Plaster Revenue -->
+          <div class="pa-multi-card pa-multi-plaster">
+            <div class="pa-multi-header">
+              <i class="bi bi-paint-bucket"></i>
+              <span>Plaster</span>
+            </div>
+            <div class="pa-multi-body">
+              <div class="pa-kpi-item plan">
+                <div class="pa-kpi-item-label">Plan</div>
+                <div class="pa-kpi-item-value" id="kpiPlasterPlanRev">₹0</div>
+              </div>
+              <div class="pa-kpi-divider"></div>
+              <div class="pa-kpi-item actual">
+                <div class="pa-kpi-item-label">Actual</div>
+                <div class="pa-kpi-item-value" id="kpiPlasterActualRev">₹0</div>
+              </div>
+            </div>
           </div>
-          <div class="kpi-value" id="kpiActualRevenue">₹0</div>
-          <div class="kpi-label">Actual Revenue (Cr)</div>
-        </div>
+
+          <!-- Flooring Revenue -->
+          <div class="pa-multi-card pa-multi-flooring">
+            <div class="pa-multi-header">
+              <i class="bi bi-grid-3x3"></i>
+              <span>Flooring & Dado</span>
+            </div>
+            <div class="pa-multi-body">
+              <div class="pa-kpi-item plan">
+                <div class="pa-kpi-item-label">Plan</div>
+                <div class="pa-kpi-item-value" id="kpiFlooringPlanRev">₹0</div>
+              </div>
+              <div class="pa-kpi-divider"></div>
+              <div class="pa-kpi-item actual">
+                <div class="pa-kpi-item-label">Actual</div>
+                <div class="pa-kpi-item-value" id="kpiFlooringActualRev">₹0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Handover Revenue -->
+          <div class="pa-multi-card pa-multi-handover">
+            <div class="pa-multi-header">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>Ready for Handover</span>
+            </div>
+            <div class="pa-multi-body">
+              <div class="pa-kpi-item plan">
+                <div class="pa-kpi-item-label">Plan</div>
+                <div class="pa-kpi-item-value" id="kpiHandoverPlanRev">₹0</div>
+              </div>
+              <div class="pa-kpi-divider"></div>
+              <div class="pa-kpi-item actual">
+                <div class="pa-kpi-item-label">Actual</div>
+                <div class="pa-kpi-item-value" id="kpiHandoverActualRev">₹0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Structures Revenue -->
+          <div class="pa-multi-card pa-multi-structure">
+            <div class="pa-multi-header">
+              <i class="bi bi-building-gear"></i>
+              <span>Structures</span>
+            </div>
+            <div class="pa-multi-body">
+              <div class="pa-kpi-item plan">
+                <div class="pa-kpi-item-label">Plan</div>
+                <div class="pa-kpi-item-value" id="kpiStructurePlanRev">₹0</div>
+              </div>
+              <div class="pa-kpi-divider"></div>
+              <div class="pa-kpi-item actual">
+                <div class="pa-kpi-item-label">Actual</div>
+                <div class="pa-kpi-item-value" id="kpiStructureActualRev">₹0</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- end row 1 -->
+
+        <!-- Row 2: Units (Nos.) KPIs -->
+        <div class="pa-kpi-row-label" style="margin-top: 0.6rem;"><i class="bi bi-buildings"></i> Units (Nos.)</div>
+        <div class="pa-kpi-row">
+
+          <!-- Plaster Nos -->
+          <div class="pa-multi-card pa-multi-plaster">
+            <div class="pa-multi-header">
+              <i class="bi bi-paint-bucket"></i>
+              <span>Plaster</span>
+            </div>
+            <div class="pa-multi-body">
+              <div class="pa-kpi-item plan">
+                <div class="pa-kpi-item-label">Plan</div>
+                <div class="pa-kpi-item-value nos" id="kpiPlasterPlanNos">0</div>
+              </div>
+              <div class="pa-kpi-divider"></div>
+              <div class="pa-kpi-item actual">
+                <div class="pa-kpi-item-label">Actual</div>
+                <div class="pa-kpi-item-value nos" id="kpiPlasterActualNos">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Flooring Nos -->
+          <div class="pa-multi-card pa-multi-flooring">
+            <div class="pa-multi-header">
+              <i class="bi bi-grid-3x3"></i>
+              <span>Flooring & Dado</span>
+            </div>
+            <div class="pa-multi-body">
+              <div class="pa-kpi-item plan">
+                <div class="pa-kpi-item-label">Plan</div>
+                <div class="pa-kpi-item-value nos" id="kpiFlooringPlanNos">0</div>
+              </div>
+              <div class="pa-kpi-divider"></div>
+              <div class="pa-kpi-item actual">
+                <div class="pa-kpi-item-label">Actual</div>
+                <div class="pa-kpi-item-value nos" id="kpiFlooringActualNos">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Handover Nos -->
+          <div class="pa-multi-card pa-multi-handover">
+            <div class="pa-multi-header">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>Ready for Handover</span>
+            </div>
+            <div class="pa-multi-body">
+              <div class="pa-kpi-item plan">
+                <div class="pa-kpi-item-label">Plan</div>
+                <div class="pa-kpi-item-value nos" id="kpiHandoverPlanNos">0</div>
+              </div>
+              <div class="pa-kpi-divider"></div>
+              <div class="pa-kpi-item actual">
+                <div class="pa-kpi-item-label">Actual</div>
+                <div class="pa-kpi-item-value nos" id="kpiHandoverActualNos">0</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- end row 2 -->
+
       </section>
+      <!-- ===== END KPI SECTION ===== -->
 
       <!-- Filter Section -->
       <section class="filter-section">
@@ -3453,7 +3695,7 @@
               <thead>
                 <tr>
                   <th>Year</th>
-                  <th>Quarter</th>
+                  <th>Qtr</th>
                   <th>Plan (Nos.)</th>
                   <th>Plan (₹ Cr)</th>
                   <th>Actual (Nos.)</th>
@@ -3476,7 +3718,7 @@
               <thead>
                 <tr>
                   <th>Year</th>
-                  <th>Quarter</th>
+                  <th>Qtr</th>
                   <th>Plan (Nos.)</th>
                   <th>Plan (₹ Cr)</th>
                   <th>Actual (Nos.)</th>
@@ -3499,7 +3741,7 @@
               <thead>
                 <tr>
                   <th>Year</th>
-                  <th>Quarter</th>
+                  <th>Qtr</th>
                   <th>Plan (Nos.)</th>
                   <th>Plan (₹ Cr)</th>
                   <th>Actual (Nos.)</th>
@@ -3522,7 +3764,7 @@
               <thead>
                 <tr>
                   <th>Year</th>
-                  <th>Quarter</th>
+                  <th>Qtr</th>
                   <th>Plan (Nos.)</th>
                   <th>Plan (₹ Cr)</th>
                   <th>Actual (Nos.)</th>
@@ -5131,46 +5373,79 @@
       (!gfcSelPA.size || gfcSelPA.has(r.GFC ? "Yes" : "No")) &&
       (!ocSelPA.size || ocSelPA.has(r.OC))
     );
-    
-    let totalPlan = 0, totalActual = 0;
-    
-    // Calculate from Plaster, Flooring, Handover (raw values in rupees)
+
+    // Per-activity accumulators
+    let plasterPlanRev = 0, plasterActualRev = 0, plasterPlanNos = 0, plasterActualNos = 0;
+    let flooringPlanRev = 0, flooringActualRev = 0, flooringPlanNos = 0, flooringActualNos = 0;
+    let handoverPlanRev = 0, handoverActualRev = 0, handoverPlanNos = 0, handoverActualNos = 0;
+
     filteredData.forEach(row => {
       const plasterPlan = parseDate(row.PlasterPlan);
-      if (plasterPlan && (!selectedYearPA || plasterPlan.getFullYear().toString() === selectedYearPA)) totalPlan += row.PlasterRev;
+      if (plasterPlan && (!selectedYearPA || plasterPlan.getFullYear().toString() === selectedYearPA)) {
+        plasterPlanRev += row.PlasterRev; plasterPlanNos++;
+      }
       const plasterActual = parseDate(row.PlasterActual);
-      if (plasterActual && (!selectedYearPA || plasterActual.getFullYear().toString() === selectedYearPA)) totalActual += row.PlasterRev;
-      
+      if (plasterActual && (!selectedYearPA || plasterActual.getFullYear().toString() === selectedYearPA)) {
+        plasterActualRev += row.PlasterRev; plasterActualNos++;
+      }
+
       const flooringPlan = parseDate(row.FlooringPlan);
-      if (flooringPlan && (!selectedYearPA || flooringPlan.getFullYear().toString() === selectedYearPA)) totalPlan += row.FloorRev;
+      if (flooringPlan && (!selectedYearPA || flooringPlan.getFullYear().toString() === selectedYearPA)) {
+        flooringPlanRev += row.FloorRev; flooringPlanNos++;
+      }
       const flooringActual = parseDate(row.FlooringActual);
-      if (flooringActual && (!selectedYearPA || flooringActual.getFullYear().toString() === selectedYearPA)) totalActual += row.FloorRev;
-      
+      if (flooringActual && (!selectedYearPA || flooringActual.getFullYear().toString() === selectedYearPA)) {
+        flooringActualRev += row.FloorRev; flooringActualNos++;
+      }
+
       const handoverPlan = parseDate(row.HandoverPlan);
-      if (handoverPlan && (!selectedYearPA || handoverPlan.getFullYear().toString() === selectedYearPA)) totalPlan += row.HandRev;
+      if (handoverPlan && (!selectedYearPA || handoverPlan.getFullYear().toString() === selectedYearPA)) {
+        handoverPlanRev += row.HandRev; handoverPlanNos++;
+      }
       const handoverActual = parseDate(row.HandoverActual);
-      if (handoverActual && (!selectedYearPA || handoverActual.getFullYear().toString() === selectedYearPA)) totalActual += row.HandRev;
+      if (handoverActual && (!selectedYearPA || handoverActual.getFullYear().toString() === selectedYearPA)) {
+        handoverActualRev += row.HandRev; handoverActualNos++;
+      }
     });
 
-    // Add Structure revenue from Shell Master (DetailAmt = Col E has actual money values)
+    // Structure revenue from Shell Master
     const slabRowsKpi = rawShell.filter(r => (r.Category || '').toLowerCase().includes('slab'));
     const baseKpi = slabRowsKpi.length > 0 ? slabRowsKpi : rawShell;
-    const shellSourceKpi = projectSelPA.size > 0
-      ? baseKpi.filter(r => projectSelPA.has(r.Project))
-      : baseKpi;
+    const shellSourceKpi = projectSelPA.size > 0 ? baseKpi.filter(r => projectSelPA.has(r.Project)) : baseKpi;
+    let structPlanRev = 0, structActualRev = 0;
     shellSourceKpi.forEach(row => {
       const planDate = parseDate(row.PlanDate);
-      if (planDate && (!selectedYearPA || planDate.getFullYear().toString() === selectedYearPA)) {
-        totalPlan += row.DetailAmt;
-      }
+      if (planDate && (!selectedYearPA || planDate.getFullYear().toString() === selectedYearPA)) structPlanRev += row.DetailAmt;
       const actualDate = parseDate(row.ActualDate);
-      if (actualDate && (!selectedYearPA || actualDate.getFullYear().toString() === selectedYearPA)) {
-        totalActual += row.DetailAmt;
-      }
+      if (actualDate && (!selectedYearPA || actualDate.getFullYear().toString() === selectedYearPA)) structActualRev += row.DetailAmt;
     });
-    
-    document.getElementById('kpiPlanRevenue').textContent = '₹' + (totalPlan / 10000000).toFixed(1);
-    document.getElementById('kpiActualRevenue').textContent = '₹' + (totalActual / 10000000).toFixed(1);
+
+    // Totals
+    const totalPlan   = plasterPlanRev   + flooringPlanRev   + handoverPlanRev   + structPlanRev;
+    const totalActual = plasterActualRev + flooringActualRev + handoverActualRev + structActualRev;
+
+    const fmt = v => '₹' + (v / 10000000).toFixed(1);
+    const fmtNos = v => v.toLocaleString();
+
+    // Row 1 — Revenue
+    document.getElementById('kpiPlanRevenue').textContent        = fmt(totalPlan);
+    document.getElementById('kpiActualRevenue').textContent      = fmt(totalActual);
+    document.getElementById('kpiPlasterPlanRev').textContent     = fmt(plasterPlanRev);
+    document.getElementById('kpiPlasterActualRev').textContent   = fmt(plasterActualRev);
+    document.getElementById('kpiFlooringPlanRev').textContent    = fmt(flooringPlanRev);
+    document.getElementById('kpiFlooringActualRev').textContent  = fmt(flooringActualRev);
+    document.getElementById('kpiHandoverPlanRev').textContent    = fmt(handoverPlanRev);
+    document.getElementById('kpiHandoverActualRev').textContent  = fmt(handoverActualRev);
+    document.getElementById('kpiStructurePlanRev').textContent   = fmt(structPlanRev);
+    document.getElementById('kpiStructureActualRev').textContent = fmt(structActualRev);
+
+    // Row 2 — Nos.
+    document.getElementById('kpiPlasterPlanNos').textContent     = fmtNos(plasterPlanNos);
+    document.getElementById('kpiPlasterActualNos').textContent   = fmtNos(plasterActualNos);
+    document.getElementById('kpiFlooringPlanNos').textContent    = fmtNos(flooringPlanNos);
+    document.getElementById('kpiFlooringActualNos').textContent  = fmtNos(flooringActualNos);
+    document.getElementById('kpiHandoverPlanNos').textContent    = fmtNos(handoverPlanNos);
+    document.getElementById('kpiHandoverActualNos').textContent  = fmtNos(handoverActualNos);
   }
 
   // Show Plan Actual Unit Details
