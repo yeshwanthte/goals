@@ -1241,8 +1241,9 @@
     }
 
     .details-table-container {
-      max-height: 500px;
+      max-height: 520px;
       overflow-y: auto;
+      overflow-x: auto;
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-md);
       position: relative;
@@ -1255,65 +1256,72 @@
       background: white;
     }
 
-    .details-table thead th {
+    /* Sort header row — frozen at top:0 */
+    .details-table thead tr.sort-row th {
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
       color: white;
-      padding: 1rem;
-      font-size: 0.8rem;
+      padding: 0.75rem 1rem;
+      font-size: 0.78rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       text-align: left;
       position: sticky;
       top: 0;
-      z-index: 20;
+      z-index: 22;
       cursor: pointer;
       user-select: none;
-      transition: var(--transition);
+      transition: background 0.2s;
+      white-space: nowrap;
     }
+    .details-table thead tr.sort-row th:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, #3730a3 100%);
+    }
+    .details-table thead tr.sort-row th.sortable { position: relative; padding-right: 2rem; }
+    .details-table thead tr.sort-row th.sortable::after {
+      content: '\F0DC'; font-family: 'bootstrap-icons';
+      position: absolute; right: 0.6rem; opacity: 0.5; font-size: 0.75rem;
+    }
+    .details-table thead tr.sort-row th.sortable.asc::after  { content: '\F0D8'; opacity: 1; }
+    .details-table thead tr.sort-row th.sortable.desc::after { content: '\F0D7'; opacity: 1; }
+    .details-table thead tr.sort-row th:first-child { border-top-left-radius: 0; }
+    .details-table thead tr.sort-row th:last-child  { border-top-right-radius: 0; }
 
+    /* Filter row — frozen at top:38px (just below sort row) */
+    .details-table thead tr.filter-row th {
+      background: #f0f1fe;
+      position: sticky;
+      top: 38px;
+      z-index: 21;
+      padding: 0.28rem 0.4rem;
+      border-bottom: 2px solid var(--primary-light);
+    }
+    .col-filter {
+      width: 100%;
+      border: 1px solid var(--gray-300);
+      border-radius: 5px;
+      padding: 0.28rem 0.5rem;
+      font-size: 0.72rem;
+      color: var(--gray-700);
+      background: white;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      box-sizing: border-box;
+    }
+    .col-filter:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(99,102,241,0.15);
+    }
+    .col-filter::placeholder { color: var(--gray-300); }
+
+    /* Total row sticky — sits just below both header rows (38+32=70px) */
     .details-table tbody .total-row {
       position: sticky;
-      top: 50px;
+      top: 70px;
       z-index: 15;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    .details-table thead th:hover {
-      background: linear-gradient(135deg, var(--primary-dark) 0%, #3730a3 100%);
-    }
-
-    .details-table thead th.sortable {
-      position: relative;
-      padding-right: 2rem;
-    }
-
-    .details-table thead th.sortable::after {
-      content: '\F0DC';
-      font-family: 'bootstrap-icons';
-      position: absolute;
-      right: 0.75rem;
-      opacity: 0.5;
-      font-size: 0.75rem;
-    }
-
-    .details-table thead th.sortable.asc::after {
-      content: '\F0D8';
-      opacity: 1;
-    }
-
-    .details-table thead th.sortable.desc::after {
-      content: '\F0D7';
-      opacity: 1;
-    }
-
-    .details-table thead th:first-child {
-      border-top-left-radius: var(--radius-lg);
-    }
-
-    .details-table thead th:last-child {
-      border-top-right-radius: var(--radius-lg);
-    }
 
     .details-table tbody td {
       padding: 0.9rem 1rem;
@@ -3630,6 +3638,25 @@
             </div>
           </div>
 
+          <!-- Structures Nos -->
+          <div class="pa-multi-card pa-multi-structure">
+            <div class="pa-multi-header">
+              <i class="bi bi-building-gear"></i>
+              <span>Structures</span>
+            </div>
+            <div class="pa-multi-body">
+              <div class="pa-kpi-item plan">
+                <div class="pa-kpi-item-label">Plan</div>
+                <div class="pa-kpi-item-value nos" id="kpiStructurePlanNos">0</div>
+              </div>
+              <div class="pa-kpi-divider"></div>
+              <div class="pa-kpi-item actual">
+                <div class="pa-kpi-item-label">Actual</div>
+                <div class="pa-kpi-item-value nos" id="kpiStructureActualNos">0</div>
+              </div>
+            </div>
+          </div>
+
         </div><!-- end row 2 -->
 
       </section>
@@ -3799,9 +3826,9 @@
           </div>
           <div class="card-body-custom" style="padding: 0;">
             <div class="details-table-container">
-              <table class="details-table">
+              <table class="details-table" id="planActualDetailsTable">
                 <thead>
-                  <tr>
+                  <tr class="sort-row">
                     <th class="sortable" onclick="sortPlanActualTable(0)">Project</th>
                     <th class="sortable" onclick="sortPlanActualTable(1)">Phase</th>
                     <th class="sortable" onclick="sortPlanActualTable(2)">Tower</th>
@@ -3811,6 +3838,17 @@
                     <th class="sortable" onclick="sortPlanActualTable(6)">Plan Amt (₹ Cr)</th>
                     <th class="sortable" onclick="sortPlanActualTable(7)">Actual Date</th>
                     <th class="sortable" onclick="sortPlanActualTable(8)">Actual Amt (₹ Cr)</th>
+                  </tr>
+                  <tr class="filter-row">
+                    <th><input class="col-filter" data-table="pa" data-col="0" placeholder="&#128269; Filter..."></th>
+                    <th><input class="col-filter" data-table="pa" data-col="1" placeholder="&#128269; Filter..."></th>
+                    <th><input class="col-filter" data-table="pa" data-col="2" placeholder="&#128269; Filter..."></th>
+                    <th><input class="col-filter" data-table="pa" data-col="3" placeholder="&#128269; Filter..."></th>
+                    <th><input class="col-filter" data-table="pa" data-col="4" placeholder="&#128269; Filter..."></th>
+                    <th><input class="col-filter" data-table="pa" data-col="5" placeholder="&#128269; Filter..."></th>
+                    <th><input class="col-filter" data-table="pa" data-col="6" placeholder="&#128269; Filter..."></th>
+                    <th><input class="col-filter" data-table="pa" data-col="7" placeholder="&#128269; Filter..."></th>
+                    <th><input class="col-filter" data-table="pa" data-col="8" placeholder="&#128269; Filter..."></th>
                   </tr>
                 </thead>
                 <tbody id="planActualDetailsTableBody"></tbody>
@@ -3841,16 +3879,25 @@
           </div>
           <div class="card-body-custom" style="padding: 0;">
             <div class="details-table-container">
-              <table class="details-table">
+              <table class="details-table" id="structureDetailsTable">
                 <thead>
-                  <tr>
+                  <tr class="sort-row">
                     <th class="sortable" onclick="sortStructureTable(0)">Project</th>
                     <th class="sortable" onclick="sortStructureTable(1)">Villa / Tower</th>
-                    <th class="sortable" onclick="sortStructureTable(2)">Category</th>
+                    <th class="sortable" onclick="sortStructureTable(2)">Milestone Name</th>
                     <th class="sortable" onclick="sortStructureTable(3)">Plan Date</th>
                     <th class="sortable" onclick="sortStructureTable(4)">Plan Amt (₹ Cr)</th>
                     <th class="sortable" onclick="sortStructureTable(5)">Actual Date</th>
                     <th class="sortable" onclick="sortStructureTable(6)">Actual Amt (₹ Cr)</th>
+                  </tr>
+                  <tr class="filter-row">
+                    <th><input class="col-filter" data-table="struct" data-col="0" placeholder="&#128269; Filter..."></th>
+                    <th><input class="col-filter" data-table="struct" data-col="1" placeholder="&#128269; Filter..."></th>
+                    <th><input class="col-filter" data-table="struct" data-col="2" placeholder="&#128269; Filter..."></th>
+                    <th><input class="col-filter" data-table="struct" data-col="3" placeholder="&#128269; Filter..."></th>
+                    <th><input class="col-filter" data-table="struct" data-col="4" placeholder="&#128269; Filter..."></th>
+                    <th><input class="col-filter" data-table="struct" data-col="5" placeholder="&#128269; Filter..."></th>
+                    <th><input class="col-filter" data-table="struct" data-col="6" placeholder="&#128269; Filter..."></th>
                   </tr>
                 </thead>
                 <tbody id="structureDetailsTableBody"></tbody>
@@ -4217,6 +4264,10 @@
   let sortColumnStruct = -1;
   let sortAscendingStruct = true;
 
+  // Column filter states for both detail tables
+  let paColumnFilters   = {};   // { colIndex: 'text', ... }
+  let structColumnFilters = {};
+
   const COL = {
     PROJECT: "Project",
     TOWER: "Tower",
@@ -4404,14 +4455,14 @@
     console.log('Shell Master sample rows (1-3):', rows.slice(1, 4));
 
     rawShell = rows.slice(1).map(r => ({
-      Project:    (r[0] || '').toString().trim(),
-      Tower:      (r[1] || '').toString().trim(),
-      Category:   (r[2] || '').toString().trim(),
-      SummaryAmt: parseFloat(String(r[3] || '').replace(/,/g, '')) || 0,  // Col D — quarterly table
-      DetailAmt:  parseFloat(String(r[4] || '').replace(/,/g, '')) || 0,  // Col E — detail rows
-      PlanDate:   (r[5] || '').toString().trim(),
-      ActualDate: (r[6] || '').toString().trim(),
-      Villa:      (r[7] || '').toString().trim()   // Col H — villa identifier
+      Project:       (r[0] || '').toString().trim(),
+      Tower:         (r[1] || '').toString().trim(),
+      Category:      (r[2] || '').toString().trim(),
+      MilestoneName: (r[3] || '').toString().trim(),              // Col D — Milestone name (text)
+      DetailAmt:     parseFloat(String(r[4] || '').replace(/,/g, '')) || 0,  // Col E — amount
+      PlanDate:      (r[5] || '').toString().trim(),
+      ActualDate:    (r[6] || '').toString().trim(),
+      Villa:         (r[7] || '').toString().trim()               // Col H — villa identifier
     })).filter(r => r.Project); // skip blank rows
 
     // Log all unique Category values so we can verify the slab filter
@@ -5412,12 +5463,12 @@
     const slabRowsKpi = rawShell.filter(r => (r.Category || '').toLowerCase().includes('slab'));
     const baseKpi = slabRowsKpi.length > 0 ? slabRowsKpi : rawShell;
     const shellSourceKpi = projectSelPA.size > 0 ? baseKpi.filter(r => projectSelPA.has(r.Project)) : baseKpi;
-    let structPlanRev = 0, structActualRev = 0;
+    let structPlanRev = 0, structActualRev = 0, structPlanNos = 0, structActualNos = 0;
     shellSourceKpi.forEach(row => {
       const planDate = parseDate(row.PlanDate);
-      if (planDate && (!selectedYearPA || planDate.getFullYear().toString() === selectedYearPA)) structPlanRev += row.DetailAmt;
+      if (planDate && (!selectedYearPA || planDate.getFullYear().toString() === selectedYearPA)) { structPlanRev += row.DetailAmt; structPlanNos++; }
       const actualDate = parseDate(row.ActualDate);
-      if (actualDate && (!selectedYearPA || actualDate.getFullYear().toString() === selectedYearPA)) structActualRev += row.DetailAmt;
+      if (actualDate && (!selectedYearPA || actualDate.getFullYear().toString() === selectedYearPA)) { structActualRev += row.DetailAmt; structActualNos++; }
     });
 
     // Totals
@@ -5446,7 +5497,100 @@
     document.getElementById('kpiFlooringActualNos').textContent  = fmtNos(flooringActualNos);
     document.getElementById('kpiHandoverPlanNos').textContent    = fmtNos(handoverPlanNos);
     document.getElementById('kpiHandoverActualNos').textContent  = fmtNos(handoverActualNos);
+    document.getElementById('kpiStructurePlanNos').textContent   = fmtNos(structPlanNos);
+    document.getElementById('kpiStructureActualNos').textContent = fmtNos(structActualNos);
   }
+
+  // ===== COLUMN FILTER HELPERS =====
+
+  // Returns cell text for a given column index in the PA details table
+  function getPACellText(unit, colIdx) {
+    let planField  = currentPlanActualRevField === 'PlasterRev' ? 'PlasterPlan'   :
+                     currentPlanActualRevField === 'FloorRev'   ? 'FlooringPlan'  : 'HandoverPlan';
+    let actualField = currentPlanActualRevField === 'PlasterRev' ? 'PlasterActual'  :
+                      currentPlanActualRevField === 'FloorRev'   ? 'FlooringActual' : 'HandoverActual';
+    switch (colIdx) {
+      case 0: return (unit.Project  || '').toString();
+      case 1: return (unit.Phase    || '').toString();
+      case 2: return (unit.Tower    || '').toString();
+      case 3: return (unit.UnitNo   || '').toString();
+      case 4: return (unit.Customer || '').toString();
+      case 5: { const d = parseDate(unit[planField]);   return d ? formatDateDDMMMYY(d) : '-'; }
+      case 6: { const d = parseDate(unit[planField]);   return d ? ((unit[currentPlanActualRevField]||0)/10000000).toFixed(2) : '-'; }
+      case 7: { const d = parseDate(unit[actualField]); return d ? formatDateDDMMMYY(d) : '-'; }
+      case 8: { const d = parseDate(unit[actualField]); return d ? ((unit[currentPlanActualRevField]||0)/10000000).toFixed(2) : '-'; }
+      default: return '';
+    }
+  }
+
+  function getStructCellText(row, colIdx) {
+    const villaTower = row.Tower ? row.Tower : row.Villa;
+    switch (colIdx) {
+      case 0: return (row.Project || '').toString();
+      case 1: return (villaTower  || '').toString();
+      case 2: return (row.MilestoneName || row.Category || '').toString();
+      case 3: { const d = parseDate(row.PlanDate);   return d ? formatDateDDMMMYY(d) : '-'; }
+      case 4: { const d = parseDate(row.PlanDate);   return d ? (row.DetailAmt/10000000).toFixed(2) : '-'; }
+      case 5: { const d = parseDate(row.ActualDate); return d ? formatDateDDMMMYY(d) : '-'; }
+      case 6: { const d = parseDate(row.ActualDate); return d ? (row.DetailAmt/10000000).toFixed(2) : '-'; }
+      default: return '';
+    }
+  }
+
+  function applyPAColumnFilters(data) {
+    return data.filter(unit =>
+      Object.entries(paColumnFilters).every(([col, term]) => {
+        if (!term) return true;
+        return getPACellText(unit, +col).toLowerCase().includes(term.toLowerCase());
+      })
+    );
+  }
+
+  function applyStructColumnFilters(data) {
+    return data.filter(row =>
+      Object.entries(structColumnFilters).every(([col, term]) => {
+        if (!term) return true;
+        return getStructCellText(row, +col).toLowerCase().includes(term.toLowerCase());
+      })
+    );
+  }
+
+  function clearPAColumnFilters() {
+    paColumnFilters = {};
+    document.querySelectorAll('#planActualDetailsTable .col-filter').forEach(inp => inp.value = '');
+  }
+
+  function clearStructColumnFilters() {
+    structColumnFilters = {};
+    document.querySelectorAll('#structureDetailsTable .col-filter').forEach(inp => inp.value = '');
+  }
+
+  function initColFilterListeners() {
+    // PA table filter inputs
+    document.querySelectorAll('#planActualDetailsTable .col-filter').forEach(inp => {
+      inp.addEventListener('input', function() {
+        const col = this.dataset.col;
+        paColumnFilters[col] = this.value;
+        renderPlanActualDetailsTable();
+      });
+      // Prevent sort trigger on click
+      inp.addEventListener('click', e => e.stopPropagation());
+    });
+    // Structure table filter inputs
+    document.querySelectorAll('#structureDetailsTable .col-filter').forEach(inp => {
+      inp.addEventListener('input', function() {
+        const col = this.dataset.col;
+        structColumnFilters[col] = this.value;
+        renderStructureDetailsTable();
+      });
+      inp.addEventListener('click', e => e.stopPropagation());
+    });
+  }
+
+  // Call once on page load to wire up listeners (inputs are always in DOM)
+  document.addEventListener('DOMContentLoaded', initColFilterListeners);
+
+  // ===== END COLUMN FILTER HELPERS =====
 
   // Show Plan Actual Unit Details
   function showPlanActualDetails(activityName, revenueField) {
@@ -5458,6 +5602,8 @@
     
     // Close structure details if open
     document.getElementById('structureDetailsSection').classList.remove('visible');
+    clearStructColumnFilters();
+    clearPAColumnFilters();
     
     const filteredData = raw.filter(r =>
       (!projectSelPA.size || projectSelPA.has(r.Project)) &&
@@ -5537,7 +5683,7 @@
   function renderPlanActualDetailsTable() {
     const tbody = document.getElementById('planActualDetailsTableBody');
     tbody.innerHTML = "";
-    
+
     if (currentPlanActualData.length === 0) {
       tbody.innerHTML = `
         <tr>
@@ -5548,38 +5694,36 @@
         </tr>`;
       return;
     }
-    
+
+    // Apply column filters on top of the sorted master data
+    const displayData = applyPAColumnFilters(currentPlanActualData);
+
     // Get plan and actual field names
     let planField, actualField;
     if (currentPlanActualRevField === 'PlasterRev') {
-      planField = 'PlasterPlan';
-      actualField = 'PlasterActual';
+      planField = 'PlasterPlan'; actualField = 'PlasterActual';
     } else if (currentPlanActualRevField === 'FloorRev') {
-      planField = 'FlooringPlan';
-      actualField = 'FlooringActual';
+      planField = 'FlooringPlan'; actualField = 'FlooringActual';
     } else {
-      planField = 'HandoverPlan';
-      actualField = 'HandoverActual';
+      planField = 'HandoverPlan'; actualField = 'HandoverActual';
     }
-    
-    // Calculate totals
-    const totalPlanAmt = currentPlanActualData.reduce((sum, unit) => {
+
+    // Calculate totals from filtered display set
+    const totalPlanAmt = displayData.reduce((sum, unit) => {
       const planDate = parseDate(unit[planField]);
       return planDate ? sum + (unit[currentPlanActualRevField] || 0) : sum;
     }, 0) / 10000000;
-    
-    const totalActualAmt = currentPlanActualData.reduce((sum, unit) => {
+    const totalActualAmt = displayData.reduce((sum, unit) => {
       const actualDate = parseDate(unit[actualField]);
       return actualDate ? sum + (unit[currentPlanActualRevField] || 0) : sum;
     }, 0) / 10000000;
-    
-    // Add total row at top
+
     tbody.innerHTML = `
       <tr class="total-row">
         <td colspan="5">
           <span class="total-label">
             <i class="bi bi-calculator"></i>
-            <strong>TOTAL - ${currentPlanActualData.length} Units</strong>
+            <strong>TOTAL - ${displayData.length} Units</strong>
           </span>
         </td>
         <td colspan="2" class="revenue-cell" style="font-size: 1rem;">
@@ -5589,18 +5733,14 @@
           <strong>₹${totalActualAmt.toFixed(2)} Cr</strong>
         </td>
       </tr>`;
-    
-    // Add individual rows
-    currentPlanActualData.forEach(unit => {
-      const planDate = parseDate(unit[planField]);
-      const actualDate = parseDate(unit[actualField]);
-      
-      const planDateText = formatDateDDMMMYY(planDate);
+
+    displayData.forEach(unit => {
+      const planDate    = parseDate(unit[planField]);
+      const actualDate  = parseDate(unit[actualField]);
+      const planDateText   = formatDateDDMMMYY(planDate);
       const actualDateText = formatDateDDMMMYY(actualDate);
-      
-      const planAmt = planDate ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
+      const planAmt   = planDate   ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
       const actualAmt = actualDate ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
-      
       tbody.innerHTML += `
         <tr>
           <td>${unit.Project || 'N/A'}</td>
@@ -5614,13 +5754,11 @@
           <td class="revenue-cell">${actualAmt !== '-' ? '₹' + actualAmt : '-'}</td>
         </tr>`;
     });
-    
-    // Update sort indicators
-    document.querySelectorAll('#planActualDetailsSection .details-table thead th.sortable').forEach((th, idx) => {
+
+    // Update sort indicators on sort-row only
+    document.querySelectorAll('#planActualDetailsTable thead tr.sort-row th.sortable').forEach((th, idx) => {
       th.classList.remove('asc', 'desc');
-      if (idx === sortColumnPA) {
-        th.classList.add(sortAscendingPA ? 'asc' : 'desc');
-      }
+      if (idx === sortColumnPA) th.classList.add(sortAscendingPA ? 'asc' : 'desc');
     });
   }
 
@@ -5692,6 +5830,7 @@
   function closePlanActualDetails() {
     document.getElementById("planActualDetailsSection").classList.remove("visible");
     document.querySelectorAll('.plan-actual-card').forEach(card => card.classList.remove('selected'));
+    clearPAColumnFilters();
   }
 
   // ===== STRUCTURES (SHELL MASTER) =====
@@ -5797,6 +5936,8 @@
 
     // Close Plaster/Flooring/Handover details if open
     document.getElementById('planActualDetailsSection').classList.remove('visible');
+    clearPAColumnFilters();
+    clearStructColumnFilters();
 
     // Build detail rows: use slab rows if any, else all Shell rows; apply project filter
     const slabRows = rawShell.filter(r => (r.Category || '').toLowerCase().includes('slab'));
@@ -5844,20 +5985,19 @@
       return;
     }
 
-    // Totals
-    const totalPlanAmt = currentStructureData.reduce((s, r) => {
-      return parseDate(r.PlanDate) ? s + r.DetailAmt : s;
-    }, 0);
-    const totalActualAmt = currentStructureData.reduce((s, r) => {
-      return parseDate(r.ActualDate) ? s + r.DetailAmt : s;
-    }, 0);
+    // Apply column filters on top of sorted master data
+    const displayData = applyStructColumnFilters(currentStructureData);
+
+    // Totals from filtered display set
+    const totalPlanAmt   = displayData.reduce((s, r) => parseDate(r.PlanDate)   ? s + r.DetailAmt : s, 0);
+    const totalActualAmt = displayData.reduce((s, r) => parseDate(r.ActualDate) ? s + r.DetailAmt : s, 0);
 
     tbody.innerHTML = `
       <tr class="total-row">
         <td colspan="3">
           <span class="total-label">
             <i class="bi bi-calculator"></i>
-            <strong>TOTAL - ${currentStructureData.length} Slabs</strong>
+            <strong>TOTAL - ${displayData.length} Slabs</strong>
           </span>
         </td>
         <td class="revenue-cell" style="font-size:1rem;"><strong>₹${(totalPlanAmt / 10000000).toFixed(2)} Cr</strong></td>
@@ -5866,10 +6006,10 @@
         <td></td>
       </tr>`;
 
-    currentStructureData.forEach(row => {
-      const villaTower = row.Tower ? row.Tower : row.Villa;
-      const planDate   = parseDate(row.PlanDate);
-      const actualDate = parseDate(row.ActualDate);
+    displayData.forEach(row => {
+      const villaTower    = row.Tower ? row.Tower : row.Villa;
+      const planDate      = parseDate(row.PlanDate);
+      const actualDate    = parseDate(row.ActualDate);
       const planDateTxt   = planDate   ? formatDateDDMMMYY(planDate)   : '-';
       const actualDateTxt = actualDate ? formatDateDDMMMYY(actualDate) : '-';
       const planAmt   = planDate   ? '₹' + (row.DetailAmt / 10000000).toFixed(2) : '-';
@@ -5879,7 +6019,7 @@
         <tr>
           <td>${row.Project || 'N/A'}</td>
           <td>${villaTower || 'N/A'}</td>
-          <td>${row.Category || 'N/A'}</td>
+          <td>${row.MilestoneName || row.Category || 'N/A'}</td>
           <td>${planDateTxt}</td>
           <td class="revenue-cell">${planAmt}</td>
           <td>${actualDateTxt}</td>
@@ -5887,8 +6027,8 @@
         </tr>`;
     });
 
-    // Update sort indicators
-    document.querySelectorAll('#structureDetailsSection .details-table thead th.sortable').forEach((th, idx) => {
+    // Update sort indicators on sort-row only
+    document.querySelectorAll('#structureDetailsTable thead tr.sort-row th.sortable').forEach((th, idx) => {
       th.classList.remove('asc', 'desc');
       if (idx === sortColumnStruct) th.classList.add(sortAscendingStruct ? 'asc' : 'desc');
     });
@@ -5907,7 +6047,7 @@
       switch (colIndex) {
         case 0: vA = a.Project  || ''; vB = b.Project  || ''; break;
         case 1: vA = (a.Tower || a.Villa || ''); vB = (b.Tower || b.Villa || ''); break;
-        case 2: vA = a.Category || ''; vB = b.Category || ''; break;
+        case 2: vA = a.MilestoneName || a.Category || ''; vB = b.MilestoneName || b.Category || ''; break;
         case 3: { const dA = parseDate(a.PlanDate), dB = parseDate(b.PlanDate);
                   vA = dA ? dA.getTime() : 0; vB = dB ? dB.getTime() : 0; break; }
         case 4: vA = parseDate(a.PlanDate)   ? a.DetailAmt : 0;
@@ -5929,13 +6069,14 @@
   function closeStructureDetails() {
     document.getElementById('structureDetailsSection').classList.remove('visible');
     document.querySelectorAll('.plan-actual-card').forEach(c => c.classList.remove('selected'));
+    clearStructColumnFilters();
   }
 
   function downloadStructureExcel() {
     if (currentStructureData.length === 0) { alert('No data to download'); return; }
 
     const excelData = [
-      ['Project', 'Villa / Tower', 'Category', 'Plan Date', 'Plan Amt (₹ Cr)', 'Actual Date', 'Actual Amt (₹ Cr)']
+      ['Project', 'Villa / Tower', 'Milestone Name', 'Plan Date', 'Plan Amt (₹ Cr)', 'Actual Date', 'Actual Amt (₹ Cr)']
     ];
 
     const totalPlanAmt   = currentStructureData.reduce((s,r) => parseDate(r.PlanDate)   ? s + r.DetailAmt : s, 0) / 10000000;
@@ -5949,7 +6090,7 @@
       excelData.push([
         row.Project || 'N/A',
         villaTower  || 'N/A',
-        row.Category || 'N/A',
+        row.MilestoneName || row.Category || 'N/A',
         planDate   ? formatDateDDMMMYY(planDate)   : '-',
         planDate   ? (row.DetailAmt / 10000000).toFixed(2) : '-',
         actualDate ? formatDateDDMMMYY(actualDate) : '-',
