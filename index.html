@@ -3338,8 +3338,8 @@
   <!-- Auto-Load Section -->
   <div class="upload-section" id="uploadSection">
     <div class="spinner"></div>
-    <h2>Loading Data from Google Sheets...</h2>
-    <p>Please wait while we fetch the latest data</p>
+    <h2>Loading Data from OneDrive...</h2>
+    <p>Please wait while we fetch the latest data from OneDrive</p>
   </div>
 
   <!-- Tab Navigation -->
@@ -4212,10 +4212,35 @@
   // ========================================
   // GOOGLE SHEETS CONFIGURATION
   // ========================================
-  const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRrl7XNihStokkflZZ2gfCKtnh3woP_Z-WphBEQziue2SgygVeAOESNAygsCDY6hGnc0-9tbE-m9dA/pub?output=csv';
-  // Shell - Master sheet: append &gid=<SHEET_GID> for the correct tab
-  // Replace SHELL_GID_HERE with the numeric gid of the "Shell - Master" tab
-  const SHELL_MASTER_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRrl7XNihStokkflZZ2gfCKtnh3woP_Z-WphBEQziue2SgygVeAOESNAygsCDY6hGnc0-9tbE-m9dA/pub?output=csv&gid=1913984627';
+  // ============================================================
+  // ONEDRIVE FOR BUSINESS (SHAREPOINT) CONFIGURATION
+  // ============================================================
+  //
+  // HOW TO GET THE DIRECT DOWNLOAD URL:
+  //   1. Go to your Excel file in OneDrive for Business / SharePoint.
+  //   2. Click the three-dot menu (⋯) → "Details" panel, or just open the file.
+  //   3. Click Share → Copy Link → set permission to "People in your organisation can view"
+  //      (or "Anyone with the link" if your admin allows it).
+  //   4. The copied link looks like:
+  //        https://<tenant>.sharepoint.com/:x:/r/sites/<site>/...
+  //   5. Convert it to a DIRECT DOWNLOAD URL by changing the URL path:
+  //        Replace  /:x:/r/  with  /_layouts/15/download.aspx?SourceUrl=
+  //        Then URL-encode the file path portion.
+  //
+  //      EASIEST WAY — in the browser, open your file in Excel Online,
+  //      then look at the address bar. You will see a URL like:
+  //        https://<tenant>.sharepoint.com/sites/<site>/Shared%20Documents/<folder>/MyFile.xlsx?...
+  //      Strip everything after the file extension (.xlsx) and prepend:
+  //        https://<tenant>.sharepoint.com/sites/<site>/_layouts/15/download.aspx?SourceUrl=
+  //      Final result example:
+  //        https://contoso.sharepoint.com/sites/MyTeam/_layouts/15/download.aspx?SourceUrl=/sites/MyTeam/Shared%20Documents/Reports/BI_Data.xlsx
+  //
+  //   PASTE YOUR DIRECT DOWNLOAD URL BELOW:
+  const ONEDRIVE_DIRECT_URL = 'https://totalenvmt-my.sharepoint.com/:x:/r/personal/yeshwanth_sesetty_total-environment_com/_layouts/15/Doc.aspx?sourcedoc=%7B8CB617D7-9C79-45AD-BE76-ABB95DFC0074%7D&file=Goals%20Master.xlsx';
+
+  // Sheet tab names inside the Excel workbook (must match exactly, case-sensitive):
+  const ONEDRIVE_MAIN_SHEET_NAME  = 'Goals Dashboard - Master';          // ← your main data tab name
+  const ONEDRIVE_SHELL_SHEET_NAME = 'Shell - Master';  // ← your shell/structures tab name
 
   // ========================================
   // AUTH GATE — credentials
@@ -4230,74 +4255,107 @@
     // data loads only when handleLogin() succeeds
   });
 
-  // Function to load data from Google Sheets
-  async function loadDataFromGoogleSheets() {
+  // Load data from OneDrive for Business / SharePoint
+  async function loadDataFromGoogleSheets() {   // function name kept for internal compatibility
     try {
-      console.log('Fetching data from Google Sheets...');
-
-      // Fetch both sheets in parallel; shell failure is surfaced via console but won't block main sheet
-      const [mainResponse, shellResponse] = await Promise.all([
-        fetch(GOOGLE_SHEETS_CSV_URL),
-        fetch(SHELL_MASTER_CSV_URL).catch(err => {
-          console.warn('Shell Master fetch error:', err);
-          return null;
-        })
-      ]);
-
-      if (!mainResponse.ok) {
-        throw new Error('Failed to fetch data from Google Sheets');
+      // ── Guard: URL not yet configured ──────────────────────
+      if (!ONEDRIVE_DIRECT_URL || ONEDRIVE_DIRECT_URL === 'PASTE_YOUR_SHAREPOINT_DOWNLOAD_URL_HERE') {
+        showError(
+          '<b>OneDrive URL not configured.</b><br><br>' +
+          'Open this HTML file in a text editor, find <code>ONEDRIVE_DIRECT_URL</code> ' +
+          'near the top of the &lt;script&gt; block, and replace ' +
+          '<code>PASTE_YOUR_SHAREPOINT_DOWNLOAD_URL_HERE</code> with your SharePoint download URL.<br><br>' +
+          'See the instructions in the comments above that variable for how to build the URL.'
+        );
+        return;
       }
 
-      if (!shellResponse) {
-        console.warn('Shell Master sheet could not be reached (network error).');
-      } else if (!shellResponse.ok) {
-        console.warn('Shell Master sheet returned HTTP', shellResponse.status, '— check the GID and that the sheet is published.');
+      console.log('Fetching Excel workbook from OneDrive for Business...');
+
+      // SharePoint supports fetch with credentials (same-tenant) or anonymous if link is open
+      const response = await fetch(ONEDRIVE_DIRECT_URL, { credentials: 'include' });
+
+      if (!response.ok) {
+        throw new Error(
+          `HTTP ${response.status} — make sure the SharePoint link permission is set to ` +
+          `"People in your organisation can view" (or wider), and the URL is a direct download URL.`
+        );
       }
 
-      const mainCsvText = await mainResponse.text();
-      const shellCsvText = (shellResponse && shellResponse.ok) ? await shellResponse.text() : null;
+      const arrayBuffer = await response.arrayBuffer();
+      console.log(`Workbook downloaded (${(arrayBuffer.byteLength / 1024).toFixed(0)} KB). Parsing...`);
 
-      if (!shellCsvText) {
-        console.warn('No Shell Master CSV text received — Structures table will be empty.');
-      }
-
-      console.log('Data fetched successfully, parsing CSV...');
-
-      // Parse main sheet
-      const mainPromise = new Promise((resolve, reject) => {
-        Papa.parse(mainCsvText, {
-          header: false,
-          skipEmptyLines: true,
-          complete: res => resolve(res.data),
-          error: err => reject(err)
-        });
+      // Parse the .xlsx workbook with SheetJS
+      const workbook = XLSX.read(new Uint8Array(arrayBuffer), {
+        type: 'array',
+        cellDates: true,   // keep dates as Date objects then we format them ourselves
+        raw: false,
+        dateNF: 'dd-mm-yyyy'
       });
 
-      // Parse shell sheet if available
-      const shellPromise = shellCsvText ? new Promise((resolve, reject) => {
-        Papa.parse(shellCsvText, {
-          header: false,
-          skipEmptyLines: true,
-          complete: res => resolve(res.data),
-          error: err => reject(err)
+      console.log('Sheets found in workbook:', workbook.SheetNames.join(', '));
+
+      // ── Main data sheet ─────────────────────────────────────
+      const mainSheetName = workbook.SheetNames.includes(ONEDRIVE_MAIN_SHEET_NAME)
+        ? ONEDRIVE_MAIN_SHEET_NAME
+        : workbook.SheetNames[0];
+
+      if (!workbook.SheetNames.includes(ONEDRIVE_MAIN_SHEET_NAME)) {
+        console.warn(
+          `Main sheet "${ONEDRIVE_MAIN_SHEET_NAME}" not found. ` +
+          `Falling back to first sheet: "${mainSheetName}". ` +
+          `Update ONEDRIVE_MAIN_SHEET_NAME if this is wrong.`
+        );
+      }
+
+      const mainData = XLSX.utils.sheet_to_json(workbook.Sheets[mainSheetName], {
+        header: 1,
+        defval: '',
+        raw: false,
+        dateNF: 'dd-mm-yyyy'
+      });
+      console.log(`Main sheet "${mainSheetName}": ${mainData.length} rows`);
+
+      // ── Shell / Structures sheet ─────────────────────────────
+      let shellData = null;
+      if (workbook.SheetNames.includes(ONEDRIVE_SHELL_SHEET_NAME)) {
+        shellData = XLSX.utils.sheet_to_json(workbook.Sheets[ONEDRIVE_SHELL_SHEET_NAME], {
+          header: 1,
+          defval: '',
+          raw: false,
+          dateNF: 'dd-mm-yyyy'
         });
-      }) : Promise.resolve(null);
+        console.log(`Shell sheet "${ONEDRIVE_SHELL_SHEET_NAME}": ${shellData.length} rows`);
+      } else {
+        console.warn(
+          `Shell sheet "${ONEDRIVE_SHELL_SHEET_NAME}" not found in workbook. ` +
+          `Structures tab will be empty. Update ONEDRIVE_SHELL_SHEET_NAME if needed. ` +
+          `Available sheets: ${workbook.SheetNames.join(', ')}`
+        );
+        rawShell = [];
+      }
 
-      const [mainData, shellData] = await Promise.all([mainPromise, shellPromise]);
-
-      console.log('CSV parsed successfully, processing data...');
+      // ── Process data ────────────────────────────────────────
       if (shellData) {
         prepareShell(shellData);
       } else {
         rawShell = [];
-        console.warn('Shell Master data is null — Structures will show no data.');
       }
       prepare(mainData);
-      console.log('Dashboard loaded successfully!');
+      console.log('Dashboard loaded successfully from OneDrive for Business!');
 
     } catch (error) {
-      console.error('Error loading data:', error);
-      showError('Failed to load data from Google Sheets. Please check your internet connection and try again.');
+      console.error('OneDrive load error:', error);
+      showError(
+        'Failed to load data from OneDrive for Business.<br><br>' +
+        '<b>Common fixes:</b><br>' +
+        '&bull; Ensure you are <b>signed in</b> to your Microsoft 365 account in this browser<br>' +
+        '&bull; Use a <b>SharePoint direct download URL</b> — not the file-view or share URL<br>' +
+        '&bull; The URL format should contain <code>/_layouts/15/download.aspx?SourceUrl=</code><br>' +
+        '&bull; Confirm the file sharing is set to <b>"People in your organisation can view"</b><br>' +
+        '&bull; If running locally, open the HTML from a <b>web server</b> (not file://)<br><br>' +
+        '<i>Error: ' + error.message + '</i>'
+      );
     }
   }
 
@@ -4322,7 +4380,7 @@
     document.getElementById('uploadSection').innerHTML = `
       <div class="spinner"></div>
       <h2>Refreshing Data...</h2>
-      <p>Loading latest data from Google Sheets</p>
+      <p>Refreshing data from OneDrive...</p>
     `;
     document.getElementById('tabNavigation').style.display = 'none';
     document.getElementById('dataSection').classList.remove('visible');
@@ -6619,7 +6677,7 @@
 
     // reset dashboard state so it reloads fresh on next login
     document.getElementById('uploadSection').style.display = 'flex';
-    document.getElementById('uploadSection').innerHTML = '<div class="spinner"></div><h2>Loading Data from Google Sheets...</h2><p>Please wait while we fetch the latest data</p>';
+    document.getElementById('uploadSection').innerHTML = '<div class="spinner"></div><h2>Loading Data from OneDrive...</h2><p>Please wait while we fetch the latest data from OneDrive</p>';
     document.getElementById('tabNavigation').style.display = 'none';
     document.getElementById('dataSection').classList.remove('visible');
     document.getElementById('planActualDataSection').classList.remove('visible');
