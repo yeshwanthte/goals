@@ -1331,7 +1331,7 @@
     /* ===== EXCEL-STYLE COLUMN FILTER DROPDOWN ===== */
     .col-filter-dropdown {
       position: fixed;
-      z-index: 9999;
+      z-index: 99999;
       background: white;
       border: 1px solid var(--gray-200);
       border-radius: var(--radius-md);
@@ -4191,23 +4191,7 @@
     </div>
   </div>
 </div>
-<!-- Excel-style column filter dropdown (shared, repositioned dynamically) -->
-<div class="col-filter-dropdown" id="colFilterDropdown" style="display:none;">
-  <div class="cfd-header" id="cfdHeader">Filter</div>
-  <div class="cfd-search-wrap">
-    <i class="bi bi-search"></i>
-    <input class="cfd-search" id="cfdSearch" type="text" placeholder="Search values...">
-  </div>
-  <div class="cfd-select-all-row" id="cfdSelectAll">
-    <input type="checkbox" id="cfdSelectAllCb" checked>
-    <label for="cfdSelectAllCb" style="cursor:pointer;margin:0;">(Select All)</label>
-  </div>
-  <div class="cfd-list" id="cfdList"></div>
-  <div class="cfd-footer">
-    <button class="cfd-btn-apply" onclick="applyCFD()">Apply</button>
-    <button class="cfd-btn-clear" onclick="clearCFD()">Clear Filter</button>
-  </div>
-</div>
+<!-- Excel-style column filter dropdown moved to body level — see bottom of page -->
 
 </main>
 
@@ -5149,8 +5133,8 @@
     // Calculate total revenue
     const totalRevenue = currentDetailsData.reduce((sum, unit) => sum + (unit[currentRevenueField] || 0), 0) / 10000000;
     
-    // Add total row at the top
-    tbody.innerHTML = `
+    // Build all rows in one string — avoids O(n²) innerHTML +=
+    const rows = [`
       <tr class="total-row">
         <td colspan="5">
           <span class="total-label">
@@ -5161,12 +5145,11 @@
         <td class="revenue-cell" style="font-size: 1.1rem;">
           <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
         </td>
-      </tr>`;
-    
-    // Add individual unit rows
+      </tr>`];
+
     currentDetailsData.forEach(unit => {
       const revenue = ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
-      tbody.innerHTML += `
+      rows.push(`
         <tr>
           <td>${unit.Project || 'N/A'}</td>
           <td>${unit.Phase || 'N/A'}</td>
@@ -5174,8 +5157,9 @@
           <td class="unit-number">${unit.UnitNo}</td>
           <td class="customer-name">${unit.Customer}</td>
           <td class="revenue-cell">₹${revenue}</td>
-        </tr>`;
+        </tr>`);
     });
+    tbody.innerHTML = rows.join('');
 
     // Update sort indicators
     document.querySelectorAll('.details-table thead th.sortable').forEach((th, idx) => {
@@ -5915,23 +5899,22 @@
 
   function renderPlanActualDetailsTable() {
     const tbody = document.getElementById('planActualDetailsTableBody');
-    tbody.innerHTML = "";
 
     if (currentPlanActualData.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="9" style="text-align: center; padding: 2rem; color: var(--gray-400);">
-            <i class="bi bi-info-circle" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+          <td colspan="9" style="text-align:center;padding:2rem;color:var(--gray-400);">
+            <i class="bi bi-info-circle" style="font-size:2rem;margin-bottom:0.5rem;display:block;"></i>
             No units found for this activity
           </td>
         </tr>`;
       return;
     }
 
-    // Apply column filters on top of the sorted master data
+    // Apply column filters
     const displayData = applyPAColumnFilters(currentPlanActualData);
 
-    // Get plan and actual field names
+    // Resolve field names once
     let planField, actualField;
     if (currentPlanActualRevField === 'PlasterRev') {
       planField = 'PlasterPlan'; actualField = 'PlasterActual';
@@ -5941,17 +5924,24 @@
       planField = 'HandoverPlan'; actualField = 'HandoverActual';
     }
 
-    // Calculate totals from filtered display set
-    const totalPlanAmt = displayData.reduce((sum, unit) => {
-      const planDate = parseDate(unit[planField]);
-      return planDate ? sum + (unit[currentPlanActualRevField] || 0) : sum;
-    }, 0) / 10000000;
-    const totalActualAmt = displayData.reduce((sum, unit) => {
-      const actualDate = parseDate(unit[actualField]);
-      return actualDate ? sum + (unit[currentPlanActualRevField] || 0) : sum;
-    }, 0) / 10000000;
+    // Pre-parse all dates once (avoids re-parsing per-row multiple times)
+    const parsed = displayData.map(unit => ({
+      unit,
+      pd: parseDate(unit[planField]),
+      ad: parseDate(unit[actualField])
+    }));
 
-    tbody.innerHTML = `
+    // Totals
+    let totalPlanAmt = 0, totalActualAmt = 0;
+    parsed.forEach(({ unit, pd, ad }) => {
+      if (pd) totalPlanAmt   += (unit[currentPlanActualRevField] || 0);
+      if (ad) totalActualAmt += (unit[currentPlanActualRevField] || 0);
+    });
+    totalPlanAmt   /= 10000000;
+    totalActualAmt /= 10000000;
+
+    // Build HTML as array then join once — much faster than innerHTML +=
+    const rows = [`
       <tr class="total-row">
         <td colspan="5">
           <span class="total-label">
@@ -5959,36 +5949,36 @@
             <strong>TOTAL - ${displayData.length} Units</strong>
           </span>
         </td>
-        <td colspan="2" class="revenue-cell" style="font-size: 1rem;">
+        <td colspan="2" class="revenue-cell" style="font-size:1rem;">
           <strong>₹${totalPlanAmt.toFixed(2)} Cr</strong>
         </td>
-        <td colspan="2" class="revenue-cell" style="font-size: 1rem;">
+        <td colspan="2" class="revenue-cell" style="font-size:1rem;">
           <strong>₹${totalActualAmt.toFixed(2)} Cr</strong>
         </td>
-      </tr>`;
+      </tr>`];
 
-    displayData.forEach(unit => {
-      const planDate    = parseDate(unit[planField]);
-      const actualDate  = parseDate(unit[actualField]);
-      const planDateText   = formatDateDDMMMYY(planDate);
-      const actualDateText = formatDateDDMMMYY(actualDate);
-      const planAmt   = planDate   ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
-      const actualAmt = actualDate ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
-      tbody.innerHTML += `
+    parsed.forEach(({ unit, pd, ad }) => {
+      const planDateText   = pd ? formatDateDDMMMYY(pd) : '-';
+      const actualDateText = ad ? formatDateDDMMMYY(ad) : '-';
+      const planAmt   = pd ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
+      const actualAmt = ad ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
+      rows.push(`
         <tr>
-          <td>${unit.Project || 'N/A'}</td>
-          <td>${unit.Phase || 'N/A'}</td>
-          <td>${unit.Tower || 'N/A'}</td>
+          <td>${unit.Project  || 'N/A'}</td>
+          <td>${unit.Phase    || 'N/A'}</td>
+          <td>${unit.Tower    || 'N/A'}</td>
           <td class="unit-number">${unit.UnitNo}</td>
           <td class="customer-name">${unit.Customer}</td>
           <td>${planDateText}</td>
           <td class="revenue-cell">${planAmt !== '-' ? '₹' + planAmt : '-'}</td>
           <td>${actualDateText}</td>
           <td class="revenue-cell">${actualAmt !== '-' ? '₹' + actualAmt : '-'}</td>
-        </tr>`;
+        </tr>`);
     });
 
-    // Update sort indicators on sort-row only
+    tbody.innerHTML = rows.join('');   // Single DOM write — fast
+
+    // Update sort indicators
     document.querySelectorAll('#planActualDetailsTable thead tr.sort-row th.sortable').forEach((th, idx) => {
       th.classList.remove('asc', 'desc');
       if (idx === sortColumnPA) th.classList.add(sortAscendingPA ? 'asc' : 'desc');
@@ -6205,7 +6195,6 @@
 
   function renderStructureDetailsTable() {
     const tbody = document.getElementById('structureDetailsTableBody');
-    tbody.innerHTML = '';
 
     if (currentStructureData.length === 0) {
       tbody.innerHTML = `
@@ -6218,14 +6207,22 @@
       return;
     }
 
-    // Apply column filters on top of sorted master data
     const displayData = applyStructColumnFilters(currentStructureData);
 
-    // Totals from filtered display set
-    const totalPlanAmt   = displayData.reduce((s, r) => parseDate(r.PlanDate)   ? s + r.DetailAmt : s, 0);
-    const totalActualAmt = displayData.reduce((s, r) => parseDate(r.ActualDate) ? s + r.DetailAmt : s, 0);
+    // Pre-parse dates once
+    const parsed = displayData.map(row => ({
+      row,
+      pd: parseDate(row.PlanDate),
+      ad: parseDate(row.ActualDate)
+    }));
 
-    tbody.innerHTML = `
+    let totalPlanAmt = 0, totalActualAmt = 0;
+    parsed.forEach(({ row, pd, ad }) => {
+      if (pd) totalPlanAmt   += row.DetailAmt;
+      if (ad) totalActualAmt += row.DetailAmt;
+    });
+
+    const rows = [`
       <tr class="total-row">
         <td colspan="3">
           <span class="total-label">
@@ -6233,22 +6230,19 @@
             <strong>TOTAL - ${displayData.length} Slabs</strong>
           </span>
         </td>
-        <td class="revenue-cell" style="font-size:1rem;"><strong>₹${(totalPlanAmt / 10000000).toFixed(2)} Cr</strong></td>
+        <td class="revenue-cell" style="font-size:1rem;"><strong>₹${(totalPlanAmt/10000000).toFixed(2)} Cr</strong></td>
         <td></td>
-        <td class="revenue-cell" style="font-size:1rem;"><strong>₹${(totalActualAmt / 10000000).toFixed(2)} Cr</strong></td>
+        <td class="revenue-cell" style="font-size:1rem;"><strong>₹${(totalActualAmt/10000000).toFixed(2)} Cr</strong></td>
         <td></td>
-      </tr>`;
+      </tr>`];
 
-    displayData.forEach(row => {
+    parsed.forEach(({ row, pd, ad }) => {
       const villaTower    = row.Tower ? row.Tower : row.Villa;
-      const planDate      = parseDate(row.PlanDate);
-      const actualDate    = parseDate(row.ActualDate);
-      const planDateTxt   = planDate   ? formatDateDDMMMYY(planDate)   : '-';
-      const actualDateTxt = actualDate ? formatDateDDMMMYY(actualDate) : '-';
-      const planAmt   = planDate   ? '₹' + (row.DetailAmt / 10000000).toFixed(2) : '-';
-      const actualAmt = actualDate ? '₹' + (row.DetailAmt / 10000000).toFixed(2) : '-';
-
-      tbody.innerHTML += `
+      const planDateTxt   = pd ? formatDateDDMMMYY(pd) : '-';
+      const actualDateTxt = ad ? formatDateDDMMMYY(ad) : '-';
+      const planAmt   = pd ? '₹' + (row.DetailAmt / 10000000).toFixed(2) : '-';
+      const actualAmt = ad ? '₹' + (row.DetailAmt / 10000000).toFixed(2) : '-';
+      rows.push(`
         <tr>
           <td>${row.Project || 'N/A'}</td>
           <td>${villaTower || 'N/A'}</td>
@@ -6257,10 +6251,11 @@
           <td class="revenue-cell">${planAmt}</td>
           <td>${actualDateTxt}</td>
           <td class="revenue-cell">${actualAmt}</td>
-        </tr>`;
+        </tr>`);
     });
 
-    // Update sort indicators on sort-row only
+    tbody.innerHTML = rows.join('');   // Single DOM write
+
     document.querySelectorAll('#structureDetailsTable thead tr.sort-row th.sortable').forEach((th, idx) => {
       th.classList.remove('asc', 'desc');
       if (idx === sortColumnStruct) th.classList.add(sortAscendingStruct ? 'asc' : 'desc');
@@ -7759,5 +7754,22 @@
   }
 </script>
 
+<!-- Column Filter Dropdown — rendered at body level to avoid overflow clipping -->
+<div class="col-filter-dropdown" id="colFilterDropdown" style="display:none;position:fixed;z-index:99999;">
+  <div class="cfd-header" id="cfdHeader">Filter</div>
+  <div class="cfd-search-wrap">
+    <i class="bi bi-search"></i>
+    <input class="cfd-search" id="cfdSearch" type="text" placeholder="Search values...">
+  </div>
+  <div class="cfd-select-all-row" id="cfdSelectAll">
+    <input type="checkbox" id="cfdSelectAllCb" checked>
+    <label for="cfdSelectAllCb" style="cursor:pointer;margin:0;">(Select All)</label>
+  </div>
+  <div class="cfd-list" id="cfdList"></div>
+  <div class="cfd-footer">
+    <button class="cfd-btn-apply" onclick="applyCFD()">Apply</button>
+    <button class="cfd-btn-clear" onclick="clearCFD()">Clear Filter</button>
+  </div>
+</div>
 </body>
 </html>
