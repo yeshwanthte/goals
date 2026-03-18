@@ -3572,15 +3572,15 @@
         </div>
         <div class="card-body-custom" style="padding: 0;">
           <div class="details-table-container">
-            <table class="details-table">
+            <table class="details-table" id="milestoneDetailsTable">
               <thead>
-                <tr>
-                  <th class="sortable" onclick="sortTable(0)">Project</th>
-                  <th class="sortable" onclick="sortTable(1)">Phase</th>
-                  <th class="sortable" onclick="sortTable(2)">Tower</th>
-                  <th class="sortable" onclick="sortTable(3)">Unit No.</th>
-                  <th class="sortable" onclick="sortTable(4)">Customer Name</th>
-                  <th class="sortable" onclick="sortTable(5)">Revenue (₹ Cr)</th>
+                <tr class="sort-row">
+                  <th class="sortable" onclick="sortTable(0)">Project<button class="col-filter-btn" data-table="milestone" data-col="0" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(1)">Phase<button class="col-filter-btn" data-table="milestone" data-col="1" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(2)">Tower<button class="col-filter-btn" data-table="milestone" data-col="2" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(3)">Unit No.<button class="col-filter-btn" data-table="milestone" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(4)">Customer Name<button class="col-filter-btn" data-table="milestone" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(5)">Revenue (₹ Cr)<button class="col-filter-btn" data-table="milestone" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                 </tr>
               </thead>
               <tbody id="detailsTableBody"></tbody>
@@ -4375,8 +4375,9 @@
   let sortAscendingStruct = true;
 
   // Column filter states for both detail tables
-  let paColumnFilters   = {};   // { colIndex: 'text', ... }
+  let paColumnFilters   = {};   // { colIndex: Set<string>, ... }
   let structColumnFilters = {};
+  let milestoneColumnFilters = {};
 
   const COL = {
     PROJECT: "Project",
@@ -5007,6 +5008,9 @@
     currentDetailsData = filteredUnits;
     currentActivityName = activityName;
     currentRevenueField = revenueField;
+
+    // Reset filters whenever a new activity is opened
+    clearMilestoneColumnFilters();
     
     // Set default sort to revenue column (index 5) in descending order
     sortColumn = 5;
@@ -5117,7 +5121,6 @@
 
   function renderDetailsTable() {
     const tbody = document.getElementById("detailsTableBody");
-    tbody.innerHTML = "";
 
     if (currentDetailsData.length === 0) {
       tbody.innerHTML = `
@@ -5130,16 +5133,19 @@
       return;
     }
 
-    // Calculate total revenue
-    const totalRevenue = currentDetailsData.reduce((sum, unit) => sum + (unit[currentRevenueField] || 0), 0) / 10000000;
-    
-    // Build all rows in one string — avoids O(n²) innerHTML +=
+    // Apply column filters
+    const displayData = applyMilestoneColumnFilters(currentDetailsData);
+
+    // Calculate total revenue from filtered set
+    const totalRevenue = displayData.reduce((sum, unit) => sum + (unit[currentRevenueField] || 0), 0) / 10000000;
+
+    // Build all rows in one string — fast single DOM write
     const rows = [`
       <tr class="total-row">
         <td colspan="5">
           <span class="total-label">
             <i class="bi bi-calculator"></i>
-            <strong>TOTAL - ${currentDetailsData.length} Units</strong>
+            <strong>TOTAL - ${displayData.length} Units</strong>
           </span>
         </td>
         <td class="revenue-cell" style="font-size: 1.1rem;">
@@ -5147,7 +5153,7 @@
         </td>
       </tr>`];
 
-    currentDetailsData.forEach(unit => {
+    displayData.forEach(unit => {
       const revenue = ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
       rows.push(`
         <tr>
@@ -5161,12 +5167,10 @@
     });
     tbody.innerHTML = rows.join('');
 
-    // Update sort indicators
-    document.querySelectorAll('.details-table thead th.sortable').forEach((th, idx) => {
+    // Update sort indicators on sort-row
+    document.querySelectorAll('#milestoneDetailsTable thead tr.sort-row th.sortable').forEach((th, idx) => {
       th.classList.remove('asc', 'desc');
-      if (idx === sortColumn) {
-        th.classList.add(sortAscending ? 'asc' : 'desc');
-      }
+      if (idx === sortColumn) th.classList.add(sortAscending ? 'asc' : 'desc');
     });
   }
 
@@ -5282,6 +5286,7 @@
 
   function closeDetails() {
     document.getElementById("detailsSection").classList.remove("visible");
+    clearMilestoneColumnFilters();
   }
 
   // Tab Switching
@@ -5618,14 +5623,18 @@
   let _cfdBtn    = null;   // the filter button element that opened the dropdown
   let _cfdPending = {};    // working copy of checked values while dropdown is open
 
-  // Returns all unique cell values for a given column + table from the FULL (unfiltered) master data
+  // Returns all unique cell values for a given column + table from FULL (unfiltered) master data
   function getCFDAllValues(tableType, colIdx) {
-    const source = tableType === 'pa' ? currentPlanActualData : currentStructureData;
-    const getter = tableType === 'pa' ? getPACellText : getStructCellText;
+    const source = tableType === 'pa'     ? currentPlanActualData
+                 : tableType === 'struct' ? currentStructureData
+                 :                          currentDetailsData;   // 'milestone'
+    const getter = tableType === 'pa'     ? getPACellText
+                 : tableType === 'struct' ? getStructCellText
+                 :                          getMilestoneCellText;
     const vals = new Set();
     source.forEach(row => {
       const v = getter(row, colIdx);
-      if (v && v !== 'N/A') vals.add(v);
+      if (v && v !== 'N/A' && v !== '-') vals.add(v);
     });
     return [...vals].sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
   }
@@ -5732,32 +5741,49 @@
 
   function applyCFD() {
     if (_cfdTable === null) return;
-    const allVals = getCFDAllValues(_cfdTable, _cfdCol);
+    const tableType = _cfdTable;   // save before closeCFD() nulls it
+    const colIdx    = _cfdCol;
+    const btn       = _cfdBtn;
+
+    const allVals = getCFDAllValues(tableType, colIdx);
     const allSelected = allVals.every(v => _cfdPending[v] !== false);
 
-    const filters = _cfdTable === 'pa' ? paColumnFilters : structColumnFilters;
+    const filters = tableType === 'pa' ? paColumnFilters
+                  : tableType === 'struct' ? structColumnFilters
+                  : milestoneColumnFilters;
+
     if (allSelected) {
-      delete filters[_cfdCol];
+      delete filters[colIdx];
     } else {
-      filters[_cfdCol] = new Set(allVals.filter(v => _cfdPending[v]));
+      filters[colIdx] = new Set(allVals.filter(v => _cfdPending[v]));
     }
 
-    // Highlight button if filter is active
-    if (_cfdBtn) _cfdBtn.classList.toggle('active', !!filters[_cfdCol]);
+    if (btn) btn.classList.toggle('active', !!filters[colIdx]);
 
-    closeCFD();
-    if (_cfdTable === 'pa') renderPlanActualDetailsTable();
-    else renderStructureDetailsTable();
+    closeCFD();   // safe to null now — we saved what we need above
+
+    if (tableType === 'pa')        renderPlanActualDetailsTable();
+    else if (tableType === 'struct') renderStructureDetailsTable();
+    else                             renderDetailsTable();
   }
 
   function clearCFD() {
     if (_cfdTable === null) return;
-    const filters = _cfdTable === 'pa' ? paColumnFilters : structColumnFilters;
-    delete filters[_cfdCol];
-    if (_cfdBtn) _cfdBtn.classList.remove('active');
+    const tableType = _cfdTable;
+    const colIdx    = _cfdCol;
+    const btn       = _cfdBtn;
+
+    const filters = tableType === 'pa' ? paColumnFilters
+                  : tableType === 'struct' ? structColumnFilters
+                  : milestoneColumnFilters;
+    delete filters[colIdx];
+    if (btn) btn.classList.remove('active');
+
     closeCFD();
-    if (_cfdTable === 'pa') renderPlanActualDetailsTable();
-    else renderStructureDetailsTable();
+
+    if (tableType === 'pa')          renderPlanActualDetailsTable();
+    else if (tableType === 'struct') renderStructureDetailsTable();
+    else                             renderDetailsTable();
   }
 
   function closeCFD() {
@@ -5774,6 +5800,54 @@
   });
 
   // Updated filter application functions using Set-based matching
+
+  // ---- cell-text getters (one per table) ----
+  function getPACellText(unit, colIdx) {
+    let planField  = currentPlanActualRevField === 'PlasterRev' ? 'PlasterPlan'
+                   : currentPlanActualRevField === 'FloorRev'   ? 'FlooringPlan' : 'HandoverPlan';
+    let actualField = currentPlanActualRevField === 'PlasterRev' ? 'PlasterActual'
+                    : currentPlanActualRevField === 'FloorRev'   ? 'FlooringActual' : 'HandoverActual';
+    switch (colIdx) {
+      case 0: return (unit.Project  || '').toString();
+      case 1: return (unit.Phase    || '').toString();
+      case 2: return (unit.Tower    || '').toString();
+      case 3: return (unit.UnitNo   || '').toString();
+      case 4: return (unit.Customer || '').toString();
+      case 5: { const d = parseDate(unit[planField]);   return d ? formatDateDDMMMYY(d) : '-'; }
+      case 6: { const d = parseDate(unit[planField]);   return d ? ((unit[currentPlanActualRevField]||0)/10000000).toFixed(2) : '-'; }
+      case 7: { const d = parseDate(unit[actualField]); return d ? formatDateDDMMMYY(d) : '-'; }
+      case 8: { const d = parseDate(unit[actualField]); return d ? ((unit[currentPlanActualRevField]||0)/10000000).toFixed(2) : '-'; }
+      default: return '';
+    }
+  }
+
+  function getStructCellText(row, colIdx) {
+    const villaTower = row.Tower ? row.Tower : row.Villa;
+    switch (colIdx) {
+      case 0: return (row.Project || '').toString();
+      case 1: return (villaTower  || '').toString();
+      case 2: return (row.MilestoneName || row.Category || '').toString();
+      case 3: { const d = parseDate(row.PlanDate);   return d ? formatDateDDMMMYY(d) : '-'; }
+      case 4: { const d = parseDate(row.PlanDate);   return d ? (row.DetailAmt/10000000).toFixed(2) : '-'; }
+      case 5: { const d = parseDate(row.ActualDate); return d ? formatDateDDMMMYY(d) : '-'; }
+      case 6: { const d = parseDate(row.ActualDate); return d ? (row.DetailAmt/10000000).toFixed(2) : '-'; }
+      default: return '';
+    }
+  }
+
+  function getMilestoneCellText(unit, colIdx) {
+    switch (colIdx) {
+      case 0: return (unit.Project  || '').toString();
+      case 1: return (unit.Phase    || '').toString();
+      case 2: return (unit.Tower    || '').toString();
+      case 3: return (unit.UnitNo   || '').toString();
+      case 4: return (unit.Customer || '').toString();
+      case 5: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
+      default: return '';
+    }
+  }
+
+  // ---- apply filters ----
   function applyPAColumnFilters(data) {
     return data.filter(unit =>
       Object.entries(paColumnFilters).every(([col, valSet]) => {
@@ -5800,6 +5874,20 @@
   function clearStructColumnFilters() {
     structColumnFilters = {};
     document.querySelectorAll('#structureDetailsTable .col-filter-btn').forEach(b => b.classList.remove('active'));
+  }
+
+  function applyMilestoneColumnFilters(data) {
+    return data.filter(unit =>
+      Object.entries(milestoneColumnFilters).every(([col, valSet]) => {
+        if (!valSet || valSet.size === 0) return true;
+        return valSet.has(getMilestoneCellText(unit, +col));
+      })
+    );
+  }
+
+  function clearMilestoneColumnFilters() {
+    milestoneColumnFilters = {};
+    document.querySelectorAll('#milestoneDetailsTable .col-filter-btn').forEach(b => b.classList.remove('active'));
   }
 
   function initColFilterListeners() {
