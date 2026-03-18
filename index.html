@@ -1256,11 +1256,11 @@
       background: white;
     }
 
-    /* Sort header row — frozen at top:0 */
+    /* Sort header row — frozen at top:0. position:sticky is set here and MUST NOT be overridden */
     .details-table thead tr.sort-row th {
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
       color: white;
-      padding: 0.75rem 1rem;
+      padding: 0.75rem 0.9rem 0.75rem 1rem;
       font-size: 0.78rem;
       font-weight: 600;
       text-transform: uppercase;
@@ -1274,53 +1274,181 @@
       transition: background 0.2s;
       white-space: nowrap;
     }
+    /* CRITICAL: sortable must NOT override position:sticky with position:relative.
+       position:sticky already acts as a containing block for ::after pseudo-elements */
+    .details-table thead tr.sort-row th.sortable {
+      padding-right: 3.4rem; /* room for sort arrow + filter icon */
+    }
     .details-table thead tr.sort-row th:hover {
       background: linear-gradient(135deg, var(--primary-dark) 0%, #3730a3 100%);
     }
-    .details-table thead tr.sort-row th.sortable { position: relative; padding-right: 2rem; }
     .details-table thead tr.sort-row th.sortable::after {
       content: '\F0DC'; font-family: 'bootstrap-icons';
-      position: absolute; right: 0.6rem; opacity: 0.5; font-size: 0.75rem;
+      position: absolute; right: 1.8rem; top: 50%; transform: translateY(-50%);
+      opacity: 0.5; font-size: 0.75rem;
     }
     .details-table thead tr.sort-row th.sortable.asc::after  { content: '\F0D8'; opacity: 1; }
     .details-table thead tr.sort-row th.sortable.desc::after { content: '\F0D7'; opacity: 1; }
     .details-table thead tr.sort-row th:first-child { border-top-left-radius: 0; }
     .details-table thead tr.sort-row th:last-child  { border-top-right-radius: 0; }
 
-    /* Filter row — frozen at top:38px (just below sort row) */
-    .details-table thead tr.filter-row th {
-      background: #f0f1fe;
-      position: sticky;
-      top: 38px;
-      z-index: 21;
-      padding: 0.28rem 0.4rem;
-      border-bottom: 2px solid var(--primary-light);
+    /* Filter icon button inside each header cell */
+    .col-filter-btn {
+      position: absolute;
+      right: 0.35rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 4px;
+      color: white;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.7rem;
+      transition: background 0.15s;
+      flex-shrink: 0;
+      padding: 0;
     }
-    .col-filter {
-      width: 100%;
-      border: 1px solid var(--gray-300);
-      border-radius: 5px;
-      padding: 0.28rem 0.5rem;
-      font-size: 0.72rem;
-      color: var(--gray-700);
-      background: white;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-      box-sizing: border-box;
+    .col-filter-btn:hover { background: rgba(255,255,255,0.32); }
+    .col-filter-btn.active {
+      background: #fbbf24;
+      border-color: #f59e0b;
+      color: #1f2937;
     }
-    .col-filter:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(99,102,241,0.15);
-    }
-    .col-filter::placeholder { color: var(--gray-300); }
 
-    /* Total row sticky — sits just below both header rows (38+32=70px) */
+    /* Total row sticky — sits just below header */
     .details-table tbody .total-row {
       position: sticky;
-      top: 70px;
+      top: 38px;
       z-index: 15;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+
+    /* ===== EXCEL-STYLE COLUMN FILTER DROPDOWN ===== */
+    .col-filter-dropdown {
+      position: fixed;
+      z-index: 9999;
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.1);
+      width: 230px;
+      max-height: 360px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: cfdFadeIn 0.12s ease;
+    }
+    @keyframes cfdFadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+
+    .cfd-header {
+      padding: 0.6rem 0.75rem 0.4rem;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      background: var(--gray-50);
+    }
+
+    .cfd-search-wrap {
+      padding: 0.45rem 0.6rem;
+      border-bottom: 1px solid var(--gray-100);
+      position: relative;
+    }
+    .cfd-search-wrap i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-400);
+      font-size: 0.8rem;
+    }
+    .cfd-search {
+      width: 100%;
+      padding: 0.3rem 0.5rem 0.3rem 1.8rem;
+      border: 1px solid var(--gray-200);
+      border-radius: 5px;
+      font-size: 0.78rem;
+      outline: none;
+      color: var(--gray-700);
+      box-sizing: border-box;
+    }
+    .cfd-search:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(99,102,241,0.12); }
+
+    .cfd-select-all-row {
+      padding: 0.35rem 0.75rem;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      cursor: pointer;
+      user-select: none;
+    }
+    .cfd-select-all-row:hover { background: var(--gray-50); }
+
+    .cfd-list {
+      overflow-y: auto;
+      flex: 1;
+      max-height: 200px;
+    }
+    .cfd-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.32rem 0.75rem;
+      font-size: 0.78rem;
+      color: var(--gray-700);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.1s;
+    }
+    .cfd-item:hover { background: rgba(99,102,241,0.06); }
+    .cfd-item input[type="checkbox"] { accent-color: var(--primary); cursor: pointer; width: 14px; height: 14px; flex-shrink: 0; }
+    .cfd-item.hidden { display: none; }
+
+    .cfd-footer {
+      padding: 0.45rem 0.6rem;
+      border-top: 1px solid var(--gray-100);
+      display: flex;
+      gap: 0.4rem;
+      background: var(--gray-50);
+    }
+    .cfd-btn-apply {
+      flex: 1;
+      padding: 0.35rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .cfd-btn-apply:hover { background: var(--primary-dark); }
+    .cfd-btn-clear {
+      flex: 1;
+      padding: 0.35rem;
+      background: white;
+      color: var(--gray-600);
+      border: 1px solid var(--gray-200);
+      border-radius: 5px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .cfd-btn-clear:hover { background: var(--gray-100); }
+    /* ===== END DROPDOWN FILTER ===== */
 
 
     .details-table tbody td {
@@ -3829,26 +3957,15 @@
               <table class="details-table" id="planActualDetailsTable">
                 <thead>
                   <tr class="sort-row">
-                    <th class="sortable" onclick="sortPlanActualTable(0)">Project</th>
-                    <th class="sortable" onclick="sortPlanActualTable(1)">Phase</th>
-                    <th class="sortable" onclick="sortPlanActualTable(2)">Tower</th>
-                    <th class="sortable" onclick="sortPlanActualTable(3)">Unit No.</th>
-                    <th class="sortable" onclick="sortPlanActualTable(4)">Customer Name</th>
-                    <th class="sortable" onclick="sortPlanActualTable(5)">Plan Date</th>
-                    <th class="sortable" onclick="sortPlanActualTable(6)">Plan Amt (₹ Cr)</th>
-                    <th class="sortable" onclick="sortPlanActualTable(7)">Actual Date</th>
-                    <th class="sortable" onclick="sortPlanActualTable(8)">Actual Amt (₹ Cr)</th>
-                  </tr>
-                  <tr class="filter-row">
-                    <th><input class="col-filter" data-table="pa" data-col="0" placeholder="&#128269; Filter..."></th>
-                    <th><input class="col-filter" data-table="pa" data-col="1" placeholder="&#128269; Filter..."></th>
-                    <th><input class="col-filter" data-table="pa" data-col="2" placeholder="&#128269; Filter..."></th>
-                    <th><input class="col-filter" data-table="pa" data-col="3" placeholder="&#128269; Filter..."></th>
-                    <th><input class="col-filter" data-table="pa" data-col="4" placeholder="&#128269; Filter..."></th>
-                    <th><input class="col-filter" data-table="pa" data-col="5" placeholder="&#128269; Filter..."></th>
-                    <th><input class="col-filter" data-table="pa" data-col="6" placeholder="&#128269; Filter..."></th>
-                    <th><input class="col-filter" data-table="pa" data-col="7" placeholder="&#128269; Filter..."></th>
-                    <th><input class="col-filter" data-table="pa" data-col="8" placeholder="&#128269; Filter..."></th>
+                    <th class="sortable" onclick="sortPlanActualTable(0)">Project<button class="col-filter-btn" data-table="pa" data-col="0" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                    <th class="sortable" onclick="sortPlanActualTable(1)">Phase<button class="col-filter-btn" data-table="pa" data-col="1" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                    <th class="sortable" onclick="sortPlanActualTable(2)">Tower<button class="col-filter-btn" data-table="pa" data-col="2" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                    <th class="sortable" onclick="sortPlanActualTable(3)">Unit No.<button class="col-filter-btn" data-table="pa" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                    <th class="sortable" onclick="sortPlanActualTable(4)">Customer Name<button class="col-filter-btn" data-table="pa" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                    <th class="sortable" onclick="sortPlanActualTable(5)">Plan Date<button class="col-filter-btn" data-table="pa" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                    <th class="sortable" onclick="sortPlanActualTable(6)">Plan Amt (₹ Cr)<button class="col-filter-btn" data-table="pa" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                    <th class="sortable" onclick="sortPlanActualTable(7)">Actual Date<button class="col-filter-btn" data-table="pa" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                    <th class="sortable" onclick="sortPlanActualTable(8)">Actual Amt (₹ Cr)<button class="col-filter-btn" data-table="pa" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   </tr>
                 </thead>
                 <tbody id="planActualDetailsTableBody"></tbody>
@@ -3882,22 +3999,13 @@
               <table class="details-table" id="structureDetailsTable">
                 <thead>
                   <tr class="sort-row">
-                    <th class="sortable" onclick="sortStructureTable(0)">Project</th>
-                    <th class="sortable" onclick="sortStructureTable(1)">Villa / Tower</th>
-                    <th class="sortable" onclick="sortStructureTable(2)">Milestone Name</th>
-                    <th class="sortable" onclick="sortStructureTable(3)">Plan Date</th>
-                    <th class="sortable" onclick="sortStructureTable(4)">Plan Amt (₹ Cr)</th>
-                    <th class="sortable" onclick="sortStructureTable(5)">Actual Date</th>
-                    <th class="sortable" onclick="sortStructureTable(6)">Actual Amt (₹ Cr)</th>
-                  </tr>
-                  <tr class="filter-row">
-                    <th><input class="col-filter" data-table="struct" data-col="0" placeholder="&#128269; Filter..."></th>
-                    <th><input class="col-filter" data-table="struct" data-col="1" placeholder="&#128269; Filter..."></th>
-                    <th><input class="col-filter" data-table="struct" data-col="2" placeholder="&#128269; Filter..."></th>
-                    <th><input class="col-filter" data-table="struct" data-col="3" placeholder="&#128269; Filter..."></th>
-                    <th><input class="col-filter" data-table="struct" data-col="4" placeholder="&#128269; Filter..."></th>
-                    <th><input class="col-filter" data-table="struct" data-col="5" placeholder="&#128269; Filter..."></th>
-                    <th><input class="col-filter" data-table="struct" data-col="6" placeholder="&#128269; Filter..."></th>
+                    <th class="sortable" onclick="sortStructureTable(0)">Project<button class="col-filter-btn" data-table="struct" data-col="0" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                    <th class="sortable" onclick="sortStructureTable(1)">Villa / Tower<button class="col-filter-btn" data-table="struct" data-col="1" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                    <th class="sortable" onclick="sortStructureTable(2)">Milestone Name<button class="col-filter-btn" data-table="struct" data-col="2" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                    <th class="sortable" onclick="sortStructureTable(3)">Plan Date<button class="col-filter-btn" data-table="struct" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                    <th class="sortable" onclick="sortStructureTable(4)">Plan Amt (₹ Cr)<button class="col-filter-btn" data-table="struct" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                    <th class="sortable" onclick="sortStructureTable(5)">Actual Date<button class="col-filter-btn" data-table="struct" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                    <th class="sortable" onclick="sortStructureTable(6)">Actual Amt (₹ Cr)<button class="col-filter-btn" data-table="struct" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   </tr>
                 </thead>
                 <tbody id="structureDetailsTableBody"></tbody>
@@ -4083,6 +4191,24 @@
     </div>
   </div>
 </div>
+<!-- Excel-style column filter dropdown (shared, repositioned dynamically) -->
+<div class="col-filter-dropdown" id="colFilterDropdown" style="display:none;">
+  <div class="cfd-header" id="cfdHeader">Filter</div>
+  <div class="cfd-search-wrap">
+    <i class="bi bi-search"></i>
+    <input class="cfd-search" id="cfdSearch" type="text" placeholder="Search values...">
+  </div>
+  <div class="cfd-select-all-row" id="cfdSelectAll">
+    <input type="checkbox" id="cfdSelectAllCb" checked>
+    <label for="cfdSelectAllCb" style="cursor:pointer;margin:0;">(Select All)</label>
+  </div>
+  <div class="cfd-list" id="cfdList"></div>
+  <div class="cfd-footer">
+    <button class="cfd-btn-apply" onclick="applyCFD()">Apply</button>
+    <button class="cfd-btn-clear" onclick="clearCFD()">Clear Filter</button>
+  </div>
+</div>
+
 </main>
 
 <!-- Footer -->
@@ -5501,96 +5627,203 @@
     document.getElementById('kpiStructureActualNos').textContent = fmtNos(structActualNos);
   }
 
-  // ===== COLUMN FILTER HELPERS =====
+  // ===== EXCEL-STYLE COLUMN FILTER DROPDOWN =====
 
-  // Returns cell text for a given column index in the PA details table
-  function getPACellText(unit, colIdx) {
-    let planField  = currentPlanActualRevField === 'PlasterRev' ? 'PlasterPlan'   :
-                     currentPlanActualRevField === 'FloorRev'   ? 'FlooringPlan'  : 'HandoverPlan';
-    let actualField = currentPlanActualRevField === 'PlasterRev' ? 'PlasterActual'  :
-                      currentPlanActualRevField === 'FloorRev'   ? 'FlooringActual' : 'HandoverActual';
-    switch (colIdx) {
-      case 0: return (unit.Project  || '').toString();
-      case 1: return (unit.Phase    || '').toString();
-      case 2: return (unit.Tower    || '').toString();
-      case 3: return (unit.UnitNo   || '').toString();
-      case 4: return (unit.Customer || '').toString();
-      case 5: { const d = parseDate(unit[planField]);   return d ? formatDateDDMMMYY(d) : '-'; }
-      case 6: { const d = parseDate(unit[planField]);   return d ? ((unit[currentPlanActualRevField]||0)/10000000).toFixed(2) : '-'; }
-      case 7: { const d = parseDate(unit[actualField]); return d ? formatDateDDMMMYY(d) : '-'; }
-      case 8: { const d = parseDate(unit[actualField]); return d ? ((unit[currentPlanActualRevField]||0)/10000000).toFixed(2) : '-'; }
-      default: return '';
-    }
+  let _cfdTable  = null;   // 'pa' | 'struct'
+  let _cfdCol    = null;   // column index (number)
+  let _cfdBtn    = null;   // the filter button element that opened the dropdown
+  let _cfdPending = {};    // working copy of checked values while dropdown is open
+
+  // Returns all unique cell values for a given column + table from the FULL (unfiltered) master data
+  function getCFDAllValues(tableType, colIdx) {
+    const source = tableType === 'pa' ? currentPlanActualData : currentStructureData;
+    const getter = tableType === 'pa' ? getPACellText : getStructCellText;
+    const vals = new Set();
+    source.forEach(row => {
+      const v = getter(row, colIdx);
+      if (v && v !== 'N/A') vals.add(v);
+    });
+    return [...vals].sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
   }
 
-  function getStructCellText(row, colIdx) {
-    const villaTower = row.Tower ? row.Tower : row.Villa;
-    switch (colIdx) {
-      case 0: return (row.Project || '').toString();
-      case 1: return (villaTower  || '').toString();
-      case 2: return (row.MilestoneName || row.Category || '').toString();
-      case 3: { const d = parseDate(row.PlanDate);   return d ? formatDateDDMMMYY(d) : '-'; }
-      case 4: { const d = parseDate(row.PlanDate);   return d ? (row.DetailAmt/10000000).toFixed(2) : '-'; }
-      case 5: { const d = parseDate(row.ActualDate); return d ? formatDateDDMMMYY(d) : '-'; }
-      case 6: { const d = parseDate(row.ActualDate); return d ? (row.DetailAmt/10000000).toFixed(2) : '-'; }
-      default: return '';
+  function openCFD(event, btnEl) {
+    event.stopPropagation();
+
+    const tableType = btnEl.dataset.table;
+    const colIdx    = +btnEl.dataset.col;
+
+    // If same button clicked again → toggle close
+    if (_cfdBtn === btnEl && document.getElementById('colFilterDropdown').style.display !== 'none') {
+      closeCFD(); return;
     }
+
+    _cfdTable = tableType;
+    _cfdCol   = colIdx;
+    _cfdBtn   = btnEl;
+
+    const activeFilters = tableType === 'pa' ? paColumnFilters : structColumnFilters;
+    const existingFilter = activeFilters[colIdx]; // Set or undefined
+
+    const allVals = getCFDAllValues(tableType, colIdx);
+
+    // Pending = existing filter if set, else all vals selected
+    _cfdPending = {};
+    allVals.forEach(v => {
+      _cfdPending[v] = existingFilter ? existingFilter.has(v) : true;
+    });
+
+    // Build list
+    const header = document.getElementById('cfdHeader');
+    const list   = document.getElementById('cfdList');
+    const search = document.getElementById('cfdSearch');
+
+    // Get column label from the button's parent th
+    const thText = btnEl.parentElement.childNodes[0].textContent.trim();
+    header.textContent = 'Filter: ' + thText;
+
+    search.value = '';
+    list.innerHTML = allVals.map(v => `
+      <div class="cfd-item" data-val="${v.replace(/"/g,'&quot;')}">
+        <input type="checkbox" ${_cfdPending[v] ? 'checked' : ''}>
+        <span>${v}</span>
+      </div>`).join('');
+
+    updateCFDSelectAll();
+
+    // Wire search
+    search.oninput = function() {
+      const q = this.value.toLowerCase();
+      list.querySelectorAll('.cfd-item').forEach(item => {
+        item.classList.toggle('hidden', !item.dataset.val.toLowerCase().includes(q));
+      });
+    };
+
+    // Wire checkboxes
+    list.querySelectorAll('.cfd-item').forEach(item => {
+      item.addEventListener('click', function(e) {
+        if (e.target.tagName === 'INPUT') return; // handled by change
+        this.querySelector('input').click();
+      });
+      item.querySelector('input').addEventListener('change', function() {
+        _cfdPending[item.dataset.val] = this.checked;
+        updateCFDSelectAll();
+      });
+    });
+
+    // Wire select-all checkbox
+    const selectAllCb = document.getElementById('cfdSelectAllCb');
+    document.getElementById('cfdSelectAll').onclick = function(e) {
+      if (e.target !== selectAllCb) selectAllCb.checked = !selectAllCb.checked;
+      const checked = selectAllCb.checked;
+      list.querySelectorAll('.cfd-item:not(.hidden) input').forEach(cb => {
+        cb.checked = checked;
+        _cfdPending[cb.closest('.cfd-item').dataset.val] = checked;
+      });
+    };
+
+    // Position dropdown below the button
+    const dropdown = document.getElementById('colFilterDropdown');
+    dropdown.style.display = 'flex';
+    const rect = btnEl.getBoundingClientRect();
+    const dw = 230, dh = 360;
+    let left = rect.left;
+    let top  = rect.bottom + 4;
+    if (left + dw > window.innerWidth - 8) left = window.innerWidth - dw - 8;
+    if (top  + dh > window.innerHeight - 8) top = rect.top - dh - 4;
+    dropdown.style.left = left + 'px';
+    dropdown.style.top  = top  + 'px';
+
+    setTimeout(() => search.focus(), 50);
   }
 
+  function updateCFDSelectAll() {
+    const list = document.getElementById('cfdList');
+    const cbs = [...list.querySelectorAll('.cfd-item:not(.hidden) input')];
+    const allChecked = cbs.length > 0 && cbs.every(cb => cb.checked);
+    const noneChecked = cbs.every(cb => !cb.checked);
+    const selCb = document.getElementById('cfdSelectAllCb');
+    selCb.checked = allChecked;
+    selCb.indeterminate = !allChecked && !noneChecked;
+  }
+
+  function applyCFD() {
+    if (_cfdTable === null) return;
+    const allVals = getCFDAllValues(_cfdTable, _cfdCol);
+    const allSelected = allVals.every(v => _cfdPending[v] !== false);
+
+    const filters = _cfdTable === 'pa' ? paColumnFilters : structColumnFilters;
+    if (allSelected) {
+      delete filters[_cfdCol];
+    } else {
+      filters[_cfdCol] = new Set(allVals.filter(v => _cfdPending[v]));
+    }
+
+    // Highlight button if filter is active
+    if (_cfdBtn) _cfdBtn.classList.toggle('active', !!filters[_cfdCol]);
+
+    closeCFD();
+    if (_cfdTable === 'pa') renderPlanActualDetailsTable();
+    else renderStructureDetailsTable();
+  }
+
+  function clearCFD() {
+    if (_cfdTable === null) return;
+    const filters = _cfdTable === 'pa' ? paColumnFilters : structColumnFilters;
+    delete filters[_cfdCol];
+    if (_cfdBtn) _cfdBtn.classList.remove('active');
+    closeCFD();
+    if (_cfdTable === 'pa') renderPlanActualDetailsTable();
+    else renderStructureDetailsTable();
+  }
+
+  function closeCFD() {
+    document.getElementById('colFilterDropdown').style.display = 'none';
+    _cfdBtn = null; _cfdTable = null; _cfdCol = null; _cfdPending = {};
+  }
+
+  // Close dropdown on outside click
+  document.addEventListener('click', function(e) {
+    const dd = document.getElementById('colFilterDropdown');
+    if (dd && dd.style.display !== 'none' && !dd.contains(e.target) && !e.target.closest('.col-filter-btn')) {
+      closeCFD();
+    }
+  });
+
+  // Updated filter application functions using Set-based matching
   function applyPAColumnFilters(data) {
     return data.filter(unit =>
-      Object.entries(paColumnFilters).every(([col, term]) => {
-        if (!term) return true;
-        return getPACellText(unit, +col).toLowerCase().includes(term.toLowerCase());
+      Object.entries(paColumnFilters).every(([col, valSet]) => {
+        if (!valSet || valSet.size === 0) return true;
+        return valSet.has(getPACellText(unit, +col));
       })
     );
   }
 
   function applyStructColumnFilters(data) {
     return data.filter(row =>
-      Object.entries(structColumnFilters).every(([col, term]) => {
-        if (!term) return true;
-        return getStructCellText(row, +col).toLowerCase().includes(term.toLowerCase());
+      Object.entries(structColumnFilters).every(([col, valSet]) => {
+        if (!valSet || valSet.size === 0) return true;
+        return valSet.has(getStructCellText(row, +col));
       })
     );
   }
 
   function clearPAColumnFilters() {
     paColumnFilters = {};
-    document.querySelectorAll('#planActualDetailsTable .col-filter').forEach(inp => inp.value = '');
+    document.querySelectorAll('#planActualDetailsTable .col-filter-btn').forEach(b => b.classList.remove('active'));
   }
 
   function clearStructColumnFilters() {
     structColumnFilters = {};
-    document.querySelectorAll('#structureDetailsTable .col-filter').forEach(inp => inp.value = '');
+    document.querySelectorAll('#structureDetailsTable .col-filter-btn').forEach(b => b.classList.remove('active'));
   }
 
   function initColFilterListeners() {
-    // PA table filter inputs
-    document.querySelectorAll('#planActualDetailsTable .col-filter').forEach(inp => {
-      inp.addEventListener('input', function() {
-        const col = this.dataset.col;
-        paColumnFilters[col] = this.value;
-        renderPlanActualDetailsTable();
-      });
-      // Prevent sort trigger on click
-      inp.addEventListener('click', e => e.stopPropagation());
-    });
-    // Structure table filter inputs
-    document.querySelectorAll('#structureDetailsTable .col-filter').forEach(inp => {
-      inp.addEventListener('input', function() {
-        const col = this.dataset.col;
-        structColumnFilters[col] = this.value;
-        renderStructureDetailsTable();
-      });
-      inp.addEventListener('click', e => e.stopPropagation());
-    });
+    // No per-input listeners needed anymore — all handled by openCFD/applyCFD
   }
-
-  // Call once on page load to wire up listeners (inputs are always in DOM)
   document.addEventListener('DOMContentLoaded', initColFilterListeners);
 
-  // ===== END COLUMN FILTER HELPERS =====
+  // ===== END COLUMN FILTER DROPDOWN =====
 
   // Show Plan Actual Unit Details
   function showPlanActualDetails(activityName, revenueField) {
