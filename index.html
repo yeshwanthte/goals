@@ -1844,7 +1844,7 @@
     .shell-tower-body {
       width: 100%;
       display: flex;
-      flex-direction: column-reverse; /* bottom slab first visually = last in DOM */
+      flex-direction: column; /* slabs rendered top→bottom in DOM; JS puts ground floor last */
       border: 2px solid #334155;
       border-top: none;
       border-radius: 0 0 var(--radius-md) var(--radius-md);
@@ -4298,6 +4298,54 @@
   <!-- Shell Tracker Tab Content -->
   <div class="tab-content" id="shellTrackerTab">
     <div class="data-section visible" id="shellTrackerSection">
+
+      <!-- KPI Row -->
+      <section class="pa-kpi-section" style="margin-bottom:1rem;">
+        <div class="pa-kpi-row-label"><i class="bi bi-currency-rupee"></i> Shell Structures</div>
+        <div class="pa-kpi-row">
+          <div class="pa-multi-card pa-multi-structure">
+            <div class="pa-multi-header"><i class="bi bi-building-gear"></i><span>Structures Revenue</span></div>
+            <div class="pa-multi-body">
+              <div class="pa-kpi-item plan">
+                <div class="pa-kpi-item-label">Plan</div>
+                <div class="pa-kpi-item-value" id="shellKpiPlanRev">₹0</div>
+              </div>
+              <div class="pa-kpi-divider"></div>
+              <div class="pa-kpi-item actual">
+                <div class="pa-kpi-item-label">Actual</div>
+                <div class="pa-kpi-item-value" id="shellKpiActualRev">₹0</div>
+              </div>
+            </div>
+          </div>
+          <div class="pa-multi-card pa-multi-handover">
+            <div class="pa-multi-header"><i class="bi bi-123"></i><span>Structure Nos.</span></div>
+            <div class="pa-multi-body">
+              <div class="pa-kpi-item plan">
+                <div class="pa-kpi-item-label">Plan</div>
+                <div class="pa-kpi-item-value nos" id="shellKpiPlanNos">0</div>
+              </div>
+              <div class="pa-kpi-divider"></div>
+              <div class="pa-kpi-item actual">
+                <div class="pa-kpi-item-label">Actual</div>
+                <div class="pa-kpi-item-value nos" id="shellKpiActualNos">0</div>
+              </div>
+            </div>
+          </div>
+          <!-- Year filter as a KPI-style card -->
+          <div class="pa-multi-card" style="max-width:160px;">
+            <div class="pa-multi-header" style="background:linear-gradient(135deg,#475569,#334155);">
+              <i class="bi bi-calendar-range"></i><span>Select Year</span>
+            </div>
+            <div class="pa-multi-body" style="padding:0.5rem 0.7rem;">
+              <div class="year-dropdown-wrapper" style="width:100%;">
+                <select id="shellYearDropdown" class="year-dropdown" onchange="onShellYearChange()" style="width:100%;">
+                  <option value="">All Years</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- Filters Row -->
       <section class="filter-section" style="margin-bottom:1rem;">
@@ -8191,37 +8239,82 @@
 
   let shellSelectedProject = null;
   let shellSelectedTowers  = new Set();   // empty = show all towers for project
+  let shellSelectedYear    = '';          // '' = all years
 
   function buildShellTrackerSlicers() {
-    // Project slicer — unique values from Col A
+    // ── Year dropdown from Shell Master dates ──
+    const years = new Set();
+    rawShell.forEach(r => {
+      [r.PlanDate, r.ActualDate].forEach(d => {
+        const parsed = parseDate(d);
+        if (parsed) years.add(parsed.getFullYear().toString());
+      });
+    });
+    const yEl = document.getElementById('shellYearDropdown');
+    if (yEl) {
+      yEl.innerHTML = '<option value="">All Years</option>';
+      [...years].sort().forEach(y => {
+        const opt = document.createElement('option');
+        opt.value = y; opt.textContent = y;
+        if (y === '2026') { opt.selected = true; shellSelectedYear = y; }
+        yEl.appendChild(opt);
+      });
+    }
+
+    // ── Project slicer — ALL + unique Col A values ──
     const projects = [...new Set(rawShell.map(r => r.Project).filter(Boolean))].sort();
     const projEl = document.getElementById('shellProjectSlicer');
     if (!projEl) return;
     projEl.innerHTML = '';
+
+    // "All" button
+    const allProjBtn = document.createElement('button');
+    allProjBtn.textContent = 'All';
+    allProjBtn.classList.add('active');
+    allProjBtn.onclick = function () {
+      projEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      allProjBtn.classList.add('active');
+      shellSelectedProject = null;
+      shellSelectedTowers.clear();
+      buildShellTowerSlicer(null);
+      updateShellKPIs();
+      renderShellTracker();
+    };
+    projEl.appendChild(allProjBtn);
 
     projects.forEach(p => {
       const btn = document.createElement('button');
       btn.textContent = p;
       btn.dataset.value = p;
       btn.onclick = function () {
-        // Single-select for project
         projEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         shellSelectedProject = p;
         shellSelectedTowers.clear();
         buildShellTowerSlicer(p);
+        updateShellKPIs();
         renderShellTracker();
       };
       projEl.appendChild(btn);
     });
 
-    // Tower slicer placeholder (populated on project select)
+    // Tower slicer placeholder
     buildShellTowerSlicer(null);
+
+    // Initial KPI calc
+    updateShellKPIs();
+  }
+
+  function onShellYearChange() {
+    shellSelectedYear = document.getElementById('shellYearDropdown').value || '';
+    updateShellKPIs();
+    renderShellTracker();
   }
 
   function buildShellTowerSlicer(project) {
     const towerEl = document.getElementById('shellTowerSlicer');
     towerEl.innerHTML = '';
+    shellSelectedTowers.clear();
 
     if (!project) return;
 
@@ -8236,6 +8329,7 @@
       shellSelectedTowers.clear();
       towerEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
       allBtn.classList.add('active');
+      updateShellKPIs();
       renderShellTracker();
     };
     towerEl.appendChild(allBtn);
@@ -8252,12 +8346,41 @@
           shellSelectedTowers.add(t);
           btn.classList.add('active');
         }
-        // Deactivate "All" if any specific tower is selected
         allBtn.classList.toggle('active', shellSelectedTowers.size === 0);
+        updateShellKPIs();
         renderShellTracker();
       };
       towerEl.appendChild(btn);
     });
+  }
+
+  function getShellFilteredRows() {
+    let rows = rawShell.filter(r => r.Tower); // must have a tower
+    if (shellSelectedProject) rows = rows.filter(r => r.Project === shellSelectedProject);
+    if (shellSelectedTowers.size > 0) rows = rows.filter(r => shellSelectedTowers.has(r.Tower));
+    return rows;
+  }
+
+  function updateShellKPIs() {
+    const rows = getShellFilteredRows();
+    let planRev = 0, actualRev = 0, planNos = 0, actualNos = 0;
+
+    rows.forEach(r => {
+      const pd = parseDate(r.PlanDate);
+      if (pd && (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear)) {
+        planRev += r.DetailAmt; planNos++;
+      }
+      const ad = parseDate(r.ActualDate);
+      if (ad && (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear)) {
+        actualRev += r.DetailAmt; actualNos++;
+      }
+    });
+
+    const fmt = v => '₹' + (v / 10000000).toFixed(1);
+    document.getElementById('shellKpiPlanRev').textContent   = fmt(planRev);
+    document.getElementById('shellKpiActualRev').textContent = fmt(actualRev);
+    document.getElementById('shellKpiPlanNos').textContent   = planNos.toLocaleString();
+    document.getElementById('shellKpiActualNos').textContent = actualNos.toLocaleString();
   }
 
   function renderShellTracker() {
@@ -8273,10 +8396,16 @@
       return;
     }
 
-    // Filter rows for selected project + towers
-    let rows = rawShell.filter(r => r.Project === shellSelectedProject && r.Tower);
-    if (shellSelectedTowers.size > 0) {
-      rows = rows.filter(r => shellSelectedTowers.has(r.Tower));
+    let rows = getShellFilteredRows();
+
+    // Year filter for visualization
+    if (shellSelectedYear) {
+      rows = rows.filter(r => {
+        const pd = parseDate(r.PlanDate);
+        const ad = parseDate(r.ActualDate);
+        return (pd && pd.getFullYear().toString() === shellSelectedYear) ||
+               (ad && ad.getFullYear().toString() === shellSelectedYear);
+      });
     }
 
     if (rows.length === 0) {
@@ -8289,7 +8418,7 @@
       return;
     }
 
-    // Group rows by tower, preserving original order (=sequential milestone order)
+    // Group rows by tower preserving sheet order (= bottom-to-top milestone sequence)
     const towerMap = {};
     rows.forEach(r => {
       if (!towerMap[r.Tower]) towerMap[r.Tower] = [];
@@ -8305,9 +8434,12 @@
       const doneCount    = milestones.filter(m => parseDate(m.ActualDate)).length;
       const pendingCount = milestones.length - doneCount;
 
-      // Build slab rows — array in bottom-to-top order
-      // We display with flex-direction: column-reverse so first item = bottom
-      const slabRows = milestones.map((m, idx) => {
+      // Build slabs top-to-bottom in DOM (index 0 = top floor visually).
+      // Sheet data is bottom-to-top (Excavation first), so we REVERSE the array
+      // so that the last milestone (highest floor) is at DOM index 0 (top).
+      const reversed = [...milestones].reverse();
+
+      const slabRows = reversed.map(m => {
         const actualDate = parseDate(m.ActualDate);
         const planDate   = parseDate(m.PlanDate);
         const hasActual  = !!actualDate;
@@ -8315,13 +8447,14 @@
                          : planDate  ? formatDateDDMMMYY(planDate) : '—';
         const statusClass = hasActual ? 'slab-actual' : 'slab-planned';
         const dateClass   = hasActual ? 'actual' : 'planned';
-        const levelLabel  = (idx + 1).toString();
+        // Amount in Crs instead of serial number
+        const amtCr = m.DetailAmt ? (m.DetailAmt / 10000000).toFixed(2) : '—';
 
         return `
           <div class="shell-slab ${statusClass}">
             <div class="shell-slab-name">${m.MilestoneName || m.Category || '—'}</div>
             <div class="shell-slab-date ${dateClass}">${dateText}</div>
-            <div class="shell-slab-level">${levelLabel}</div>
+            <div class="shell-slab-level" title="Milestone Amount">₹${amtCr}Cr</div>
           </div>`;
       });
 
