@@ -844,50 +844,49 @@
 
     /* ── Funnel Stage Colours — brand palette ── */
     /* ── Funnel Bar Stage Gradients — scoped to .funnel-bar only ── */
-    /* 0: Total Scope */
+    /* Index 0: Total Scope — brand terracotta */
     .funnel-bar.stage-0 {
       background: linear-gradient(90deg, #5a2708 0%, #833C0C 50%, #a84e11 100%);
       color: #fff;
     }
-    /* 1: GFC Released */
-    .funnel-bar.stage-1 {
-      background: linear-gradient(90deg, #cc9900 0%, #FFC000 50%, #ffd133 100%);
+    /* Index 2: GFC Released — #FFC000 gold */
+    .funnel-bar.stage-2 {
+      background: linear-gradient(90deg, #b38600 0%, #FFC000 50%, #ffd94d 100%);
       color: #3d2e00;
     }
-    /* 2: Plaster */
-    .funnel-bar.stage-2 {
-      background: linear-gradient(90deg, #7f7f7f 0%, #A5A5A5 50%, #c0c0c0 100%);
+    /* Index 3: Plaster — #A5A5A5 grey */
+    .funnel-bar.stage-3 {
+      background: linear-gradient(90deg, #6e6e6e 0%, #A5A5A5 50%, #c8c8c8 100%);
       color: #1a1a1a;
     }
-    /* 3: Flooring & Dado */
-    .funnel-bar.stage-3 {
-      background: linear-gradient(90deg, #d4b800 0%, #FFE699 50%, #fff0b3 100%);
-      color: #3d3300;
-    }
-    /* 4: HVAC Installed */
+    /* Index 4: Flooring & Dado — #FFE699 pale yellow */
     .funnel-bar.stage-4 {
-      background: linear-gradient(90deg, #d4c47a 0%, #FFF2CC 50%, #fffae6 100%);
+      background: linear-gradient(90deg, #c9a800 0%, #FFE699 50%, #fff3b3 100%);
       color: #3d3300;
     }
-    /* 5: False Ceiling */
+    /* Index 5: HVAC Installed — #FFF2CC cream */
     .funnel-bar.stage-5 {
-      background: linear-gradient(90deg, #b8d4a8 0%, #E2EFDA 50%, #eef7e8 100%);
+      background: linear-gradient(90deg, #c8b566 0%, #FFF2CC 50%, #fffbe6 100%);
+      color: #3d3300;
+    }
+    /* Index 6: False Ceiling — #E2EFDA pale green */
+    .funnel-bar.stage-6 {
+      background: linear-gradient(90deg, #a5c497 0%, #E2EFDA 50%, #f0f8ec 100%);
       color: #1e3a14;
     }
-    /* 6: Fenestration */
-    .funnel-bar.stage-6 {
-      background: linear-gradient(90deg, #7db568 0%, #A9D08E 50%, #c3ddb0 100%);
+    /* Index 7: Fenestration — #A9D08E medium green */
+    .funnel-bar.stage-7 {
+      background: linear-gradient(90deg, #6aaa52 0%, #A9D08E 50%, #c6e0b4 100%);
       color: #153308;
     }
-    /* 7: Ready for Handover */
-    .funnel-bar.stage-7 {
-      background: linear-gradient(90deg, #2a4119 0%, #446A2C 50%, #5a8a3a 100%);
+    /* Index 8: Ready for Handover — #446A2C deep green */
+    .funnel-bar.stage-8 {
+      background: linear-gradient(90deg, #2a4119 0%, #446A2C 50%, #5c8c3a 100%);
       color: #fff;
     }
 
-    /* Dot colours for funnel labels — 0:Scope, 1:Sold, 2:GFC... 8:Handover */
-    .dot-0 { background: #ffffff; border: 1.5px solid #999; }
-    .dot-1 { background: #833C0C; }
+    /* Dot colours for funnel labels */
+    .dot-0 { background: #833C0C; }
     .dot-2 { background: #FFC000; }
     .dot-3 { background: #A5A5A5; }
     .dot-4 { background: #FFE699; border: 1px solid #ccc; }
