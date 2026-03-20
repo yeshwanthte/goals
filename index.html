@@ -880,9 +880,8 @@
     }
     /* 7: Ready for Handover */
     .stage-7 {
-      background: linear-gradient(90deg, #d0d0d0 0%, #F0F0F0 50%, #ffffff 100%);
-      color: #1a1a1a;
-      border: 1px solid #d0d0d0;
+      background: linear-gradient(90deg, #2a4119 0%, #446A2C 50%, #5a8a3a 100%);
+      color: #fff;
     }
 
     /* Dot colours for funnel labels */
@@ -893,7 +892,7 @@
     .dot-4 { background: #FFF2CC; border: 1px solid #ccc; }
     .dot-5 { background: #E2EFDA; border: 1px solid #ccc; }
     .dot-6 { background: #A9D08E; }
-    .dot-7 { background: #FFFFFF; border: 1.5px solid #999; }
+    .dot-7 { background: #446A2C; }
 
     /* Activity Table */
     .activity-table {
@@ -2562,9 +2561,9 @@
       border-color: #87A672;
     }
     .tower-unit.stage-7 { 
-      background: #70AD47;
+      background: #446A2C;
       color: #fff;
-      border-color: #5A8A39;
+      border-color: #2a4119;
     }
     .tower-unit.sold {
       background: #833C0C;
@@ -2599,7 +2598,7 @@
     .legend-color.stage-4 { background: #FFF2CC; }
     .legend-color.stage-5 { background: #E2EFDA; }
     .legend-color.stage-6 { background: #A9D08E; }
-    .legend-color.stage-7 { background: #70AD47; }
+    .legend-color.stage-7 { background: #446A2C; }
     
     @media (max-width: 768px) {
       .tower-viz-container {
@@ -2670,7 +2669,7 @@
     .stage-kpi-color-box.stage-4 { background: #FFF2CC; }
     .stage-kpi-color-box.stage-5 { background: #E2EFDA; }
     .stage-kpi-color-box.stage-6 { background: #A9D08E; }
-    .stage-kpi-color-box.stage-7 { background: #70AD47; }
+    .stage-kpi-color-box.stage-7 { background: #446A2C; }
     
     .stage-kpi-value-compact {
       font-size: 1.4rem;
@@ -2820,7 +2819,7 @@
     .villa-unit.stage-4 { background: #FFF2CC; color: #000; border-color: #CCC2A3; }
     .villa-unit.stage-5 { background: #E2EFDA; color: #000; border-color: #B5BFAE; }
     .villa-unit.stage-6 { background: #A9D08E; color: #000; border-color: #87A672; }
-    .villa-unit.stage-7 { background: #70AD47; color: #fff; border-color: #5A8A39; }
+    .villa-unit.stage-7 { background: #446A2C; color: #fff; border-color: #2a4119; }
 
     /* ===== UNIT DETAIL POPUP ===== */
     .unit-detail-overlay {
@@ -3552,7 +3551,9 @@
           <i class="bi bi-arrow-clockwise"></i>
           Refresh Data
         </button>
-        <button onclick="logoutAdmin()" style="background: rgba(239,68,68,0.25); border: 2px solid rgba(239,68,68,0.45); color: #fca5a5; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; white-space: nowrap;"
+        <button onclick="logoutAdmin()" style="background: rgba(131,60,12,0.18); border: 1.5px solid rgba(198,89,17,0.5); color: #FCE7DC; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; white-space: nowrap;"
+          onmouseover="this.style.background='rgba(198,89,17,0.35)';this.style.borderColor='rgba(198,89,17,0.8)'"
+          onmouseout="this.style.background='rgba(131,60,12,0.18)';this.style.borderColor='rgba(198,89,17,0.5)'"
                 onmouseover="this.style.background='rgba(239,68,68,0.38)'" onmouseout="this.style.background='rgba(239,68,68,0.25)'">
           <i class="bi bi-box-arrow-right"></i>
           Logout
@@ -7531,10 +7532,40 @@
   // ===== UNIT DETAIL POPUP =====
   let currentUnitData = null;
   
+  // Project-specific popup header colours
+  const PROJECT_COLOURS = {
+    '0043 WoYM': { from: '#0e6e7e', mid: '#1BB2C9', to: '#3fd0e8' },
+    '0053 TMFT': { from: '#537a0e', mid: '#8DC917', to: '#aae034' },
+    '0056 TMD':  { from: '#4e4d2c', mid: '#85824B', to: '#a09d68' },
+    '0057 SftW': { from: '#1a0a07', mid: '#35140F', to: '#5a231a' },
+    '0059 PoaRR':{ from: '#560705', mid: '#920C09', to: '#be1410' },
+    '0063 ITQE': { from: '#3e5c37', mid: '#6B9D5E', to: '#89be79' },
+    '0066 LtF':  { from: '#3e6a7e', mid: '#70B0CB', to: '#96cfe3' },
+    '0072 AtR':  { from: '#6a6662', mid: '#A29D99', to: '#c0bcb8' },
+    '0082 OtR':  { from: '#5c1670', mid: '#9B26B5', to: '#c040dc' },
+    '0093 DbtW': { from: '#2e7572', mid: '#5BC5C3', to: '#7de0de' },
+  };
+
+  function getProjectHeaderGradient(projectName) {
+    if (!projectName) return 'linear-gradient(135deg, #1e293b 0%, #334155 100%)';
+    // Match by checking if the project name starts with or contains the key
+    for (const [key, clr] of Object.entries(PROJECT_COLOURS)) {
+      if ((projectName || '').toString().toUpperCase().includes(key.split(' ')[0]) ||
+          (projectName || '').toString().toUpperCase().includes(key.split(' ')[1] || '')) {
+        return `linear-gradient(135deg, ${clr.from} 0%, ${clr.mid} 50%, ${clr.to} 100%)`;
+      }
+    }
+    return 'linear-gradient(135deg, #1e293b 0%, #334155 100%)';
+  }
+
   function showUnitDetail(unit) {
     currentUnitData = unit;
     
-    // === HEADER ===
+    // === HEADER — project-specific colour ===
+    const headerEl = document.querySelector('#unitDetailCard .unit-detail-header');
+    if (headerEl) {
+      headerEl.style.background = getProjectHeaderGradient(selectedProjectTower);
+    }
     document.getElementById('popupProject').textContent = selectedProjectTower;
     document.getElementById('popupUnitNo').textContent = 'Unit ' + unit.UnitNo;
     document.getElementById('popupCustomer').textContent = unit.Customer || 'N/A';
