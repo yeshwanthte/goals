@@ -2341,6 +2341,16 @@
       color: #fff;
       border-color: #5A8A39;
     }
+    .tower-unit.sold {
+      background: #833C0C;
+      color: #fff;
+      border-color: #5e2a08;
+    }
+    .villa-unit.sold {
+      background: #833C0C;
+      color: #fff;
+      border-color: #5e2a08;
+    }
     
     .legend-item {
       display: flex;
@@ -6864,10 +6874,11 @@
           if (units.length > 0) {
             units.forEach(unit => {
               const stageClass = unit.stage >= 0 ? `stage-${unit.stage}` : '';
+              const soldClass   = unit.Sold ? 'sold' : '';
               const unitNoDisplay = unit.UnitNo || `${towerNum}${floor.toString().padStart(2, '0')}${flat}${unit.parsed.suffix}`;
               const unitJson = JSON.stringify(unit).replace(/'/g, "&apos;");
               towerHTML += `
-                <div class="tower-unit ${stageClass}" 
+                <div class="tower-unit ${stageClass} ${soldClass}" 
                      data-unit="${unitNoDisplay}"
                      onclick='showUnitDetail(${unitJson})'
                      title="${unitNoDisplay}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}">
@@ -7182,9 +7193,10 @@
         const unit = unitMap[unitNo];
         if (unit) {
           const stageClass = unit.stage >= 0 ? `stage-${unit.stage}` : '';
+          const soldClass   = unit.Sold ? 'sold' : '';
           const unitJson = JSON.stringify(unit).replace(/'/g, "&apos;");
           blockHTML += `
-            <div class="villa-unit ${stageClass}" 
+            <div class="villa-unit ${stageClass} ${soldClass}" 
                  data-unit="${unit.UnitNo}"
                  onclick='showUnitDetail(${unitJson})'
                  title="${unit.UnitNo}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}">
