@@ -818,8 +818,7 @@
       align-items: center;
       justify-content: flex-end;
       padding-right: 12px;
-      color: white;
-      font-weight: 600;
+      font-weight: 700;
       font-size: 0.8rem;
       transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
       min-width: 40px;
@@ -834,8 +833,8 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%);
-      animation: shimmer 2s infinite;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%);
+      animation: shimmer 2.5s infinite;
     }
 
     @keyframes shimmer {
@@ -843,24 +842,58 @@
       100% { transform: translateX(100%); }
     }
 
-    /* Stage Gradients */
-    .stage-0 { background: linear-gradient(90deg, #7c3aed, #C65911); }
-    .stage-1 { background: linear-gradient(90deg, #2563eb, #3b82f6); }
-    .stage-2 { background: linear-gradient(90deg, #0891b2, #06b6d4); }
-    .stage-3 { background: linear-gradient(90deg, #0d9488, #14b8a6); }
-    .stage-4 { background: linear-gradient(90deg, #059669, #10b981); }
-    .stage-5 { background: linear-gradient(90deg, #65a30d, #84cc16); }
-    .stage-6 { background: linear-gradient(90deg, #ca8a04, #eab308); }
-    .stage-7 { background: linear-gradient(90deg, #16a34a, #22c55e); }
+    /* ── Funnel Stage Colours — brand palette ── */
+    /* 0: Total Scope */
+    .stage-0 {
+      background: linear-gradient(90deg, #5a2708 0%, #833C0C 50%, #a84e11 100%);
+      color: #fff;
+    }
+    /* 1: GFC Released */
+    .stage-1 {
+      background: linear-gradient(90deg, #cc9900 0%, #FFC000 50%, #ffd133 100%);
+      color: #3d2e00;
+    }
+    /* 2: Plaster */
+    .stage-2 {
+      background: linear-gradient(90deg, #7f7f7f 0%, #A5A5A5 50%, #c0c0c0 100%);
+      color: #1a1a1a;
+    }
+    /* 3: Flooring & Dado */
+    .stage-3 {
+      background: linear-gradient(90deg, #d4b800 0%, #FFE699 50%, #fff0b3 100%);
+      color: #3d3300;
+    }
+    /* 4: HVAC Installed */
+    .stage-4 {
+      background: linear-gradient(90deg, #d4c47a 0%, #FFF2CC 50%, #fffae6 100%);
+      color: #3d3300;
+    }
+    /* 5: False Ceiling */
+    .stage-5 {
+      background: linear-gradient(90deg, #b8d4a8 0%, #E2EFDA 50%, #eef7e8 100%);
+      color: #1e3a14;
+    }
+    /* 6: Fenestration */
+    .stage-6 {
+      background: linear-gradient(90deg, #7db568 0%, #A9D08E 50%, #c3ddb0 100%);
+      color: #153308;
+    }
+    /* 7: Ready for Handover */
+    .stage-7 {
+      background: linear-gradient(90deg, #d0d0d0 0%, #F0F0F0 50%, #ffffff 100%);
+      color: #1a1a1a;
+      border: 1px solid #d0d0d0;
+    }
 
-    .dot-0 { background: #C65911; }
-    .dot-1 { background: #3b82f6; }
-    .dot-2 { background: #06b6d4; }
-    .dot-3 { background: #14b8a6; }
-    .dot-4 { background: #10b981; }
-    .dot-5 { background: #84cc16; }
-    .dot-6 { background: #eab308; }
-    .dot-7 { background: #22c55e; }
+    /* Dot colours for funnel labels */
+    .dot-0 { background: #833C0C; }
+    .dot-1 { background: #FFC000; }
+    .dot-2 { background: #A5A5A5; }
+    .dot-3 { background: #FFE699; border: 1px solid #ccc; }
+    .dot-4 { background: #FFF2CC; border: 1px solid #ccc; }
+    .dot-5 { background: #E2EFDA; border: 1px solid #ccc; }
+    .dot-6 { background: #A9D08E; }
+    .dot-7 { background: #FFFFFF; border: 1.5px solid #999; }
 
     /* Activity Table */
     .activity-table {
