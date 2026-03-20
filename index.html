@@ -1897,19 +1897,23 @@
     .shell-slab-date.actual  { color: #059669; }
     .shell-slab-date.planned { color: #94a3b8; }
 
-    /* Floor level marker on right edge */
+    /* Milestone amount on right edge */
     .shell-slab-level {
-      width: 26px;
+      min-width: 52px;
+      max-width: 64px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.58rem;
+      text-align: center;
+      padding: 0.3rem 0.4rem;
+      font-size: 0.6rem;
       font-weight: 700;
-      color: #94a3b8;
+      color: #64748b;
       background: #f8fafc;
       border-left: 1px solid #e2e8f0;
       flex-shrink: 0;
-      letter-spacing: 0.2px;
+      line-height: 1.3;
+      word-break: break-all;
     }
 
     /* Roof cap */
@@ -8386,16 +8390,6 @@
   function renderShellTracker() {
     const container = document.getElementById('shellTrackerContainer');
 
-    if (!shellSelectedProject) {
-      container.innerHTML = `
-        <div class="shell-tracker-empty">
-          <i class="bi bi-building-fill-gear"></i>
-          <h3>Select a Project</h3>
-          <p>Choose a project to view the shell construction tracker</p>
-        </div>`;
-      return;
-    }
-
     let rows = getShellFilteredRows();
 
     // Year filter for visualization
@@ -8411,26 +8405,28 @@
     if (rows.length === 0) {
       container.innerHTML = `
         <div class="shell-tracker-empty">
-          <i class="bi bi-building"></i>
-          <h3>No data found</h3>
-          <p>No shell milestones found for the selected filters</p>
+          <i class="bi bi-building-fill-gear"></i>
+          <h3>${rawShell.length === 0 ? 'No Shell Data Loaded' : 'No data found'}</h3>
+          <p>${rawShell.length === 0 ? 'Shell Master sheet may not have loaded yet.' : 'No shell milestones match the selected filters.'}</p>
         </div>`;
       return;
     }
 
-    // Group rows by tower preserving sheet order (= bottom-to-top milestone sequence)
+    // Group rows by (project + tower) key to avoid merging same-named towers across projects
     const towerMap = {};
     rows.forEach(r => {
-      if (!towerMap[r.Tower]) towerMap[r.Tower] = [];
-      towerMap[r.Tower].push(r);
+      const key = shellSelectedProject ? r.Tower : `${r.Project} — ${r.Tower}`;
+      if (!towerMap[key]) towerMap[key] = [];
+      towerMap[key].push(r);
     });
 
     const towers = Object.keys(towerMap).sort((a, b) =>
       a.localeCompare(b, undefined, { numeric: true })
     );
 
-    const parts = towers.map(tower => {
-      const milestones = towerMap[tower];
+    const parts = towers.map(towerKey => {
+      const milestones  = towerMap[towerKey];
+      const displayName = towerKey;   // project+tower label when All, just tower otherwise
       const doneCount    = milestones.filter(m => parseDate(m.ActualDate)).length;
       const pendingCount = milestones.length - doneCount;
 
@@ -8447,14 +8443,16 @@
                          : planDate  ? formatDateDDMMMYY(planDate) : '—';
         const statusClass = hasActual ? 'slab-actual' : 'slab-planned';
         const dateClass   = hasActual ? 'actual' : 'planned';
-        // Amount in Crs instead of serial number
-        const amtCr = m.DetailAmt ? (m.DetailAmt / 10000000).toFixed(2) : '—';
+        // Amount in Crs — blank if zero or missing
+        const amtDisplay = (m.DetailAmt && m.DetailAmt > 0)
+          ? `₹${(m.DetailAmt / 10000000).toFixed(2)}<br>Cr`
+          : '';
 
         return `
           <div class="shell-slab ${statusClass}">
             <div class="shell-slab-name">${m.MilestoneName || m.Category || '—'}</div>
             <div class="shell-slab-date ${dateClass}">${dateText}</div>
-            <div class="shell-slab-level" title="Milestone Amount">₹${amtCr}Cr</div>
+            <div class="shell-slab-level" title="Milestone Amount">${amtDisplay}</div>
           </div>`;
       });
 
@@ -8462,7 +8460,7 @@
         <div class="shell-tower">
           <div class="shell-tower-roof"></div>
           <div class="shell-tower-label">
-            <i class="bi bi-building"></i>${tower}
+            <i class="bi bi-building"></i>${displayName}
           </div>
           <div class="shell-tower-body">
             ${slabRows.join('')}
