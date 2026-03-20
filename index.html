@@ -1788,6 +1788,177 @@
     }
     /* ===== END PA KPI SECTION ===== */
 
+    /* ===== SHELL TRACKER ===== */
+    .shell-tracker-container {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 1.5rem;
+      overflow-x: auto;
+      padding: 1rem 0.5rem 1.5rem;
+      align-items: flex-end;
+      min-height: 300px;
+    }
+
+    .shell-tracker-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 4rem 2rem;
+      color: var(--gray-400);
+      text-align: center;
+      gap: 0.75rem;
+    }
+    .shell-tracker-empty i { font-size: 3.5rem; }
+    .shell-tracker-empty h3 { font-size: 1.1rem; font-weight: 600; color: var(--gray-500); margin: 0; }
+    .shell-tracker-empty p  { font-size: 0.85rem; margin: 0; }
+
+    /* ── Individual Tower ── */
+    .shell-tower {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      min-width: 220px;
+      max-width: 260px;
+    }
+
+    .shell-tower-label {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: white;
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      width: 100%;
+      text-align: center;
+      padding: 0.6rem 1rem;
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.18);
+      position: relative;
+      z-index: 2;
+    }
+    .shell-tower-label i { margin-right: 0.4rem; opacity: 0.85; }
+
+    .shell-tower-body {
+      width: 100%;
+      display: flex;
+      flex-direction: column-reverse; /* bottom slab first visually = last in DOM */
+      border: 2px solid #334155;
+      border-top: none;
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+      overflow: hidden;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    /* ── Slab Row ── */
+    .shell-slab {
+      display: flex;
+      align-items: stretch;
+      border-top: 1.5px solid #e2e8f0;
+      background: white;
+      transition: background 0.18s;
+      position: relative;
+    }
+    .shell-slab:first-child { border-top: none; }
+    .shell-slab:hover { background: #f1f5f9; }
+
+    /* Slab left accent bar — colour by status */
+    .shell-slab::before {
+      content: '';
+      width: 5px;
+      background: #cbd5e1;
+      flex-shrink: 0;
+    }
+    .shell-slab.slab-actual::before  { background: linear-gradient(180deg, #059669, #10b981); }
+    .shell-slab.slab-planned::before { background: linear-gradient(180deg, #94a3b8, #cbd5e1); }
+
+    .shell-slab-name {
+      flex: 1;
+      padding: 0.45rem 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      line-height: 1.3;
+      display: flex;
+      align-items: center;
+    }
+
+    .shell-slab-date {
+      padding: 0.45rem 0.65rem 0.45rem 0;
+      font-size: 0.68rem;
+      font-weight: 700;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      letter-spacing: 0.2px;
+    }
+    .shell-slab-date.actual  { color: #059669; }
+    .shell-slab-date.planned { color: #94a3b8; }
+
+    /* Floor level marker on right edge */
+    .shell-slab-level {
+      width: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.58rem;
+      font-weight: 700;
+      color: #94a3b8;
+      background: #f8fafc;
+      border-left: 1px solid #e2e8f0;
+      flex-shrink: 0;
+      letter-spacing: 0.2px;
+    }
+
+    /* Roof cap */
+    .shell-tower-roof {
+      width: 100%;
+      height: 14px;
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      border-radius: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .shell-tower-roof::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        transparent 0%, transparent 20%,
+        rgba(255,255,255,0.07) 20%, rgba(255,255,255,0.07) 21%
+      );
+    }
+
+    /* Ground base */
+    .shell-tower-base {
+      width: calc(100% + 20px);
+      height: 10px;
+      background: linear-gradient(180deg, #475569 0%, #1e293b 100%);
+      border-radius: 0 0 6px 6px;
+      margin-top: -1px;
+    }
+
+    /* Stage stats below tower */
+    .shell-tower-stats {
+      margin-top: 0.6rem;
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .shell-stat-pill {
+      padding: 0.2rem 0.55rem;
+      border-radius: 50px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .shell-stat-pill.done    { background: #d1fae5; color: #059669; }
+    .shell-stat-pill.pending { background: #f1f5f9; color: #64748b; }
+    /* ===== END SHELL TRACKER ===== */
+
     /* Plan vs Actuals Tables Grid */
     .plan-actual-tables-grid {
       display: grid;
@@ -3366,6 +3537,10 @@
       <i class="bi bi-building"></i>
       Graphical Representation
     </button>
+    <button class="tab-button" onclick="switchTab('shelltracker')">
+      <i class="bi bi-building-fill-gear"></i>
+      Shell Tracker
+    </button>
   </div>
 
   <!-- Milestone Dashboard Tab Content -->
@@ -4120,6 +4295,41 @@
   </div>
   <!-- End Tower Tab -->
 
+  <!-- Shell Tracker Tab Content -->
+  <div class="tab-content" id="shellTrackerTab">
+    <div class="data-section visible" id="shellTrackerSection">
+
+      <!-- Filters Row -->
+      <section class="filter-section" style="margin-bottom:1rem;">
+        <div class="filter-grid" style="grid-template-columns: repeat(2, 1fr);">
+          <div class="filter-card">
+            <div class="filter-card-header"><i class="bi bi-folder"></i> Project</div>
+            <div class="filter-card-body">
+              <div id="shellProjectSlicer" class="slicer"></div>
+            </div>
+          </div>
+          <div class="filter-card">
+            <div class="filter-card-header"><i class="bi bi-building"></i> Tower</div>
+            <div class="filter-card-body">
+              <div id="shellTowerSlicer" class="slicer"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Building Visualization -->
+      <div id="shellTrackerContainer" class="shell-tracker-container">
+        <div class="shell-tracker-empty">
+          <i class="bi bi-building-fill-gear"></i>
+          <h3>Select a Project</h3>
+          <p>Choose a project to view the shell construction tracker</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- End Shell Tracker Tab -->
+
 
   <!-- Empty State -->
   <div class="empty-state" id="emptyState">
@@ -4503,7 +4713,7 @@
       UnitNo: r[h.indexOf(COL.UNIT_NO)] || "N/A",
       Customer: r[COL.CUSTOMER] || "N/A",
       OC: r[COL.OC] || "N/A",
-      Sold: (r[COL.SOLD] || '').toLowerCase() === 'sold',
+      Sold: (r[COL.SOLD] || '').toString().trim().toLowerCase() === 'sold',
       GFC: validDate(r[COL.GFC]),
       Plaster: validDate(r[COL.PLASTER]),
       Floor: validDate(r[COL.FLOOR]),
@@ -4557,6 +4767,9 @@
     // Build tower visualization
     buildTowerProjectSlicer();
     document.getElementById('towerDataSection').classList.add('visible');
+
+    // Build shell tracker
+    buildShellTrackerSlicers();
   }
 
   // ===== SHELL MASTER SHEET PARSER =====
@@ -5313,6 +5526,8 @@
       document.getElementById('planActualTab').classList.add('active');
     } else if (tabName === 'tower') {
       document.getElementById('towerTab').classList.add('active');
+    } else if (tabName === 'shelltracker') {
+      document.getElementById('shellTrackerTab').classList.add('active');
     }
   }
 
@@ -7971,6 +8186,166 @@
     if (clearBtn) clearBtn.classList.remove('visible');
     if (workFrontKpi) workFrontKpi.style.display = 'none';
   }
+
+  // ===== SHELL TRACKER =====
+
+  let shellSelectedProject = null;
+  let shellSelectedTowers  = new Set();   // empty = show all towers for project
+
+  function buildShellTrackerSlicers() {
+    // Project slicer — unique values from Col A
+    const projects = [...new Set(rawShell.map(r => r.Project).filter(Boolean))].sort();
+    const projEl = document.getElementById('shellProjectSlicer');
+    if (!projEl) return;
+    projEl.innerHTML = '';
+
+    projects.forEach(p => {
+      const btn = document.createElement('button');
+      btn.textContent = p;
+      btn.dataset.value = p;
+      btn.onclick = function () {
+        // Single-select for project
+        projEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        shellSelectedProject = p;
+        shellSelectedTowers.clear();
+        buildShellTowerSlicer(p);
+        renderShellTracker();
+      };
+      projEl.appendChild(btn);
+    });
+
+    // Tower slicer placeholder (populated on project select)
+    buildShellTowerSlicer(null);
+  }
+
+  function buildShellTowerSlicer(project) {
+    const towerEl = document.getElementById('shellTowerSlicer');
+    towerEl.innerHTML = '';
+
+    if (!project) return;
+
+    const towers = [...new Set(
+      rawShell.filter(r => r.Project === project).map(r => r.Tower).filter(Boolean)
+    )].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+    const allBtn = document.createElement('button');
+    allBtn.textContent = 'All';
+    allBtn.classList.add('active');
+    allBtn.onclick = function () {
+      shellSelectedTowers.clear();
+      towerEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      allBtn.classList.add('active');
+      renderShellTracker();
+    };
+    towerEl.appendChild(allBtn);
+
+    towers.forEach(t => {
+      const btn = document.createElement('button');
+      btn.textContent = t;
+      btn.dataset.value = t;
+      btn.onclick = function () {
+        if (shellSelectedTowers.has(t)) {
+          shellSelectedTowers.delete(t);
+          btn.classList.remove('active');
+        } else {
+          shellSelectedTowers.add(t);
+          btn.classList.add('active');
+        }
+        // Deactivate "All" if any specific tower is selected
+        allBtn.classList.toggle('active', shellSelectedTowers.size === 0);
+        renderShellTracker();
+      };
+      towerEl.appendChild(btn);
+    });
+  }
+
+  function renderShellTracker() {
+    const container = document.getElementById('shellTrackerContainer');
+
+    if (!shellSelectedProject) {
+      container.innerHTML = `
+        <div class="shell-tracker-empty">
+          <i class="bi bi-building-fill-gear"></i>
+          <h3>Select a Project</h3>
+          <p>Choose a project to view the shell construction tracker</p>
+        </div>`;
+      return;
+    }
+
+    // Filter rows for selected project + towers
+    let rows = rawShell.filter(r => r.Project === shellSelectedProject && r.Tower);
+    if (shellSelectedTowers.size > 0) {
+      rows = rows.filter(r => shellSelectedTowers.has(r.Tower));
+    }
+
+    if (rows.length === 0) {
+      container.innerHTML = `
+        <div class="shell-tracker-empty">
+          <i class="bi bi-building"></i>
+          <h3>No data found</h3>
+          <p>No shell milestones found for the selected filters</p>
+        </div>`;
+      return;
+    }
+
+    // Group rows by tower, preserving original order (=sequential milestone order)
+    const towerMap = {};
+    rows.forEach(r => {
+      if (!towerMap[r.Tower]) towerMap[r.Tower] = [];
+      towerMap[r.Tower].push(r);
+    });
+
+    const towers = Object.keys(towerMap).sort((a, b) =>
+      a.localeCompare(b, undefined, { numeric: true })
+    );
+
+    const parts = towers.map(tower => {
+      const milestones = towerMap[tower];
+      const doneCount    = milestones.filter(m => parseDate(m.ActualDate)).length;
+      const pendingCount = milestones.length - doneCount;
+
+      // Build slab rows — array in bottom-to-top order
+      // We display with flex-direction: column-reverse so first item = bottom
+      const slabRows = milestones.map((m, idx) => {
+        const actualDate = parseDate(m.ActualDate);
+        const planDate   = parseDate(m.PlanDate);
+        const hasActual  = !!actualDate;
+        const dateText   = hasActual ? formatDateDDMMMYY(actualDate)
+                         : planDate  ? formatDateDDMMMYY(planDate) : '—';
+        const statusClass = hasActual ? 'slab-actual' : 'slab-planned';
+        const dateClass   = hasActual ? 'actual' : 'planned';
+        const levelLabel  = (idx + 1).toString();
+
+        return `
+          <div class="shell-slab ${statusClass}">
+            <div class="shell-slab-name">${m.MilestoneName || m.Category || '—'}</div>
+            <div class="shell-slab-date ${dateClass}">${dateText}</div>
+            <div class="shell-slab-level">${levelLabel}</div>
+          </div>`;
+      });
+
+      return `
+        <div class="shell-tower">
+          <div class="shell-tower-roof"></div>
+          <div class="shell-tower-label">
+            <i class="bi bi-building"></i>${tower}
+          </div>
+          <div class="shell-tower-body">
+            ${slabRows.join('')}
+          </div>
+          <div class="shell-tower-base"></div>
+          <div class="shell-tower-stats">
+            <span class="shell-stat-pill done"><i class="bi bi-check-circle-fill"></i> ${doneCount} Done</span>
+            <span class="shell-stat-pill pending"><i class="bi bi-circle"></i> ${pendingCount} Pending</span>
+          </div>
+        </div>`;
+    });
+
+    container.innerHTML = parts.join('');
+  }
+
+  // ===== END SHELL TRACKER =====
 </script>
 
 <!-- Column Filter Dropdown — rendered at body level to avoid overflow clipping -->
