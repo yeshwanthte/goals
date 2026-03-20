@@ -7761,19 +7761,16 @@
     const [hr, hg, hb] = hexToRgb(projMid);
     const [dr, dg, db] = darkenHex(projMid, 0.45);  // darker shade for gradient feel
 
-    // Header background — two-tone gradient via two rects
+    // Header background — clean two-tone gradient (left=darker, right=project colour)
     doc.setFillColor(dr, dg, db);
-    doc.rect(0, 0, 105, 45, 'F');
+    doc.rect(0, 0, 210, 45, 'F');
+    // Smooth gradient feel: overlay lighter colour on right half with slight transparency trick
     doc.setFillColor(hr, hg, hb);
-    doc.rect(105, 0, 105, 45, 'F');
-
-    // Diagonal blend overlay for premium gradient look
-    doc.setFillColor(255, 255, 255);
-    doc.setGState(doc.GState({ opacity: 0.04 }));
-    for (let i = 0; i < 210; i += 8) {
-      doc.rect(i, 0, 4, 45, 'F');
-    }
-    doc.setGState(doc.GState({ opacity: 1 }));
+    doc.rect(70, 0, 140, 45, 'F');
+    // Thin accent line at bottom of header
+    doc.setDrawColor(255, 255, 255);
+    doc.setLineWidth(0.4);
+    doc.line(0, 45, 210, 45);
 
     // ── Logo image (top-right) ───────────────────────────────────────────────
     try {
