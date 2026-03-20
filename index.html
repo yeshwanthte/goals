@@ -6984,164 +6984,136 @@
   }
   
   function renderAtRLayout(container, units) {
-    // 0072 AtR — layout sourced strictly from official PDF site plan.
-    // Block names (Block 06, Block 07 … Block 28) match the PDF exactly.
-    // All invented names (6aNS, 6aEW, 7aNS, 5aEW, 4aEW, 3aEW) have been removed.
-    // Units are listed in display order (row-by-row, left→right) for each block.
-    // 'cols' = CSS grid-template-columns count for that block.
+    // 0072 AtR — block numbers, unit numbers, and grid layout
+    // sourced EXACTLY from the provided Excel specification (Book1.xlsx).
+    // Units listed in row-order as specified in the Excel file.
 
     const blocks = [
+      // Block 01 — 6 Cols x 1 Row
+      { name: 'Block 01', cols: 6,
+        units: [91,93,95,97,99,100] },
 
-      // ── Block 06 — top-left, 2 rows ────────────────────────────────────
-      // Row 1: 91 93 95 97 99 100
-      // Row 2: 90 92 94 96 98
-      { name: 'Block 06', cols: 6,
-        units: [91,93,95,97,99,100,
-                90,92,94,96,98] },
+      // Block 02 — 5 Cols x 2 Rows
+      { name: 'Block 02', cols: 5,
+        units: [90,92,94,96,98,
+                68,70,72,74,76] },
 
-      // ── Block 19 — left column, 2 rows × 5 ────────────────────────────
-      // Row 1: 81 83 85 87 89
-      // Row 2: 88 86 84 82 80
-      { name: 'Block 19', cols: 5,
-        units: [81,83,85,87,89,
-                88,86,84,82,80] },
+      // Block 03 — 5 Cols x 1 Row
+      { name: 'Block 03', cols: 5,
+        units: [81,83,85,87,89] },
 
-      // ── Block 20 — left column, 1 row × 5 ─────────────────────────────
-      { name: 'Block 20', cols: 5,
-        units: [66,65,63,61,59] },
+      // Block 04 — 5 Cols x 2 Rows
+      { name: 'Block 04', cols: 5,
+        units: [88,86,84,82,80,
+                66,65,63,61,59] },
 
-      // ── Block 05 — left column, 2 rows × 4 ────────────────────────────
-      // Row 1: 64 62 60 58
-      // Row 2: 41 39 37 35
+      // Block 05 — 4 Cols x 2 Rows
       { name: 'Block 05', cols: 4,
         units: [64,62,60,58,
                 41,39,37,35] },
 
-      // ── Block 17 — centre-left top strip, 1 row × 5 ───────────────────
-      { name: 'Block 17', cols: 5,
-        units: [68,70,72,74,76] },
+      // Block 06 — 14 Cols x 2 Rows
+      { name: 'Block 06', cols: 14,
+        units: [40,38,36,34,33,32,30,28,26,24,22,20,18,16,
+                246,245,244,243,242,241,240,239,238,237,236,235,11,10] },
 
-      // ── Block 18 — centre-left main, 2 rows × 8 ───────────────────────
-      // Row 1: 67 69 71 73 75 77 78 79
-      // Row 2: 43 45 47 49 51 53 55 57
-      { name: 'Block 18', cols: 8,
-        units: [67,69,71,73,75,77,78,79,
-                43,45,47,49,51,53,55,57] },
+      // Block 07 — 1 Col x 4 Rows
+      { name: 'Block 07', cols: 1,
+        units: [6,4,2,1] },
 
-      // ── Block 16 — centre upper, 2 rows × 8 ───────────────────────────
-      // Row 1: 42 44 46 48 50 52 54 56
-      // Row 2: 31 29 27 25 23 21 19 17
-      { name: 'Block 16', cols: 8,
-        units: [42,44,46,48,50,52,54,56,
-                31,29,27,25,23,21,19,17] },
+      // Block 08 — 1 Col x 5 Rows
+      { name: 'Block 08', cols: 1,
+        units: [9,8,7,5,3] },
 
-      // ── Block 09 — NS column 1, 3 rows × 2 ────────────────────────────
-      // Row 1: 15 105 | Row 2: 14 103 | Row 3: 12 101
+      // Block 09 — 2 Cols x 3 Rows
       { name: 'Block 09', cols: 2,
         units: [15,105, 14,103, 12,101] },
 
-      // ── Block 10 — NS column 2, 3 rows × 2 ────────────────────────────
+      // Block 10 — 2 Cols x 3 Rows
       { name: 'Block 10', cols: 2,
         units: [106,111, 104,109, 102,107] },
 
-      // ── Block 11 — NS column 3, 4 rows × 2 ────────────────────────────
+      // Block 11 — 2 Cols x 4 Rows
       { name: 'Block 11', cols: 2,
         units: [113,120, 112,118, 110,116, 108,114] },
 
-      // ── Block 12 — NS column 4, 4 rows × 2 ────────────────────────────
+      // Block 12 — 2 Cols x 4 Rows
       { name: 'Block 12', cols: 2,
         units: [121,128, 119,126, 117,124, 115,122] },
 
-      // ── Block 13 — NS column 5, 4 rows × 2 ────────────────────────────
+      // Block 13 — 2 Cols x 4 Rows
       { name: 'Block 13', cols: 2,
         units: [129,133, 127,132, 125,131, 123,130] },
 
-      // ── Block 14 — right of NS columns, 1 row × 5 ─────────────────────
-      { name: 'Block 14', cols: 5,
-        units: [176,178,180,182,184] },
+      // Block 14 — 8 Cols x 2 Rows  (unit 47a stored as 47)
+      { name: 'Block 14', cols: 8,
+        units: [67,69,71,73,75,77,78,79,
+                43,45,47,49,51,53,55,57] },
 
-      // ── Block 15 — below Block 14, 1 row × 5 ──────────────────────────
-      { name: 'Block 15', cols: 5,
-        units: [167,169,171,173,175] },
+      // Block 15 — 8 Cols x 2 Rows
+      { name: 'Block 15', cols: 8,
+        units: [42,44,46,48,50,52,54,56,
+                31,29,27,25,23,21,19,17] },
 
-      // ── Block 01 — long horizontal row, 1 row × 14 ────────────────────
-      { name: 'Block 01', cols: 14,
-        units: [40,38,36,34,33,32,30,28,26,24,22,20,18,16] },
+      // Block 16 — 2 Cols x 5 Rows
+      { name: 'Block 16', cols: 2,
+        units: [220,219, 222,218, 224,217, 225,216, 226,215] },
 
-      // ── Block 02 / 03 / 04 — lower long horizontal, 1 row × 14 ───────
-      { name: 'Block 02 / 03 / 04', cols: 14,
-        units: [246,245,244,243,242,241,240,239,238,237,236,235,11,10] },
+      // Block 17 — 8 Cols x 1 Row
+      { name: 'Block 17', cols: 8,
+        units: [201,203,205,207,209,211,213,214] },
 
-      // ── Block 07 — bottom-left vertical, 2 cols ────────────────────────
-      // Row 1: 9 | Row 2: 8 | Row 3: 6 7 | Row 4: 4 5 | Row 5: 2 3 | Row 6: 1
-      { name: 'Block 07', cols: 2,
-        units: [9, 8, 6,7, 4,5, 2,3, 1] },
+      // Block 18 — 7 Cols x 2 Rows
+      { name: 'Block 18', cols: 7,
+        units: [200,202,204,206,208,210,212,
+                187,189,191,193,195,197,199] },
 
-      // ── Block 08 — lower centre, 3 cols × 5 rows ──────────────────────
-      // Row 1: 134 135 143
-      // Row 2: 136 137 145
-      // Row 3: 138 139 147
-      // Row 4: 140 141 149
-      // Row 5: 142
-      { name: 'Block 08', cols: 3,
-        units: [134,135,143,
-                136,137,145,
-                138,139,147,
-                140,141,149,
-                142] },
+      // Block 19 — 7 Cols x 2 Rows (row 2 has 5 units)
+      { name: 'Block 19', cols: 7,
+        units: [186,188,190,192,194,196,198,
+                177,179,181,183,185] },
 
-      // ── Block 25 — lower right centre, 2 cols × 4 rows ────────────────
-      { name: 'Block 25', cols: 2,
-        units: [144,151, 146,152, 148,153, 150,154] },
+      // Block 20 — 5 Cols x 2 Rows
+      { name: 'Block 20', cols: 5,
+        units: [176,178,180,182,184,
+                167,169,171,173,175] },
 
-      // ── Block 27 — lower far-right, 2 rows × 5 ────────────────────────
-      // Row 1: 166 168 170 172 174
-      // Row 2: 156 158 160 162 164
-      { name: 'Block 27', cols: 5,
+      // Block 21 — 5 Cols x 2 Rows
+      { name: 'Block 21', cols: 5,
         units: [166,168,170,172,174,
                 156,158,160,162,164] },
 
-      // ── Block 28 — bottom far-right, 1 row × 6 ────────────────────────
-      { name: 'Block 28', cols: 6,
+      // Block 22 — 6 Cols x 1 Row
+      { name: 'Block 22', cols: 6,
         units: [155,157,159,161,163,165] },
 
-      // ── Block 26 — upper-right NS pair (3 cols × 2 rows) ──────────────
-      // Row 1: 231 232 227
-      // Row 2: 233 234 229
-      { name: 'Block 26', cols: 3,
-        units: [231,232,227,
-                233,234,229] },
-
-      // ── Block 24 — right NS section, 2 cols × 2 rows ──────────────────
-      // Row 1: 228 221 | Row 2: 230 223
-      { name: 'Block 24', cols: 2,
-        units: [228,221, 230,223] },
-
-      // ── Block 23 — right NS section, 2 cols × 2 rows ──────────────────
-      // Row 1: 220 219 | Row 2: 222 218
+      // Block 23 — 2 Cols x 4 Rows
       { name: 'Block 23', cols: 2,
-        units: [220,219, 222,218] },
+        units: [144,151, 146,152, 148,153, 150,154] },
 
-      // ── Block 22 — right NS section, 2 cols × 3 rows ──────────────────
-      // Row 1: 224 217 | Row 2: 225 216 | Row 3: 226 215
-      { name: 'Block 22', cols: 2,
-        units: [224,217, 225,216, 226,215] },
+      // Block 24 — 2 Cols x 4 Rows
+      { name: 'Block 24', cols: 2,
+        units: [135,143, 137,145, 139,147, 141,149] },
 
-      // ── Block 21 — far-right EW rows ──────────────────────────────────
-      // Row 1 (8): 201 203 205 207 209 211 213 214
-      // Row 2 (7): 200 202 204 206 208 210 212
-      // Row 3 (7): 187 189 191 193 195 197 199
-      // Row 4 (7): 186 188 190 192 194 196 198
-      // Row 5 (5): 177 179 181 183 185
-      { name: 'Block 21', cols: 8,
-        units: [201,203,205,207,209,211,213,214,
-                200,202,204,206,208,210,212,
-                187,189,191,193,195,197,199,
-                186,188,190,192,194,196,198,
-                177,179,181,183,185] }
+      // Block 25 — 1 Col x 5 Rows
+      { name: 'Block 25', cols: 1,
+        units: [134,136,138,140,142] },
+
+      // Block 26 — 1 Col x 2 Rows
+      { name: 'Block 26', cols: 1,
+        units: [231,233] },
+
+      // Block 27 — 2 Cols x 2 Rows
+      { name: 'Block 27', cols: 2,
+        units: [232,227, 234,229] },
+
+      // Block 28 — 2 Cols x 2 Rows
+      { name: 'Block 28', cols: 2,
+        units: [228,221, 230,223] }
     ];
 
-    // Build lookup of unit numbers present in data (strip letter suffixes e.g. 47a→47)
+    // Build lookup from unit numbers present in the loaded data.
+    // Strip letter suffixes (e.g. "47a" → 47) before matching.
     const unitNumbers = new Set(
       units.map(u => parseInt((u.UnitNo || '').toString().replace(/[a-zA-Z]/g, ''), 10))
     );
