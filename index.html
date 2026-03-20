@@ -885,15 +885,16 @@
       color: #fff;
     }
 
-    /* Dot colours for funnel labels */
-    .dot-0 { background: #833C0C; }
-    .dot-1 { background: #FFC000; }
-    .dot-2 { background: #A5A5A5; }
-    .dot-3 { background: #FFE699; border: 1px solid #ccc; }
-    .dot-4 { background: #FFF2CC; border: 1px solid #ccc; }
-    .dot-5 { background: #E2EFDA; border: 1px solid #ccc; }
-    .dot-6 { background: #A9D08E; }
-    .dot-7 { background: #446A2C; }
+    /* Dot colours for funnel labels — 0:Scope, 1:Sold, 2:GFC... 8:Handover */
+    .dot-0 { background: #ffffff; border: 1.5px solid #999; }
+    .dot-1 { background: #833C0C; }
+    .dot-2 { background: #FFC000; }
+    .dot-3 { background: #A5A5A5; }
+    .dot-4 { background: #FFE699; border: 1px solid #ccc; }
+    .dot-5 { background: #FFF2CC; border: 1px solid #ccc; }
+    .dot-6 { background: #E2EFDA; border: 1px solid #ccc; }
+    .dot-7 { background: #A9D08E; }
+    .dot-8 { background: #446A2C; }
 
     /* Activity Table */
     .activity-table {
@@ -2531,51 +2532,16 @@
     /* Stage colors for tower units - custom colors */
     /* stage-0 (Scope) - removed, will use default white */
     
-    .tower-unit.stage-1 { 
-      background: #FFC000;
-      color: #000;
-      border-color: #CC9900;
-    }
-    .tower-unit.stage-2 { 
-      background: #A5A5A5;
-      color: #fff;
-      border-color: #7F7F7F;
-    }
-    .tower-unit.stage-3 { 
-      background: #FFE699;
-      color: #000;
-      border-color: #CCBA77;
-    }
-    .tower-unit.stage-4 { 
-      background: #FFF2CC;
-      color: #000;
-      border-color: #CCC2A3;
-    }
-    .tower-unit.stage-5 { 
-      background: #E2EFDA;
-      color: #000;
-      border-color: #B5BFAE;
-    }
-    .tower-unit.stage-6 { 
-      background: #A9D08E;
-      color: #000;
-      border-color: #87A672;
-    }
-    .tower-unit.stage-7 { 
-      background: #446A2C;
-      color: #fff;
-      border-color: #2a4119;
-    }
-    .tower-unit.sold {
-      background: #833C0C;
-      color: #fff;
-      border-color: #5e2a08;
-    }
-    .villa-unit.sold {
-      background: #833C0C;
-      color: #fff;
-      border-color: #5e2a08;
-    }
+    /* Tower unit stage colours — 0:Scope, 1:Sold, 2:GFC, 3:Plaster, 4:Floor, 5:HVAC, 6:False, 7:Fenest, 8:Handover */
+    .tower-unit.stage-0 { background: #ffffff; color: #374151; border-color: #d1d5db; }
+    .tower-unit.stage-1 { background: #833C0C; color: #fff; border-color: #5e2a08; }
+    .tower-unit.stage-2 { background: #FFC000; color: #000; border-color: #CC9900; }
+    .tower-unit.stage-3 { background: #A5A5A5; color: #fff; border-color: #7F7F7F; }
+    .tower-unit.stage-4 { background: #FFE699; color: #000; border-color: #CCBA77; }
+    .tower-unit.stage-5 { background: #FFF2CC; color: #000; border-color: #CCC2A3; }
+    .tower-unit.stage-6 { background: #E2EFDA; color: #000; border-color: #B5BFAE; }
+    .tower-unit.stage-7 { background: #A9D08E; color: #000; border-color: #87A672; }
+    .tower-unit.stage-8 { background: #446A2C; color: #fff; border-color: #2a4119; }
     
     .legend-item {
       display: flex;
@@ -2593,13 +2559,14 @@
       flex-shrink: 0;
     }
     
-    .legend-color.stage-1 { background: #FFC000; }
-    .legend-color.stage-2 { background: #A5A5A5; }
-    .legend-color.stage-3 { background: #FFE699; }
-    .legend-color.stage-4 { background: #FFF2CC; }
-    .legend-color.stage-5 { background: #E2EFDA; }
-    .legend-color.stage-6 { background: #A9D08E; }
-    .legend-color.stage-7 { background: #446A2C; }
+    .legend-color.stage-1 { background: #833C0C; }
+    .legend-color.stage-2 { background: #FFC000; }
+    .legend-color.stage-3 { background: #A5A5A5; }
+    .legend-color.stage-4 { background: #FFE699; }
+    .legend-color.stage-5 { background: #FFF2CC; }
+    .legend-color.stage-6 { background: #E2EFDA; }
+    .legend-color.stage-7 { background: #A9D08E; }
+    .legend-color.stage-8 { background: #446A2C; }
     
     @media (max-width: 768px) {
       .tower-viz-container {
@@ -2662,15 +2629,15 @@
       margin-bottom: 0.2rem;
     }
     
-    .stage-kpi-color-box.scope { background: white; border: 2px solid var(--gray-300); }
-    .stage-kpi-color-box.sold { background: #833C0C; }
-    .stage-kpi-color-box.stage-1 { background: #FFC000; }
-    .stage-kpi-color-box.stage-2 { background: #A5A5A5; }
-    .stage-kpi-color-box.stage-3 { background: #FFE699; }
-    .stage-kpi-color-box.stage-4 { background: #FFF2CC; }
-    .stage-kpi-color-box.stage-5 { background: #E2EFDA; }
-    .stage-kpi-color-box.stage-6 { background: #A9D08E; }
-    .stage-kpi-color-box.stage-7 { background: #446A2C; }
+    .stage-kpi-color-box.scope   { background: white; border: 2px solid var(--gray-300); }
+    .stage-kpi-color-box.stage-1 { background: #833C0C; }
+    .stage-kpi-color-box.stage-2 { background: #FFC000; }
+    .stage-kpi-color-box.stage-3 { background: #A5A5A5; }
+    .stage-kpi-color-box.stage-4 { background: #FFE699; border: 1px solid #ccc; }
+    .stage-kpi-color-box.stage-5 { background: #FFF2CC; border: 1px solid #ccc; }
+    .stage-kpi-color-box.stage-6 { background: #E2EFDA; border: 1px solid #ccc; }
+    .stage-kpi-color-box.stage-7 { background: #A9D08E; }
+    .stage-kpi-color-box.stage-8 { background: #446A2C; }
     
     .stage-kpi-value-compact {
       font-size: 1.4rem;
@@ -2814,13 +2781,16 @@
       z-index: 10;
     }
     
-    .villa-unit.stage-1 { background: #FFC000; color: #000; border-color: #CC9900; }
-    .villa-unit.stage-2 { background: #A5A5A5; color: #fff; border-color: #7F7F7F; }
-    .villa-unit.stage-3 { background: #FFE699; color: #000; border-color: #CCBA77; }
-    .villa-unit.stage-4 { background: #FFF2CC; color: #000; border-color: #CCC2A3; }
-    .villa-unit.stage-5 { background: #E2EFDA; color: #000; border-color: #B5BFAE; }
-    .villa-unit.stage-6 { background: #A9D08E; color: #000; border-color: #87A672; }
-    .villa-unit.stage-7 { background: #446A2C; color: #fff; border-color: #2a4119; }
+    /* Villa unit stage colours — same mapping as tower units */
+    .villa-unit.stage-0 { background: #ffffff; color: #374151; border-color: #d1d5db; }
+    .villa-unit.stage-1 { background: #833C0C; color: #fff; border-color: #5e2a08; }
+    .villa-unit.stage-2 { background: #FFC000; color: #000; border-color: #CC9900; }
+    .villa-unit.stage-3 { background: #A5A5A5; color: #fff; border-color: #7F7F7F; }
+    .villa-unit.stage-4 { background: #FFE699; color: #000; border-color: #CCBA77; }
+    .villa-unit.stage-5 { background: #FFF2CC; color: #000; border-color: #CCC2A3; }
+    .villa-unit.stage-6 { background: #E2EFDA; color: #000; border-color: #B5BFAE; }
+    .villa-unit.stage-7 { background: #A9D08E; color: #000; border-color: #87A672; }
+    .villa-unit.stage-8 { background: #446A2C; color: #fff; border-color: #2a4119; }
 
     /* ===== UNIT DETAIL POPUP ===== */
     .unit-detail-overlay {
@@ -5271,32 +5241,35 @@
         </tr>`;
     });
 
-    // Funnel
+    // Funnel — each entry: [label, count, colourIndex]
+    // Colour index maps to .dot-N and .funnel-bar.stage-N
+    // 0:Scope, 2:GFC, 3:Plaster, 4:Floor, 5:HVAC, 6:False, 7:Fenest, 8:Handover
     const stages = [
-      ["Total Scope", scope],
-      ["GFC Released", rows[0][2]],
-      ["Plaster", rows[1][2]],
-      ["Flooring & Dado", rows[2][2]],
-      ["HVAC Installed", rows[3][2]],
-      ["False Ceiling", rows[4][2]],
-      ["Fenestration", rows[5][2]],
-      ["Ready for Handover", rows[6][2]]
+      ["Total Scope",         scope,         0],
+      ["GFC Released",        rows[0][2],    2],
+      ["Plaster",             rows[1][2],    3],
+      ["Flooring & Dado",     rows[2][2],    4],
+      ["HVAC Installed",      rows[3][2],    5],
+      ["False Ceiling",       rows[4][2],    6],
+      ["Fenestration",        rows[5][2],    7],
+      ["Ready for Handover",  rows[6][2],    8]
     ];
 
     const max = scope || 1;
     const f = document.getElementById("funnel");
     f.innerHTML = "";
 
-    stages.forEach((s, i) => {
+    stages.forEach((s) => {
       const w = (s[1] / max) * 100;
+      const ci = s[2];  // colour index
       f.innerHTML += `
         <div class="funnel-row">
           <div class="funnel-label">
-            <span class="stage-dot dot-${i}"></span>
+            <span class="stage-dot dot-${ci}"></span>
             ${s[0]}
           </div>
           <div class="funnel-bar-container">
-            <div class="funnel-bar stage-${i}" style="width: ${Math.max(w, 5)}%">${s[1].toLocaleString()}</div>
+            <div class="funnel-bar stage-${ci}" style="width: ${Math.max(w, 5)}%">${s[1].toLocaleString()}</div>
           </div>
         </div>`;
     });
@@ -7033,16 +7006,24 @@
   
   // Determine completion stage for a unit (1-7, skip 0 for Scope)
   function getUnitStage(unit) {
-    // Stages: 1:GFC, 2:Plaster, 3:Floor, 4:HVAC, 5:False, 6:Fenest, 7:Hand
-    // Return highest completed stage (-1 if none)
-    let stage = -1;
-    if (unit.GFC) stage = 1;
-    if (unit.Plaster) stage = 2;
-    if (unit.Floor) stage = 3;
-    if (unit.HVAC) stage = 4;
-    if (unit.False) stage = 5;
-    if (unit.Fenest) stage = 6;
-    if (unit.Hand) stage = 7;
+    // Stage 0: Scope (no completion)
+    // Stage 1: Sold
+    // Stage 2: GFC Released
+    // Stage 3: Plaster
+    // Stage 4: Flooring & Dado
+    // Stage 5: HVAC Installed
+    // Stage 6: False Ceiling
+    // Stage 7: Fenestration
+    // Stage 8: Ready for Handover
+    let stage = 0;
+    if (unit.Sold)   stage = 1;
+    if (unit.GFC)    stage = 2;
+    if (unit.Plaster) stage = 3;
+    if (unit.Floor)  stage = 4;
+    if (unit.HVAC)   stage = 5;
+    if (unit.False)  stage = 6;
+    if (unit.Fenest) stage = 7;
+    if (unit.Hand)   stage = 8;
     return stage;
   }
   
@@ -7192,8 +7173,8 @@
           
           if (units.length > 0) {
             units.forEach(unit => {
-              const stageClass = unit.stage >= 0 ? `stage-${unit.stage}` : '';
-              const soldClass   = unit.Sold ? 'sold' : '';
+              const stageClass = `stage-${unit.stage}`;
+              const soldClass   = ''; // Sold is now stage-1, no separate class needed
               const unitNoDisplay = unit.UnitNo || `${towerNum}${floor.toString().padStart(2, '0')}${flat}${unit.parsed.suffix}`;
               const unitJson = JSON.stringify(unit).replace(/'/g, "&apos;");
               towerHTML += `
@@ -7223,28 +7204,30 @@
   
   function getStageName(stage) {
     const names = {
-      1: 'GFC Released',
-      2: 'Plaster',
-      3: 'Flooring & Dado',
-      4: 'HVAC Installed',
-      5: 'False Ceiling',
-      6: 'Fenestration',
-      7: 'Ready for Handover'
+      0: 'Scope',
+      1: 'Sold',
+      2: 'GFC Released',
+      3: 'Plaster',
+      4: 'Flooring & Dado',
+      5: 'HVAC Installed',
+      6: 'False Ceiling',
+      7: 'Fenestration',
+      8: 'Ready for Handover'
     };
     return names[stage] || 'Incomplete';
   }
   
   function renderStageKPIs(data) {
     const stages = [
-      { id: 'scope', name: 'Scope', count: data.length },
-      { id: 'sold', name: 'Sold', count: data.filter(u => u.Sold).length },
-      { id: 'stage-1', name: 'GFC Released', count: data.filter(u => u.GFC).length },
-      { id: 'stage-2', name: 'Plaster', count: data.filter(u => u.Plaster).length },
-      { id: 'stage-3', name: 'Flooring & Dado', count: data.filter(u => u.Floor).length },
-      { id: 'stage-4', name: 'HVAC Installed', count: data.filter(u => u.HVAC).length },
-      { id: 'stage-5', name: 'False Ceiling', count: data.filter(u => u.False).length },
-      { id: 'stage-6', name: 'Fenestration', count: data.filter(u => u.Fenest).length },
-      { id: 'stage-7', name: 'Ready for Handover', count: data.filter(u => u.Hand).length }
+      { id: 'scope',   name: 'Scope',              count: data.length },
+      { id: 'stage-1', name: 'Sold',               count: data.filter(u => u.Sold).length },
+      { id: 'stage-2', name: 'GFC Released',        count: data.filter(u => u.GFC).length },
+      { id: 'stage-3', name: 'Plaster',             count: data.filter(u => u.Plaster).length },
+      { id: 'stage-4', name: 'Flooring & Dado',     count: data.filter(u => u.Floor).length },
+      { id: 'stage-5', name: 'HVAC Installed',      count: data.filter(u => u.HVAC).length },
+      { id: 'stage-6', name: 'False Ceiling',       count: data.filter(u => u.False).length },
+      { id: 'stage-7', name: 'Fenestration',        count: data.filter(u => u.Fenest).length },
+      { id: 'stage-8', name: 'Ready for Handover',  count: data.filter(u => u.Hand).length }
     ];
     
     const container = document.getElementById('stageKpiGrid');
@@ -7511,8 +7494,8 @@
       block.units.forEach(unitNo => {
         const unit = unitMap[unitNo];
         if (unit) {
-          const stageClass = unit.stage >= 0 ? `stage-${unit.stage}` : '';
-          const soldClass   = unit.Sold ? 'sold' : '';
+          const stageClass = `stage-${unit.stage}`;
+          const soldClass   = ''; // Sold is now stage-1, no separate class needed
           const unitJson = JSON.stringify(unit).replace(/'/g, "&apos;");
           blockHTML += `
             <div class="villa-unit ${stageClass} ${soldClass}" 
