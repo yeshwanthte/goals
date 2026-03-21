@@ -3791,6 +3791,10 @@
                   <th class="sortable" onclick="sortTable(3)">Unit No.<button class="col-filter-btn" data-table="milestone" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(4)">Customer Name<button class="col-filter-btn" data-table="milestone" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(5)">Revenue (₹ Cr)<button class="col-filter-btn" data-table="milestone" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(6)" style="text-align:center;">GFC<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(7)" style="text-align:center;">Plaster<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(8)" style="text-align:center;">Flooring<button class="col-filter-btn" data-table="milestone" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(9)" style="text-align:center;">Fenestration<button class="col-filter-btn" data-table="milestone" data-col="9" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                 </tr>
               </thead>
               <tbody id="detailsTableBody"></tbody>
@@ -5424,12 +5428,19 @@
     if (currentDetailsData.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray-400);">
+          <td colspan="10" style="text-align: center; padding: 2rem; color: var(--gray-400);">
             <i class="bi bi-info-circle" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
             No pending units for this activity
           </td>
         </tr>`;
       return;
+    }
+
+    // Helper: render tick/cross cell
+    function statusCell(done) {
+      return done
+        ? `<td style="text-align:center;"><i class="bi bi-check-circle-fill" style="color:#446A2C;font-size:1rem;"></i></td>`
+        : `<td style="text-align:center;"><i class="bi bi-x-circle-fill" style="color:#d1d5db;font-size:1rem;"></i></td>`;
     }
 
     // Apply column filters
@@ -5450,6 +5461,7 @@
         <td class="revenue-cell" style="font-size: 1.1rem;">
           <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
         </td>
+        <td colspan="4"></td>
       </tr>`];
 
     displayData.forEach(unit => {
@@ -5462,6 +5474,10 @@
           <td class="unit-number">${unit.UnitNo}</td>
           <td class="customer-name">${unit.Customer}</td>
           <td class="revenue-cell">₹${revenue}</td>
+          ${statusCell(!!unit.GFC)}
+          ${statusCell(!!unit.Plaster)}
+          ${statusCell(!!unit.Floor)}
+          ${statusCell(!!unit.Fenest)}
         </tr>`);
     });
     tbody.innerHTML = rows.join('');
@@ -5511,12 +5527,16 @@
           valA = a[currentRevenueField] || 0;
           valB = b[currentRevenueField] || 0;
           break;
+        case 6: valA = a.GFC    ? 1 : 0; valB = b.GFC    ? 1 : 0; break;
+        case 7: valA = a.Plaster ? 1 : 0; valB = b.Plaster ? 1 : 0; break;
+        case 8: valA = a.Floor   ? 1 : 0; valB = b.Floor   ? 1 : 0; break;
+        case 9: valA = a.Fenest  ? 1 : 0; valB = b.Fenest  ? 1 : 0; break;
         default:
           return 0;
       }
 
-      // Handle numeric comparison for revenue
-      if (columnIndex === 5) {
+      // Numeric comparison for revenue and status columns
+      if (columnIndex >= 5) {
         return sortAscending ? valA - valB : valB - valA;
       }
 
@@ -5539,11 +5559,11 @@
     const excelData = [];
     
     // Add header row
-    excelData.push(['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)']);
+    excelData.push(['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', 'GFC Released', 'Plaster', 'Flooring & Dado', 'Fenestration']);
     
     // Add total row
     const totalRevenue = currentDetailsData.reduce((sum, unit) => sum + (unit[currentRevenueField] || 0), 0) / 10000000;
-    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue.toFixed(2)]);
+    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue.toFixed(2), '', '', '', '']);
     
     // Add data rows
     currentDetailsData.forEach(unit => {
@@ -5554,7 +5574,11 @@
         unit.Tower || 'N/A',
         unit.UnitNo,
         unit.Customer,
-        revenue
+        revenue,
+        unit.GFC    ? 'Done' : 'Pending',
+        unit.Plaster ? 'Done' : 'Pending',
+        unit.Floor   ? 'Done' : 'Pending',
+        unit.Fenest  ? 'Done' : 'Pending'
       ]);
     });
 
@@ -5565,11 +5589,15 @@
     // Set column widths
     ws['!cols'] = [
       { wch: 20 },  // Project
-      { wch: 15 },  // Phase
-      { wch: 15 },  // Tower
-      { wch: 15 },  // Unit No
+      { wch: 12 },  // Phase
+      { wch: 12 },  // Tower
+      { wch: 12 },  // Unit No
       { wch: 25 },  // Customer Name
-      { wch: 15 }   // Revenue
+      { wch: 15 },  // Revenue
+      { wch: 14 },  // GFC Released
+      { wch: 10 },  // Plaster
+      { wch: 16 },  // Flooring & Dado
+      { wch: 14 }   // Fenestration
     ];
 
     // Add worksheet to workbook
@@ -6144,6 +6172,10 @@
       case 3: return (unit.UnitNo   || '').toString();
       case 4: return (unit.Customer || '').toString();
       case 5: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
+      case 6: return unit.GFC    ? 'Done' : 'Pending';
+      case 7: return unit.Plaster ? 'Done' : 'Pending';
+      case 8: return unit.Floor   ? 'Done' : 'Pending';
+      case 9: return unit.Fenest  ? 'Done' : 'Pending';
       default: return '';
     }
   }
