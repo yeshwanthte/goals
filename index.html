@@ -617,7 +617,7 @@
 
     .filter-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 0.75rem;
     }
 
@@ -4035,6 +4035,10 @@
             <div class="filter-card-body"><div id="inventorySlicerPA" class="slicer"></div></div>
           </div>
           <div class="filter-card">
+            <div class="filter-card-header"><i class="bi bi-calendar-check"></i> IDSA Status</div>
+            <div class="filter-card-body"><div id="idsaSlicerPA" class="slicer"></div></div>
+          </div>
+          <div class="filter-card">
             <div class="filter-card-header"><i class="bi bi-file-check"></i> GFC Status</div>
             <div class="filter-card-body"><div id="gfcSlicerPA" class="slicer"></div></div>
           </div>
@@ -4661,7 +4665,7 @@
   
   // Plan vs Actuals filters
   let projectSelPA = new Set(), towerSelPA = new Set(), phaseSelPA = new Set(),
-      inventorySelPA = new Set(), gfcSelPA = new Set(), ocSelPA = new Set();
+      inventorySelPA = new Set(), idsaSelPA = new Set(), gfcSelPA = new Set(), ocSelPA = new Set();
   let selectedYearPA = '2026'; // Default year
   
   // Plan Actual Details (Plaster / Flooring / Handover)
@@ -5016,6 +5020,7 @@
     buildSlicerPA("towerSlicerPA", [...new Set(raw.map(r => r.Tower))], towerSelPA);
     buildSlicerPA("phaseSlicerPA", [...new Set(raw.map(r => r.Phase))], phaseSelPA);
     buildSlicerPA("inventorySlicerPA", [...new Set(raw.map(r => r.Inventory))], inventorySelPA);
+    buildSlicerPA("idsaSlicerPA", ["Yes", "No"], idsaSelPA);
     buildSlicerPA("gfcSlicerPA", ["Yes", "No"], gfcSelPA);
     buildSlicerPA("ocSlicerPA", ["OC recvd", "OC not recvd"], ocSelPA);
     
@@ -5088,7 +5093,7 @@
     // Get current filtered data
     const hasActiveFilters = projectSelPA.size > 0 || towerSelPA.size > 0 || 
                              phaseSelPA.size > 0 || inventorySelPA.size > 0 || 
-                             gfcSelPA.size > 0 || ocSelPA.size > 0;
+                             idsaSelPA.size > 0 || gfcSelPA.size > 0 || ocSelPA.size > 0;
     
     if (!hasActiveFilters) {
       // Remove all highlighting if no filters
@@ -5104,6 +5109,7 @@
       (!towerSelPA.size || towerSelPA.has(r.Tower)) &&
       (!phaseSelPA.size || phaseSelPA.has(r.Phase)) &&
       (!inventorySelPA.size || inventorySelPA.has(r.Inventory)) &&
+      (!idsaSelPA.size || idsaSelPA.has(r.IDSADate ? "Yes" : "No")) &&
       (!gfcSelPA.size || gfcSelPA.has(r.GFC ? "Yes" : "No")) &&
       (!ocSelPA.size || ocSelPA.has(r.OC))
     );
@@ -5112,6 +5118,7 @@
     const availableTowers = new Set(d.map(x => x.Tower));
     const availablePhases = new Set(d.map(x => x.Phase));
     const availableInventory = new Set(d.map(x => x.Inventory));
+    const availableIDSA = new Set(d.map(x => x.IDSADate ? "Yes" : "No"));
     const availableGFC = new Set(d.map(x => x.GFC ? "Yes" : "No"));
     const availableOC = new Set(d.map(x => x.OC));
 
@@ -5120,6 +5127,7 @@
     updateSlicerButtonsPA('towerSlicerPA', availableTowers, towerSelPA);
     updateSlicerButtonsPA('phaseSlicerPA', availablePhases, phaseSelPA);
     updateSlicerButtonsPA('inventorySlicerPA', availableInventory, inventorySelPA);
+    updateSlicerButtonsPA('idsaSlicerPA', availableIDSA, idsaSelPA);
     updateSlicerButtonsPA('gfcSlicerPA', availableGFC, gfcSelPA);
     updateSlicerButtonsPA('ocSlicerPA', availableOC, ocSelPA);
   }
@@ -5149,7 +5157,7 @@
   }
 
   function clearAllFiltersPlanActual() {
-    [projectSelPA, towerSelPA, phaseSelPA, inventorySelPA, gfcSelPA, ocSelPA].forEach(s => s.clear());
+    [projectSelPA, towerSelPA, phaseSelPA, inventorySelPA, idsaSelPA, gfcSelPA, ocSelPA].forEach(s => s.clear());
     document.querySelectorAll("#planActualDataSection .slicer button").forEach(b => {
       b.classList.remove("active", "dimmed", "highlighted");
     });
@@ -5168,7 +5176,7 @@
   }
 
   function clearAllFilters() {
-    [projectSel, towerSel, phaseSel, inventorySel, gfcSel, ocSel].forEach(s => s.clear());
+    [projectSel, towerSel, phaseSel, inventorySel, idsaSel, gfcSel, ocSel].forEach(s => s.clear());
     document.querySelectorAll(".slicer button").forEach(b => {
       b.classList.remove("active", "dimmed", "highlighted");
     });
@@ -5452,11 +5460,11 @@
         ? `<td style="text-align:center;"><i class="bi bi-check-circle-fill" style="color:#446A2C;font-size:1rem;"></i></td>`
         : `<td style="text-align:center;"><i class="bi bi-x-circle-fill" style="color:#d1d5db;font-size:1rem;"></i></td>`;
     }
-    // IDSA: Yes/No text badge
+    // IDSA: tick/cross (same style as other status columns)
     function idsaCell(hasDate) {
       return hasDate
-        ? `<td style="text-align:center;"><span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:50px;font-size:0.7rem;font-weight:700;">Yes</span></td>`
-        : `<td style="text-align:center;"><span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:50px;font-size:0.7rem;font-weight:700;">No</span></td>`;
+        ? `<td style="text-align:center;"><i class="bi bi-check-circle-fill" style="color:#446A2C;font-size:1rem;"></i></td>`
+        : `<td style="text-align:center;"><i class="bi bi-x-circle-fill" style="color:#d1d5db;font-size:1rem;"></i></td>`;
     }
 
     // Apply column filters
@@ -5747,6 +5755,7 @@
       (!towerSelPA.size || towerSelPA.has(r.Tower)) &&
       (!phaseSelPA.size || phaseSelPA.has(r.Phase)) &&
       (!inventorySelPA.size || inventorySelPA.has(r.Inventory)) &&
+      (!idsaSelPA.size || idsaSelPA.has(r.IDSADate ? "Yes" : "No")) &&
       (!gfcSelPA.size || gfcSelPA.has(r.GFC ? "Yes" : "No")) &&
       (!ocSelPA.size || ocSelPA.has(r.OC))
     );
@@ -5885,6 +5894,7 @@
       (!towerSelPA.size || towerSelPA.has(r.Tower)) &&
       (!phaseSelPA.size || phaseSelPA.has(r.Phase)) &&
       (!inventorySelPA.size || inventorySelPA.has(r.Inventory)) &&
+      (!idsaSelPA.size || idsaSelPA.has(r.IDSADate ? "Yes" : "No")) &&
       (!gfcSelPA.size || gfcSelPA.has(r.GFC ? "Yes" : "No")) &&
       (!ocSelPA.size || ocSelPA.has(r.OC))
     );
@@ -6269,6 +6279,7 @@
       (!towerSelPA.size || towerSelPA.has(r.Tower)) &&
       (!phaseSelPA.size || phaseSelPA.has(r.Phase)) &&
       (!inventorySelPA.size || inventorySelPA.has(r.Inventory)) &&
+      (!idsaSelPA.size || idsaSelPA.has(r.IDSADate ? "Yes" : "No")) &&
       (!gfcSelPA.size || gfcSelPA.has(r.GFC ? "Yes" : "No")) &&
       (!ocSelPA.size || ocSelPA.has(r.OC))
     );
