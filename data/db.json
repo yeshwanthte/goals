@@ -1,5 +1,11 @@
 {
-  "users": [],
+  "users": [
+    {
+      "username": "Karthick",
+      "hash": "83cdd1c3a5e1597aa9d3ffd877ae10d0500702bc3340289b8325c111e0397cf9",
+      "createdAt": "2026-03-23T07:11:13.247Z"
+    }
+  ],
   "log": [
     {
       "username": "Admin",
