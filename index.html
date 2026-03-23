@@ -6275,7 +6275,7 @@
           const days = [...tree[yr][mo]].sort((a,b)=>{const da=parseDate(a),db=parseDate(b);return da&&db?da-db:0;});
           const allMoChk = days.every(d=>_cfdPending[d]!==false);
           const dayHtml = days.map(d=>`<div class="cfd-item cfd-day" data-val="${d.replace(/"/g,'&quot;')}" style="padding-left:2.8rem;"><input type="checkbox" ${_cfdPending[d]!==false?'checked':''}><span>${d}</span></div>`).join('');
-          return `<div><div class="cfd-item cfd-grp" style="padding-left:1.4rem;font-weight:700;background:#f8fafc;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'"><i class="bi bi-chevron-down" style="font-size:0.6rem;margin-right:5px;"></i><span>${MONTHS[+mo]}</span><input type="checkbox" style="margin-left:auto;" ${allMoChk?'checked':''} onclick="event.stopPropagation();var g=this.closest('.cfd-grp').nextElementSibling;g.querySelectorAll('.cfd-day input').forEach(function(cb){cb.checked=this.checked;_cfdPending[cb.closest('.cfd-day').dataset.val]=this.checked}.bind(this));updateCFDSelectAll()"></div><div>${dayHtml}</div></div>`;
+          return `<div><div class="cfd-item cfd-grp" style="padding-left:1.4rem;font-weight:700;background:#f8fafc;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'"><i class="bi bi-chevron-down" style="font-size:0.6rem;margin-right:5px;"></i><span>${MONTHS[+mo]}</span><input type="checkbox" style="margin-left:auto;" ${allMoChk?'checked':''} onclick="event.stopPropagation();var g=this.closest('.cfd-grp').nextElementSibling;g.querySelectorAll('.cfd-day input').forEach(function(cb){cb.checked=this.checked;_cfdPending[cb.closest('.cfd-day').dataset.val]=this.checked}.bind(this));updateCFDSelectAll()"></div><div style="display:none">${dayHtml}</div></div>`;
         }).join('');
         return `<div><div class="cfd-item cfd-grp" style="font-weight:900;background:#f1f5f9;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'"><i class="bi bi-chevron-down" style="font-size:0.65rem;margin-right:5px;"></i><span>${yr}</span><input type="checkbox" style="margin-left:auto;" ${allYrChk?'checked':''} onclick="event.stopPropagation();var g=this.closest('.cfd-grp').nextElementSibling;g.querySelectorAll('.cfd-day input').forEach(function(cb){cb.checked=this.checked;_cfdPending[cb.closest('.cfd-day').dataset.val]=this.checked}.bind(this));updateCFDSelectAll()"></div><div>${months}</div></div>`;
       }).join('');
@@ -7235,8 +7235,8 @@
   let selectedProjectTower = null; // Default to none (empty state)
   
   // Build tower project slicer
-  let selectedTowerViz = null;
-  let selectedPhaseViz = null;
+  let selectedTowerViz = new Set();
+  let selectedPhaseViz = new Set();
 
   function buildTowerProjectSlicer() {
     const projects = [...new Set(raw.map(r => r.Project))].filter(Boolean).sort();
@@ -7251,8 +7251,8 @@
         el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         selectedProjectTower = proj;
-        selectedTowerViz = null;
-        selectedPhaseViz = null;
+        selectedTowerViz.clear();
+        selectedPhaseViz.clear();
         buildVizTowerSlicer(proj);
         buildVizPhaseSlicer(proj);
         renderTowerVisualization();
@@ -7260,7 +7260,6 @@
       el.appendChild(btn);
     });
 
-    // Build empty Tower / Phase slicers (populated once project is chosen)
     buildVizTowerSlicer(null);
     buildVizPhaseSlicer(null);
     showEmptyState();
@@ -7273,11 +7272,21 @@
     const towers = [...new Set(raw.filter(r => r.Project === project).map(r => r.Tower).filter(Boolean))].sort((a,b) => a.localeCompare(b, undefined, {numeric:true}));
     const allBtn = document.createElement('button');
     allBtn.textContent = 'All'; allBtn.classList.add('active');
-    allBtn.onclick = () => { el.querySelectorAll('button').forEach(b => b.classList.remove('active')); allBtn.classList.add('active'); selectedTowerViz = null; renderTowerVisualization(); };
+    allBtn.onclick = () => {
+      selectedTowerViz.clear();
+      el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      allBtn.classList.add('active');
+      renderTowerVisualization();
+    };
     el.appendChild(allBtn);
     towers.forEach(t => {
       const btn = document.createElement('button'); btn.textContent = t; btn.dataset.value = t;
-      btn.onclick = () => { el.querySelectorAll('button').forEach(b => b.classList.remove('active')); btn.classList.add('active'); selectedTowerViz = t; renderTowerVisualization(); };
+      btn.onclick = () => {
+        if (selectedTowerViz.has(t)) { selectedTowerViz.delete(t); btn.classList.remove('active'); }
+        else { selectedTowerViz.add(t); btn.classList.add('active'); }
+        allBtn.classList.toggle('active', selectedTowerViz.size === 0);
+        renderTowerVisualization();
+      };
       el.appendChild(btn);
     });
   }
@@ -7289,11 +7298,21 @@
     const phases = [...new Set(raw.filter(r => r.Project === project).map(r => r.Phase).filter(Boolean))].sort();
     const allBtn = document.createElement('button');
     allBtn.textContent = 'All'; allBtn.classList.add('active');
-    allBtn.onclick = () => { el.querySelectorAll('button').forEach(b => b.classList.remove('active')); allBtn.classList.add('active'); selectedPhaseViz = null; renderTowerVisualization(); };
+    allBtn.onclick = () => {
+      selectedPhaseViz.clear();
+      el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      allBtn.classList.add('active');
+      renderTowerVisualization();
+    };
     el.appendChild(allBtn);
     phases.forEach(p => {
       const btn = document.createElement('button'); btn.textContent = p; btn.dataset.value = p;
-      btn.onclick = () => { el.querySelectorAll('button').forEach(b => b.classList.remove('active')); btn.classList.add('active'); selectedPhaseViz = p; renderTowerVisualization(); };
+      btn.onclick = () => {
+        if (selectedPhaseViz.has(p)) { selectedPhaseViz.delete(p); btn.classList.remove('active'); }
+        else { selectedPhaseViz.add(p); btn.classList.add('active'); }
+        allBtn.classList.toggle('active', selectedPhaseViz.size === 0);
+        renderTowerVisualization();
+      };
       el.appendChild(btn);
     });
   }
@@ -7374,8 +7393,8 @@
     
     const projectData = raw.filter(r => {
       if (r.Project !== selectedProjectTower) return false;
-      if (selectedTowerViz && r.Tower !== selectedTowerViz) return false;
-      if (selectedPhaseViz && r.Phase !== selectedPhaseViz) return false;
+      if (selectedTowerViz.size > 0 && !selectedTowerViz.has(r.Tower)) return false;
+      if (selectedPhaseViz.size > 0 && !selectedPhaseViz.has(r.Phase)) return false;
       return true;
     });
     
