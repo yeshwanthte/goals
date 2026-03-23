@@ -3607,7 +3607,7 @@
   <!-- Auto-Load Section -->
   <div class="upload-section" id="uploadSection">
     <div class="spinner"></div>
-    <h2>Loading Data from Google Sheets...</h2>
+    <h2>Loading Data...</h2>
     <p>Please wait while we fetch the latest data</p>
   </div>
 
@@ -4813,7 +4813,7 @@
 
     } catch (error) {
       console.error('Error loading data:', error);
-      showError('Failed to load data from Google Sheets. Please check your internet connection and try again.');
+      showError('Failed to load data. Please check your internet connection and try again.');
     }
   }
 
@@ -4838,7 +4838,7 @@
     document.getElementById('uploadSection').innerHTML = `
       <div class="spinner"></div>
       <h2>Refreshing Data...</h2>
-      <p>Loading latest data from Google Sheets</p>
+      <p>Loading latest data...</p>
     `;
     document.getElementById('tabNavigation').style.display = 'none';
     document.getElementById('dataSection').classList.remove('visible');
@@ -7200,7 +7200,7 @@
 
     // reset dashboard state so it reloads fresh on next login
     document.getElementById('uploadSection').style.display = 'flex';
-    document.getElementById('uploadSection').innerHTML = '<div class="spinner"></div><h2>Loading Data from Google Sheets...</h2><p>Please wait while we fetch the latest data</p>';
+    document.getElementById('uploadSection').innerHTML = '<div class="spinner"></div><h2>Loading Data...</h2><p>Please wait while we fetch the latest data</p>';
     document.getElementById('tabNavigation').style.display = 'none';
     document.getElementById('dataSection').classList.remove('visible');
     document.getElementById('planActualDataSection').classList.remove('visible');
