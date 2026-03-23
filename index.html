@@ -4311,15 +4311,20 @@
     <!-- Tower Visualization Content (Hidden until data loads) -->
     <div class="data-section" id="towerDataSection">
       
-      <!-- Project Slicer -->
+      <!-- Project / Tower / Phase Slicers -->
       <section class="filter-section">
-        <div class="filter-toggle">
-          <h6><i class="bi bi-folder"></i> Select Project</h6>
-        </div>
-        <div class="filter-grid" style="grid-template-columns: 1fr;">
+        <div class="filter-grid" style="grid-template-columns: repeat(3,1fr);">
           <div class="filter-card">
             <div class="filter-card-header"><i class="bi bi-folder"></i> Project</div>
             <div class="filter-card-body"><div id="projectSlicerTower" class="slicer"></div></div>
+          </div>
+          <div class="filter-card">
+            <div class="filter-card-header"><i class="bi bi-building"></i> Tower</div>
+            <div class="filter-card-body"><div id="towerSlicerViz" class="slicer"></div></div>
+          </div>
+          <div class="filter-card">
+            <div class="filter-card-header"><i class="bi bi-layers"></i> Phase</div>
+            <div class="filter-card-body"><div id="phaseSlicerViz" class="slicer"></div></div>
           </div>
         </div>
       </section>
@@ -6227,8 +6232,11 @@
     _cfdCol   = colIdx;
     _cfdBtn   = btnEl;
 
+    // Date columns in PA table (5=Plan Date, 7=Actual Date) get a hierarchy filter
+    const isDateHierarchy = tableType === 'pa' && (colIdx === 5 || colIdx === 7);
+
     const activeFilters = tableType === 'pa' ? paColumnFilters : structColumnFilters;
-    const existingFilter = activeFilters[colIdx]; // Set or undefined
+    const existingFilter = activeFilters[colIdx];
 
     const allVals = getCFDAllValues(tableType, colIdx);
 
@@ -6248,33 +6256,44 @@
     header.textContent = 'Filter: ' + thText;
 
     search.value = '';
-    list.innerHTML = allVals.map(v => `
-      <div class="cfd-item" data-val="${v.replace(/"/g,'&quot;')}">
-        <input type="checkbox" ${_cfdPending[v] ? 'checked' : ''}>
-        <span>${v}</span>
-      </div>`).join('');
+
+    if (isDateHierarchy) {
+      const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const tree = {};
+      allVals.forEach(v => {
+        const d = parseDate(v);
+        if (!d || isNaN(d)) return;
+        const yr = d.getFullYear(), mo = d.getMonth();
+        if (!tree[yr]) tree[yr] = {};
+        if (!tree[yr][mo]) tree[yr][mo] = new Set();
+        tree[yr][mo].add(v);
+      });
+      list.innerHTML = Object.keys(tree).sort().map(yr => {
+        const yrDays = Object.values(tree[yr]).flatMap(s=>[...s]);
+        const allYrChk = yrDays.every(d=>_cfdPending[d]!==false);
+        const months = Object.keys(tree[yr]).sort((a,b)=>+a-+b).map(mo => {
+          const days = [...tree[yr][mo]].sort((a,b)=>{const da=parseDate(a),db=parseDate(b);return da&&db?da-db:0;});
+          const allMoChk = days.every(d=>_cfdPending[d]!==false);
+          const dayHtml = days.map(d=>`<div class="cfd-item cfd-day" data-val="${d.replace(/"/g,'&quot;')}" style="padding-left:2.8rem;"><input type="checkbox" ${_cfdPending[d]!==false?'checked':''}><span>${d}</span></div>`).join('');
+          return `<div><div class="cfd-item cfd-grp" style="padding-left:1.4rem;font-weight:700;background:#f8fafc;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'"><i class="bi bi-chevron-down" style="font-size:0.6rem;margin-right:5px;"></i><span>${MONTHS[+mo]}</span><input type="checkbox" style="margin-left:auto;" ${allMoChk?'checked':''} onclick="event.stopPropagation();var g=this.closest('.cfd-grp').nextElementSibling;g.querySelectorAll('.cfd-day input').forEach(function(cb){cb.checked=this.checked;_cfdPending[cb.closest('.cfd-day').dataset.val]=this.checked}.bind(this));updateCFDSelectAll()"></div><div>${dayHtml}</div></div>`;
+        }).join('');
+        return `<div><div class="cfd-item cfd-grp" style="font-weight:900;background:#f1f5f9;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'"><i class="bi bi-chevron-down" style="font-size:0.65rem;margin-right:5px;"></i><span>${yr}</span><input type="checkbox" style="margin-left:auto;" ${allYrChk?'checked':''} onclick="event.stopPropagation();var g=this.closest('.cfd-grp').nextElementSibling;g.querySelectorAll('.cfd-day input').forEach(function(cb){cb.checked=this.checked;_cfdPending[cb.closest('.cfd-day').dataset.val]=this.checked}.bind(this));updateCFDSelectAll()"></div><div>${months}</div></div>`;
+      }).join('');
+      list.querySelectorAll('.cfd-day').forEach(item => {
+        item.addEventListener('click', e=>{if(e.target.tagName==='INPUT')return;item.querySelector('input').click();});
+        item.querySelector('input').addEventListener('change', function(){_cfdPending[item.dataset.val]=this.checked;updateCFDSelectAll();});
+      });
+      search.oninput = function(){const q=this.value.toLowerCase();list.querySelectorAll('.cfd-day').forEach(item=>item.classList.toggle('hidden',!!q&&!item.dataset.val.toLowerCase().includes(q)));};
+    } else {
+      list.innerHTML = allVals.map(v=>`<div class="cfd-item" data-val="${v.replace(/"/g,'&quot;')}"><input type="checkbox" ${_cfdPending[v]?'checked':''}><span>${v}</span></div>`).join('');
+      search.oninput = function(){const q=this.value.toLowerCase();list.querySelectorAll('.cfd-item').forEach(item=>item.classList.toggle('hidden',!item.dataset.val.toLowerCase().includes(q)));};
+      list.querySelectorAll('.cfd-item').forEach(item=>{
+        item.addEventListener('click',e=>{if(e.target.tagName==='INPUT')return;item.querySelector('input').click();});
+        item.querySelector('input').addEventListener('change',function(){_cfdPending[item.dataset.val]=this.checked;updateCFDSelectAll();});
+      });
+    }
 
     updateCFDSelectAll();
-
-    // Wire search
-    search.oninput = function() {
-      const q = this.value.toLowerCase();
-      list.querySelectorAll('.cfd-item').forEach(item => {
-        item.classList.toggle('hidden', !item.dataset.val.toLowerCase().includes(q));
-      });
-    };
-
-    // Wire checkboxes
-    list.querySelectorAll('.cfd-item').forEach(item => {
-      item.addEventListener('click', function(e) {
-        if (e.target.tagName === 'INPUT') return; // handled by change
-        this.querySelector('input').click();
-      });
-      item.querySelector('input').addEventListener('change', function() {
-        _cfdPending[item.dataset.val] = this.checked;
-        updateCFDSelectAll();
-      });
-    });
 
     // Wire select-all checkbox
     const selectAllCb = document.getElementById('cfdSelectAllCb');
@@ -7216,29 +7235,67 @@
   let selectedProjectTower = null; // Default to none (empty state)
   
   // Build tower project slicer
+  let selectedTowerViz = null;
+  let selectedPhaseViz = null;
+
   function buildTowerProjectSlicer() {
     const projects = [...new Set(raw.map(r => r.Project))].filter(Boolean).sort();
     const el = document.getElementById('projectSlicerTower');
     el.innerHTML = '';
-    
+
     projects.forEach(proj => {
       const btn = document.createElement('button');
       btn.textContent = proj;
       btn.dataset.value = proj;
-      
       btn.onclick = function() {
-        // Single-select behavior for tower viz
         el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         selectedProjectTower = proj;
+        selectedTowerViz = null;
+        selectedPhaseViz = null;
+        buildVizTowerSlicer(proj);
+        buildVizPhaseSlicer(proj);
         renderTowerVisualization();
       };
-      
       el.appendChild(btn);
     });
-    
-    // Show empty state by default and initialize cross-project search
+
+    // Build empty Tower / Phase slicers (populated once project is chosen)
+    buildVizTowerSlicer(null);
+    buildVizPhaseSlicer(null);
     showEmptyState();
+  }
+
+  function buildVizTowerSlicer(project) {
+    const el = document.getElementById('towerSlicerViz');
+    el.innerHTML = '';
+    if (!project) return;
+    const towers = [...new Set(raw.filter(r => r.Project === project).map(r => r.Tower).filter(Boolean))].sort((a,b) => a.localeCompare(b, undefined, {numeric:true}));
+    const allBtn = document.createElement('button');
+    allBtn.textContent = 'All'; allBtn.classList.add('active');
+    allBtn.onclick = () => { el.querySelectorAll('button').forEach(b => b.classList.remove('active')); allBtn.classList.add('active'); selectedTowerViz = null; renderTowerVisualization(); };
+    el.appendChild(allBtn);
+    towers.forEach(t => {
+      const btn = document.createElement('button'); btn.textContent = t; btn.dataset.value = t;
+      btn.onclick = () => { el.querySelectorAll('button').forEach(b => b.classList.remove('active')); btn.classList.add('active'); selectedTowerViz = t; renderTowerVisualization(); };
+      el.appendChild(btn);
+    });
+  }
+
+  function buildVizPhaseSlicer(project) {
+    const el = document.getElementById('phaseSlicerViz');
+    el.innerHTML = '';
+    if (!project) return;
+    const phases = [...new Set(raw.filter(r => r.Project === project).map(r => r.Phase).filter(Boolean))].sort();
+    const allBtn = document.createElement('button');
+    allBtn.textContent = 'All'; allBtn.classList.add('active');
+    allBtn.onclick = () => { el.querySelectorAll('button').forEach(b => b.classList.remove('active')); allBtn.classList.add('active'); selectedPhaseViz = null; renderTowerVisualization(); };
+    el.appendChild(allBtn);
+    phases.forEach(p => {
+      const btn = document.createElement('button'); btn.textContent = p; btn.dataset.value = p;
+      btn.onclick = () => { el.querySelectorAll('button').forEach(b => b.classList.remove('active')); btn.classList.add('active'); selectedPhaseViz = p; renderTowerVisualization(); };
+      el.appendChild(btn);
+    });
   }
   
   function showEmptyState() {
@@ -7315,7 +7372,12 @@
       return;
     }
     
-    const projectData = raw.filter(r => r.Project === selectedProjectTower);
+    const projectData = raw.filter(r => {
+      if (r.Project !== selectedProjectTower) return false;
+      if (selectedTowerViz && r.Tower !== selectedTowerViz) return false;
+      if (selectedPhaseViz && r.Phase !== selectedPhaseViz) return false;
+      return true;
+    });
     
     if (projectData.length === 0) {
       document.getElementById('towerVizContainer').innerHTML = `
@@ -7979,17 +8041,17 @@
     
     // === SECTION 4: CONSTRUCTION ACTIVITIES ===
     const activities = [
-      { name: 'GFC Released',     completed: !!unit.GFC,     projected: null },
-      { name: 'Plaster',          completed: !!unit.Plaster,  projected: unit.PlasterPlan },
-      { name: 'Flooring & Dado',  completed: !!unit.Floor,    projected: unit.FlooringProjected },
-      { name: 'HVAC Installed',   completed: !!unit.HVAC,    projected: null },
-      { name: 'False Ceiling',    completed: !!unit.False,   projected: null },
-      { name: 'Fenestration',     completed: !!unit.Fenest,  projected: null },
-      { name: 'Ready for Handover', completed: !!unit.Hand,  projected: unit.HandoverPlan }
+      { name: 'GFC Released',     completed: !!unit.GFC,     projected: null,                   amt: null },
+      { name: 'Plaster',          completed: !!unit.Plaster,  projected: unit.PlasterPlan,        amt: unit.PlasterRev },
+      { name: 'Flooring & Dado',  completed: !!unit.Floor,    projected: unit.FlooringProjected,  amt: unit.FloorRev },
+      { name: 'HVAC Installed',   completed: !!unit.HVAC,    projected: null,                   amt: null },
+      { name: 'False Ceiling',    completed: !!unit.False,   projected: null,                   amt: null },
+      { name: 'Fenestration',     completed: !!unit.Fenest,  projected: null,                   amt: null },
+      { name: 'Ready for Handover', completed: !!unit.Hand,  projected: unit.HandoverPlan,       amt: unit.HandRev }
     ];
 
     const activityHTML = activities.map(a => {
-      // Show projected date only when pending and a date is available
+      // Projected date badge — only for pending items with a date
       let projectedTag = '';
       if (!a.completed && a.projected) {
         const pd = parseDate(a.projected);
@@ -8000,9 +8062,17 @@
           </span>`;
         }
       }
+      // Milestone amount badge
+      let amtTag = '';
+      if (a.amt && a.amt > 0) {
+        const amtCr = (a.amt / 10000000).toFixed(2);
+        amtTag = `<span style="font-size:0.68rem;color:#059669;font-weight:700;background:#d1fae5;padding:2px 8px;border-radius:50px;margin-left:0.4rem;white-space:nowrap;">
+          ₹${amtCr} Cr
+        </span>`;
+      }
       return `
       <div class="unit-activity-item ${a.completed ? 'completed' : ''}">
-        <span class="unit-activity-name">${a.name}${projectedTag}</span>
+        <span class="unit-activity-name">${a.name}${projectedTag}${amtTag}</span>
         <span class="unit-activity-status ${a.completed ? 'completed' : 'pending'}">
           <i class="bi bi-${a.completed ? 'check-circle-fill' : 'circle'}"></i>
           ${a.completed ? 'Completed' : 'Pending'}
