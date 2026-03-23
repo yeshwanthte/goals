@@ -4758,34 +4758,20 @@
 
   // Function to load data from Google Sheets
   async function loadDataFromGoogleSheets() {
-    // When served from GitHub Pages, direct fetch of Google Sheets CSV is blocked by CORS.
-    // We use a reliable public CORS proxy as a fallback.
-    const PROXY = 'https://corsproxy.io/?';
-
-    async function fetchCSV(url) {
-      // Try direct first (works on localhost / some browsers)
-      try {
-        const r = await fetch(url, { cache: 'no-cache' });
-        if (r.ok) return r;
-      } catch(_) {}
-      // Fallback: CORS proxy
-      const r = await fetch(PROXY + encodeURIComponent(url), { cache: 'no-cache' });
-      return r;
-    }
-
     try {
       console.log('Fetching data from Google Sheets...');
 
+      // Google Sheets published CSV URLs natively support CORS — no proxy needed
       const [mainResponse, shellResponse] = await Promise.all([
-        fetchCSV(GOOGLE_SHEETS_CSV_URL),
-        fetchCSV(SHELL_MASTER_CSV_URL).catch(err => {
+        fetch(GOOGLE_SHEETS_CSV_URL, { cache: 'no-cache' }),
+        fetch(SHELL_MASTER_CSV_URL,  { cache: 'no-cache' }).catch(err => {
           console.warn('Shell Master fetch error:', err);
           return null;
         })
       ]);
 
       if (!mainResponse || !mainResponse.ok) {
-        throw new Error('Failed to fetch data from Google Sheets (HTTP ' + (mainResponse?.status || 'network error') + ')');
+        throw new Error('Failed to fetch main sheet (HTTP ' + (mainResponse?.status || 'network error') + ')');
       }
 
       if (!shellResponse || !shellResponse.ok) {
