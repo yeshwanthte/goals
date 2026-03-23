@@ -5933,10 +5933,12 @@
       }
     });
 
-    // Structure revenue from Shell Master
-    const slabRowsKpi = rawShell.filter(r => (r.Category || '').toLowerCase().includes('slab'));
-    const baseKpi = slabRowsKpi.length > 0 ? slabRowsKpi : rawShell;
-    const shellSourceKpi = projectSelPA.size > 0 ? baseKpi.filter(r => projectSelPA.has(r.Project)) : baseKpi;
+    // Structure revenue — same formula as Shell Tracker:
+    // use all Shell Master rows that have a Tower, filtered by selected projects and year
+    const allShellRows = rawShell.filter(r => r.Tower);
+    const shellSourceKpi = projectSelPA.size > 0
+      ? allShellRows.filter(r => projectSelPA.has(r.Project))
+      : allShellRows;
     let structPlanRev = 0, structActualRev = 0, structPlanNos = 0, structActualNos = 0;
     shellSourceKpi.forEach(row => {
       const planDate = parseDate(row.PlanDate);
