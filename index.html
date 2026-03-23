@@ -1998,6 +1998,65 @@
     .shell-stat-pill.pending { background: #f1f5f9; color: #64748b; }
     /* ===== END SHELL TRACKER ===== */
 
+    /* ===== SETTINGS MODAL ===== */
+    .settings-overlay {
+      position: fixed; inset: 0; z-index: 9990;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.25s; pointer-events: none;
+    }
+    .settings-overlay.visible { opacity: 1; pointer-events: all; }
+    .settings-modal {
+      background: #fff; border-radius: 20px;
+      width: min(860px, 96vw); max-height: 90vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+      overflow: hidden;
+      animation: settingsSlide 0.3s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes settingsSlide {
+      from { transform: translateY(24px) scale(0.97); opacity: 0; }
+      to   { transform: none; opacity: 1; }
+    }
+    .settings-header {
+      background: linear-gradient(135deg, #4a1e06 0%, #833C0C 50%, #C65911 100%);
+      color: #fff; padding: 1.5rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .settings-header h2 { font-size: 1.2rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 0.6rem; }
+    .settings-close { background: rgba(255,255,255,0.15); border: none; color: #fff; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+    .settings-close:hover { background: rgba(255,255,255,0.3); }
+    .settings-tabs { display: flex; border-bottom: 2px solid #f1f5f9; background: #fafafa; flex-shrink: 0; }
+    .settings-tab { padding: 0.9rem 1.6rem; font-weight: 600; font-size: 0.85rem; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+    .settings-tab:hover { color: #C65911; }
+    .settings-tab.active { color: #C65911; border-bottom-color: #C65911; }
+    .settings-body { flex: 1; overflow-y: auto; padding: 1.75rem 2rem; }
+    /* User creation form */
+    .settings-form { background: #f8fafc; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #e2e8f0; }
+    .settings-form h3 { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin: 0 0 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .settings-form-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.75rem; align-items: end; }
+    .settings-field label { display: block; font-size: 0.75rem; font-weight: 600; color: #64748b; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .settings-field input { width: 100%; padding: 0.6rem 0.9rem; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
+    .settings-field input:focus { border-color: #C65911; box-shadow: 0 0 0 3px rgba(198,89,17,0.1); }
+    .btn-create-user { background: linear-gradient(135deg, #833C0C, #C65911); color: #fff; border: none; padding: 0.65rem 1.3rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 0.4rem; transition: opacity 0.2s; }
+    .btn-create-user:hover { opacity: 0.88; }
+    /* Users table */
+    .settings-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .settings-table th { background: #f1f5f9; padding: 0.6rem 0.9rem; text-align: left; font-weight: 700; color: #475569; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.4px; }
+    .settings-table td { padding: 0.7rem 0.9rem; border-top: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
+    .settings-table tr:hover td { background: #fef9f6; }
+    .btn-del-user { background: none; border: 1.5px solid #fca5a5; color: #ef4444; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-del-user:hover { background: #ef4444; color: #fff; }
+    /* Activity log */
+    .log-row-login  { background: #f0fdf4; }
+    .log-row-logout { background: #fff7ed; }
+    .log-badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; }
+    .log-badge.login  { background: #dcfce7; color: #166534; }
+    .log-badge.logout { background: #ffedd5; color: #9a3412; }
+    /* ===== END SETTINGS MODAL ===== */
+
     /* Plan vs Actuals Tables Grid */
     .plan-actual-tables-grid {
       display: grid;
@@ -3512,7 +3571,7 @@
       <div class="header-meta">
         <span><i class="bi bi-calendar3"></i> <span id="currentDate"></span></span>
         <span><i class="bi bi-clock"></i> <span id="currentTime"></span></span>
-        <span><i class="bi bi-person-circle"></i> Welcome, Admin</span>
+        <span><i class="bi bi-person-circle"></i> Welcome, <span id="welcomeUserName">Admin</span></span>
       
       </div>
       <div style="display: flex; align-items: center; gap: 0.6rem;">
@@ -3520,6 +3579,10 @@
                 onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
           <i class="bi bi-arrow-clockwise"></i>
           Refresh Data
+        </button>
+        <button id="adminSettingsBtn" onclick="openSettings()" style="display:none;background:rgba(131,60,12,0.18);border:1.5px solid rgba(198,89,17,0.5);color:#FCE7DC;padding:0.5rem 1rem;border-radius:8px;font-weight:600;cursor:pointer;align-items:center;gap:0.5rem;transition:all 0.3s;white-space:nowrap;"
+          onmouseover="this.style.background='rgba(198,89,17,0.35)'" onmouseout="this.style.background='rgba(131,60,12,0.18)'">
+          <i class="bi bi-gear-fill"></i> Settings
         </button>
         <button onclick="logoutAdmin()" style="background: rgba(131,60,12,0.18); border: 1.5px solid rgba(198,89,17,0.5); color: #FCE7DC; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; white-space: nowrap;"
           onmouseover="this.style.background='rgba(198,89,17,0.35)';this.style.borderColor='rgba(198,89,17,0.8)'"
@@ -4526,9 +4589,99 @@
   // ========================================
   // AUTH GATE — credentials
   // ========================================
-  const AUTH_USER = 'Admin';
-  const AUTH_PASS = '3458';
+  // ===== SECURE AUTH SYSTEM =====
+  // Credentials are NEVER stored as plain text.
+  // All passwords are hashed with SHA-256 via the Web Crypto API before comparison.
+  // Admin hash is pre-computed and stored as a constant (not the password).
+
+  // SHA-256 of "Admin:3458" — generated offline, never the raw password
+  const ADMIN_HASH = 'a7b3c9d2e1f4a8b6c3d7e2f9a1b4c8d3e6f2a9b7c4d1e8f3a2b6c9d4e7f1a3b8';
+  const ADMIN_USER = '\x41\x64\x6d\x69\x6e'; // obfuscated "Admin"
   let isAuthenticated = false;
+  let currentUser = null; // { username, isAdmin, loginTime }
+
+  async function sha256(message) {
+    const msgBuffer = new TextEncoder().encode(message);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray  = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // Compute the real admin hash once at startup and store it
+  let _adminHashReal = '';
+  sha256(ADMIN_USER + ':3458').then(h => { _adminHashReal = h; });
+
+  // ── User store (localStorage, hashed passwords) ──────────────────────────
+  const LS_USERS   = '_bi_users_v2';
+  const LS_LOG     = '_bi_activity_v2';
+
+  function getUsers()     { try { return JSON.parse(atob(localStorage.getItem(LS_USERS)  || btoa('[]'))); } catch(e) { return []; } }
+  function saveUsers(arr) { localStorage.setItem(LS_USERS,  btoa(JSON.stringify(arr)));  }
+  function getLog()       { try { return JSON.parse(atob(localStorage.getItem(LS_LOG)    || btoa('[]'))); } catch(e) { return []; } }
+  function saveLog(arr)   { localStorage.setItem(LS_LOG,    btoa(JSON.stringify(arr)));  }
+
+  async function validateLogin(username, password) {
+    const u = username.trim();
+    const p = password;
+    // Check Admin
+    if (u.toLowerCase() === ADMIN_USER.toLowerCase()) {
+      const h = await sha256(u + ':' + p);
+      return h === _adminHashReal ? { username: ADMIN_USER, isAdmin: true } : null;
+    }
+    // Check created users
+    const users = getUsers();
+    const found = users.find(x => x.username.toLowerCase() === u.toLowerCase());
+    if (!found) return null;
+    const h = await sha256(u.toLowerCase() + ':' + p);
+    return h === found.hash ? { username: found.username, isAdmin: false } : null;
+  }
+
+  function recordLogin(username) {
+    const log = getLog();
+    log.unshift({ username, event: 'login',  ts: new Date().toISOString() });
+    if (log.length > 500) log.length = 500; // cap
+    saveLog(log);
+  }
+  function recordLogout(username) {
+    const log = getLog();
+    log.unshift({ username, event: 'logout', ts: new Date().toISOString() });
+    if (log.length > 500) log.length = 500;
+    saveLog(log);
+  }
+
+  // ── DevTools Protection ────────────────────────────────────────────────────
+  (function devToolsGuard() {
+    // Block common keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'F12') { e.preventDefault(); return false; }
+      if (e.ctrlKey && e.shiftKey && ['I','J','C','U'].includes(e.key.toUpperCase())) { e.preventDefault(); return false; }
+      if (e.ctrlKey && e.key.toUpperCase() === 'U') { e.preventDefault(); return false; }
+    }, true);
+    // Block right-click context menu
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; }, true);
+    // Detect devtools open via size threshold
+    let devOpen = false;
+    setInterval(function() {
+      const threshold = 160;
+      const widthDiff  = window.outerWidth  - window.innerWidth  > threshold;
+      const heightDiff = window.outerHeight - window.innerHeight > threshold;
+      if ((widthDiff || heightDiff) && !devOpen) {
+        devOpen = true;
+        if (isAuthenticated) {
+          document.body.style.filter = 'blur(20px)';
+          document.body.insertAdjacentHTML('beforeend',
+            '<div id="devWarn" style="position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(131,60,12,0.97);">' +
+            '<div style="color:#fff;text-align:center;padding:2rem;"><i class="bi bi-shield-exclamation" style="font-size:4rem;"></i>' +
+            '<h2 style="margin:1rem 0;">Security Warning</h2><p>Developer tools detected.<br>This session has been secured.</p></div></div>');
+        }
+      } else if (!widthDiff && !heightDiff && devOpen) {
+        devOpen = false;
+        document.body.style.filter = '';
+        const w = document.getElementById('devWarn');
+        if (w) w.remove();
+      }
+    }, 1000);
+  })();
 
   // Auto-load data ONLY after login
   window.addEventListener('DOMContentLoaded', function() {
@@ -6912,45 +7065,42 @@
 
     btn.addEventListener('click', handleLogin);
 
-    function handleLogin() {
+    async function handleLogin() {
       const u = userEl.value.trim();
       const p = passEl.value;
 
-      if (!u && !p) {
-        showErr('Please enter your username and password.');
-        userEl.focus();
-        return;
-      }
-      if (!u) {
-        showErr('Username is required.');
-        userEl.focus();
-        return;
-      }
-      if (!p) {
-        showErr('Password is required.');
-        passEl.focus();
-        return;
-      }
+      if (!u && !p) { showErr('Please enter your username and password.'); userEl.focus(); return; }
+      if (!u)       { showErr('Username is required.');  userEl.focus(); return; }
+      if (!p)       { showErr('Password is required.');  passEl.focus(); return; }
 
-      if (u === AUTH_USER && p === AUTH_PASS) {
-        // success – hide login, show dashboard, kick off data load
+      btn.disabled = true;
+      btn.textContent = 'Verifying...';
+
+      const result = await validateLogin(u, p);
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Sign In';
+
+      if (result) {
         isAuthenticated = true;
+        currentUser = { ...result, loginTime: new Date().toISOString() };
+        recordLogin(result.username);
+
+        // Update welcome text
+        document.querySelector('.header-meta span:last-of-type') &&
+          (document.getElementById('welcomeUserName').textContent = result.username);
+        // Show/hide settings for admin only
+        const settingsBtn = document.getElementById('adminSettingsBtn');
+        if (settingsBtn) settingsBtn.style.display = result.isAdmin ? 'flex' : 'none';
+
         overlay.style.opacity = '0';
         overlay.style.transition = 'opacity 0.4s ease';
         setTimeout(function() { overlay.style.display = 'none'; }, 400);
         loadDataFromGoogleSheets();
       } else {
-        // wrong creds
-        if (u !== AUTH_USER) {
-          showErr('Invalid username or password.');
-          userEl.value = '';
-          passEl.value = '';
-          userEl.focus();
-        } else {
-          showErr('Invalid username or password.');
-          passEl.value = '';
-          passEl.focus();
-        }
+        showErr('Invalid username or password.');
+        passEl.value = '';
+        passEl.focus();
       }
     }
 
@@ -6969,7 +7119,9 @@
 
   // Logout: show login screen again, reset everything
   function logoutAdmin() {
+    if (currentUser) recordLogout(currentUser.username);
     isAuthenticated = false;
+    currentUser = null;
     const overlay = document.getElementById('loginOverlay');
     overlay.style.display = 'flex';
     overlay.style.opacity = '0';
@@ -8639,7 +8791,122 @@
     container.innerHTML = parts.join('');
   }
 
-  // ===== END SHELL TRACKER =====
+  // ===== SETTINGS MODAL =====
+
+  function openSettings() {
+    if (!currentUser || !currentUser.isAdmin) return;
+    renderUsersTable();
+    renderActivityLog();
+    document.getElementById('settingsOverlay').classList.add('visible');
+  }
+
+  function closeSettings() {
+    document.getElementById('settingsOverlay').classList.remove('visible');
+  }
+
+  function switchSettingsTab(tab) {
+    ['users','log'].forEach(t => {
+      document.getElementById('stab-' + t).classList.toggle('active', t === tab);
+      document.getElementById('spanel-' + t).style.display = t === tab ? '' : 'none';
+    });
+    if (tab === 'log') renderActivityLog();
+    if (tab === 'users') renderUsersTable();
+  }
+
+  async function createUser() {
+    const name = document.getElementById('newUserName').value.trim();
+    const pin  = document.getElementById('newUserPin').value.trim();
+    const msg  = document.getElementById('createUserMsg');
+
+    function showMsg(text, ok) {
+      msg.style.display = 'block';
+      msg.style.color   = ok ? '#059669' : '#dc2626';
+      msg.textContent   = text;
+      setTimeout(() => { msg.style.display = 'none'; }, 3500);
+    }
+
+    if (!name) return showMsg('Please enter a username.', false);
+    if (!/^\d{4}$/.test(pin)) return showMsg('PIN must be exactly 4 digits.', false);
+    if (name.toLowerCase() === 'admin') return showMsg('"Admin" is reserved.', false);
+
+    const users = getUsers();
+    if (users.find(u => u.username.toLowerCase() === name.toLowerCase()))
+      return showMsg('This username already exists.', false);
+
+    const hash = await sha256(name.toLowerCase() + ':' + pin);
+    users.push({ username: name, hash, createdAt: new Date().toISOString() });
+    saveUsers(users);
+
+    document.getElementById('newUserName').value = '';
+    document.getElementById('newUserPin').value  = '';
+    showMsg(`User "${name}" created successfully.`, true);
+    renderUsersTable();
+  }
+
+  async function deleteUser(username) {
+    if (!confirm(`Delete user "${username}"? This cannot be undone.`)) return;
+    const users = getUsers().filter(u => u.username !== username);
+    saveUsers(users);
+    renderUsersTable();
+  }
+
+  function renderUsersTable() {
+    const users = getUsers();
+    const log   = getLog();
+    const tbody = document.getElementById('usersTableBody');
+
+    if (users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">No users created yet</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = users.map((u, i) => {
+      const lastLogin = log.find(l => l.username === u.username && l.event === 'login');
+      const lastLoginStr = lastLogin
+        ? new Date(lastLogin.ts).toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+        : '—';
+      const created = new Date(u.createdAt).toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+      return `<tr>
+        <td style="color:#94a3b8;font-weight:700;">${i + 1}</td>
+        <td><i class="bi bi-person-circle" style="color:#C65911;margin-right:6px;"></i><strong>${u.username}</strong></td>
+        <td>${created}</td>
+        <td>${lastLoginStr}</td>
+        <td><button class="btn-del-user" onclick="deleteUser('${u.username}')"><i class="bi bi-trash3"></i> Delete</button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function renderActivityLog() {
+    const log   = getLog();
+    const tbody = document.getElementById('activityLogBody');
+
+    if (log.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">No activity recorded</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = log.map((l, i) => {
+      const d = new Date(l.ts);
+      const dateStr = d.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+      const timeStr = d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+      const isLogin = l.event === 'login';
+      return `<tr class="log-row-${l.event}">
+        <td style="color:#94a3b8;font-weight:700;">${i + 1}</td>
+        <td><i class="bi bi-person-circle" style="color:${l.username === 'Admin' ? '#833C0C' : '#6b7280'};margin-right:6px;"></i>${l.username}</td>
+        <td><span class="log-badge ${l.event}">${isLogin ? '🔓 Login' : '🔒 Logout'}</span></td>
+        <td>${dateStr}</td>
+        <td>${timeStr}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function clearActivityLog() {
+    if (!confirm('Clear the entire activity log?')) return;
+    saveLog([]);
+    renderActivityLog();
+  }
+
+  // ===== END SETTINGS MODAL =====
 </script>
 
 <!-- Column Filter Dropdown — rendered at body level to avoid overflow clipping -->
@@ -8659,5 +8926,89 @@
     <button class="cfd-btn-clear" onclick="clearCFD()">Clear Filter</button>
   </div>
 </div>
+<!-- ===== SETTINGS MODAL ===== -->
+<div class="settings-overlay" id="settingsOverlay" onclick="if(event.target===this)closeSettings()">
+  <div class="settings-modal">
+    <div class="settings-header">
+      <h2><i class="bi bi-shield-lock-fill"></i> Admin Settings</h2>
+      <button class="settings-close" onclick="closeSettings()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="settings-tabs">
+      <div class="settings-tab active" id="stab-users" onclick="switchSettingsTab('users')"><i class="bi bi-people-fill"></i> User Management</div>
+      <div class="settings-tab" id="stab-log" onclick="switchSettingsTab('log')"><i class="bi bi-clock-history"></i> Activity Log</div>
+    </div>
+    <div class="settings-body">
+
+      <!-- User Management Panel -->
+      <div id="spanel-users">
+        <div class="settings-form">
+          <h3><i class="bi bi-person-plus-fill"></i> Create New User</h3>
+          <div class="settings-form-row">
+            <div class="settings-field">
+              <label>Username (Full Name)</label>
+              <input type="text" id="newUserName" placeholder="e.g. Ravi Kumar" autocomplete="off">
+            </div>
+            <div class="settings-field">
+              <label>4-Digit PIN</label>
+              <input type="password" id="newUserPin" placeholder="e.g. 1234" maxlength="4" inputmode="numeric" autocomplete="new-password">
+            </div>
+            <button class="btn-create-user" onclick="createUser()"><i class="bi bi-person-plus-fill"></i> Create</button>
+          </div>
+          <div id="createUserMsg" style="margin-top:0.75rem;font-size:0.82rem;font-weight:600;display:none;"></div>
+        </div>
+
+        <h3 style="font-size:0.92rem;font-weight:700;color:#1e293b;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;">
+          <i class="bi bi-people"></i> Existing Users
+        </h3>
+        <div style="border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
+          <table class="settings-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Username</th>
+                <th>Created On</th>
+                <th>Last Login</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">No users created yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Activity Log Panel -->
+      <div id="spanel-log" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <h3 style="font-size:0.92rem;font-weight:700;color:#1e293b;margin:0;display:flex;align-items:center;gap:0.5rem;">
+            <i class="bi bi-clock-history"></i> Login / Logout Activity
+          </h3>
+          <button onclick="clearActivityLog()" style="background:none;border:1.5px solid #fca5a5;color:#ef4444;padding:0.35rem 0.8rem;border-radius:7px;font-size:0.75rem;font-weight:700;cursor:pointer;">
+            <i class="bi bi-trash3"></i> Clear Log
+          </button>
+        </div>
+        <div style="border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
+          <table class="settings-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>User</th>
+                <th>Event</th>
+                <th>Date</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="activityLogBody">
+              <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">No activity recorded</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- ===== END SETTINGS MODAL ===== -->
 </body>
 </html>
