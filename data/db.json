@@ -6,21 +6,5 @@
       "createdAt": "2026-03-23T07:11:13.247Z"
     }
   ],
-  "log": [
-    {
-      "username": "Yeshwanth",
-      "event": "login",
-      "ts": "2026-03-23T16:28:17.249Z"
-    },
-    {
-      "username": "Yeshwanth",
-      "event": "login",
-      "ts": "2026-03-23T16:26:47.395Z"
-    },
-    {
-      "username": "Yeshwanth",
-      "event": "login",
-      "ts": "2026-03-23T16:16:54.131Z"
-    }
-  ]
+  "log": []
 }
