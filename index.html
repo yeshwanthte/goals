@@ -4917,6 +4917,7 @@
     PLASTER_PLAN: 11, // Column L (index 11)
     PLASTER_ACTUAL: 36,  // Column AK (index 36)
     FLOORING_PLAN: 14, // Column O (index 14)
+    FLOORING_PROJECTED: 15, // Column P (index 15) — Flooring projected completion
     FLOORING_ACTUAL: 39, // Column AN (index 39)
     HANDOVER_PLAN: 26, // Column AA (index 26)
     HANDOVER_ACTUAL: 51,  // Column AZ (index 51)
@@ -5023,6 +5024,7 @@
       PlasterPlan: r[COL.PLASTER_PLAN] || "",
       PlasterActual: r[COL.PLASTER_ACTUAL] || "",
       FlooringPlan: r[COL.FLOORING_PLAN] || "",
+      FlooringProjected: r[COL.FLOORING_PROJECTED] || "",
       FlooringActual: r[COL.FLOORING_ACTUAL] || "",
       HandoverPlan: r[COL.HANDOVER_PLAN] || "",
       HandoverActual: r[COL.HANDOVER_ACTUAL] || "",
@@ -7977,25 +7979,37 @@
     
     // === SECTION 4: CONSTRUCTION ACTIVITIES ===
     const activities = [
-      { name: 'GFC Released', completed: !!unit.GFC },
-      { name: 'Plaster', completed: !!unit.Plaster },
-      { name: 'Flooring & Dado', completed: !!unit.Floor },
-      { name: 'HVAC Installed', completed: !!unit.HVAC },
-      { name: 'False Ceiling', completed: !!unit.False },
-      { name: 'Fenestration', completed: !!unit.Fenest },
-      { name: 'Ready for Handover', completed: !!unit.Hand }
+      { name: 'GFC Released',     completed: !!unit.GFC,     projected: null },
+      { name: 'Plaster',          completed: !!unit.Plaster,  projected: unit.PlasterPlan },
+      { name: 'Flooring & Dado',  completed: !!unit.Floor,    projected: unit.FlooringProjected },
+      { name: 'HVAC Installed',   completed: !!unit.HVAC,    projected: null },
+      { name: 'False Ceiling',    completed: !!unit.False,   projected: null },
+      { name: 'Fenestration',     completed: !!unit.Fenest,  projected: null },
+      { name: 'Ready for Handover', completed: !!unit.Hand,  projected: unit.HandoverPlan }
     ];
-    
-    const activityHTML = activities.map(a => `
+
+    const activityHTML = activities.map(a => {
+      // Show projected date only when pending and a date is available
+      let projectedTag = '';
+      if (!a.completed && a.projected) {
+        const pd = parseDate(a.projected);
+        const projStr = pd ? formatDateDDMMMYY(pd) : formatRawDate(a.projected);
+        if (projStr && projStr !== 'N/A') {
+          projectedTag = `<span style="font-size:0.68rem;color:#C65911;font-weight:600;background:#FCE7DC;padding:2px 8px;border-radius:50px;margin-left:0.5rem;white-space:nowrap;">
+            <i class="bi bi-calendar-event" style="margin-right:3px;"></i>${projStr}
+          </span>`;
+        }
+      }
+      return `
       <div class="unit-activity-item ${a.completed ? 'completed' : ''}">
-        <span class="unit-activity-name">${a.name}</span>
+        <span class="unit-activity-name">${a.name}${projectedTag}</span>
         <span class="unit-activity-status ${a.completed ? 'completed' : 'pending'}">
           <i class="bi bi-${a.completed ? 'check-circle-fill' : 'circle'}"></i>
           ${a.completed ? 'Completed' : 'Pending'}
         </span>
-      </div>
-    `).join('');
-    
+      </div>`;
+    }).join('');
+
     document.getElementById('popupActivityList').innerHTML = activityHTML;
     
     // Show overlay
