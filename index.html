@@ -3643,6 +3643,10 @@
           <div class="filter-card-body"><div id="inventorySlicer" class="slicer"></div></div>
         </div>
         <div class="filter-card">
+          <div class="filter-card-header"><i class="bi bi-calendar-check"></i> IDSA Status</div>
+          <div class="filter-card-body"><div id="idsaSlicer" class="slicer"></div></div>
+        </div>
+        <div class="filter-card">
           <div class="filter-card-header"><i class="bi bi-file-check"></i> GFC Status</div>
           <div class="filter-card-body"><div id="gfcSlicer" class="slicer"></div></div>
         </div>
@@ -3791,10 +3795,11 @@
                   <th class="sortable" onclick="sortTable(3)">Unit No.<button class="col-filter-btn" data-table="milestone" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(4)">Customer Name<button class="col-filter-btn" data-table="milestone" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(5)">Revenue (₹ Cr)<button class="col-filter-btn" data-table="milestone" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(6)" style="text-align:center;">GFC<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(7)" style="text-align:center;">Plaster<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(8)" style="text-align:center;">Flooring<button class="col-filter-btn" data-table="milestone" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(9)" style="text-align:center;">Fenestration<button class="col-filter-btn" data-table="milestone" data-col="9" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(6)" style="text-align:center;">IDSA<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(7)" style="text-align:center;">GFC<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(8)" style="text-align:center;">Plaster<button class="col-filter-btn" data-table="milestone" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(9)" style="text-align:center;">Flooring<button class="col-filter-btn" data-table="milestone" data-col="9" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(10)" style="text-align:center;">Fenestration<button class="col-filter-btn" data-table="milestone" data-col="10" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                 </tr>
               </thead>
               <tbody id="detailsTableBody"></tbody>
@@ -4652,7 +4657,7 @@
   let sortColumn = -1;
   let sortAscending = true;
   let projectSel = new Set(), towerSel = new Set(), phaseSel = new Set(),
-      inventorySel = new Set(), gfcSel = new Set(), ocSel = new Set();
+      inventorySel = new Set(), idsaSel = new Set(), gfcSel = new Set(), ocSel = new Set();
   
   // Plan vs Actuals filters
   let projectSelPA = new Set(), towerSelPA = new Set(), phaseSelPA = new Set(),
@@ -4927,7 +4932,7 @@
     // Get current filtered data
     const hasActiveFilters = projectSel.size > 0 || towerSel.size > 0 || 
                              phaseSel.size > 0 || inventorySel.size > 0 || 
-                             gfcSel.size > 0 || ocSel.size > 0;
+                             idsaSel.size > 0 || gfcSel.size > 0 || ocSel.size > 0;
     
     if (!hasActiveFilters) {
       // Remove all highlighting if no filters
@@ -4943,6 +4948,7 @@
       (!towerSel.size || towerSel.has(r.Tower)) &&
       (!phaseSel.size || phaseSel.has(r.Phase)) &&
       (!inventorySel.size || inventorySel.has(r.Inventory)) &&
+      (!idsaSel.size || idsaSel.has(r.IDSADate ? "Yes" : "No")) &&
       (!gfcSel.size || gfcSel.has(r.GFC ? "Yes" : "No")) &&
       (!ocSel.size || ocSel.has(r.OC))
     );
@@ -4951,6 +4957,7 @@
     const availableTowers = new Set(d.map(x => x.Tower));
     const availablePhases = new Set(d.map(x => x.Phase));
     const availableInventory = new Set(d.map(x => x.Inventory));
+    const availableIDSA = new Set(d.map(x => x.IDSADate ? "Yes" : "No"));
     const availableGFC = new Set(d.map(x => x.GFC ? "Yes" : "No"));
     const availableOC = new Set(d.map(x => x.OC));
 
@@ -4959,6 +4966,7 @@
     updateSlicerButtons('towerSlicer', availableTowers, towerSel);
     updateSlicerButtons('phaseSlicer', availablePhases, phaseSel);
     updateSlicerButtons('inventorySlicer', availableInventory, inventorySel);
+    updateSlicerButtons('idsaSlicer', availableIDSA, idsaSel);
     updateSlicerButtons('gfcSlicer', availableGFC, gfcSel);
     updateSlicerButtons('ocSlicer', availableOC, ocSel);
   }
@@ -4992,6 +5000,7 @@
     buildSlicer("towerSlicer", [...new Set(raw.map(r => r.Tower))], towerSel);
     buildSlicer("phaseSlicer", [...new Set(raw.map(r => r.Phase))], phaseSel);
     buildSlicer("inventorySlicer", [...new Set(raw.map(r => r.Inventory))], inventorySel);
+    buildSlicer("idsaSlicer", ["Yes", "No"], idsaSel);
     buildSlicer("gfcSlicer", ["Yes", "No"], gfcSel);
     buildSlicer("ocSlicer", ["OC recvd", "OC not recvd"], ocSel);
   }
@@ -5173,6 +5182,7 @@
       (!towerSel.size || towerSel.has(r.Tower)) &&
       (!phaseSel.size || phaseSel.has(r.Phase)) &&
       (!inventorySel.size || inventorySel.has(r.Inventory)) &&
+      (!idsaSel.size || idsaSel.has(r.IDSADate ? "Yes" : "No")) &&
       (!gfcSel.size || gfcSel.has(r.GFC ? "Yes" : "No")) &&
       (!ocSel.size || ocSel.has(r.OC))
     );
@@ -5428,7 +5438,7 @@
     if (currentDetailsData.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="10" style="text-align: center; padding: 2rem; color: var(--gray-400);">
+          <td colspan="11" style="text-align: center; padding: 2rem; color: var(--gray-400);">
             <i class="bi bi-info-circle" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
             No pending units for this activity
           </td>
@@ -5441,6 +5451,12 @@
       return done
         ? `<td style="text-align:center;"><i class="bi bi-check-circle-fill" style="color:#446A2C;font-size:1rem;"></i></td>`
         : `<td style="text-align:center;"><i class="bi bi-x-circle-fill" style="color:#d1d5db;font-size:1rem;"></i></td>`;
+    }
+    // IDSA: Yes/No text badge
+    function idsaCell(hasDate) {
+      return hasDate
+        ? `<td style="text-align:center;"><span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:50px;font-size:0.7rem;font-weight:700;">Yes</span></td>`
+        : `<td style="text-align:center;"><span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:50px;font-size:0.7rem;font-weight:700;">No</span></td>`;
     }
 
     // Apply column filters
@@ -5461,7 +5477,7 @@
         <td class="revenue-cell" style="font-size: 1.1rem;">
           <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
         </td>
-        <td colspan="4"></td>
+        <td colspan="5"></td>
       </tr>`];
 
     displayData.forEach(unit => {
@@ -5474,6 +5490,7 @@
           <td class="unit-number">${unit.UnitNo}</td>
           <td class="customer-name">${unit.Customer}</td>
           <td class="revenue-cell">₹${revenue}</td>
+          ${idsaCell(!!unit.IDSADate)}
           ${statusCell(!!unit.GFC)}
           ${statusCell(!!unit.Plaster)}
           ${statusCell(!!unit.Floor)}
@@ -5527,10 +5544,11 @@
           valA = a[currentRevenueField] || 0;
           valB = b[currentRevenueField] || 0;
           break;
-        case 6: valA = a.GFC    ? 1 : 0; valB = b.GFC    ? 1 : 0; break;
-        case 7: valA = a.Plaster ? 1 : 0; valB = b.Plaster ? 1 : 0; break;
-        case 8: valA = a.Floor   ? 1 : 0; valB = b.Floor   ? 1 : 0; break;
-        case 9: valA = a.Fenest  ? 1 : 0; valB = b.Fenest  ? 1 : 0; break;
+        case 6:  valA = a.IDSADate  ? 1 : 0; valB = b.IDSADate  ? 1 : 0; break;
+        case 7:  valA = a.GFC    ? 1 : 0; valB = b.GFC    ? 1 : 0; break;
+        case 8:  valA = a.Plaster ? 1 : 0; valB = b.Plaster ? 1 : 0; break;
+        case 9:  valA = a.Floor   ? 1 : 0; valB = b.Floor   ? 1 : 0; break;
+        case 10: valA = a.Fenest  ? 1 : 0; valB = b.Fenest  ? 1 : 0; break;
         default:
           return 0;
       }
@@ -5559,11 +5577,11 @@
     const excelData = [];
     
     // Add header row
-    excelData.push(['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', 'GFC Released', 'Plaster', 'Flooring & Dado', 'Fenestration']);
+    excelData.push(['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', 'IDSA Status', 'GFC Released', 'Plaster', 'Flooring & Dado', 'Fenestration']);
     
     // Add total row
     const totalRevenue = currentDetailsData.reduce((sum, unit) => sum + (unit[currentRevenueField] || 0), 0) / 10000000;
-    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue.toFixed(2), '', '', '', '']);
+    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue.toFixed(2), '', '', '', '', '']);
     
     // Add data rows
     currentDetailsData.forEach(unit => {
@@ -5575,6 +5593,7 @@
         unit.UnitNo,
         unit.Customer,
         revenue,
+        unit.IDSADate ? 'Yes' : 'No',
         unit.GFC    ? 'Done' : 'Pending',
         unit.Plaster ? 'Done' : 'Pending',
         unit.Floor   ? 'Done' : 'Pending',
@@ -5594,6 +5613,7 @@
       { wch: 12 },  // Unit No
       { wch: 25 },  // Customer Name
       { wch: 15 },  // Revenue
+      { wch: 13 },  // IDSA Status
       { wch: 14 },  // GFC Released
       { wch: 10 },  // Plaster
       { wch: 16 },  // Flooring & Dado
@@ -6172,10 +6192,11 @@
       case 3: return (unit.UnitNo   || '').toString();
       case 4: return (unit.Customer || '').toString();
       case 5: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
-      case 6: return unit.GFC    ? 'Done' : 'Pending';
-      case 7: return unit.Plaster ? 'Done' : 'Pending';
-      case 8: return unit.Floor   ? 'Done' : 'Pending';
-      case 9: return unit.Fenest  ? 'Done' : 'Pending';
+      case 6: return unit.IDSADate  ? 'Yes' : 'No';
+      case 7: return unit.GFC    ? 'Done' : 'Pending';
+      case 8: return unit.Plaster ? 'Done' : 'Pending';
+      case 9: return unit.Floor   ? 'Done' : 'Pending';
+      case 10: return unit.Fenest  ? 'Done' : 'Pending';
       default: return '';
     }
   }
