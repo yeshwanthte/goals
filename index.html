@@ -4758,54 +4758,58 @@
 
   // Function to load data from Google Sheets
   async function loadDataFromGoogleSheets() {
+    // When served from GitHub Pages, direct fetch of Google Sheets CSV is blocked by CORS.
+    // We use a reliable public CORS proxy as a fallback.
+    const PROXY = 'https://corsproxy.io/?';
+
+    async function fetchCSV(url) {
+      // Try direct first (works on localhost / some browsers)
+      try {
+        const r = await fetch(url, { cache: 'no-cache' });
+        if (r.ok) return r;
+      } catch(_) {}
+      // Fallback: CORS proxy
+      const r = await fetch(PROXY + encodeURIComponent(url), { cache: 'no-cache' });
+      return r;
+    }
+
     try {
       console.log('Fetching data from Google Sheets...');
 
-      // Fetch both sheets in parallel; shell failure is surfaced via console but won't block main sheet
       const [mainResponse, shellResponse] = await Promise.all([
-        fetch(GOOGLE_SHEETS_CSV_URL),
-        fetch(SHELL_MASTER_CSV_URL).catch(err => {
+        fetchCSV(GOOGLE_SHEETS_CSV_URL),
+        fetchCSV(SHELL_MASTER_CSV_URL).catch(err => {
           console.warn('Shell Master fetch error:', err);
           return null;
         })
       ]);
 
-      if (!mainResponse.ok) {
-        throw new Error('Failed to fetch data from Google Sheets');
+      if (!mainResponse || !mainResponse.ok) {
+        throw new Error('Failed to fetch data from Google Sheets (HTTP ' + (mainResponse?.status || 'network error') + ')');
       }
 
-      if (!shellResponse) {
-        console.warn('Shell Master sheet could not be reached (network error).');
-      } else if (!shellResponse.ok) {
-        console.warn('Shell Master sheet returned HTTP', shellResponse.status, '— check the GID and that the sheet is published.');
+      if (!shellResponse || !shellResponse.ok) {
+        console.warn('Shell Master sheet could not be reached — status:', shellResponse?.status);
       }
 
-      const mainCsvText = await mainResponse.text();
+      const mainCsvText  = await mainResponse.text();
       const shellCsvText = (shellResponse && shellResponse.ok) ? await shellResponse.text() : null;
 
-      if (!shellCsvText) {
-        console.warn('No Shell Master CSV text received — Structures table will be empty.');
-      }
+      if (!shellCsvText) console.warn('No Shell Master CSV — Structures table will be empty.');
 
       console.log('Data fetched successfully, parsing CSV...');
 
-      // Parse main sheet
       const mainPromise = new Promise((resolve, reject) => {
         Papa.parse(mainCsvText, {
-          header: false,
-          skipEmptyLines: true,
-          complete: res => resolve(res.data),
-          error: err => reject(err)
+          header: false, skipEmptyLines: true,
+          complete: res => resolve(res.data), error: err => reject(err)
         });
       });
 
-      // Parse shell sheet if available
       const shellPromise = shellCsvText ? new Promise((resolve, reject) => {
         Papa.parse(shellCsvText, {
-          header: false,
-          skipEmptyLines: true,
-          complete: res => resolve(res.data),
-          error: err => reject(err)
+          header: false, skipEmptyLines: true,
+          complete: res => resolve(res.data), error: err => reject(err)
         });
       }) : Promise.resolve(null);
 
