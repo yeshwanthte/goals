@@ -3571,7 +3571,7 @@
       <div class="header-meta">
         <span><i class="bi bi-calendar3"></i> <span id="currentDate"></span></span>
         <span><i class="bi bi-clock"></i> <span id="currentTime"></span></span>
-        <span><i class="bi bi-person-circle"></i> Welcome, <span id="welcomeUserName">Admin</span></span>
+        <span><i class="bi bi-person-circle"></i> Welcome, <span id="welcomeUserName">Yeshwanth</span></span>
       
       </div>
       <div style="display: flex; align-items: center; gap: 0.6rem;">
@@ -4691,7 +4691,7 @@
     // Check Admin
     if (u.toLowerCase() === ADMIN_USER.toLowerCase()) {
       const h = await sha256(u + ':' + p);
-      return h === _adminHashReal ? { username: ADMIN_USER, isAdmin: true } : null;
+      return h === _adminHashReal ? { username: 'Yeshwanth', isAdmin: true } : null;
     }
     // Check created users
     const users = getUsers();
