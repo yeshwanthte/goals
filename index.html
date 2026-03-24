@@ -3496,6 +3496,807 @@
       font-size: 0.9rem;
       color: var(--gray-400);
     }
+
+    /* ============================================================
+       PREMIUM ENHANCEMENTS — DARK MODE + ADVANCED ADMIN + UX++
+    ============================================================ */
+
+    /* ── Dark Mode Variables ── */
+    body.dark-mode {
+      --bg-page: #0d0f14;
+      --bg-card: #161a22;
+      --bg-card-hover: #1e2330;
+      --bg-header: linear-gradient(135deg, #1a0a02 0%, #2d1506 40%, #4a1e06 70%, #6b2d0a 100%);
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border-color: rgba(255,255,255,0.08);
+      --shadow-card: 0 8px 32px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.3);
+      background: radial-gradient(ellipse at 0% 0%, rgba(198,89,17,0.12) 0%, transparent 50%),
+                  radial-gradient(ellipse at 100% 100%, rgba(14,165,233,0.08) 0%, transparent 50%),
+                  #0d0f14;
+    }
+    body.dark-mode::before { display: none; }
+    body.dark-mode .card,
+    body.dark-mode .kpi-card,
+    body.dark-mode .filter-card,
+    body.dark-mode .tab-navigation,
+    body.dark-mode .tower-column,
+    body.dark-mode .search-box,
+    body.dark-mode .stage-kpi-bar,
+    body.dark-mode .work-front-kpi-container,
+    body.dark-mode .summary-table-card,
+    body.dark-mode .pa-kpi-section,
+    body.dark-mode .plan-actual-card,
+    body.dark-mode .shell-tracker-grid { background: #161a22 !important; border-color: rgba(255,255,255,0.07) !important; color: #f1f5f9; }
+    body.dark-mode .kpi-value, body.dark-mode .kpi-label,
+    body.dark-mode .card-header-custom h5,
+    body.dark-mode .filter-card-header,
+    body.dark-mode h5, body.dark-mode h6, body.dark-mode h4,
+    body.dark-mode .activity-table thead th,
+    body.dark-mode .details-table thead th,
+    body.dark-mode .activity-table tbody td,
+    body.dark-mode .details-table tbody td { color: #e2e8f0 !important; }
+    body.dark-mode .card-header-custom,
+    body.dark-mode .filter-card-header { background: #1e2330 !important; border-color: rgba(255,255,255,0.07) !important; }
+    body.dark-mode .activity-table thead,
+    body.dark-mode .details-table thead tr.sort-row th { background: #1e2330 !important; }
+    body.dark-mode .activity-table tbody tr:hover,
+    body.dark-mode .details-table tbody tr:hover { background: rgba(198,89,17,0.08) !important; }
+    body.dark-mode .activity-table tbody td,
+    body.dark-mode .details-table tbody td { border-color: rgba(255,255,255,0.05) !important; }
+    body.dark-mode .slicer button { background: #1e2330; border-color: rgba(255,255,255,0.1); color: #94a3b8; }
+    body.dark-mode .slicer button:hover { background: rgba(198,89,17,0.15); color: #FCE7DC; }
+    body.dark-mode .upload-section { background: #161a22; color: #e2e8f0; }
+    body.dark-mode .summary-table thead th { background: #1e2330 !important; }
+    body.dark-mode .summary-table tbody td { border-color: rgba(255,255,255,0.05) !important; color: #e2e8f0 !important; }
+    body.dark-mode .summary-table tbody tr:hover { background: rgba(255,255,255,0.04) !important; }
+    body.dark-mode .funnel-bar-container { background: rgba(255,255,255,0.06) !important; }
+    body.dark-mode .pa-kpi-item .pa-kpi-item-label { color: #94a3b8 !important; }
+    body.dark-mode .year-dropdown { background: #1e2330; color: #e2e8f0; border-color: rgba(255,255,255,0.1); }
+    body.dark-mode .search-input { background: #1e2330; border-color: rgba(255,255,255,0.1); color: #e2e8f0; }
+    body.dark-mode .search-dropdown { background: #1e2330; border-color: var(--primary); }
+    body.dark-mode .search-dropdown-item { border-color: rgba(255,255,255,0.05); color: #e2e8f0; }
+    body.dark-mode .search-dropdown-item:hover { background: rgba(198,89,17,0.1); }
+    body.dark-mode .tower-stat { background: rgba(255,255,255,0.04) !important; }
+    body.dark-mode .tower-legend { background: rgba(255,255,255,0.04) !important; }
+    body.dark-mode .tower-floor-label { color: #94a3b8 !important; }
+    body.dark-mode .tab-button { color: #94a3b8 !important; }
+    body.dark-mode .tab-button:hover { background: rgba(198,89,17,0.12) !important; color: #FCE7DC !important; }
+    body.dark-mode .unit-detail-card { background: #1a1f2e !important; }
+    body.dark-mode .unit-detail-section { border-color: rgba(255,255,255,0.07) !important; }
+    body.dark-mode .unit-info-item-premium { background: rgba(255,255,255,0.05) !important; }
+    body.dark-mode .unit-info-value-premium, body.dark-mode .unit-detail-unit-no, body.dark-mode .unit-detail-customer { color: #f1f5f9 !important; }
+    body.dark-mode .date-item { background: rgba(255,255,255,0.04) !important; border-color: rgba(255,255,255,0.08) !important; }
+    body.dark-mode .date-value { color: #e2e8f0 !important; }
+    body.dark-mode .unit-activity-item { background: rgba(255,255,255,0.04) !important; }
+    body.dark-mode .unit-detail-footer { background: rgba(255,255,255,0.04) !important; border-color: rgba(255,255,255,0.07) !important; }
+    body.dark-mode .pa-multi-card { background: #161a22 !important; border-color: rgba(255,255,255,0.07) !important; }
+    body.dark-mode .pa-kpi-item-value { color: #f1f5f9 !important; }
+    body.dark-mode .plan-actual-table thead th { background: #1e2330 !important; color: #94a3b8 !important; }
+    body.dark-mode .plan-actual-table tbody td { border-color: rgba(255,255,255,0.05) !important; color: #e2e8f0 !important; }
+    body.dark-mode .plan-actual-table tbody tr:hover { background: rgba(255,255,255,0.04) !important; }
+    body.dark-mode .col-filter-dropdown { background: #1e2330 !important; border-color: rgba(255,255,255,0.1) !important; }
+    body.dark-mode .cfd-header { background: #2a3040 !important; color: #e2e8f0 !important; }
+    body.dark-mode .cfd-search-wrap { background: #161a22 !important; }
+    body.dark-mode .cfd-search { background: transparent !important; color: #e2e8f0 !important; }
+    body.dark-mode .cfd-list label, body.dark-mode .cfd-select-all-row label { color: #e2e8f0 !important; }
+    body.dark-mode .cfd-select-all-row { border-color: rgba(255,255,255,0.07) !important; }
+
+    /* ── Dark Mode Toggle Button ── */
+    .dark-mode-toggle {
+      width: 44px; height: 24px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 12px;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      cursor: pointer;
+      position: relative;
+      transition: background 0.3s;
+      flex-shrink: 0;
+    }
+    .dark-mode-toggle::after {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: white;
+      top: 1px; left: 1px;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), background 0.3s;
+    }
+    body.dark-mode .dark-mode-toggle { background: rgba(198,89,17,0.5); border-color: rgba(198,89,17,0.8); }
+    body.dark-mode .dark-mode-toggle::after { transform: translateX(20px); background: #FFC000; }
+
+    /* ── Notification Bell ── */
+    .notif-bell-btn {
+      position: relative;
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.25);
+      color: white;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .notif-bell-btn:hover { background: rgba(255,255,255,0.25); transform: scale(1.08); }
+    .notif-badge {
+      position: absolute;
+      top: -4px; right: -4px;
+      background: #ef4444;
+      color: white;
+      font-size: 0.6rem;
+      font-weight: 700;
+      min-width: 16px; height: 16px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 3px;
+      border: 2px solid #C65911;
+      display: none;
+    }
+    .notif-badge.visible { display: flex; }
+
+    /* ── Notification Dropdown ── */
+    .notif-dropdown {
+      position: fixed;
+      top: 70px; right: 20px;
+      width: 340px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05);
+      z-index: 99998;
+      display: none;
+      overflow: hidden;
+      animation: slideDown2 0.2s cubic-bezier(0.4,0,0.2,1);
+    }
+    body.dark-mode .notif-dropdown { background: #1e2330; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    .notif-dropdown.visible { display: block; }
+    @keyframes slideDown2 { from { opacity:0; transform: translateY(-8px); } to { opacity:1; transform: translateY(0); } }
+    .notif-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: 700; font-size: 0.9rem; color: var(--gray-900);
+    }
+    body.dark-mode .notif-header { border-color: rgba(255,255,255,0.07); color: #f1f5f9; }
+    .notif-mark-all { font-size: 0.75rem; color: var(--primary); cursor: pointer; font-weight: 600; }
+    .notif-list { max-height: 320px; overflow-y: auto; }
+    .notif-item {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--gray-50);
+      cursor: pointer;
+      transition: background 0.15s;
+      display: flex; gap: 0.75rem;
+    }
+    body.dark-mode .notif-item { border-color: rgba(255,255,255,0.05); }
+    .notif-item:hover { background: var(--gray-50); }
+    body.dark-mode .notif-item:hover { background: rgba(255,255,255,0.04); }
+    .notif-item.unread { background: rgba(198,89,17,0.04); }
+    body.dark-mode .notif-item.unread { background: rgba(198,89,17,0.08); }
+    .notif-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; flex-shrink: 0;
+    }
+    .notif-icon.info { background: rgba(14,165,233,0.12); color: #0ea5e9; }
+    .notif-icon.success { background: rgba(16,185,129,0.12); color: #10b981; }
+    .notif-icon.warn { background: rgba(245,158,11,0.12); color: #f59e0b; }
+    .notif-icon.danger { background: rgba(239,68,68,0.12); color: #ef4444; }
+    .notif-text { flex: 1; }
+    .notif-title { font-size: 0.82rem; font-weight: 600; color: var(--gray-800); margin-bottom: 0.2rem; }
+    body.dark-mode .notif-title { color: #e2e8f0; }
+    .notif-desc { font-size: 0.75rem; color: var(--gray-500); line-height: 1.4; }
+    .notif-time { font-size: 0.68rem; color: var(--gray-400); margin-top: 0.25rem; }
+    .notif-footer { padding: 0.75rem 1.25rem; text-align: center; border-top: 1px solid var(--gray-100); }
+    body.dark-mode .notif-footer { border-color: rgba(255,255,255,0.07); }
+    .notif-footer a { font-size: 0.8rem; color: var(--primary); font-weight: 600; text-decoration: none; }
+
+    /* ── Toast Notifications ── */
+    .toast-container {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      z-index: 999999;
+      display: flex; flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .toast {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.1);
+      padding: 1rem 1.25rem;
+      min-width: 300px; max-width: 380px;
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      pointer-events: all;
+      animation: toastIn 0.35s cubic-bezier(0.4,0,0.2,1);
+      border-left: 4px solid var(--primary);
+      position: relative; overflow: hidden;
+    }
+    body.dark-mode .toast { background: #1e2330; color: #f1f5f9; }
+    .toast.success { border-left-color: var(--success); }
+    .toast.warning { border-left-color: var(--warning); }
+    .toast.danger { border-left-color: var(--danger); }
+    .toast.info { border-left-color: var(--secondary); }
+    .toast-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+    .toast.success .toast-icon { color: var(--success); }
+    .toast.warning .toast-icon { color: var(--warning); }
+    .toast.danger .toast-icon { color: var(--danger); }
+    .toast.info .toast-icon { color: var(--secondary); }
+    .toast-body { flex: 1; }
+    .toast-title { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.2rem; }
+    body.dark-mode .toast-title { color: #f1f5f9; }
+    .toast-msg { font-size: 0.78rem; color: var(--gray-600); line-height: 1.4; }
+    body.dark-mode .toast-msg { color: #94a3b8; }
+    .toast-close { background: none; border: none; color: var(--gray-400); cursor: pointer; font-size: 0.9rem; padding: 0; flex-shrink: 0; }
+    .toast-progress {
+      position: absolute; bottom: 0; left: 0; height: 3px;
+      background: currentColor; opacity: 0.3;
+      animation: toastProgress 4s linear forwards;
+    }
+    @keyframes toastIn { from { opacity:0; transform: translateX(40px); } to { opacity:1; transform: translateX(0); } }
+    @keyframes toastOut { to { opacity:0; transform: translateX(40px); } }
+    @keyframes toastProgress { from { width: 100%; } to { width: 0%; } }
+
+    /* ── Global Search Overlay (Cmd+K) ── */
+    .search-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+      z-index: 999997;
+      display: none; align-items: flex-start; justify-content: center;
+      padding-top: 10vh;
+    }
+    .search-overlay.visible { display: flex; animation: fadeIn 0.2s ease; }
+    .search-modal {
+      width: 100%; max-width: 600px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+      overflow: hidden;
+      animation: slideDown2 0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+    body.dark-mode .search-modal { background: #1a1f2e; }
+    .search-modal-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    body.dark-mode .search-modal-header { border-color: rgba(255,255,255,0.07); }
+    .search-modal-input {
+      flex: 1; border: none; outline: none;
+      font-size: 1.1rem; font-family: inherit;
+      color: var(--gray-900); background: transparent;
+    }
+    body.dark-mode .search-modal-input { color: #f1f5f9; }
+    .search-modal-input::placeholder { color: var(--gray-400); }
+    .search-modal-icon { color: var(--gray-400); font-size: 1.1rem; }
+    .search-modal-kbd {
+      background: var(--gray-100); border-radius: 6px;
+      padding: 0.2rem 0.5rem; font-size: 0.72rem; font-weight: 600;
+      color: var(--gray-500); white-space: nowrap;
+    }
+    body.dark-mode .search-modal-kbd { background: rgba(255,255,255,0.08); color: #94a3b8; }
+    .search-modal-results { max-height: 440px; overflow-y: auto; padding: 0.75rem; }
+    .search-result-group-label {
+      font-size: 0.68rem; text-transform: uppercase; font-weight: 700;
+      letter-spacing: 0.8px; color: var(--gray-400);
+      padding: 0.5rem 0.75rem; margin-top: 0.5rem;
+    }
+    .search-result-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.75rem; border-radius: 10px;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .search-result-item:hover, .search-result-item.focused { background: rgba(198,89,17,0.08); }
+    body.dark-mode .search-result-item:hover, body.dark-mode .search-result-item.focused { background: rgba(198,89,17,0.12); }
+    .search-result-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; flex-shrink: 0;
+      background: rgba(198,89,17,0.1); color: var(--primary);
+    }
+    .search-result-label { font-size: 0.88rem; font-weight: 600; color: var(--gray-800); }
+    body.dark-mode .search-result-label { color: #e2e8f0; }
+    .search-result-sub { font-size: 0.73rem; color: var(--gray-500); }
+    .search-result-arrow { color: var(--gray-300); font-size: 0.8rem; margin-left: auto; }
+    .search-modal-footer {
+      padding: 0.75rem 1.5rem;
+      border-top: 1px solid var(--gray-100);
+      display: flex; gap: 1.5rem;
+      font-size: 0.72rem; color: var(--gray-400);
+    }
+    body.dark-mode .search-modal-footer { border-color: rgba(255,255,255,0.07); }
+    .search-modal-footer span { display: flex; align-items: center; gap: 0.4rem; }
+    .search-modal-footer kbd {
+      background: var(--gray-100); border-radius: 4px;
+      padding: 0.1rem 0.4rem; font-size: 0.7rem; font-family: inherit;
+    }
+    body.dark-mode .search-modal-footer kbd { background: rgba(255,255,255,0.08); }
+
+    /* ── Keyboard Shortcuts Panel ── */
+    .shortcuts-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
+      z-index: 999997;
+      display: none; align-items: center; justify-content: center;
+    }
+    .shortcuts-overlay.visible { display: flex; animation: fadeIn 0.2s ease; }
+    .shortcuts-modal {
+      background: white; border-radius: 20px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+      width: 100%; max-width: 520px; max-height: 80vh; overflow-y: auto;
+      padding: 2rem;
+    }
+    body.dark-mode .shortcuts-modal { background: #1a1f2e; }
+    .shortcuts-title {
+      font-size: 1.1rem; font-weight: 700; color: var(--gray-900);
+      margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+    body.dark-mode .shortcuts-title { color: #f1f5f9; }
+    .shortcuts-group { margin-bottom: 1.5rem; }
+    .shortcuts-group-label {
+      font-size: 0.7rem; text-transform: uppercase; font-weight: 700;
+      letter-spacing: 0.8px; color: var(--primary);
+      margin-bottom: 0.75rem; padding-bottom: 0.4rem;
+      border-bottom: 1px solid rgba(198,89,17,0.2);
+    }
+    .shortcut-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.5rem 0; font-size: 0.82rem; color: var(--gray-700);
+    }
+    body.dark-mode .shortcut-row { color: #cbd5e1; }
+    .shortcut-keys { display: flex; gap: 0.3rem; }
+    .shortcut-keys kbd {
+      background: var(--gray-100); border: 1px solid var(--gray-300);
+      border-radius: 5px; padding: 0.2rem 0.5rem;
+      font-size: 0.72rem; font-weight: 600; font-family: inherit;
+      color: var(--gray-700); box-shadow: 0 1px 0 var(--gray-300);
+    }
+    body.dark-mode .shortcut-keys kbd { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.1); color: #e2e8f0; box-shadow: none; }
+
+    /* ── Session Timer ── */
+    .session-timer {
+      position: fixed;
+      bottom: 20px; left: 20px;
+      background: rgba(31,41,55,0.95);
+      backdrop-filter: blur(10px);
+      color: white;
+      border-radius: 12px;
+      padding: 0.6rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: none;
+      align-items: center; gap: 0.5rem;
+      z-index: 9990;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .session-timer:hover { background: rgba(31,41,55,1); transform: translateY(-2px); }
+    .session-timer.visible { display: flex; }
+    .session-timer.warn { border-color: rgba(245,158,11,0.5); background: rgba(120,53,15,0.95); }
+    .session-timer.critical { border-color: rgba(239,68,68,0.6); background: rgba(127,29,29,0.95); animation: timerPulse 1s infinite; }
+    @keyframes timerPulse { 0%,100% { box-shadow: 0 4px 20px rgba(239,68,68,0.3); } 50% { box-shadow: 0 4px 30px rgba(239,68,68,0.6); } }
+    .session-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; animation: pulse 2s infinite; }
+    .session-timer.warn .session-dot { background: #f59e0b; }
+    .session-timer.critical .session-dot { background: #ef4444; }
+
+    /* ── Admin Quick Access FAB ── */
+    .admin-fab {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      z-index: 9991;
+      display: none;
+    }
+    .admin-fab.visible { display: flex; flex-direction: column-reverse; align-items: flex-end; gap: 10px; }
+    .fab-main {
+      width: 54px; height: 54px;
+      background: linear-gradient(135deg, #833C0C 0%, #C65911 100%);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.3rem;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(198,89,17,0.4);
+      border: none;
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .fab-main:hover { transform: scale(1.1) rotate(45deg); box-shadow: 0 10px 32px rgba(198,89,17,0.5); }
+    .fab-items { display: flex; flex-direction: column-reverse; gap: 8px; align-items: flex-end; }
+    .fab-item {
+      display: flex; align-items: center; gap: 0.6rem;
+      background: white; border-radius: 10px; padding: 0.5rem 1rem 0.5rem 0.75rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      cursor: pointer; font-size: 0.8rem; font-weight: 600;
+      color: var(--gray-700);
+      transition: all 0.2s;
+      transform: scale(0.8) translateX(20px);
+      opacity: 0;
+      pointer-events: none;
+    }
+    body.dark-mode .fab-item { background: #1e2330; color: #e2e8f0; }
+    .admin-fab.open .fab-item { transform: scale(1) translateX(0); opacity: 1; pointer-events: all; }
+    .admin-fab.open .fab-item:nth-child(1) { transition: all 0.2s 0.05s; }
+    .admin-fab.open .fab-item:nth-child(2) { transition: all 0.2s 0.1s; }
+    .admin-fab.open .fab-item:nth-child(3) { transition: all 0.2s 0.15s; }
+    .admin-fab.open .fab-item:nth-child(4) { transition: all 0.2s 0.2s; }
+    .fab-item:hover { background: rgba(198,89,17,0.08); color: var(--primary); transform: scale(1.02) translateX(0) !important; }
+    .admin-fab.open .fab-main { transform: rotate(45deg); }
+
+    /* ── Premium Settings Modal Extended ── */
+    .settings-tab-ext {
+      background: none; border: none;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.82rem; font-weight: 600;
+      color: rgba(255,255,255,0.65);
+      cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      transition: all 0.2s; white-space: nowrap;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .settings-tab-ext:hover { color: white; background: rgba(255,255,255,0.07); }
+    .settings-tab-ext.active { color: white; border-bottom-color: #FFC000; background: rgba(255,255,255,0.1); }
+    .settings-panel-ext { display: none; }
+    .settings-panel-ext.visible { display: block; animation: fadeIn 0.25s ease; }
+
+    /* System Health Panel */
+    .sys-health-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .sys-health-card {
+      background: var(--gray-50); border-radius: 12px;
+      padding: 1.25rem; text-align: center;
+      border: 1px solid var(--gray-200);
+    }
+    .sys-health-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .sys-health-value { font-size: 1.6rem; font-weight: 800; color: var(--gray-900); line-height: 1; }
+    .sys-health-label { font-size: 0.72rem; color: var(--gray-500); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0.4rem; }
+    .sys-health-badge {
+      display: inline-block; padding: 0.25rem 0.75rem;
+      border-radius: 20px; font-size: 0.72rem; font-weight: 700;
+      margin-top: 0.5rem;
+    }
+    .sys-health-badge.ok { background: rgba(16,185,129,0.1); color: #059669; }
+    .sys-health-badge.warn { background: rgba(245,158,11,0.1); color: #d97706; }
+    .sys-health-badge.err { background: rgba(239,68,68,0.1); color: #dc2626; }
+
+    /* Branding Panel */
+    .branding-section {
+      background: var(--gray-50); border-radius: 12px; padding: 1.5rem;
+      border: 1px solid var(--gray-200); margin-bottom: 1rem;
+    }
+    .branding-section h4 { font-size: 0.85rem; font-weight: 700; color: var(--gray-800); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .branding-section h4 i { color: var(--primary); }
+    .branding-field { margin-bottom: 0.9rem; }
+    .branding-field label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--gray-600); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.3px; }
+    .branding-field input, .branding-field select {
+      width: 100%; padding: 0.6rem 0.9rem;
+      border: 1.5px solid var(--gray-200); border-radius: 8px;
+      font-size: 0.85rem; font-family: inherit; outline: none;
+      transition: border-color 0.2s;
+      background: white;
+    }
+    .branding-field input:focus, .branding-field select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(198,89,17,0.1); }
+    .color-palette { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+    .color-swatch {
+      width: 32px; height: 32px; border-radius: 8px; cursor: pointer;
+      border: 2px solid transparent; transition: all 0.2s;
+      position: relative;
+    }
+    .color-swatch:hover { transform: scale(1.15); }
+    .color-swatch.active::after {
+      content: '✓'; position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-weight: 700; font-size: 0.8rem;
+    }
+
+    /* Security Panel */
+    .security-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem; border-radius: 10px;
+      background: var(--gray-50); border: 1px solid var(--gray-200);
+      margin-bottom: 0.75rem;
+    }
+    .security-row-info h5 { font-size: 0.85rem; font-weight: 700; color: var(--gray-800); margin: 0 0 0.2rem; }
+    .security-row-info p { font-size: 0.75rem; color: var(--gray-500); margin: 0; }
+    .security-toggle {
+      width: 46px; height: 26px;
+      background: var(--gray-300); border-radius: 13px;
+      border: none; cursor: pointer; position: relative;
+      transition: background 0.25s;
+      flex-shrink: 0;
+    }
+    .security-toggle::after {
+      content: ''; position: absolute;
+      width: 20px; height: 20px; border-radius: 50%; background: white;
+      top: 3px; left: 3px;
+      transition: transform 0.25s; box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    }
+    .security-toggle.on { background: var(--success); }
+    .security-toggle.on::after { transform: translateX(20px); }
+    .session-timeout-control {
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .session-timeout-control input[type=range] {
+      width: 120px; accent-color: var(--primary);
+    }
+    .session-timeout-val {
+      font-size: 0.82rem; font-weight: 700;
+      color: var(--primary); min-width: 50px;
+    }
+
+    /* Export Panel */
+    .export-options-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;
+    }
+    .export-option-card {
+      background: var(--gray-50); border-radius: 12px; padding: 1.25rem;
+      border: 1.5px solid var(--gray-200); cursor: pointer; transition: all 0.2s;
+      display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
+      text-align: center;
+    }
+    .export-option-card:hover { border-color: var(--primary); background: rgba(198,89,17,0.04); transform: translateY(-2px); }
+    .export-option-icon { font-size: 2rem; }
+    .export-option-label { font-size: 0.85rem; font-weight: 700; color: var(--gray-800); }
+    .export-option-desc { font-size: 0.73rem; color: var(--gray-500); }
+
+    /* ── Announcement Banner ── */
+    .announcement-banner {
+      display: none;
+      background: linear-gradient(135deg, #833C0C 0%, #C65911 100%);
+      color: white; padding: 0.6rem 1.5rem;
+      text-align: center; font-size: 0.82rem; font-weight: 500;
+      position: relative; z-index: 100;
+      animation: fadeIn 0.3s ease;
+    }
+    .announcement-banner.visible { display: flex; align-items: center; justify-content: center; gap: 0.75rem; }
+    .announcement-close {
+      position: absolute; right: 1rem;
+      background: rgba(255,255,255,0.2); border: none; color: white;
+      width: 24px; height: 24px; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; transition: background 0.2s;
+    }
+    .announcement-close:hover { background: rgba(255,255,255,0.35); }
+    .announcement-input {
+      width: 100%;
+      padding: 0.6rem 0.9rem; border: 1.5px solid var(--gray-200);
+      border-radius: 8px; font-size: 0.85rem; font-family: inherit; outline: none;
+      transition: border-color 0.2s;
+    }
+    .announcement-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(198,89,17,0.1); }
+
+    /* ── Header Premium Upgrade ── */
+    .header-admin-controls {
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .header-icon-btn {
+      background: rgba(255,255,255,0.12);
+      border: 1.5px solid rgba(255,255,255,0.2);
+      color: white; border-radius: 8px;
+      padding: 0.45rem 0.7rem;
+      cursor: pointer; font-size: 0.78rem; font-weight: 600;
+      transition: all 0.2s; display: flex; align-items: center; gap: 0.4rem;
+      white-space: nowrap;
+    }
+    .header-icon-btn:hover { background: rgba(255,255,255,0.22); transform: translateY(-1px); }
+    .header-icon-btn i { font-size: 0.9rem; }
+
+    /* Online users indicator */
+    .online-users-badge {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: rgba(16,185,129,0.15);
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 20px; padding: 0.3rem 0.75rem;
+      font-size: 0.75rem; font-weight: 600; color: #6ee7b7;
+      white-space: nowrap;
+    }
+    .online-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; animation: pulse 2s infinite; }
+
+    /* Data freshness indicator */
+    .data-freshness {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.72rem; color: rgba(255,255,255,0.6);
+      white-space: nowrap;
+    }
+    .data-freshness i { font-size: 0.75rem; }
+
+    /* KPI animated counter */
+    .kpi-value.counting { transition: none; }
+
+    /* ── Progress ring for KPI cards ── */
+    .kpi-ring-wrap {
+      position: absolute; top: 0.75rem; right: 0.75rem;
+      width: 44px; height: 44px;
+    }
+    .kpi-ring-wrap svg { transform: rotate(-90deg); }
+    .kpi-ring-track { fill: none; stroke: var(--gray-100); stroke-width: 3; }
+    .kpi-ring-bar { fill: none; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1); }
+
+    /* ── Tab badge counts ── */
+    .tab-count-badge {
+      background: rgba(255,255,255,0.25);
+      color: white; font-size: 0.65rem; font-weight: 700;
+      padding: 0.15rem 0.45rem; border-radius: 20px;
+      margin-left: 0.3rem; border: 1px solid rgba(255,255,255,0.3);
+    }
+    .tab-button.active .tab-count-badge { background: rgba(255,255,255,0.3); }
+
+    /* ── Admin PIN reset button ── */
+    .btn-reset-pin {
+      background: rgba(245,158,11,0.12); border: 1.5px solid rgba(245,158,11,0.3);
+      color: #d97706; border-radius: 8px; padding: 0.35rem 0.75rem;
+      font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-reset-pin:hover { background: rgba(245,158,11,0.2); border-color: rgba(245,158,11,0.5); }
+
+    /* ── PIN Reset Modal ── */
+    .pin-reset-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+      z-index: 999999; display: none; align-items: center; justify-content: center;
+    }
+    .pin-reset-overlay.visible { display: flex; animation: fadeIn 0.2s ease; }
+    .pin-reset-modal {
+      background: white; border-radius: 16px; padding: 2rem;
+      width: 100%; max-width: 380px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      animation: slideDown2 0.25s ease;
+    }
+    .pin-reset-modal h3 { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+    .pin-reset-modal h3 i { color: var(--warning); }
+    .pin-reset-field { margin-bottom: 1rem; }
+    .pin-reset-field label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--gray-600); margin-bottom: 0.4rem; }
+    .pin-reset-field input { width: 100%; padding: 0.65rem 0.9rem; border: 1.5px solid var(--gray-200); border-radius: 8px; font-size: 0.9rem; font-family: inherit; outline: none; }
+    .pin-reset-field input:focus { border-color: var(--primary); }
+    .pin-reset-actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
+    .btn-pin-save {
+      flex: 1; padding: 0.7rem; background: linear-gradient(135deg, #833C0C, #C65911);
+      color: white; border: none; border-radius: 9px; font-weight: 700; font-size: 0.85rem; cursor: pointer;
+    }
+    .btn-pin-cancel {
+      padding: 0.7rem 1.25rem; background: var(--gray-100); color: var(--gray-700);
+      border: none; border-radius: 9px; font-weight: 600; font-size: 0.85rem; cursor: pointer;
+    }
+
+    /* ── Smooth entrance animations ── */
+    @keyframes kpiEntrance {
+      from { opacity: 0; transform: translateY(16px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .kpi-card { animation: kpiEntrance 0.4s cubic-bezier(0.4,0,0.2,1) both; }
+    .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+    .kpi-card:nth-child(2) { animation-delay: 0.1s; }
+    .kpi-card:nth-child(3) { animation-delay: 0.15s; }
+    .kpi-card:nth-child(4) { animation-delay: 0.2s; }
+    .kpi-card:nth-child(5) { animation-delay: 0.25s; }
+
+    /* ── Fullscreen mode ── */
+    .main-container.fullscreen-mode {
+      position: fixed; inset: 0; z-index: 9995;
+      background: white; overflow-y: auto;
+      max-width: 100%; padding: 1rem;
+    }
+    body.dark-mode .main-container.fullscreen-mode { background: #0d0f14; }
+
+    /* ── Premium scrollbar (dark mode) ── */
+    body.dark-mode ::-webkit-scrollbar-track { background: #1a1f2e; }
+    body.dark-mode ::-webkit-scrollbar-thumb { background: #374151; }
+    body.dark-mode ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+    /* ── Sticky Tab Nav on scroll ── */
+    .tab-navigation.sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 500;
+      border-radius: 0 !important;
+      margin-bottom: 0 !important;
+      border-top: none !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12) !important;
+    }
+
+    /* ── Print Styles ── */
+    @media print {
+      .dashboard-header, .tab-navigation, .filter-section,
+      .login-overlay, .admin-fab, .session-timer,
+      .toast-container, .notif-dropdown, .announcement-banner,
+      .btn-clear-filters, .btn-download-excel, .btn-close-details,
+      .col-filter-btn, .search-container, .upload-section,
+      #adminExtraControls { display: none !important; }
+      body { background: white !important; }
+      body.dark-mode { background: white !important; }
+      .card, .kpi-card, .summary-table-card, .plan-actual-card {
+        box-shadow: none !important; border: 1px solid #ddd !important;
+        break-inside: avoid;
+      }
+      .kpi-grid { grid-template-columns: repeat(5, 1fr) !important; }
+      .tab-content { display: block !important; }
+      h1, h2, h3, h4, h5, h6 { color: #1f2937 !important; }
+    }
+
+    /* ── Loading Skeleton for cards ── */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+    body.dark-mode .skeleton {
+      background: linear-gradient(90deg, #1e2330 25%, #252d3d 50%, #1e2330 75%);
+      background-size: 200% 100%;
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ── Hover tooltip for KPI cards ── */
+    .kpi-card .kpi-tooltip {
+      position: absolute;
+      bottom: 0.6rem; right: 0.75rem;
+      font-size: 0.68rem;
+      color: var(--gray-400);
+      font-weight: 500;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .kpi-card:hover .kpi-tooltip { opacity: 1; }
+
+    /* ── Improved upload zone with animated border ── */
+    .upload-zone {
+      background: linear-gradient(white, white) padding-box,
+                  linear-gradient(135deg, #C65911, #0ea5e9) border-box !important;
+      border: 2px solid transparent !important;
+    }
+
+    /* ── Glassmorphism enhancement for cards in dark mode ── */
+    body.dark-mode .card {
+      background: rgba(22, 26, 34, 0.95) !important;
+      backdrop-filter: blur(20px) !important;
+    }
+
+    /* ── Micro-animation: table row entrance ── */
+    @keyframes rowFadeIn {
+      from { opacity: 0; transform: translateX(-6px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .activity-table tbody tr, .details-table tbody tr {
+      animation: rowFadeIn 0.2s ease both;
+    }
+
+    /* ── Gradient text for KPI values on hover ── */
+    .kpi-card.primary:hover .kpi-value { 
+      background: linear-gradient(135deg, #833C0C, #e06b1a);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .kpi-card.success:hover .kpi-value { 
+      background: linear-gradient(135deg, #059669, #34d399);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Focus-visible outline for accessibility ── */
+    button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 2px solid var(--primary) !important;
+      outline-offset: 2px !important;
+    }
+
+    /* ── Smooth page transition ── */
+    .tab-content {
+      transition: opacity 0.25s ease;
+    }
+    .tab-content:not(.active) { opacity: 0; pointer-events: none; }
+    .tab-content.active { opacity: 1; }
+  </style>
+
+  <!-- Premium print stylesheet -->
+  <style media="print">
+    * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
+    .main-container { padding: 0 !important; }
+    .kpi-card::before { -webkit-print-color-adjust: exact !important; }
   </style>
 </head>
 
@@ -3559,6 +4360,13 @@
 </div>
 
 
+<!-- Announcement Banner -->
+<div class="announcement-banner" id="announcementBanner">
+  <i class="bi bi-megaphone-fill"></i>
+  <span id="announcementText"></span>
+  <button class="announcement-close" onclick="closeAnnouncement()"><i class="bi bi-x"></i></button>
+</div>
+
 <!-- Header -->
 <header class="dashboard-header">
   <div class="header-content">
@@ -3584,10 +4392,38 @@
           onmouseover="this.style.background='rgba(198,89,17,0.35)'" onmouseout="this.style.background='rgba(131,60,12,0.18)'">
           <i class="bi bi-gear-fill"></i> Settings
         </button>
+        <!-- Premium Admin Controls -->
+        <div class="header-admin-controls" id="adminExtraControls" style="display:none;">
+          <div class="online-users-badge" id="onlineUsersBadge">
+            <span class="online-dot"></span>
+            <span id="onlineCount">1 online</span>
+          </div>
+          <div class="data-freshness" id="dataFreshnessInfo">
+            <i class="bi bi-clock"></i>
+            <span id="dataFreshnessText">Loading...</span>
+          </div>
+          <button class="header-icon-btn" onclick="toggleDarkMode()" id="darkModeBtn" data-tooltip="Toggle Dark Mode" title="Dark Mode">
+            <i class="bi bi-moon-fill" id="darkModeIcon"></i>
+          </button>
+          <button class="header-icon-btn" onclick="openGlobalSearch()" data-tooltip="Global Search (Ctrl+K)" title="Search">
+            <i class="bi bi-search"></i>
+          </button>
+          <button class="header-icon-btn" onclick="refreshData()" data-tooltip="Refresh Data" title="Refresh">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+          <button class="header-icon-btn" onclick="toggleFullscreen()" id="fullscreenBtn" data-tooltip="Toggle Fullscreen" title="Fullscreen">
+            <i class="bi bi-arrows-fullscreen"></i>
+          </button>
+          <div style="position:relative;">
+            <button class="notif-bell-btn" onclick="toggleNotifications()" title="Notifications">
+              <i class="bi bi-bell-fill"></i>
+              <span class="notif-badge" id="notifBadge">3</span>
+            </button>
+          </div>
+        </div>
         <button onclick="logoutAdmin()" style="background: rgba(131,60,12,0.18); border: 1.5px solid rgba(198,89,17,0.5); color: #FCE7DC; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; white-space: nowrap;"
           onmouseover="this.style.background='rgba(198,89,17,0.35)';this.style.borderColor='rgba(198,89,17,0.8)'"
-          onmouseout="this.style.background='rgba(131,60,12,0.18)';this.style.borderColor='rgba(198,89,17,0.5)'"
-                onmouseover="this.style.background='rgba(239,68,68,0.38)'" onmouseout="this.style.background='rgba(239,68,68,0.25)'">
+          onmouseout="this.style.background='rgba(131,60,12,0.18)';this.style.borderColor='rgba(198,89,17,0.5)'">
           <i class="bi bi-box-arrow-right"></i>
           Logout
         </button>
@@ -3602,7 +4438,153 @@
   </div>
 </header>
 
-<main class="main-container">
+<main class="main-container" id="mainContainer">
+
+<!-- ===== NOTIFICATION DROPDOWN ===== -->
+<div class="notif-dropdown" id="notifDropdown">
+  <div class="notif-header">
+    <span><i class="bi bi-bell-fill" style="color:var(--primary);margin-right:0.4rem;"></i>Notifications</span>
+    <span class="notif-mark-all" onclick="markAllNotifRead()">Mark all read</span>
+  </div>
+  <div class="notif-list" id="notifList">
+    <div class="notif-item unread">
+      <div class="notif-icon success"><i class="bi bi-check-circle-fill"></i></div>
+      <div class="notif-text">
+        <div class="notif-title">Data Loaded Successfully</div>
+        <div class="notif-desc">All units and milestones are up to date.</div>
+        <div class="notif-time">Just now</div>
+      </div>
+    </div>
+    <div class="notif-item unread">
+      <div class="notif-icon warn"><i class="bi bi-exclamation-triangle-fill"></i></div>
+      <div class="notif-text">
+        <div class="notif-title">Handover Pending Units</div>
+        <div class="notif-desc">Some units are past their handover plan date.</div>
+        <div class="notif-time">Today</div>
+      </div>
+    </div>
+    <div class="notif-item unread">
+      <div class="notif-icon info"><i class="bi bi-cloud-check-fill"></i></div>
+      <div class="notif-text">
+        <div class="notif-title">GitHub Sync Available</div>
+        <div class="notif-desc">User database can be synced to GitHub.</div>
+        <div class="notif-time">Earlier</div>
+      </div>
+    </div>
+  </div>
+  <div class="notif-footer"><a href="#" onclick="clearAllNotif();return false;">Clear all notifications</a></div>
+</div>
+
+<!-- ===== TOAST CONTAINER ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== GLOBAL SEARCH OVERLAY ===== -->
+<div class="search-overlay" id="globalSearchOverlay" onclick="if(event.target===this)closeGlobalSearch()">
+  <div class="search-modal">
+    <div class="search-modal-header">
+      <i class="bi bi-search search-modal-icon"></i>
+      <input class="search-modal-input" id="globalSearchInput" placeholder="Search units, projects, customers..." autocomplete="off">
+      <span class="search-modal-kbd">ESC to close</span>
+    </div>
+    <div class="search-modal-results" id="globalSearchResults">
+      <div class="search-result-group-label">Quick Actions</div>
+      <div class="search-result-item" onclick="switchTab('milestone');closeGlobalSearch()">
+        <div class="search-result-icon"><i class="bi bi-buildings"></i></div>
+        <div><div class="search-result-label">Project Milestone Dashboard</div><div class="search-result-sub">View all projects and milestones</div></div>
+        <span class="search-result-arrow"><i class="bi bi-arrow-right"></i></span>
+      </div>
+      <div class="search-result-item" onclick="switchTab('planactual');closeGlobalSearch()">
+        <div class="search-result-icon"><i class="bi bi-graph-up-arrow"></i></div>
+        <div><div class="search-result-label">Plan vs Actuals Dashboard</div><div class="search-result-sub">Compare planned vs actual progress</div></div>
+        <span class="search-result-arrow"><i class="bi bi-arrow-right"></i></span>
+      </div>
+      <div class="search-result-item" onclick="switchTab('tower');closeGlobalSearch()">
+        <div class="search-result-icon"><i class="bi bi-building"></i></div>
+        <div><div class="search-result-label">Graphical Representation</div><div class="search-result-sub">Tower and villa visualization</div></div>
+        <span class="search-result-arrow"><i class="bi bi-arrow-right"></i></span>
+      </div>
+      <div class="search-result-item" onclick="openSettings();closeGlobalSearch()">
+        <div class="search-result-icon"><i class="bi bi-gear-fill"></i></div>
+        <div><div class="search-result-label">Admin Settings</div><div class="search-result-sub">User management, security, branding</div></div>
+        <span class="search-result-arrow"><i class="bi bi-arrow-right"></i></span>
+      </div>
+    </div>
+    <div class="search-modal-footer">
+      <span><kbd>↑↓</kbd> Navigate</span>
+      <span><kbd>Enter</kbd> Select</span>
+      <span><kbd>ESC</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== KEYBOARD SHORTCUTS OVERLAY ===== -->
+<div class="shortcuts-overlay" id="shortcutsOverlay" onclick="if(event.target===this)closeShortcuts()">
+  <div class="shortcuts-modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+      <div class="shortcuts-title"><i class="bi bi-keyboard" style="color:var(--primary);"></i> Keyboard Shortcuts</div>
+      <button onclick="closeShortcuts()" style="background:var(--gray-100);border:none;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center;color:var(--gray-600);">✕</button>
+    </div>
+    <div class="shortcuts-group">
+      <div class="shortcuts-group-label">Navigation</div>
+      <div class="shortcut-row"><span>Project Milestone Dashboard</span><div class="shortcut-keys"><kbd>Alt</kbd><kbd>1</kbd></div></div>
+      <div class="shortcut-row"><span>Plan vs Actuals Dashboard</span><div class="shortcut-keys"><kbd>Alt</kbd><kbd>2</kbd></div></div>
+      <div class="shortcut-row"><span>Graphical Representation</span><div class="shortcut-keys"><kbd>Alt</kbd><kbd>3</kbd></div></div>
+      <div class="shortcut-row"><span>Shell Tracker</span><div class="shortcut-keys"><kbd>Alt</kbd><kbd>4</kbd></div></div>
+    </div>
+    <div class="shortcuts-group">
+      <div class="shortcuts-group-label">Search & Tools</div>
+      <div class="shortcut-row"><span>Global Search</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>K</kbd></div></div>
+      <div class="shortcut-row"><span>Toggle Dark Mode</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>D</kbd></div></div>
+      <div class="shortcut-row"><span>Fullscreen</span><div class="shortcut-keys"><kbd>F11</kbd></div></div>
+      <div class="shortcut-row"><span>Keyboard Shortcuts</span><div class="shortcut-keys"><kbd>?</kbd></div></div>
+    </div>
+    <div class="shortcuts-group">
+      <div class="shortcuts-group-label">Admin</div>
+      <div class="shortcut-row"><span>Open Settings</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>,</kbd></div></div>
+      <div class="shortcut-row"><span>Refresh Data</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>R</kbd></div></div>
+      <div class="shortcut-row"><span>Logout</span><div class="shortcut-keys"><kbd>Ctrl</kbd><kbd>L</kbd></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SESSION TIMER ===== -->
+<div class="session-timer" id="sessionTimer" onclick="resetSessionTimer()" title="Click to reset session timer">
+  <span class="session-dot"></span>
+  <span id="sessionTimerText">Session: 30:00</span>
+</div>
+
+<!-- ===== ADMIN FAB ===== -->
+<div class="admin-fab" id="adminFab">
+  <div class="fab-items" id="fabItems">
+    <div class="fab-item" onclick="openSettings();toggleFab()"><i class="bi bi-gear-fill" style="color:var(--primary);"></i> Admin Settings</div>
+    <div class="fab-item" onclick="openGlobalSearch();toggleFab()"><i class="bi bi-search" style="color:var(--secondary);"></i> Global Search</div>
+    <div class="fab-item" onclick="refreshData();toggleFab()"><i class="bi bi-arrow-clockwise" style="color:var(--success);"></i> Refresh Data</div>
+    <div class="fab-item" onclick="openShortcuts();toggleFab()"><i class="bi bi-keyboard" style="color:var(--warning);"></i> Shortcuts</div>
+  </div>
+  <button class="fab-main" onclick="toggleFab()" title="Quick Actions" id="fabMainBtn">
+    <i class="bi bi-plus-lg"></i>
+  </button>
+</div>
+
+<!-- ===== PIN RESET MODAL ===== -->
+<div class="pin-reset-overlay" id="pinResetOverlay" onclick="if(event.target===this)closePinReset()">
+  <div class="pin-reset-modal">
+    <h3><i class="bi bi-key-fill"></i> Reset PIN for <span id="pinResetUsername"></span></h3>
+    <div class="pin-reset-field">
+      <label>New 4-Digit PIN</label>
+      <input type="password" id="pinResetInput" placeholder="Enter new 4-digit PIN" maxlength="4" inputmode="numeric" autocomplete="new-password">
+    </div>
+    <div class="pin-reset-field">
+      <label>Confirm PIN</label>
+      <input type="password" id="pinResetConfirm" placeholder="Confirm new PIN" maxlength="4" inputmode="numeric">
+    </div>
+    <div id="pinResetMsg" style="font-size:0.8rem;font-weight:600;display:none;margin-top:0.5rem;"></div>
+    <div class="pin-reset-actions">
+      <button class="btn-pin-cancel" onclick="closePinReset()">Cancel</button>
+      <button class="btn-pin-save" onclick="savePinReset()"><i class="bi bi-check-circle-fill"></i> Save PIN</button>
+    </div>
+  </div>
+</div>
 
   <!-- Auto-Load Section -->
   <div class="upload-section" id="uploadSection">
@@ -3613,19 +4595,20 @@
 
   <!-- Tab Navigation -->
   <div class="tab-navigation" id="tabNavigation" style="display: none;">
-    <button class="tab-button active" onclick="switchTab('milestone')">
+    <button class="tab-button active" onclick="switchTab('milestone')" id="tabBtn-milestone">
       <i class="bi bi-buildings"></i>
       Project Milestone Dashboard
+      <span class="tab-count-badge" id="tabBadge-milestone">—</span>
     </button>
-    <button class="tab-button" onclick="switchTab('planactual')">
+    <button class="tab-button" onclick="switchTab('planactual')" id="tabBtn-planactual">
       <i class="bi bi-graph-up-arrow"></i>
       Plan Vs Actuals Dashboard
     </button>
-    <button class="tab-button" onclick="switchTab('tower')">
+    <button class="tab-button" onclick="switchTab('tower')" id="tabBtn-tower">
       <i class="bi bi-building"></i>
       Graphical Representation
     </button>
-    <button class="tab-button" onclick="switchTab('shelltracker')">
+    <button class="tab-button" onclick="switchTab('shelltracker')" id="tabBtn-shelltracker">
       <i class="bi bi-building-fill-gear"></i>
       Shell Tracker
     </button>
@@ -4848,9 +5831,12 @@
     document.getElementById('tabNavigation').style.display = 'none';
     document.getElementById('dataSection').classList.remove('visible');
     document.getElementById('planActualDataSection').classList.remove('visible');
-
+    if (typeof showToast === 'function') showToast('info', 'Refreshing', 'Fetching latest data from Google Sheets...', 3000);
     // Reload data
-    loadDataFromGoogleSheets();
+    loadDataFromGoogleSheets().then(() => {
+      lastDataLoadTime = Date.now();
+      updateDataFreshness();
+    }).catch(() => {});
   }
 
   // Update date/time
@@ -5073,6 +6059,24 @@
 
     // Build shell tracker
     buildShellTrackerSlicers();
+
+    // ── Premium: update tab badge, freshness, notifications ──
+    const tabBadge = document.getElementById('tabBadge-milestone');
+    if (tabBadge) tabBadge.textContent = raw.length.toLocaleString() + ' units';
+    if (typeof lastDataLoadTime !== 'undefined') {
+      lastDataLoadTime = Date.now();
+      if (typeof updateDataFreshness === 'function') updateDataFreshness();
+    }
+    // Push a notification that data loaded
+    const nList = document.getElementById('notifList');
+    if (nList) {
+      const ts = new Date().toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'});
+      const newNotif = document.createElement('div');
+      newNotif.className = 'notif-item unread';
+      newNotif.innerHTML = `<div class="notif-icon success"><i class="bi bi-database-fill-check"></i></div><div class="notif-text"><div class="notif-title">Data Refreshed</div><div class="notif-desc">${raw.length.toLocaleString()} units loaded from Google Sheets.</div><div class="notif-time">${ts}</div></div>`;
+      nList.insertBefore(newNotif, nList.firstChild);
+      if (typeof updateNotifBadge === 'function' && typeof notifCount !== 'undefined') updateNotifBadge(notifCount + 1);
+    }
   }
 
   // ===== SHELL MASTER SHEET PARSER =====
@@ -7178,7 +8182,11 @@
 
         overlay.style.opacity = '0';
         overlay.style.transition = 'opacity 0.4s ease';
-        setTimeout(function() { overlay.style.display = 'none'; }, 400);
+        setTimeout(function() {
+          overlay.style.display = 'none';
+          // Init premium features after login
+          if (typeof initPremiumFeatures === 'function') initPremiumFeatures(result);
+        }, 400);
         loadDataFromGoogleSheets();
       } else {
         showErr('Invalid username or password.');
@@ -7205,6 +8213,14 @@
     if (currentUser) recordLogout(currentUser.username);
     isAuthenticated = false;
     currentUser = null;
+    // Stop session timer
+    if (sessionTimerInterval) { clearInterval(sessionTimerInterval); sessionTimerInterval = null; }
+    // Hide premium admin controls
+    const extra = document.getElementById('adminExtraControls');
+    if (extra) extra.style.display = 'none';
+    const fab = document.getElementById('adminFab');
+    if (fab) fab.classList.remove('visible','open');
+    document.getElementById('sessionTimer')?.classList.remove('visible');
     const overlay = document.getElementById('loginOverlay');
     overlay.style.display = 'flex';
     overlay.style.opacity = '0';
@@ -9068,14 +10084,705 @@
     }).join('');
   }
 
+  }
+
+  async function deleteUser(username) {
+    if (!confirm(`Delete user "${username}"? This cannot be undone.`)) return;
+    const users = getUsers().filter(u => u.username !== username);
+    saveUsers(users);
+    renderUsersTable();
+    await persistGitHubDB();
+    showToast('success', 'User Deleted', `"${username}" has been removed.`);
+  }
+
+  function renderUsersTable() {
+    const users = getUsers();
+    const log   = getLog();
+    const tbody = document.getElementById('usersTableBody');
+
+    if (users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:1.5rem;">No users created yet</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = users.map((u, i) => {
+      const lastLogin = log.find(l => l.username === u.username && l.event === 'login');
+      const lastLoginStr = lastLogin
+        ? new Date(lastLogin.ts).toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+        : '—';
+      const created = new Date(u.createdAt).toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+      return `<tr>
+        <td style="color:#94a3b8;font-weight:700;">${i + 1}</td>
+        <td><i class="bi bi-person-circle" style="color:#C65911;margin-right:6px;"></i><strong>${u.username}</strong></td>
+        <td>${created}</td>
+        <td>${lastLoginStr}</td>
+        <td><button class="btn-reset-pin" onclick="openPinReset('${u.username}')"><i class="bi bi-key-fill"></i> Reset PIN</button></td>
+        <td><button class="btn-del-user" onclick="deleteUser('${u.username}')"><i class="bi bi-trash3"></i> Delete</button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function renderActivityLog() {
+    const log   = getLog();
+    const tbody = document.getElementById('activityLogBody');
+
+    if (log.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">No activity recorded</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = log.map((l, i) => {
+      const d = new Date(l.ts);
+      const dateStr = d.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+      const timeStr = d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+      const isLogin = l.event === 'login';
+      return `<tr class="log-row-${l.event}">
+        <td style="color:#94a3b8;font-weight:700;">${i + 1}</td>
+        <td><i class="bi bi-person-circle" style="color:${l.username === 'Admin' ? '#833C0C' : '#6b7280'};margin-right:6px;"></i>${l.username}</td>
+        <td><span class="log-badge ${l.event}">${isLogin ? '🔓 Login' : '🔒 Logout'}</span></td>
+        <td>${dateStr}</td>
+        <td>${timeStr}</td>
+      </tr>`;
+    }).join('');
+  }
+
   function clearActivityLog() {
     if (!confirm('Clear the entire activity log?')) return;
     saveLog([]);
     renderActivityLog();
     persistGitHubDB();
+    showToast('info', 'Log Cleared', 'Activity log has been cleared.');
+  }
+
+  // ===== EXTENDED SETTINGS TABS =====
+  function switchSettingsTab(tab) { switchSettingsTabExt(tab); }
+
+  function switchSettingsTabExt(tab) {
+    ['users','log','health','branding','security','export'].forEach(t => {
+      const btn = document.getElementById('stab-' + t);
+      const panel = document.getElementById('spanel-' + t);
+      if (btn) btn.classList.toggle('active', t === tab);
+      if (panel) panel.classList.toggle('visible', t === tab);
+    });
+    if (tab === 'log') renderActivityLog();
+    if (tab === 'users') renderUsersTable();
+    if (tab === 'health') renderSystemHealth();
+    if (tab === 'branding') loadBrandingValues();
+    if (tab === 'security') loadSecurityValues();
+  }
+
+  // ===== OPEN SETTINGS (extended) =====
+  function openSettings() {
+    if (!currentUser || !currentUser.isAdmin) return;
+    renderUsersTable();
+    renderActivityLog();
+    document.getElementById('settingsOverlay').classList.add('visible');
+    // Default to users tab
+    switchSettingsTabExt('users');
   }
 
   // ===== END SETTINGS MODAL =====
+
+  // ============================================================
+  //   PREMIUM FEATURE IMPLEMENTATIONS
+  // ============================================================
+
+  // ── Toast Notification System ──────────────────────────────
+  function showToast(type, title, message, duration = 4000) {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const icons = { success:'bi-check-circle-fill', warning:'bi-exclamation-triangle-fill', danger:'bi-x-circle-fill', info:'bi-info-circle-fill' };
+    const id = 'toast_' + Date.now();
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.id = id;
+    toast.innerHTML = `
+      <i class="bi ${icons[type] || icons.info} toast-icon"></i>
+      <div class="toast-body">
+        <div class="toast-title">${title}</div>
+        <div class="toast-msg">${message}</div>
+      </div>
+      <button class="toast-close" onclick="dismissToast('${id}')">✕</button>
+      <div class="toast-progress"></div>`;
+    container.appendChild(toast);
+    setTimeout(() => dismissToast(id), duration);
+  }
+
+  function dismissToast(id) {
+    const t = document.getElementById(id);
+    if (!t) return;
+    t.style.animation = 'toastOut 0.3s ease forwards';
+    setTimeout(() => t.remove(), 300);
+  }
+
+  // ── Dark Mode ───────────────────────────────────────────────
+  function toggleDarkMode() {
+    const isDark = document.body.classList.toggle('dark-mode');
+    const icon   = document.getElementById('darkModeIcon');
+    if (icon) icon.className = isDark ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+    localStorage.setItem('bi_dark_mode', isDark ? '1' : '0');
+    showToast('info', isDark ? 'Dark Mode On' : 'Light Mode On', isDark ? 'Dashboard switched to dark theme.' : 'Dashboard switched to light theme.', 2000);
+  }
+
+  function initDarkMode() {
+    if (localStorage.getItem('bi_dark_mode') === '1') {
+      document.body.classList.add('dark-mode');
+      const icon = document.getElementById('darkModeIcon');
+      if (icon) icon.className = 'bi bi-sun-fill';
+    }
+  }
+  initDarkMode();
+
+  // ── Global Search ───────────────────────────────────────────
+  function openGlobalSearch() {
+    const overlay = document.getElementById('globalSearchOverlay');
+    if (overlay) { overlay.classList.add('visible'); document.getElementById('globalSearchInput').focus(); }
+  }
+
+  function closeGlobalSearch() {
+    const overlay = document.getElementById('globalSearchOverlay');
+    if (overlay) { overlay.classList.remove('visible'); document.getElementById('globalSearchInput').value = ''; renderGlobalSearchDefaults(); }
+  }
+
+  function renderGlobalSearchDefaults() {
+    const res = document.getElementById('globalSearchResults');
+    if (!res) return;
+    res.innerHTML = `
+      <div class="search-result-group-label">Quick Actions</div>
+      <div class="search-result-item" onclick="switchTab('milestone');closeGlobalSearch()"><div class="search-result-icon"><i class="bi bi-buildings"></i></div><div><div class="search-result-label">Project Milestone Dashboard</div><div class="search-result-sub">View all projects and milestones</div></div><span class="search-result-arrow"><i class="bi bi-arrow-right"></i></span></div>
+      <div class="search-result-item" onclick="switchTab('planactual');closeGlobalSearch()"><div class="search-result-icon"><i class="bi bi-graph-up-arrow"></i></div><div><div class="search-result-label">Plan vs Actuals Dashboard</div><div class="search-result-sub">Compare planned vs actual progress</div></div><span class="search-result-arrow"><i class="bi bi-arrow-right"></i></span></div>
+      <div class="search-result-item" onclick="switchTab('tower');closeGlobalSearch()"><div class="search-result-icon"><i class="bi bi-building"></i></div><div><div class="search-result-label">Graphical Representation</div><div class="search-result-sub">Tower and villa visualization</div></div><span class="search-result-arrow"><i class="bi bi-arrow-right"></i></span></div>
+      <div class="search-result-item" onclick="openSettings();closeGlobalSearch()"><div class="search-result-icon"><i class="bi bi-gear-fill"></i></div><div><div class="search-result-label">Admin Settings</div><div class="search-result-sub">User management, security, branding</div></div><span class="search-result-arrow"><i class="bi bi-arrow-right"></i></span></div>`;
+  }
+
+  const gSearchInput = document.getElementById('globalSearchInput');
+  if (gSearchInput) {
+    gSearchInput.addEventListener('input', function() {
+      const q = this.value.trim().toLowerCase();
+      const res = document.getElementById('globalSearchResults');
+      if (!q || !raw.length) { renderGlobalSearchDefaults(); return; }
+      const matches = raw.filter(r =>
+        (r.UnitNo || '').toString().toLowerCase().includes(q) ||
+        (r.Customer || '').toLowerCase().includes(q) ||
+        (r.Project || '').toLowerCase().includes(q) ||
+        (r.Tower || '').toLowerCase().includes(q)
+      ).slice(0, 10);
+      if (!matches.length) {
+        res.innerHTML = `<div class="search-no-results" style="padding:2rem;text-align:center;color:#94a3b8;"><i class="bi bi-search" style="font-size:1.5rem;display:block;margin-bottom:0.5rem;"></i>No results for "${q}"</div>`;
+        return;
+      }
+      res.innerHTML = `<div class="search-result-group-label">${matches.length} Unit${matches.length !== 1 ? 's' : ''} Found</div>` +
+        matches.map(r => `
+          <div class="search-result-item" onclick="closeGlobalSearch();switchTab('tower');setTimeout(()=>{const u=document.getElementById('unitSearchInput');if(u){u.value='${(r.UnitNo||'').replace(/'/g,'\\'')}';u.dispatchEvent(new Event('input'));}},300)">
+            <div class="search-result-icon"><i class="bi bi-house-fill"></i></div>
+            <div><div class="search-result-label">Unit ${r.UnitNo} — ${r.Project}</div><div class="search-result-sub">${r.Tower} · ${r.Phase} · ${r.Customer}</div></div>
+            <span class="search-result-arrow"><i class="bi bi-arrow-right"></i></span>
+          </div>`).join('');
+    });
+  }
+
+  // ── Keyboard Shortcuts ─────────────────────────────────────
+  function openShortcuts() { const o = document.getElementById('shortcutsOverlay'); if (o) o.classList.add('visible'); }
+  function closeShortcuts() { const o = document.getElementById('shortcutsOverlay'); if (o) o.classList.remove('visible'); }
+
+  document.addEventListener('keydown', function(e) {
+    // Ctrl+K → Global Search
+    if (e.ctrlKey && e.key === 'k') { e.preventDefault(); openGlobalSearch(); return; }
+    // Ctrl+Shift+D → Dark Mode
+    if (e.ctrlKey && e.shiftKey && e.key === 'D') { e.preventDefault(); toggleDarkMode(); return; }
+    // Ctrl+, → Settings
+    if (e.ctrlKey && e.key === ',') { e.preventDefault(); if (currentUser?.isAdmin) openSettings(); return; }
+    // ? → Shortcuts
+    if (e.key === '?' && !e.ctrlKey && !e.altKey && document.activeElement.tagName !== 'INPUT') { openShortcuts(); return; }
+    // ESC → close all overlays
+    if (e.key === 'Escape') {
+      closeGlobalSearch(); closeShortcuts();
+      const po = document.getElementById('pinResetOverlay'); if (po) po.classList.remove('visible');
+      closeNotifications();
+    }
+    // Alt+1-4 → switch tabs
+    if (e.altKey && ['1','2','3','4'].includes(e.key)) {
+      e.preventDefault();
+      const tabs = ['milestone','planactual','tower','shelltracker'];
+      switchTab(tabs[+e.key - 1]);
+    }
+  });
+
+  // ── Notification System ────────────────────────────────────
+  let notifOpen = false;
+  let notifCount = 3;
+
+  function toggleNotifications() {
+    notifOpen = !notifOpen;
+    const dd = document.getElementById('notifDropdown');
+    if (dd) dd.classList.toggle('visible', notifOpen);
+    if (notifOpen) updateNotifBadge(0);
+  }
+
+  function closeNotifications() {
+    notifOpen = false;
+    const dd = document.getElementById('notifDropdown');
+    if (dd) dd.classList.remove('visible');
+  }
+
+  function updateNotifBadge(count) {
+    const badge = document.getElementById('notifBadge');
+    if (!badge) return;
+    notifCount = count;
+    badge.textContent = count;
+    badge.classList.toggle('visible', count > 0);
+  }
+
+  function markAllNotifRead() {
+    document.querySelectorAll('.notif-item.unread').forEach(el => el.classList.remove('unread'));
+    updateNotifBadge(0);
+  }
+
+  function clearAllNotif() {
+    const list = document.getElementById('notifList');
+    if (list) list.innerHTML = '<div style="padding:2rem;text-align:center;color:#94a3b8;font-size:0.82rem;"><i class="bi bi-bell-slash" style="display:block;font-size:1.5rem;margin-bottom:0.5rem;"></i>No notifications</div>';
+    updateNotifBadge(0);
+    closeNotifications();
+  }
+
+  document.addEventListener('click', function(e) {
+    if (notifOpen && !e.target.closest('.notif-dropdown') && !e.target.closest('.notif-bell-btn')) closeNotifications();
+    if (!e.target.closest('.admin-fab')) {
+      const fab = document.getElementById('adminFab');
+      if (fab && fab.classList.contains('open')) fab.classList.remove('open');
+    }
+  });
+
+  // ── Admin FAB ───────────────────────────────────────────────
+  let fabOpen = false;
+  function toggleFab() {
+    fabOpen = !fabOpen;
+    const fab = document.getElementById('adminFab');
+    if (fab) fab.classList.toggle('open', fabOpen);
+  }
+
+  // ── Session Timer ───────────────────────────────────────────
+  let sessionTimeoutMins = parseInt(localStorage.getItem('bi_session_timeout') || '30');
+  let sessionStartTime   = Date.now();
+  let sessionTimerInterval = null;
+
+  function startSessionTimer() {
+    const timerEl  = document.getElementById('sessionTimer');
+    const timerTxt = document.getElementById('sessionTimerText');
+    if (!timerEl || !timerTxt) return;
+    const showTimer = localStorage.getItem('bi_show_session_timer') !== '0';
+    if (showTimer) timerEl.classList.add('visible');
+    sessionTimerInterval = setInterval(() => {
+      const elapsed  = Math.floor((Date.now() - sessionStartTime) / 1000);
+      const totalSec = sessionTimeoutMins * 60;
+      const remaining = Math.max(0, totalSec - elapsed);
+      const mins = Math.floor(remaining / 60);
+      const secs = remaining % 60;
+      timerTxt.textContent = `Session: ${mins}:${secs.toString().padStart(2,'0')}`;
+      timerEl.classList.remove('warn','critical');
+      if (remaining <= 60) timerEl.classList.add('critical');
+      else if (remaining <= 5 * 60) timerEl.classList.add('warn');
+      if (remaining <= 0) { clearInterval(sessionTimerInterval); logoutAdmin(); }
+    }, 1000);
+  }
+
+  function resetSessionTimer() {
+    sessionStartTime = Date.now();
+    showToast('success','Session Extended', `Session reset to ${sessionTimeoutMins} minutes.`, 2500);
+  }
+
+  // ── Data Freshness Indicator ────────────────────────────────
+  let lastDataLoadTime = null;
+  function updateDataFreshness() {
+    if (!lastDataLoadTime) return;
+    const mins = Math.floor((Date.now() - lastDataLoadTime) / 60000);
+    const el = document.getElementById('dataFreshnessText');
+    if (el) el.textContent = mins < 1 ? 'Just refreshed' : `Refreshed ${mins}m ago`;
+  }
+  setInterval(updateDataFreshness, 30000);
+
+  // ── Full-screen Mode ────────────────────────────────────────
+  function toggleFullscreen() {
+    const mc = document.getElementById('mainContainer');
+    const btn = document.getElementById('fullscreenBtn');
+    if (!mc || !btn) return;
+    const isFS = mc.classList.toggle('fullscreen-mode');
+    btn.innerHTML = isFS ? '<i class="bi bi-fullscreen-exit"></i>' : '<i class="bi bi-arrows-fullscreen"></i>';
+    btn.title = isFS ? 'Exit Fullscreen' : 'Enter Fullscreen';
+  }
+
+  // ── System Health Panel ─────────────────────────────────────
+  function renderSystemHealth() {
+    // Storage
+    try {
+      let total = 0;
+      for (let k in localStorage) { if (localStorage.hasOwnProperty(k)) total += ((localStorage[k] || '').length + k.length) * 2; }
+      const kb = (total / 1024).toFixed(1);
+      document.getElementById('shLocalStorage').textContent = kb + ' KB';
+      document.getElementById('shLocalStorageBadge').textContent = total < 4 * 1024 * 1024 ? 'OK' : 'High';
+      document.getElementById('shLocalStorageBadge').className = 'sys-health-badge ' + (total < 4 * 1024 * 1024 ? 'ok' : 'warn');
+    } catch(e) {}
+    document.getElementById('shUserCount').textContent   = getUsers().length;
+    document.getElementById('shLogCount').textContent    = getLog().length;
+    document.getElementById('shUnitCount').textContent   = raw.length.toLocaleString();
+    document.getElementById('shDataBadge').textContent   = raw.length > 0 ? 'Loaded' : 'No Data';
+    document.getElementById('shDataBadge').className     = 'sys-health-badge ' + (raw.length > 0 ? 'ok' : 'err');
+    // Session duration
+    const sessSec = Math.floor((Date.now() - sessionStartTime) / 1000);
+    const sm = Math.floor(sessSec / 60), ss = sessSec % 60;
+    document.getElementById('shSession').textContent = `${sm}m ${ss}s`;
+    // User info
+    document.getElementById('shCurrentUser').textContent = currentUser ? currentUser.username + (currentUser.isAdmin ? ' (Admin)' : '') : '—';
+    const loginTimeRaw = sessionStorage.getItem('bi_login_time');
+    document.getElementById('shLoginTime').textContent = loginTimeRaw ? new Date(loginTimeRaw).toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '—';
+    // Browser
+    const ua = navigator.userAgent;
+    let browser = 'Unknown';
+    if (ua.includes('Chrome') && !ua.includes('Edg')) browser = 'Chrome';
+    else if (ua.includes('Firefox')) browser = 'Firefox';
+    else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari';
+    else if (ua.includes('Edg')) browser = 'Edge';
+    document.getElementById('shBrowser').textContent = browser;
+    // GitHub sync status
+    const lastSync = localStorage.getItem('bi_last_sync');
+    document.getElementById('shGitHub').textContent = lastSync ? '✓ Synced' : 'Not Synced';
+    document.getElementById('shGitHubBadge').textContent = lastSync ? 'OK' : 'Pending';
+    document.getElementById('shGitHubBadge').className = 'sys-health-badge ' + (lastSync ? 'ok' : 'warn');
+    // Last refresh
+    document.getElementById('shLastRefresh').textContent = lastDataLoadTime
+      ? new Date(lastDataLoadTime).toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'}) : '—';
+  }
+
+  // ── Branding System ─────────────────────────────────────────
+  function loadBrandingValues() {
+    const saved = JSON.parse(localStorage.getItem('bi_branding') || '{}');
+    const fields = ['brandTitle','brandCompany','brandSubtitle','brandFooter'];
+    fields.forEach(f => { const el = document.getElementById(f); if (el && saved[f]) el.value = saved[f]; });
+    const msg = localStorage.getItem('bi_announcement') || '';
+    const msgEl = document.getElementById('announcementMsgInput'); if (msgEl) msgEl.value = msg;
+  }
+
+  function applyBranding() {
+    const branding = {
+      brandTitle:    document.getElementById('brandTitle')?.value.trim(),
+      brandCompany:  document.getElementById('brandCompany')?.value.trim(),
+      brandSubtitle: document.getElementById('brandSubtitle')?.value.trim(),
+      brandFooter:   document.getElementById('brandFooter')?.value.trim()
+    };
+    localStorage.setItem('bi_branding', JSON.stringify(branding));
+    if (branding.brandTitle) document.title = branding.brandTitle + ' | Construction Analytics';
+    showToast('success', 'Branding Applied', 'Dashboard branding has been updated.', 3000);
+  }
+
+  function resetBranding() {
+    localStorage.removeItem('bi_branding');
+    ['brandTitle','brandCompany','brandSubtitle','brandFooter'].forEach(f => { const el = document.getElementById(f); if (el) el.value = ''; });
+    document.title = 'Business Intelligence | Construction Analytics';
+    showToast('info', 'Branding Reset', 'Dashboard branding restored to defaults.', 3000);
+  }
+
+  function setBrandColor(primary, dark) {
+    document.querySelectorAll('.color-swatch').forEach(sw => sw.classList.remove('active'));
+    event.target.classList.add('active');
+    document.documentElement.style.setProperty('--primary', primary);
+    document.documentElement.style.setProperty('--primary-dark', dark);
+    document.documentElement.style.setProperty('--primary-light', primary + '22');
+    localStorage.setItem('bi_brand_color', JSON.stringify({primary, dark}));
+    showToast('success', 'Color Applied', 'Theme color updated across the dashboard.', 2500);
+  }
+
+  function saveAnnouncement() {
+    const msg = document.getElementById('announcementMsgInput')?.value.trim() || '';
+    localStorage.setItem('bi_announcement', msg);
+    applyAnnouncementBanner(msg);
+    showToast('success', 'Announcement Published', msg ? 'Banner is now visible to all users.' : 'Announcement cleared.', 3000);
+  }
+
+  function applyAnnouncementBanner(msg) {
+    const banner = document.getElementById('announcementBanner');
+    const text   = document.getElementById('announcementText');
+    if (!banner || !text) return;
+    if (msg) { text.textContent = msg; banner.classList.add('visible'); }
+    else { banner.classList.remove('visible'); }
+  }
+
+  function closeAnnouncement() {
+    document.getElementById('announcementBanner')?.classList.remove('visible');
+  }
+
+  // ── Security Settings ───────────────────────────────────────
+  function loadSecurityValues() {
+    const timeout = parseInt(localStorage.getItem('bi_session_timeout') || '30');
+    const range = document.getElementById('sessionTimeoutRange');
+    if (range) range.value = timeout;
+    updateSessionTimeoutDisplay();
+  }
+
+  function updateSessionTimeoutDisplay() {
+    const v = document.getElementById('sessionTimeoutRange')?.value || 30;
+    const el = document.getElementById('sessionTimeoutDisplay');
+    if (el) el.textContent = v + ' min';
+  }
+
+  function applySessionTimeout() {
+    const v = parseInt(document.getElementById('sessionTimeoutRange')?.value || 30);
+    sessionTimeoutMins = v;
+    localStorage.setItem('bi_session_timeout', v);
+    resetSessionTimer();
+    showToast('success', 'Timeout Updated', `Session will auto-logout after ${v} minutes.`);
+  }
+
+  function toggleSessionTimerVis(btn) {
+    btn.classList.toggle('on');
+    const show = btn.classList.contains('on');
+    localStorage.setItem('bi_show_session_timer', show ? '1' : '0');
+    const timerEl = document.getElementById('sessionTimer');
+    if (timerEl) timerEl.classList.toggle('visible', show);
+  }
+
+  // ── PIN Reset ───────────────────────────────────────────────
+  let pinResetTarget = null;
+
+  function openPinReset(username) {
+    pinResetTarget = username;
+    document.getElementById('pinResetUsername').textContent = `"${username}"`;
+    document.getElementById('pinResetInput').value  = '';
+    document.getElementById('pinResetConfirm').value = '';
+    const msg = document.getElementById('pinResetMsg'); if (msg) msg.style.display = 'none';
+    document.getElementById('pinResetOverlay').classList.add('visible');
+  }
+
+  function closePinReset() {
+    pinResetTarget = null;
+    document.getElementById('pinResetOverlay').classList.remove('visible');
+  }
+
+  async function savePinReset() {
+    const pin1 = document.getElementById('pinResetInput').value.trim();
+    const pin2 = document.getElementById('pinResetConfirm').value.trim();
+    const msg  = document.getElementById('pinResetMsg');
+    function showMsg(text, ok) {
+      msg.style.display = 'block'; msg.style.color = ok ? '#059669' : '#dc2626';
+      msg.textContent = text;
+    }
+    if (!/^\d{4}$/.test(pin1)) return showMsg('PIN must be exactly 4 digits.', false);
+    if (pin1 !== pin2) return showMsg('PINs do not match.', false);
+    const users = getUsers();
+    const idx   = users.findIndex(u => u.username === pinResetTarget);
+    if (idx === -1) return showMsg('User not found.', false);
+    users[idx].hash = await sha256(users[idx].username.toLowerCase() + ':' + pin1);
+    saveUsers(users);
+    await persistGitHubDB();
+    showMsg('PIN updated successfully!', true);
+    setTimeout(() => { closePinReset(); showToast('success', 'PIN Updated', `PIN for "${pinResetTarget}" has been reset.`); }, 1200);
+  }
+
+  function showAdminPinChange() {
+    closeSettings();
+    setTimeout(() => {
+      const np = prompt('Enter new 4-digit Admin PIN:');
+      if (!np || !/^\d{4}$/.test(np)) { showToast('danger','Invalid PIN','Admin PIN must be exactly 4 digits.'); return; }
+      const np2 = prompt('Confirm new Admin PIN:');
+      if (np !== np2) { showToast('danger','Mismatch','PINs do not match. Try again.'); return; }
+      sha256('admin:' + np).then(hash => {
+        localStorage.setItem('bi_admin_pin_hash', hash);
+        showToast('success','Admin PIN Updated','New admin PIN is now active.');
+      });
+    }, 300);
+  }
+
+  // ── Export Functions ────────────────────────────────────────
+  function exportActivityLogExcel() {
+    const log = getLog();
+    if (!log.length) { showToast('warning','No Data','Activity log is empty.'); return; }
+    const data = [['#','User','Event','Date','Time']].concat(
+      log.map((l,i) => {
+        const d = new Date(l.ts);
+        return [i+1, l.username, l.event === 'login' ? 'Login' : 'Logout',
+          d.toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}),
+          d.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit'})];
+      })
+    );
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Activity Log');
+    XLSX.writeFile(wb, 'Activity_Log_' + new Date().toLocaleDateString('en-IN').replace(/\//g,'-') + '.xlsx');
+    showToast('success','Export Complete','Activity log exported to Excel.');
+  }
+
+  function exportUsersExcel() {
+    const users = getUsers();
+    if (!users.length) { showToast('warning','No Data','No users to export.'); return; }
+    const log = getLog();
+    const data = [['#','Username','Created On','Last Login']].concat(
+      users.map((u,i) => {
+        const lastLogin = log.find(l => l.username === u.username && l.event === 'login');
+        return [i+1, u.username,
+          new Date(u.createdAt).toLocaleDateString('en-IN'),
+          lastLogin ? new Date(lastLogin.ts).toLocaleString('en-IN') : 'Never'];
+      })
+    );
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Users');
+    XLSX.writeFile(wb, 'User_List_' + new Date().toLocaleDateString('en-IN').replace(/\//g,'-') + '.xlsx');
+    showToast('success','Export Complete','User list exported to Excel.');
+  }
+
+  function printDashboard() {
+    window.print();
+  }
+
+  // ── Init Admin Controls after login ─────────────────────────
+  const _origHandleLogin = typeof handleLogin === 'function' ? handleLogin : null;
+
+  // Patch: show admin extras after successful auth
+  function initPremiumFeatures(user) {
+    if (!user) return;
+    // Show admin controls
+    if (user.isAdmin) {
+      const extra = document.getElementById('adminExtraControls');
+      if (extra) extra.style.display = 'flex';
+      const fab = document.getElementById('adminFab');
+      if (fab) fab.classList.add('visible');
+      const adminBtn = document.getElementById('adminSettingsBtn');
+      if (adminBtn) adminBtn.style.display = 'flex';
+    }
+    // Record login time in session
+    sessionStorage.setItem('bi_login_time', new Date().toISOString());
+    // Start session timer
+    startSessionTimer();
+    // Set data freshness
+    lastDataLoadTime = Date.now();
+    updateDataFreshness();
+    // Apply saved branding
+    const saved = JSON.parse(localStorage.getItem('bi_branding') || '{}');
+    if (saved.brandTitle) document.title = saved.brandTitle + ' | Construction Analytics';
+    const savedColor = JSON.parse(localStorage.getItem('bi_brand_color') || 'null');
+    if (savedColor) {
+      document.documentElement.style.setProperty('--primary', savedColor.primary);
+      document.documentElement.style.setProperty('--primary-dark', savedColor.dark);
+    }
+    // Apply announcement
+    const ann = localStorage.getItem('bi_announcement') || '';
+    if (ann) applyAnnouncementBanner(ann);
+    // Show welcome toast
+    setTimeout(() => {
+      showToast('success', `Welcome, ${user.username}!`, user.isAdmin ? 'Admin access granted. Full controls available.' : 'Dashboard loaded and ready.');
+      if (user.isAdmin) updateNotifBadge(3);
+    }, 800);
+  }
+
+  // Intercept the existing handleLogin to run initPremiumFeatures
+  (function patchHandleLogin() {
+    const loginBtn = document.getElementById('loginBtn');
+    if (!loginBtn) return;
+    const _orig = loginBtn.onclick;
+    // We instead watch for the loginOverlay being hidden (login success signal)
+    const observer = new MutationObserver(() => {
+      const overlay = document.getElementById('loginOverlay');
+      if (overlay && overlay.style.display === 'none' && window.currentUser) {
+        initPremiumFeatures(window.currentUser);
+        observer.disconnect();
+      }
+    });
+    const overlay = document.getElementById('loginOverlay');
+    if (overlay) observer.observe(overlay, { attributes: true, attributeFilter: ['style'] });
+  })();
+
+  // Also handle when data loads (to update freshness)
+  const _origPrepare = typeof prepare === 'function' ? prepare : null;
+  // Patch prepare to update freshness time
+  (function() {
+    const origPrep = window.prepare;
+    if (typeof origPrep === 'function') {
+      window.prepare = function(...args) {
+        origPrep.apply(this, args);
+        lastDataLoadTime = Date.now();
+        updateDataFreshness();
+        // Update unit count in health panel if open
+        const el = document.getElementById('shUnitCount');
+        if (el) el.textContent = raw.length.toLocaleString();
+      };
+    }
+  })();
+
+  // ── Animated KPI Counters ────────────────────────────────────
+  function animateCounter(el, target, isCurrency, isArea) {
+    if (!el) return;
+    const duration = 800;
+    const start = performance.now();
+    const startVal = 0;
+    function update(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(startVal + (target - startVal) * eased);
+      if (isCurrency) el.textContent = '₹' + current.toFixed(1);
+      else if (isArea) el.textContent = current.toLocaleString() + ' sqft';
+      else el.textContent = current.toLocaleString();
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+
+  // Patch render to animate KPIs
+  (function() {
+    const origRender = window.render;
+    if (typeof origRender === 'function') {
+      window.render = function(...args) {
+        origRender.apply(this, args);
+        // After a tick, re-animate KPI values
+        setTimeout(() => {
+          const kpiTotal    = document.getElementById('kpiTotal');
+          const kpiHandover = document.getElementById('kpiHandover');
+          const kpiPending  = document.getElementById('kpiPending');
+          const kpiRevEl    = document.getElementById('kpiRevenue');
+          const kpiArea     = document.getElementById('kpiSaleableArea');
+          [kpiTotal, kpiHandover, kpiPending].forEach(el => {
+            if (el) { const v = parseInt(el.textContent.replace(/[^0-9]/g,'')); if (!isNaN(v)) animateCounter(el, v, false, false); }
+          });
+        }, 50);
+      };
+    }
+  })();
+
+  // ── Restore brand color on page load ────────────────────────
+  (function() {
+    const savedColor = JSON.parse(localStorage.getItem('bi_brand_color') || 'null');
+    if (savedColor) {
+      document.documentElement.style.setProperty('--primary', savedColor.primary);
+      document.documentElement.style.setProperty('--primary-dark', savedColor.dark);
+    }
+  })();
+
+  // ── Sticky Tab Navigation on Scroll ────────────────────────
+  (function() {
+    let stickyActive = false;
+    const tabNav = document.getElementById('tabNavigation');
+    let navOffsetTop = 0;
+    window.addEventListener('scroll', function() {
+      if (!tabNav || tabNav.style.display === 'none') return;
+      if (!navOffsetTop) navOffsetTop = tabNav.getBoundingClientRect().top + window.scrollY;
+      const shouldStick = window.scrollY > navOffsetTop - 10;
+      if (shouldStick && !stickyActive) { tabNav.classList.add('sticky-nav'); stickyActive = true; }
+      else if (!shouldStick && stickyActive) { tabNav.classList.remove('sticky-nav'); stickyActive = false; }
+    }, { passive: true });
+  })();
+
+  // ── Keyboard shortcut hint on header ────────────────────────
+  (function() {
+    // Show Ctrl+K hint after 3 seconds on first login
+    setTimeout(() => {
+      if (document.getElementById('loginOverlay')?.style.display !== 'none' &&
+          document.getElementById('loginOverlay')?.style.display !== '') return;
+      if (typeof showToast === 'function' && !sessionStorage.getItem('bi_shortcut_hint')) {
+        sessionStorage.setItem('bi_shortcut_hint', '1');
+        showToast('info', 'Tip: Quick Search', 'Press Ctrl+K anywhere to instantly search units & projects.', 5000);
+      }
+    }, 3500);
+  })();
+
 </script>
 
 <!-- Column Filter Dropdown — rendered at body level to avoid overflow clipping -->
@@ -9095,26 +10802,31 @@
     <button class="cfd-btn-clear" onclick="clearCFD()">Clear Filter</button>
   </div>
 </div>
-<!-- ===== SETTINGS MODAL ===== -->
+<!-- ===== PREMIUM ADMIN SETTINGS MODAL ===== -->
 <div class="settings-overlay" id="settingsOverlay" onclick="if(event.target===this)closeSettings()">
-  <div class="settings-modal">
+  <div class="settings-modal" style="max-width:780px;width:96%;">
     <div class="settings-header">
-      <h2><i class="bi bi-shield-lock-fill"></i> Admin Settings</h2>
+      <h2><i class="bi bi-shield-lock-fill"></i> Admin Control Panel</h2>
       <div style="display:flex;align-items:center;gap:0.75rem;">
-        <button onclick="persistGitHubDB().then(()=>alert('Synced to GitHub ✓'))" style="background:rgba(255,255,255,0.18);border:1.5px solid rgba(255,255,255,0.4);color:#fff;padding:0.45rem 1rem;border-radius:8px;font-weight:600;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;gap:0.4rem;" title="Force sync current data to GitHub">
+        <button onclick="persistGitHubDB().then(()=>showToast('success','Synced!','User data synced to GitHub successfully.'))" style="background:rgba(255,255,255,0.18);border:1.5px solid rgba(255,255,255,0.4);color:#fff;padding:0.45rem 1rem;border-radius:8px;font-weight:600;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;gap:0.4rem;" title="Force sync current data to GitHub">
           <i class="bi bi-cloud-arrow-up-fill"></i> Sync to GitHub
         </button>
         <button class="settings-close" onclick="closeSettings()"><i class="bi bi-x-lg"></i></button>
       </div>
     </div>
-    <div class="settings-tabs">
-      <div class="settings-tab active" id="stab-users" onclick="switchSettingsTab('users')"><i class="bi bi-people-fill"></i> User Management</div>
-      <div class="settings-tab" id="stab-log" onclick="switchSettingsTab('log')"><i class="bi bi-clock-history"></i> Activity Log</div>
+    <!-- Extended Tab Bar -->
+    <div class="settings-tabs" style="overflow-x:auto;display:flex;gap:0;padding:0 0.5rem;">
+      <button class="settings-tab-ext active" id="stab-users" onclick="switchSettingsTabExt('users')"><i class="bi bi-people-fill"></i> Users</button>
+      <button class="settings-tab-ext" id="stab-log" onclick="switchSettingsTabExt('log')"><i class="bi bi-clock-history"></i> Activity Log</button>
+      <button class="settings-tab-ext" id="stab-health" onclick="switchSettingsTabExt('health')"><i class="bi bi-heart-pulse-fill"></i> System Health</button>
+      <button class="settings-tab-ext" id="stab-branding" onclick="switchSettingsTabExt('branding')"><i class="bi bi-palette-fill"></i> Branding</button>
+      <button class="settings-tab-ext" id="stab-security" onclick="switchSettingsTabExt('security')"><i class="bi bi-shield-fill-check"></i> Security</button>
+      <button class="settings-tab-ext" id="stab-export" onclick="switchSettingsTabExt('export')"><i class="bi bi-box-arrow-up"></i> Export</button>
     </div>
     <div class="settings-body">
 
-      <!-- User Management Panel -->
-      <div id="spanel-users">
+      <!-- ── User Management Panel ── -->
+      <div id="spanel-users" class="settings-panel-ext visible">
         <div class="settings-form">
           <h3><i class="bi bi-person-plus-fill"></i> Create New User</h3>
           <div class="settings-form-row">
@@ -9130,7 +10842,6 @@
           </div>
           <div id="createUserMsg" style="margin-top:0.75rem;font-size:0.82rem;font-weight:600;display:none;"></div>
         </div>
-
         <h3 style="font-size:0.92rem;font-weight:700;color:#1e293b;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;">
           <i class="bi bi-people"></i> Existing Users
         </h3>
@@ -9138,40 +10849,35 @@
           <table class="settings-table">
             <thead>
               <tr>
-                <th>#</th>
-                <th>Username</th>
-                <th>Created On</th>
-                <th>Last Login</th>
-                <th>Action</th>
+                <th>#</th><th>Username</th><th>Created On</th><th>Last Login</th><th>Reset PIN</th><th>Delete</th>
               </tr>
             </thead>
             <tbody id="usersTableBody">
-              <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">No users created yet</td></tr>
+              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:1.5rem;">No users created yet</td></tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- Activity Log Panel -->
-      <div id="spanel-log" style="display:none;">
+      <!-- ── Activity Log Panel ── -->
+      <div id="spanel-log" class="settings-panel-ext">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
           <h3 style="font-size:0.92rem;font-weight:700;color:#1e293b;margin:0;display:flex;align-items:center;gap:0.5rem;">
             <i class="bi bi-clock-history"></i> Login / Logout Activity
           </h3>
-          <button onclick="clearActivityLog()" style="background:none;border:1.5px solid #fca5a5;color:#ef4444;padding:0.35rem 0.8rem;border-radius:7px;font-size:0.75rem;font-weight:700;cursor:pointer;">
-            <i class="bi bi-trash3"></i> Clear Log
-          </button>
+          <div style="display:flex;gap:0.5rem;">
+            <button onclick="exportActivityLogExcel()" style="background:rgba(16,185,129,0.1);border:1.5px solid rgba(16,185,129,0.3);color:#059669;padding:0.35rem 0.8rem;border-radius:7px;font-size:0.75rem;font-weight:700;cursor:pointer;">
+              <i class="bi bi-file-earmark-excel"></i> Export Excel
+            </button>
+            <button onclick="clearActivityLog()" style="background:none;border:1.5px solid #fca5a5;color:#ef4444;padding:0.35rem 0.8rem;border-radius:7px;font-size:0.75rem;font-weight:700;cursor:pointer;">
+              <i class="bi bi-trash3"></i> Clear Log
+            </button>
+          </div>
         </div>
         <div style="border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
           <table class="settings-table">
             <thead>
-              <tr>
-                <th>#</th>
-                <th>User</th>
-                <th>Event</th>
-                <th>Date</th>
-                <th>Time</th>
-              </tr>
+              <tr><th>#</th><th>User</th><th>Event</th><th>Date</th><th>Time</th></tr>
             </thead>
             <tbody id="activityLogBody">
               <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">No activity recorded</td></tr>
@@ -9180,9 +10886,214 @@
         </div>
       </div>
 
+      <!-- ── System Health Panel ── -->
+      <div id="spanel-health" class="settings-panel-ext">
+        <div class="sys-health-grid">
+          <div class="sys-health-card">
+            <div class="sys-health-icon">💾</div>
+            <div class="sys-health-value" id="shLocalStorage">—</div>
+            <div class="sys-health-label">Local Storage Used</div>
+            <div class="sys-health-badge ok" id="shLocalStorageBadge">OK</div>
+          </div>
+          <div class="sys-health-card">
+            <div class="sys-health-icon">👥</div>
+            <div class="sys-health-value" id="shUserCount">—</div>
+            <div class="sys-health-label">Registered Users</div>
+            <div class="sys-health-badge ok">Active</div>
+          </div>
+          <div class="sys-health-card">
+            <div class="sys-health-icon">📋</div>
+            <div class="sys-health-value" id="shLogCount">—</div>
+            <div class="sys-health-label">Log Entries</div>
+            <div class="sys-health-badge ok">Healthy</div>
+          </div>
+          <div class="sys-health-card">
+            <div class="sys-health-icon">🏗️</div>
+            <div class="sys-health-value" id="shUnitCount">—</div>
+            <div class="sys-health-label">Units Loaded</div>
+            <div class="sys-health-badge ok" id="shDataBadge">—</div>
+          </div>
+          <div class="sys-health-card">
+            <div class="sys-health-icon">⏱️</div>
+            <div class="sys-health-value" id="shSession">—</div>
+            <div class="sys-health-label">Session Duration</div>
+            <div class="sys-health-badge ok">Active</div>
+          </div>
+          <div class="sys-health-card">
+            <div class="sys-health-icon">🔐</div>
+            <div class="sys-health-value" id="shGitHub">—</div>
+            <div class="sys-health-label">GitHub Sync</div>
+            <div class="sys-health-badge" id="shGitHubBadge">—</div>
+          </div>
+        </div>
+        <div style="margin-top:1rem;">
+          <h3 style="font-size:0.88rem;font-weight:700;color:#1e293b;margin-bottom:0.75rem;"><i class="bi bi-info-circle" style="color:var(--primary);margin-right:0.4rem;"></i>Session Information</h3>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;">
+            <div style="background:var(--gray-50);border-radius:8px;padding:0.85rem;border:1px solid var(--gray-200);">
+              <div style="font-size:0.7rem;text-transform:uppercase;font-weight:700;color:var(--gray-500);margin-bottom:0.3rem;">Logged In User</div>
+              <div style="font-size:0.95rem;font-weight:700;color:var(--gray-800);" id="shCurrentUser">—</div>
+            </div>
+            <div style="background:var(--gray-50);border-radius:8px;padding:0.85rem;border:1px solid var(--gray-200);">
+              <div style="font-size:0.7rem;text-transform:uppercase;font-weight:700;color:var(--gray-500);margin-bottom:0.3rem;">Login Time</div>
+              <div style="font-size:0.95rem;font-weight:700;color:var(--gray-800);" id="shLoginTime">—</div>
+            </div>
+            <div style="background:var(--gray-50);border-radius:8px;padding:0.85rem;border:1px solid var(--gray-200);">
+              <div style="font-size:0.7rem;text-transform:uppercase;font-weight:700;color:var(--gray-500);margin-bottom:0.3rem;">Browser</div>
+              <div style="font-size:0.85rem;font-weight:600;color:var(--gray-700);" id="shBrowser">—</div>
+            </div>
+            <div style="background:var(--gray-50);border-radius:8px;padding:0.85rem;border:1px solid var(--gray-200);">
+              <div style="font-size:0.7rem;text-transform:uppercase;font-weight:700;color:var(--gray-500);margin-bottom:0.3rem;">Last Data Refresh</div>
+              <div style="font-size:0.85rem;font-weight:600;color:var(--gray-700);" id="shLastRefresh">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Branding Panel ── -->
+      <div id="spanel-branding" class="settings-panel-ext">
+        <div class="branding-section">
+          <h4><i class="bi bi-building"></i> Company Identity</h4>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+            <div class="branding-field">
+              <label>Dashboard Title</label>
+              <input type="text" id="brandTitle" placeholder="Business Intelligence" value="">
+            </div>
+            <div class="branding-field">
+              <label>Company Name</label>
+              <input type="text" id="brandCompany" placeholder="Your Company" value="">
+            </div>
+            <div class="branding-field">
+              <label>Dashboard Subtitle</label>
+              <input type="text" id="brandSubtitle" placeholder="Construction Analytics" value="">
+            </div>
+            <div class="branding-field">
+              <label>Footer Note</label>
+              <input type="text" id="brandFooter" placeholder="Secure • Internal Use Only" value="">
+            </div>
+          </div>
+        </div>
+        <div class="branding-section">
+          <h4><i class="bi bi-palette"></i> Accent Color</h4>
+          <p style="font-size:0.78rem;color:var(--gray-500);margin-bottom:0.75rem;">Choose a theme color for the dashboard (affects buttons, headers, highlights).</p>
+          <div class="color-palette">
+            <div class="color-swatch active" style="background:#C65911;border-color:#C65911;" onclick="setBrandColor('#C65911','#833C0C')" title="Terracotta (Default)"></div>
+            <div class="color-swatch" style="background:#0ea5e9;" onclick="setBrandColor('#0ea5e9','#0369a1')" title="Sky Blue"></div>
+            <div class="color-swatch" style="background:#8b5cf6;" onclick="setBrandColor('#8b5cf6','#6d28d9')" title="Violet"></div>
+            <div class="color-swatch" style="background:#10b981;" onclick="setBrandColor('#10b981','#059669')" title="Emerald"></div>
+            <div class="color-swatch" style="background:#ef4444;" onclick="setBrandColor('#ef4444','#dc2626')" title="Red"></div>
+            <div class="color-swatch" style="background:#f59e0b;" onclick="setBrandColor('#f59e0b','#d97706')" title="Amber"></div>
+            <div class="color-swatch" style="background:#ec4899;" onclick="setBrandColor('#ec4899','#db2777')" title="Pink"></div>
+            <div class="color-swatch" style="background:#1f2937;" onclick="setBrandColor('#1f2937','#111827')" title="Charcoal"></div>
+          </div>
+        </div>
+        <div class="branding-section">
+          <h4><i class="bi bi-megaphone"></i> Announcement Banner</h4>
+          <div class="branding-field">
+            <label>Message (leave empty to hide banner)</label>
+            <input type="text" id="announcementMsgInput" placeholder="e.g. Q4 handover targets updated — check milestone dashboard">
+          </div>
+          <button onclick="saveAnnouncement()" style="background:linear-gradient(135deg,#833C0C,#C65911);color:white;border:none;padding:0.55rem 1.25rem;border-radius:8px;font-weight:600;font-size:0.82rem;cursor:pointer;margin-top:0.25rem;">
+            <i class="bi bi-megaphone-fill"></i> Publish Announcement
+          </button>
+        </div>
+        <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:0.5rem;">
+          <button onclick="applyBranding()" style="background:linear-gradient(135deg,#833C0C,#C65911);color:white;border:none;padding:0.65rem 1.5rem;border-radius:9px;font-weight:700;font-size:0.85rem;cursor:pointer;">
+            <i class="bi bi-check-circle-fill"></i> Apply Branding
+          </button>
+          <button onclick="resetBranding()" style="background:var(--gray-100);color:var(--gray-700);border:none;padding:0.65rem 1.5rem;border-radius:9px;font-weight:600;font-size:0.85rem;cursor:pointer;">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset to Default
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Security Panel ── -->
+      <div id="spanel-security" class="settings-panel-ext">
+        <div class="security-row">
+          <div class="security-row-info">
+            <h5>Session Auto-Logout</h5>
+            <p>Automatically log out users after a period of inactivity.</p>
+          </div>
+          <div class="session-timeout-control">
+            <input type="range" id="sessionTimeoutRange" min="5" max="120" value="30" step="5" oninput="updateSessionTimeoutDisplay()">
+            <span class="session-timeout-val" id="sessionTimeoutDisplay">30 min</span>
+            <button onclick="applySessionTimeout()" style="background:linear-gradient(135deg,#833C0C,#C65911);color:white;border:none;padding:0.4rem 0.8rem;border-radius:7px;font-size:0.75rem;font-weight:700;cursor:pointer;">Apply</button>
+          </div>
+        </div>
+        <div class="security-row">
+          <div class="security-row-info">
+            <h5>Show Session Timer</h5>
+            <p>Display a countdown timer in the bottom-left corner.</p>
+          </div>
+          <button class="security-toggle on" id="sessionTimerToggle" onclick="toggleSessionTimerVis(this)"></button>
+        </div>
+        <div class="security-row">
+          <div class="security-row-info">
+            <h5>DevTools Protection</h5>
+            <p>Blur content and show warning when browser DevTools are opened.</p>
+          </div>
+          <button class="security-toggle on" id="devToolsToggle" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="security-row">
+          <div class="security-row-info">
+            <h5>Right-Click Protection</h5>
+            <p>Disable right-click context menu for non-admin users.</p>
+          </div>
+          <button class="security-toggle on" id="rightClickToggle" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="security-row">
+          <div class="security-row-info">
+            <h5>Admin PIN</h5>
+            <p>Change the master admin PIN for the dashboard.</p>
+          </div>
+          <button onclick="showAdminPinChange()" style="background:rgba(198,89,17,0.12);border:1.5px solid rgba(198,89,17,0.3);color:var(--primary);padding:0.45rem 1rem;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;">
+            <i class="bi bi-key-fill"></i> Change Admin PIN
+          </button>
+        </div>
+        <div class="security-row" style="border:none;background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.2);">
+          <div class="security-row-info">
+            <h5 style="color:#059669;">Security Status</h5>
+            <p>All security measures are active and up to date.</p>
+          </div>
+          <span style="background:rgba(16,185,129,0.12);color:#059669;padding:0.35rem 0.9rem;border-radius:20px;font-size:0.75rem;font-weight:700;border:1px solid rgba(16,185,129,0.25);">
+            <i class="bi bi-shield-fill-check"></i> Secure
+          </span>
+        </div>
+      </div>
+
+      <!-- ── Export Panel ── -->
+      <div id="spanel-export" class="settings-panel-ext">
+        <p style="font-size:0.82rem;color:var(--gray-500);margin-bottom:1.25rem;">Export your dashboard data in various formats for reporting and analysis.</p>
+        <div class="export-options-grid">
+          <div class="export-option-card" onclick="exportActivityLogExcel()">
+            <div class="export-option-icon">📋</div>
+            <div class="export-option-label">Activity Log</div>
+            <div class="export-option-desc">Export login/logout history as Excel</div>
+          </div>
+          <div class="export-option-card" onclick="exportUsersExcel()">
+            <div class="export-option-icon">👥</div>
+            <div class="export-option-label">User List</div>
+            <div class="export-option-desc">Export all registered users to Excel</div>
+          </div>
+          <div class="export-option-card" onclick="printDashboard()">
+            <div class="export-option-icon">🖨️</div>
+            <div class="export-option-label">Print Dashboard</div>
+            <div class="export-option-desc">Print current view or save as PDF</div>
+          </div>
+          <div class="export-option-card" onclick="persistGitHubDB().then(()=>showToast('success','Backup Complete','Data backed up to GitHub successfully.'))">
+            <div class="export-option-icon">☁️</div>
+            <div class="export-option-label">GitHub Backup</div>
+            <div class="export-option-desc">Push all settings and users to GitHub</div>
+          </div>
+        </div>
+        <div style="margin-top:1.25rem;padding:1rem;background:var(--gray-50);border-radius:10px;border:1px solid var(--gray-200);">
+          <h4 style="font-size:0.82rem;font-weight:700;color:var(--gray-700);margin-bottom:0.5rem;"><i class="bi bi-info-circle" style="color:var(--secondary);margin-right:0.4rem;"></i>Export Notes</h4>
+          <p style="font-size:0.75rem;color:var(--gray-500);margin:0;line-height:1.6;">All exports use your current browser's capabilities. Excel exports require SheetJS to be loaded. PDF export uses the browser's built-in print dialog — choose "Save as PDF" as the printer.</p>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
-<!-- ===== END SETTINGS MODAL ===== -->
+<!-- ===== END PREMIUM ADMIN SETTINGS MODAL ===== -->
 </body>
 </html>
