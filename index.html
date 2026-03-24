@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
   <style>
     :root {
@@ -4186,6 +4187,287 @@
     body.dark-mode ::-webkit-scrollbar-thumb { background: #374151; }
     body.dark-mode ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
 
+    /* ═══════════════════════════════════════════════════════════
+       NEW ADVANCED FEATURES CSS
+    ═══════════════════════════════════════════════════════════ */
+
+    /* ── Analytics Row ── */
+    .analytics-row {
+      display: grid;
+      grid-template-columns: 280px 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      animation: fadeIn 0.4s ease;
+    }
+    @media (max-width:1200px) { .analytics-row { grid-template-columns: 1fr 1fr; } }
+    @media (max-width:768px) { .analytics-row { grid-template-columns: 1fr; } }
+    .analytics-card { overflow: hidden; }
+
+    /* ── Smart Insights ── */
+    .insights-card { min-height: 260px; }
+    .insights-list { display: flex; flex-direction: column; gap: 0.6rem; max-height: 260px; overflow-y: auto; }
+    .insight-item {
+      display: flex; align-items: flex-start; gap: 0.65rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: 10px; border-left: 3px solid transparent;
+      font-size: 0.8rem; line-height: 1.45;
+      animation: slideDown 0.3s ease both;
+    }
+    .insight-item.good  { background: rgba(16,185,129,0.07); border-left-color: #10b981; }
+    .insight-item.warn  { background: rgba(245,158,11,0.07); border-left-color: #f59e0b; }
+    .insight-item.danger{ background: rgba(239,68,68,0.07);  border-left-color: #ef4444; }
+    .insight-item.info  { background: rgba(14,165,233,0.07); border-left-color: #0ea5e9; }
+    .insight-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .insight-text { flex: 1; color: var(--gray-700); font-weight: 500; }
+    body.dark-mode .insight-text { color: #cbd5e1; }
+    .insight-value { font-weight: 800; color: var(--gray-900); }
+    body.dark-mode .insight-value { color: #f1f5f9; }
+    .insights-refresh-btn {
+      cursor: pointer; color: var(--gray-400); font-size: 0.9rem;
+      transition: transform 0.3s, color 0.2s;
+    }
+    .insights-refresh-btn:hover { color: var(--primary); transform: rotate(180deg); }
+    .insights-empty { text-align: center; color: var(--gray-400); padding: 2rem; font-size: 0.82rem; }
+
+    /* ── Doughnut Legend ── */
+    .doughnut-legend-item {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.75rem; color: var(--gray-700); font-weight: 500;
+    }
+    body.dark-mode .doughnut-legend-item { color: #cbd5e1; }
+    .doughnut-legend-dot {
+      width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0;
+    }
+    .doughnut-legend-pct { margin-left: auto; font-weight: 700; color: var(--gray-800); font-size: 0.72rem; }
+    body.dark-mode .doughnut-legend-pct { color: #e2e8f0; }
+
+    /* ── Header Ticker Strip ── */
+    .header-ticker {
+      background: rgba(0,0,0,0.2);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding: 0.35rem 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .ticker-inner {
+      display: inline-flex; gap: 0; white-space: nowrap;
+      animation: ticker-scroll 40s linear infinite;
+    }
+    .ticker-inner:hover { animation-play-state: paused; }
+    @keyframes ticker-scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .ticker-item {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0 2rem;
+      font-size: 0.75rem; color: rgba(255,255,255,0.85); font-weight: 500;
+      border-right: 1px solid rgba(255,255,255,0.15);
+    }
+    .ticker-item i { opacity: 0.8; font-size: 0.8rem; }
+    .ticker-item .ticker-val { font-weight: 700; color: #fcd34d; }
+    .ticker-item .ticker-good { color: #6ee7b7; }
+    .ticker-item .ticker-warn { color: #fcd34d; }
+    .ticker-item .ticker-danger { color: #fca5a5; }
+
+    /* ── PA Quarterly Chart Row ── */
+    .pa-charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    @media (max-width:900px) { .pa-charts-row { grid-template-columns: 1fr; } }
+    .pa-chart-card {
+      background: rgba(255,255,255,0.98);
+      backdrop-filter: blur(20px);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(198,89,17,0.1), 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+    body.dark-mode .pa-chart-card { background: #161a22 !important; border-color: rgba(255,255,255,0.07) !important; }
+    .pa-chart-header {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    body.dark-mode .pa-chart-header { border-color: rgba(255,255,255,0.07); }
+    .pa-chart-header h6 {
+      margin: 0; font-size: 0.88rem; font-weight: 700; color: var(--gray-800);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    body.dark-mode .pa-chart-header h6 { color: #e2e8f0; }
+    .pa-chart-header h6 i { color: var(--primary); }
+    .pa-chart-body { padding: 1rem; }
+
+    /* ── Variance colour coding in PA tables ── */
+    .var-ahead  { color: #059669; font-weight: 700; }
+    .var-behind { color: #dc2626; font-weight: 700; }
+    .var-ontrack{ color: #d97706; font-weight: 700; }
+    .var-cell {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.2rem 0.55rem; border-radius: 20px; font-size: 0.72rem; font-weight: 700;
+    }
+    .var-cell.ahead  { background: rgba(16,185,129,0.1);  color: #059669; }
+    .var-cell.behind { background: rgba(239,68,68,0.1);   color: #dc2626; }
+    .var-cell.ontrack{ background: rgba(245,158,11,0.1);  color: #d97706; }
+
+    /* ── PDF Export Button (inside FAB items) ── */
+    .fab-item.pdf-export { }
+
+    /* ── Project Comparison Widget ── */
+    .compare-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
+      z-index: 99990; display: none;
+      align-items: center; justify-content: center; padding: 1rem;
+    }
+    .compare-overlay.visible { display: flex; animation: fadeIn 0.2s ease; }
+    .compare-modal {
+      background: white; border-radius: 20px;
+      width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+      animation: slideDown2 0.3s ease;
+    }
+    body.dark-mode .compare-modal { background: #1a1f2e; }
+    .compare-header {
+      background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+      color: white; padding: 1.5rem 2rem;
+      border-radius: 20px 20px 0 0;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .compare-header h3 { margin: 0; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 0.6rem; }
+    .compare-body { padding: 1.5rem 2rem; }
+    .compare-selects {
+      display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem;
+      align-items: center; margin-bottom: 1.5rem;
+    }
+    .compare-vs {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, #833C0C, #C65911);
+      color: white; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.85rem; flex-shrink: 0;
+    }
+    .compare-select {
+      width: 100%; padding: 0.65rem 0.9rem;
+      border: 1.5px solid var(--gray-200); border-radius: 10px;
+      font-size: 0.88rem; font-family: inherit; outline: none;
+      background: white; color: var(--gray-900);
+      transition: border-color 0.2s;
+    }
+    body.dark-mode .compare-select { background: #1e2330; color: #e2e8f0; border-color: rgba(255,255,255,0.1); }
+    .compare-select:focus { border-color: var(--primary); }
+    .compare-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;
+    }
+    @media (max-width:600px) { .compare-grid { grid-template-columns: 1fr; } }
+    .compare-project-card {
+      border-radius: 12px; overflow: hidden;
+      border: 2px solid var(--gray-200);
+      transition: border-color 0.2s;
+    }
+    .compare-project-card:first-child { border-color: rgba(198,89,17,0.3); }
+    .compare-project-card:last-child  { border-color: rgba(14,165,233,0.3); }
+    .compare-project-header {
+      padding: 0.85rem 1rem; font-size: 0.88rem; font-weight: 700;
+      color: white; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .compare-project-card:first-child .compare-project-header { background: linear-gradient(135deg,#833C0C,#C65911); }
+    .compare-project-card:last-child  .compare-project-header { background: linear-gradient(135deg,#0369a1,#0ea5e9); }
+    .compare-stat-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.6rem 1rem; border-bottom: 1px solid var(--gray-100);
+      font-size: 0.8rem;
+    }
+    body.dark-mode .compare-stat-row { border-color: rgba(255,255,255,0.05); }
+    .compare-stat-row:last-child { border-bottom: none; }
+    .compare-stat-label { color: var(--gray-600); font-weight: 500; }
+    body.dark-mode .compare-stat-label { color: #94a3b8; }
+    .compare-stat-value { font-weight: 700; color: var(--gray-900); }
+    body.dark-mode .compare-stat-value { color: #f1f5f9; }
+    .compare-bar-wrap { padding: 0.5rem 1rem; }
+    .compare-bar-track { background: var(--gray-100); border-radius: 4px; height: 8px; overflow: hidden; }
+    body.dark-mode .compare-bar-track { background: rgba(255,255,255,0.06); }
+    .compare-bar-fill {
+      height: 100%; border-radius: 4px;
+      transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+    }
+    .compare-project-card:first-child .compare-bar-fill { background: linear-gradient(90deg,#833C0C,#C65911); }
+    .compare-project-card:last-child  .compare-bar-fill { background: linear-gradient(90deg,#0369a1,#0ea5e9); }
+    .compare-actions { display: flex; gap: 0.75rem; justify-content: flex-end; padding: 1rem 2rem; border-top: 1px solid var(--gray-100); }
+    body.dark-mode .compare-actions { border-color: rgba(255,255,255,0.07); }
+
+    /* ── PDF Export Progress Overlay ── */
+    .pdf-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+      z-index: 999999; display: none;
+      align-items: center; justify-content: center;
+    }
+    .pdf-overlay.visible { display: flex; }
+    .pdf-modal {
+      background: white; border-radius: 20px; padding: 2.5rem 3rem;
+      text-align: center; min-width: 320px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+      animation: slideDown2 0.3s ease;
+    }
+    body.dark-mode .pdf-modal { background: #1a1f2e; }
+    .pdf-spinner {
+      width: 56px; height: 56px; border-radius: 50%;
+      border: 4px solid var(--gray-200);
+      border-top-color: var(--primary);
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1.25rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .pdf-modal h4 { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.5rem; }
+    body.dark-mode .pdf-modal h4 { color: #f1f5f9; }
+    .pdf-modal p { font-size: 0.82rem; color: var(--gray-500); margin: 0; }
+    .pdf-progress-bar {
+      width: 100%; height: 6px; background: var(--gray-100); border-radius: 3px;
+      margin-top: 1.25rem; overflow: hidden;
+    }
+    .pdf-progress-fill {
+      height: 100%; background: linear-gradient(90deg, #833C0C, #C65911);
+      border-radius: 3px; width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    /* ── Sticky Summary Bar (appears on scroll in dashboard) ── */
+    .sticky-summary-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(26,31,46,0.97); backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding: 0.6rem 1.5rem;
+      display: none; align-items: center; justify-content: space-around;
+      gap: 1rem; z-index: 490;
+      transition: transform 0.3s ease;
+    }
+    .sticky-summary-bar.visible { display: flex; }
+    .sticky-summary-item {
+      display: flex; flex-direction: column; align-items: center; gap: 0.1rem;
+    }
+    .sticky-summary-value {
+      font-size: 1.1rem; font-weight: 800; color: white; line-height: 1;
+    }
+    .sticky-summary-label {
+      font-size: 0.62rem; color: rgba(255,255,255,0.5);
+      text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;
+    }
+    .sticky-summary-divider {
+      width: 1px; height: 32px; background: rgba(255,255,255,0.12);
+    }
+
+    /* ── Confetti canvas ── */
+    #confettiCanvas {
+      position: fixed; inset: 0; pointer-events: none; z-index: 999997;
+      display: none;
+    }
+
+    /* ─────── Dark-mode additions for new cards ─────── */
+    body.dark-mode .analytics-card { background: #161a22 !important; border-color: rgba(255,255,255,0.07) !important; }
+
     /* ── Sticky Tab Nav on scroll ── */
     .tab-navigation.sticky-nav {
       position: sticky;
@@ -4435,8 +4717,10 @@
         Business Intelligence
       </h1>
     </div>
-  </div>
-</header>
+    <!-- Premium data ticker strip -->
+    <div class="header-ticker" id="headerTicker" style="display:none;">
+      <div class="ticker-inner" id="tickerInner"></div>
+    </div>
 
 <main class="main-container" id="mainContainer">
 
@@ -4558,6 +4842,8 @@
   <div class="fab-items" id="fabItems">
     <div class="fab-item" onclick="openSettings();toggleFab()"><i class="bi bi-gear-fill" style="color:var(--primary);"></i> Admin Settings</div>
     <div class="fab-item" onclick="openGlobalSearch();toggleFab()"><i class="bi bi-search" style="color:var(--secondary);"></i> Global Search</div>
+    <div class="fab-item" onclick="openCompare();toggleFab()"><i class="bi bi-columns-gap" style="color:#8b5cf6;"></i> Compare Projects</div>
+    <div class="fab-item" onclick="exportFullPDF();toggleFab()"><i class="bi bi-file-earmark-pdf-fill" style="color:#ef4444;"></i> Export PDF Report</div>
     <div class="fab-item" onclick="refreshData();toggleFab()"><i class="bi bi-arrow-clockwise" style="color:var(--success);"></i> Refresh Data</div>
     <div class="fab-item" onclick="openShortcuts();toggleFab()"><i class="bi bi-keyboard" style="color:var(--warning);"></i> Shortcuts</div>
   </div>
@@ -4737,6 +5023,56 @@
         </div>
       </div>
     </div>
+
+    <!-- ===== ANALYTICS CHARTS ROW + SMART INSIGHTS ===== -->
+    <div class="analytics-row" id="analyticsRow" style="display:none;">
+
+      <!-- Doughnut completion chart -->
+      <div class="card analytics-card">
+        <div class="card-header-custom">
+          <h5><i class="bi bi-pie-chart-fill"></i> Stage Completion Overview</h5>
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <span style="font-size:0.72rem;color:var(--gray-500);">% of total scope</span>
+          </div>
+        </div>
+        <div class="card-body-custom" style="display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap;padding:1.25rem;">
+          <div style="position:relative;width:200px;height:200px;flex-shrink:0;">
+            <canvas id="completionDoughnut"></canvas>
+            <div id="doughnutCenter" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+              <div style="font-size:2rem;font-weight:800;color:var(--gray-900);line-height:1;" id="doughnutPct">0%</div>
+              <div style="font-size:0.7rem;color:var(--gray-500);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Handover</div>
+            </div>
+          </div>
+          <div id="doughnutLegend" style="display:flex;flex-direction:column;gap:0.5rem;min-width:160px;"></div>
+        </div>
+      </div>
+
+      <!-- Bar chart: Plan vs Actual by stage -->
+      <div class="card analytics-card">
+        <div class="card-header-custom">
+          <h5><i class="bi bi-bar-chart-fill"></i> Milestone Progress by Stage</h5>
+          <span style="font-size:0.72rem;color:var(--gray-500);">Units completed</span>
+        </div>
+        <div class="card-body-custom" style="padding:1rem;">
+          <canvas id="stageBarChart" style="max-height:200px;"></canvas>
+        </div>
+      </div>
+
+      <!-- Smart Insights Panel -->
+      <div class="card analytics-card insights-card">
+        <div class="card-header-custom">
+          <h5><i class="bi bi-lightbulb-fill" style="color:#f59e0b;"></i> Smart Insights</h5>
+          <span class="insights-refresh-btn" onclick="buildInsights()" title="Refresh insights">
+            <i class="bi bi-arrow-clockwise"></i>
+          </span>
+        </div>
+        <div class="card-body-custom" style="padding:0.75rem;">
+          <div id="insightsList" class="insights-list"></div>
+        </div>
+      </div>
+
+    </div>
+    <!-- ===== END ANALYTICS CHARTS ROW ===== -->
 
     <!-- Summary Tables Section -->
     <section class="summary-tables-section" id="summaryTablesSection">
@@ -5288,6 +5624,9 @@
 
   </div>
   <!-- End Plan Actual Tab -->
+
+  <!-- ===== PA CHARTS ROW ===== -->
+  <!-- (injected inside planActualDataSection via JS after data loads) -->
   <!-- Graphical Representation (Tower Visualization) Tab Content -->
   <div class="tab-content" id="towerTab">
     
@@ -6085,6 +6424,8 @@
       nList.insertBefore(newNotif, nList.firstChild);
       if (typeof updateNotifBadge === 'function' && typeof notifCount !== 'undefined') updateNotifBadge(notifCount + 1);
     }
+    // ── Fire advanced analytics (charts, insights, ticker) ──
+    setTimeout(() => { if (typeof window._buildAnalytics === 'function') window._buildAnalytics(); }, 150);
   }
 
   // ===== SHELL MASTER SHEET PARSER =====
@@ -10644,6 +10985,746 @@
     }
   })();
 
+  // ═══════════════════════════════════════════════════════════════════════
+  //  ADVANCED ANALYTICS ENGINE
+  // ═══════════════════════════════════════════════════════════════════════
+
+  // ── Chart instances (kept for destroy/rebuild on filter change) ────────
+  let _doughnutChart = null;
+  let _stageBarChart = null;
+  let _paRevChart    = null;
+  let _paNosChart    = null;
+
+  // ── Build all charts + insights after data loads ───────────────────────
+  function buildAnalytics() {
+    if (!raw.length) return;
+    document.getElementById('analyticsRow').style.display = 'grid';
+    buildDoughnutChart();
+    buildStageBarChart();
+    buildInsights();
+    buildHeaderTicker();
+    buildStickySummaryBar();
+    buildPACharts();
+    buildCompareDropdowns();
+  }
+
+  // ── Doughnut Completion Chart ──────────────────────────────────────────
+  function buildDoughnutChart() {
+    const d = currentFilteredData.length ? currentFilteredData : raw;
+    const scope    = d.length;
+    const gfc      = d.filter(x => x.GFC).length;
+    const plaster  = d.filter(x => x.Plaster).length;
+    const floor    = d.filter(x => x.Floor).length;
+    const fenest   = d.filter(x => x.Fenest).length;
+    const handover = d.filter(x => x.Hand).length;
+    const pending  = scope - handover;
+    const pct      = scope > 0 ? Math.round((handover / scope) * 100) : 0;
+
+    document.getElementById('doughnutPct').textContent = pct + '%';
+
+    const labels = ['Handover Ready','Fenestration','Flooring','Plaster','GFC','Remaining'];
+    const data   = [handover, Math.max(0,fenest-handover), Math.max(0,floor-fenest),
+                    Math.max(0,plaster-floor), Math.max(0,gfc-plaster), Math.max(0,scope-gfc)];
+    const colors = ['#446A2C','#A9D08E','#FFE699','#A5A5A5','#FFC000','#e5e7eb'];
+
+    const canvas = document.getElementById('completionDoughnut');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    if (_doughnutChart) _doughnutChart.destroy();
+    _doughnutChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#fff', hoverOffset: 8 }] },
+      options: {
+        cutout: '72%', responsive: true, maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const v = ctx.parsed;
+                const pct = scope > 0 ? Math.round((v/scope)*100) : 0;
+                return ` ${ctx.label}: ${v.toLocaleString()} (${pct}%)`;
+              }
+            }
+          }
+        },
+        animation: { animateRotate: true, duration: 900, easing: 'easeOutQuart' }
+      }
+    });
+
+    // Legend
+    const legend = document.getElementById('doughnutLegend');
+    if (legend) {
+      legend.innerHTML = labels.map((l,i) => {
+        if (data[i] === 0) return '';
+        const p = scope > 0 ? Math.round((data[i]/scope)*100) : 0;
+        return `<div class="doughnut-legend-item">
+          <div class="doughnut-legend-dot" style="background:${colors[i]};"></div>
+          <span>${l}</span>
+          <span class="doughnut-legend-pct">${p}%</span>
+        </div>`;
+      }).join('');
+    }
+  }
+
+  // ── Stage Bar Chart ────────────────────────────────────────────────────
+  function buildStageBarChart() {
+    const d = currentFilteredData.length ? currentFilteredData : raw;
+    const scope = d.length;
+    const stages = [
+      { label: 'GFC',       val: d.filter(x=>x.GFC).length,    color:'#FFC000' },
+      { label: 'Plaster',   val: d.filter(x=>x.Plaster).length, color:'#A5A5A5' },
+      { label: 'Flooring',  val: d.filter(x=>x.Floor).length,   color:'#FFE699' },
+      { label: 'HVAC',      val: d.filter(x=>x.HVAC).length,    color:'#FFF2CC' },
+      { label: 'False Ceil',val: d.filter(x=>x.False).length,   color:'#E2EFDA' },
+      { label: 'Fenest.',   val: d.filter(x=>x.Fenest).length,  color:'#A9D08E' },
+      { label: 'Handover',  val: d.filter(x=>x.Hand).length,    color:'#446A2C'  },
+    ];
+
+    const canvas = document.getElementById('stageBarChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (_stageBarChart) _stageBarChart.destroy();
+
+    _stageBarChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: stages.map(s=>s.label),
+        datasets: [
+          { label: 'Completed', data: stages.map(s=>s.val), backgroundColor: stages.map(s=>s.color), borderRadius: 6, borderSkipped: false },
+          { label: 'Balance',   data: stages.map(s=>Math.max(0,scope-s.val)), backgroundColor: stages.map(()=>'rgba(0,0,0,0.06)'), borderRadius: 6, borderSkipped: false }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: true,
+        plugins: {
+          legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 }, color: '#6b7280' } },
+          tooltip: { callbacks: {
+            label: ctx => {
+              const p = scope>0 ? Math.round((ctx.parsed.y/scope)*100) : 0;
+              return ` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()} (${p}%)`;
+            }
+          }}
+        },
+        scales: {
+          x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 }, color: '#6b7280' } },
+          y: { stacked: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 10 }, color: '#6b7280' } }
+        },
+        animation: { duration: 700, easing: 'easeOutQuart' }
+      }
+    });
+  }
+
+  // ── Smart Insights Engine ──────────────────────────────────────────────
+  function buildInsights() {
+    const d = currentFilteredData.length ? currentFilteredData : raw;
+    const scope    = d.length;
+    if (!scope) { document.getElementById('insightsList').innerHTML = '<div class="insights-empty">Load data to generate insights.</div>'; return; }
+
+    const insights = [];
+    const handover  = d.filter(x=>x.Hand).length;
+    const plaster   = d.filter(x=>x.Plaster).length;
+    const floor     = d.filter(x=>x.Floor).length;
+    const fenest    = d.filter(x=>x.Fenest).length;
+    const gfc       = d.filter(x=>x.GFC).length;
+    const hvac      = d.filter(x=>x.HVAC).length;
+    const pct       = scope > 0 ? Math.round((handover/scope)*100) : 0;
+    const projects  = [...new Set(d.map(x=>x.Project).filter(Boolean))];
+    const towers    = [...new Set(d.map(x=>x.Tower).filter(Boolean))];
+
+    // Revenue
+    const pendingRev = (d.filter(x=>!x.Hand).reduce((s,x)=>s+x.HandRev,0) / 10000000).toFixed(1);
+    const plasterRev = (d.filter(x=>!x.Plaster).reduce((s,x)=>s+x.PlasterRev,0) / 10000000).toFixed(1);
+
+    // Bottleneck stage — largest gap between consecutive stages
+    const stageCounts = [scope, gfc, plaster, floor, hvac, fenest, handover];
+    const stageNames  = ['Scope','GFC','Plaster','Flooring','HVAC','Fenestration','Handover'];
+    let maxDrop = 0, bottleneckIdx = 0;
+    for (let i = 1; i < stageCounts.length; i++) {
+      const drop = stageCounts[i-1] - stageCounts[i];
+      if (drop > maxDrop) { maxDrop = drop; bottleneckIdx = i; }
+    }
+
+    // Insight 1: Overall completion
+    const type1 = pct >= 70 ? 'good' : pct >= 40 ? 'warn' : 'danger';
+    const icon1 = pct >= 70 ? '🏆' : pct >= 40 ? '📊' : '⚠️';
+    insights.push({ type: type1, icon: icon1, text: `Overall handover completion is <strong>${pct}%</strong> — ${handover.toLocaleString()} of ${scope.toLocaleString()} units are ready.` });
+
+    // Insight 2: Bottleneck
+    if (maxDrop > 0) {
+      insights.push({ type: 'warn', icon: '🔧', text: `Biggest bottleneck: <strong>${maxDrop.toLocaleString()} units</strong> are stuck between <strong>${stageNames[bottleneckIdx-1]}</strong> and <strong>${stageNames[bottleneckIdx]}</strong>. Focus here for fastest progress.` });
+    }
+
+    // Insight 3: Pending handover revenue
+    if (parseFloat(pendingRev) > 0) {
+      insights.push({ type: 'info', icon: '💰', text: `<strong>₹${pendingRev} Cr</strong> in handover revenue is pending — completing remaining ${(scope-handover).toLocaleString()} units unlocks this.` });
+    }
+
+    // Insight 4: Plaster pending revenue
+    if (parseFloat(plasterRev) > 0) {
+      insights.push({ type: 'info', icon: '🏗️', text: `<strong>₹${plasterRev} Cr</strong> in plaster milestone revenue remains — ${(scope-plaster).toLocaleString()} units are not yet plastered.` });
+    }
+
+    // Insight 5: Best performing project
+    if (projects.length > 1) {
+      const projStats = projects.map(p => {
+        const pd = d.filter(x=>x.Project===p);
+        return { name: p, pct: pd.length > 0 ? Math.round((pd.filter(x=>x.Hand).length/pd.length)*100) : 0 };
+      }).sort((a,b)=>b.pct-a.pct);
+      insights.push({ type: 'good', icon: '⭐', text: `Best performing project: <strong>${projStats[0].name}</strong> at <strong>${projStats[0].pct}%</strong> handover. Worst: <strong>${projStats[projStats.length-1].name}</strong> at <strong>${projStats[projStats.length-1].pct}%</strong>.` });
+    }
+
+    // Insight 6: GFC coverage
+    const gfcPct = scope > 0 ? Math.round((gfc/scope)*100) : 0;
+    if (gfcPct < 100) {
+      insights.push({ type: gfcPct > 80 ? 'good' : 'warn', icon: '📋', text: `GFC released for <strong>${gfcPct}%</strong> of units (${gfc.toLocaleString()}/${scope.toLocaleString()}). ${(scope-gfc).toLocaleString()} units still awaiting GFC release.` });
+    }
+
+    // Insight 7: HVAC vs False Ceiling gap
+    const hvacFcGap = hvac - d.filter(x=>x.False).length;
+    if (hvacFcGap > 10) {
+      insights.push({ type: 'warn', icon: '❄️', text: `<strong>${hvacFcGap.toLocaleString()} units</strong> have HVAC installed but false ceiling pending — potential finishing delay.` });
+    }
+
+    // Insight 8: Near-complete units
+    const nearComplete = d.filter(x => x.Fenest && !x.Hand).length;
+    if (nearComplete > 0) {
+      insights.push({ type: 'good', icon: '🎯', text: `<strong>${nearComplete.toLocaleString()} units</strong> have completed fenestration and are in the final stretch before handover. High priority for delivery team.` });
+    }
+
+    const list = document.getElementById('insightsList');
+    list.innerHTML = insights.map((ins, i) =>
+      `<div class="insight-item ${ins.type}" style="animation-delay:${i*0.05}s;">
+        <span class="insight-icon">${ins.icon}</span>
+        <span class="insight-text">${ins.text}</span>
+      </div>`
+    ).join('');
+
+    // Celebration if > 80% handover
+    if (pct >= 80 && pct < 100) triggerConfetti();
+  }
+
+  // ── Header Ticker ──────────────────────────────────────────────────────
+  function buildHeaderTicker() {
+    const d = raw;
+    if (!d.length) return;
+    const scope    = d.length;
+    const handover = d.filter(x=>x.Hand).length;
+    const plaster  = d.filter(x=>x.Plaster).length;
+    const floor    = d.filter(x=>x.Floor).length;
+    const pct      = scope > 0 ? Math.round((handover/scope)*100) : 0;
+    const rev      = (d.filter(x=>!x.Hand).reduce((s,x)=>s+x.HandRev,0)/10000000).toFixed(1);
+    const projects = [...new Set(d.map(x=>x.Project).filter(Boolean))].length;
+    const towers   = [...new Set(d.map(x=>x.Tower).filter(Boolean))].length;
+    const plasterPct = scope>0 ? Math.round((plaster/scope)*100) : 0;
+    const floorPct   = scope>0 ? Math.round((floor/scope)*100) : 0;
+
+    const items = [
+      { icon:'bi-buildings',    label:'Total Units',       val: scope.toLocaleString(),      cls:'ticker-val' },
+      { icon:'bi-check-circle-fill', label:'Handover Ready', val: `${handover.toLocaleString()} (${pct}%)`, cls: pct>=70?'ticker-good':'ticker-warn' },
+      { icon:'bi-currency-rupee', label:'Pending Revenue',  val: `₹${rev} Cr`,               cls:'ticker-danger' },
+      { icon:'bi-folder-fill',  label:'Projects',          val: projects,                    cls:'ticker-val' },
+      { icon:'bi-building',     label:'Towers',            val: towers,                      cls:'ticker-val' },
+      { icon:'bi-paint-bucket', label:'Plaster Done',      val: `${plasterPct}%`,            cls: plasterPct>=70?'ticker-good':'ticker-warn' },
+      { icon:'bi-grid-3x3',     label:'Flooring Done',     val: `${floorPct}%`,              cls: floorPct>=70?'ticker-good':'ticker-warn' },
+      { icon:'bi-clock-fill',   label:'Data as of',        val: new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}), cls:'ticker-val' },
+    ];
+
+    const html = items.map(it =>
+      `<span class="ticker-item"><i class="bi ${it.icon}"></i>${it.label}: <span class="${it.cls}">${it.val}</span></span>`
+    ).join('');
+    // Duplicate for infinite scroll
+    document.getElementById('tickerInner').innerHTML = html + html;
+    document.getElementById('headerTicker').style.display = 'block';
+  }
+
+  // ── Sticky Summary Bar ─────────────────────────────────────────────────
+  function buildStickySummaryBar() {
+    const d = currentFilteredData.length ? currentFilteredData : raw;
+    if (!d.length) return;
+    const scope    = d.length;
+    const handover = d.filter(x=>x.Hand).length;
+    const pct      = scope > 0 ? Math.round((handover/scope)*100) : 0;
+    const rev      = (d.filter(x=>!x.Hand).reduce((s,x)=>s+x.HandRev,0)/10000000).toFixed(1);
+    const projects = [...new Set(d.map(x=>x.Project).filter(Boolean))].length;
+
+    const set = (id, v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+    set('stickyTotal',    scope.toLocaleString());
+    set('stickyHandover', handover.toLocaleString());
+    set('stickyPct',      pct + '%');
+    set('stickyRevenue',  '₹' + rev);
+    set('stickyProjects', projects);
+
+    // Show after scrolling 400px
+    const bar = document.getElementById('stickySummaryBar');
+    const onScroll = () => { if (bar) bar.classList.toggle('visible', window.scrollY > 400 && document.getElementById('tabNavigation')?.style.display !== 'none'); };
+    window.removeEventListener('scroll', window._stickySummaryHandler);
+    window._stickySummaryHandler = onScroll;
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  // ── Plan vs Actuals Charts (quarterly) ────────────────────────────────
+  function buildPACharts() {
+    // Insert chart row into PA section if not already there
+    const paSection = document.getElementById('planActualDataSection');
+    if (!paSection || paSection.querySelector('#paChartsRow')) { updatePACharts(); return; }
+    const row = document.createElement('div');
+    row.className = 'pa-charts-row';
+    row.id = 'paChartsRow';
+    row.innerHTML = `
+      <div class="pa-chart-card">
+        <div class="pa-chart-header">
+          <h6><i class="bi bi-bar-chart-fill"></i> Revenue Plan vs Actual (₹ Cr)</h6>
+          <span style="font-size:0.72rem;color:var(--gray-500);">By Quarter</span>
+        </div>
+        <div class="pa-chart-body"><canvas id="paRevChart" style="max-height:220px;"></canvas></div>
+      </div>
+      <div class="pa-chart-card">
+        <div class="pa-chart-header">
+          <h6><i class="bi bi-graph-up"></i> Units Plan vs Actual</h6>
+          <span style="font-size:0.72rem;color:var(--gray-500);">By Quarter</span>
+        </div>
+        <div class="pa-chart-body"><canvas id="paNosChart" style="max-height:220px;"></canvas></div>
+      </div>`;
+    paSection.insertBefore(row, paSection.firstChild);
+    setTimeout(updatePACharts, 100);
+  }
+
+  function updatePACharts() {
+    const filteredData = raw.filter(r =>
+      (!projectSelPA.size || projectSelPA.has(r.Project)) &&
+      (!towerSelPA.size   || towerSelPA.has(r.Tower))
+    );
+    if (!filteredData.length) return;
+
+    // Collect quarterly data across Plaster, Flooring, Handover
+    const qMap = {};
+    const activities = [
+      { plan:'PlasterPlan',  actual:'PlasterActual',  rev:'PlasterRev' },
+      { plan:'FlooringPlan', actual:'FlooringActual', rev:'FloorRev'   },
+      { plan:'HandoverPlan', actual:'HandoverActual', rev:'HandRev'    },
+    ];
+
+    activities.forEach(act => {
+      filteredData.forEach(r => {
+        const pd = parseDate(r[act.plan]);
+        const ad = parseDate(r[act.actual]);
+        const yr = selectedYearPA || (pd ? pd.getFullYear().toString() : null);
+        if (pd && yr && pd.getFullYear().toString() === yr) {
+          const k = `Q${getQuarter(pd)}`;
+          if (!qMap[k]) qMap[k] = { planRev:0, actualRev:0, planNos:0, actualNos:0 };
+          qMap[k].planRev += (r[act.rev] || 0) / 10000000;
+          qMap[k].planNos++;
+        }
+        if (ad && yr && ad.getFullYear().toString() === yr) {
+          const k = `Q${getQuarter(ad)}`;
+          if (!qMap[k]) qMap[k] = { planRev:0, actualRev:0, planNos:0, actualNos:0 };
+          qMap[k].actualRev += (r[act.rev] || 0) / 10000000;
+          qMap[k].actualNos++;
+        }
+      });
+    });
+
+    const quarters  = ['Q1','Q2','Q3','Q4'];
+    const planRev   = quarters.map(q => qMap[q] ? +qMap[q].planRev.toFixed(2) : 0);
+    const actualRev = quarters.map(q => qMap[q] ? +qMap[q].actualRev.toFixed(2) : 0);
+    const planNos   = quarters.map(q => qMap[q] ? qMap[q].planNos   : 0);
+    const actualNos = quarters.map(q => qMap[q] ? qMap[q].actualNos : 0);
+
+    const revCanvas = document.getElementById('paRevChart');
+    const nosCanvas = document.getElementById('paNosChart');
+    if (!revCanvas || !nosCanvas) return;
+
+    const commonOpts = {
+      responsive: true, maintainAspectRatio: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, font:{size:11}, color:'#6b7280' } }
+      },
+      scales: {
+        x: { grid:{display:false}, ticks:{font:{size:11}, color:'#6b7280'} },
+        y: { grid:{color:'rgba(0,0,0,0.05)'}, ticks:{font:{size:11}, color:'#6b7280'} }
+      },
+      animation: { duration: 700 }
+    };
+
+    if (_paRevChart) _paRevChart.destroy();
+    _paRevChart = new Chart(revCanvas.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: quarters,
+        datasets: [
+          { label: 'Plan (₹ Cr)',   data: planRev,   backgroundColor: 'rgba(198,89,17,0.2)',  borderColor: '#C65911', borderWidth: 2, borderRadius: 5 },
+          { label: 'Actual (₹ Cr)', data: actualRev, backgroundColor: 'rgba(16,185,129,0.2)', borderColor: '#10b981', borderWidth: 2, borderRadius: 5 }
+        ]
+      },
+      options: { ...commonOpts, plugins: { ...commonOpts.plugins, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ₹${ctx.parsed.y.toFixed(2)} Cr` } } } }
+    });
+
+    if (_paNosChart) _paNosChart.destroy();
+    _paNosChart = new Chart(nosCanvas.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: quarters,
+        datasets: [
+          { label: 'Plan (Units)',   data: planNos,   backgroundColor: 'rgba(139,92,246,0.2)', borderColor: '#8b5cf6', borderWidth: 2, borderRadius: 5 },
+          { label: 'Actual (Units)', data: actualNos, backgroundColor: 'rgba(14,165,233,0.2)', borderColor: '#0ea5e9', borderWidth: 2, borderRadius: 5 }
+        ]
+      },
+      options: commonOpts
+    });
+  }
+
+  // Rebuild charts when render() fires (filters change)
+  const _origRenderForCharts = render;
+  render = function() {
+    _origRenderForCharts.apply(this, arguments);
+    if (raw.length) {
+      setTimeout(() => { buildDoughnutChart(); buildStageBarChart(); buildInsights(); buildStickySummaryBar(); }, 80);
+    }
+  };
+
+  // ── Project Comparison ─────────────────────────────────────────────────
+  function buildCompareDropdowns() {
+    const projects = [...new Set(raw.map(x=>x.Project).filter(Boolean))].sort();
+    ['compareProjectA','compareProjectB'].forEach(id => {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      sel.innerHTML = '<option value="">— Select Project —</option>' +
+        projects.map(p => `<option value="${p}">${p}</option>`).join('');
+    });
+  }
+
+  function openCompare() {
+    buildCompareDropdowns();
+    const ov = document.getElementById('compareOverlay');
+    if (ov) ov.classList.add('visible');
+  }
+
+  function closeCompare() {
+    const ov = document.getElementById('compareOverlay');
+    if (ov) ov.classList.remove('visible');
+  }
+
+  function renderComparison() {
+    const pa = document.getElementById('compareProjectA')?.value;
+    const pb = document.getElementById('compareProjectB')?.value;
+    const grid = document.getElementById('compareGrid');
+    if (!grid) return;
+
+    if (!pa || !pb) {
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--gray-400);padding:2rem;font-size:0.85rem;"><i class="bi bi-columns-gap" style="font-size:2rem;display:block;margin-bottom:0.75rem;opacity:0.4;"></i>Select two projects to compare.</div>`;
+      return;
+    }
+    if (pa === pb) {
+      grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--danger);padding:1.5rem;font-size:0.85rem;">Please select two different projects.</div>`;
+      return;
+    }
+
+    const stats = [pa, pb].map(proj => {
+      const d = raw.filter(x => x.Project === proj);
+      const scope    = d.length;
+      const handover = d.filter(x=>x.Hand).length;
+      const plaster  = d.filter(x=>x.Plaster).length;
+      const floor    = d.filter(x=>x.Floor).length;
+      const fenest   = d.filter(x=>x.Fenest).length;
+      const gfc      = d.filter(x=>x.GFC).length;
+      const pct      = scope>0 ? Math.round((handover/scope)*100) : 0;
+      const rev      = (d.filter(x=>!x.Hand).reduce((s,x)=>s+x.HandRev,0)/10000000).toFixed(1);
+      const plasterRev = (d.filter(x=>!x.Plaster).reduce((s,x)=>s+x.PlasterRev,0)/10000000).toFixed(1);
+      const towers   = [...new Set(d.map(x=>x.Tower).filter(Boolean))].length;
+      return { proj, scope, handover, plaster, floor, fenest, gfc, pct, rev, plasterRev, towers };
+    });
+
+    const rows = [
+      { label:'Total Units',         vals: stats.map(s=>s.scope.toLocaleString()),    bar: false },
+      { label:'Towers / Blocks',     vals: stats.map(s=>s.towers),                   bar: false },
+      { label:'GFC Released',        vals: stats.map(s=>`${s.gfc} (${s.scope>0?Math.round(s.gfc/s.scope*100):0}%)`), bar: true, pcts: stats.map(s=>s.scope>0?Math.round(s.gfc/s.scope*100):0) },
+      { label:'Plaster Done',        vals: stats.map(s=>`${s.plaster} (${s.scope>0?Math.round(s.plaster/s.scope*100):0}%)`), bar: true, pcts: stats.map(s=>s.scope>0?Math.round(s.plaster/s.scope*100):0) },
+      { label:'Flooring Done',       vals: stats.map(s=>`${s.floor} (${s.scope>0?Math.round(s.floor/s.scope*100):0}%)`), bar: true, pcts: stats.map(s=>s.scope>0?Math.round(s.floor/s.scope*100):0) },
+      { label:'Fenestration Done',   vals: stats.map(s=>`${s.fenest} (${s.scope>0?Math.round(s.fenest/s.scope*100):0}%)`), bar: true, pcts: stats.map(s=>s.scope>0?Math.round(s.fenest/s.scope*100):0) },
+      { label:'Handover Ready',      vals: stats.map(s=>`${s.handover} (${s.pct}%)`), bar: true, pcts: stats.map(s=>s.pct) },
+      { label:'Pending H/O Rev (Cr)',vals: stats.map(s=>`₹${s.rev}`),              bar: false },
+      { label:'Pending Plaster Rev', vals: stats.map(s=>`₹${s.plasterRev} Cr`),    bar: false },
+    ];
+
+    grid.innerHTML = [0,1].map(ci => `
+      <div class="compare-project-card">
+        <div class="compare-project-header"><i class="bi bi-building-fill"></i> ${stats[ci].proj}</div>
+        ${rows.map(row => `
+          <div>
+            <div class="compare-stat-row">
+              <span class="compare-stat-label">${row.label}</span>
+              <span class="compare-stat-value">${row.vals[ci]}</span>
+            </div>
+            ${row.bar ? `<div class="compare-bar-wrap"><div class="compare-bar-track"><div class="compare-bar-fill" style="width:${row.pcts[ci]}%;"></div></div></div>` : ''}
+          </div>`).join('')}
+      </div>`).join('');
+  }
+
+  function exportComparisonExcel() {
+    const pa = document.getElementById('compareProjectA')?.value;
+    const pb = document.getElementById('compareProjectB')?.value;
+    if (!pa || !pb || pa===pb) { showToast('warning','Select Projects','Please select two different projects.'); return; }
+
+    const combined = [pa,pb].reduce((acc,proj) => {
+      raw.filter(x=>x.Project===proj).forEach(r => acc.push([
+        r.Project,r.Tower,r.Phase,r.UnitNo,r.Customer,
+        r.GFC?'✓':'',r.Plaster?'✓':'',r.Floor?'✓':'',r.Fenest?'✓':'',r.Hand?'✓':'',
+        '₹'+(r.HandRev/10000000).toFixed(2)
+      ]));
+      return acc;
+    }, [['Project','Tower','Phase','Unit No','Customer','GFC','Plaster','Flooring','Fenestration','Handover','H/O Rev (Cr)']]);
+
+    const ws = XLSX.utils.aoa_to_sheet(combined);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Comparison');
+    XLSX.writeFile(wb, `Comparison_${pa.replace(/\s/g,'_')}_vs_${pb.replace(/\s/g,'_')}.xlsx`);
+    showToast('success','Exported','Comparison data exported to Excel.');
+  }
+
+  // ── Full PDF Report Export ─────────────────────────────────────────────
+  async function exportFullPDF() {
+    if (!raw.length) { showToast('warning','No Data','Please load data before exporting.'); return; }
+    const overlay = document.getElementById('pdfOverlay');
+    const fill    = document.getElementById('pdfProgressFill');
+    const txt     = document.getElementById('pdfProgressText');
+    const setProgress = (pct, msg) => {
+      if (fill) fill.style.width = pct + '%';
+      if (txt)  txt.textContent  = msg;
+    };
+
+    overlay.classList.add('visible');
+    setProgress(5, 'Initialising PDF engine…');
+    await new Promise(r => setTimeout(r, 200));
+
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const W = 297, H = 210;
+      const brand = '#C65911', dark = '#1f2937';
+
+      const d = raw;
+      const scope    = d.length;
+      const handover = d.filter(x=>x.Hand).length;
+      const plaster  = d.filter(x=>x.Plaster).length;
+      const floor    = d.filter(x=>x.Floor).length;
+      const gfc      = d.filter(x=>x.GFC).length;
+      const fenest   = d.filter(x=>x.Fenest).length;
+      const pct      = scope>0 ? Math.round((handover/scope)*100) : 0;
+      const pendingRev = (d.filter(x=>!x.Hand).reduce((s,x)=>s+x.HandRev,0)/10000000).toFixed(1);
+      const plasterRev = (d.filter(x=>!x.Plaster).reduce((s,x)=>s+x.PlasterRev,0)/10000000).toFixed(1);
+      const projects = [...new Set(d.map(x=>x.Project).filter(Boolean))].sort();
+
+      const addHeader = (title, pageNum) => {
+        // Background bar
+        doc.setFillColor(74,30,6); doc.rect(0,0,W,18,'F');
+        doc.setFillColor(198,89,17); doc.rect(0,16,W,2,'F');
+        // Title
+        doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(255,255,255);
+        doc.text('Business Intelligence — Construction Analytics', 10, 10);
+        doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(255,220,180);
+        doc.text(title, 10, 15);
+        // Date + page
+        doc.setFontSize(8); doc.setTextColor(255,255,255);
+        doc.text(`Generated: ${new Date().toLocaleString('en-IN')}  |  Page ${pageNum}`, W-10, 10, {align:'right'});
+      };
+
+      // ── Page 1: Executive Summary ───────────────────────────────────────
+      setProgress(15, 'Building executive summary…');
+      addHeader('Executive Summary', 1);
+
+      // KPI boxes
+      const kpis = [
+        { label:'Total Units',     val: scope.toLocaleString(),   color:[198,89,17] },
+        { label:'Handover Ready',  val: `${handover.toLocaleString()} (${pct}%)`, color:[16,185,129] },
+        { label:'Pending Units',   val: (scope-handover).toLocaleString(), color:[245,158,11] },
+        { label:'Pending Rev (Cr)',val: '₹'+pendingRev,           color:[239,68,68] },
+        { label:'Projects',        val: projects.length,          color:[14,165,233] },
+      ];
+
+      let kpiX = 10;
+      kpis.forEach(k => {
+        const bw = 51;
+        doc.setFillColor(k.color[0], k.color[1], k.color[2]);
+        doc.roundedRect(kpiX, 22, bw, 28, 3, 3, 'F');
+        doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.setTextColor(255,255,255);
+        doc.text(String(k.val), kpiX+bw/2, 33, {align:'center'});
+        doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(255,255,255);
+        doc.text(k.label, kpiX+bw/2, 40, {align:'center'});
+        kpiX += bw + 4;
+      });
+
+      // Stage progress table
+      setProgress(30, 'Building stage progress table…');
+      doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(31,41,55);
+      doc.text('Stage Progress', 10, 62);
+      doc.setFillColor(74,30,6); doc.rect(10,64,277,7,'F');
+      ['Stage','Completed','Balance','% Done'].forEach((h,i) => {
+        doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(255,255,255);
+        doc.text(h, [10,80,130,200][i]+2, 69);
+      });
+
+      const stageRows = [
+        ['GFC Released',    gfc,    scope-gfc,  scope>0?Math.round(gfc/scope*100):0],
+        ['Plaster',         plaster,scope-plaster,scope>0?Math.round(plaster/scope*100):0],
+        ['Flooring & Dado', floor,  scope-floor, scope>0?Math.round(floor/scope*100):0],
+        ['Fenestration',    fenest, scope-fenest,scope>0?Math.round(fenest/scope*100):0],
+        ['Handover Ready',  handover,scope-handover,pct],
+      ];
+
+      stageRows.forEach((row,i) => {
+        const y = 73 + i*9;
+        if (i%2===0) { doc.setFillColor(249,250,251); doc.rect(10,y-1,277,8,'F'); }
+        doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(55,65,81);
+        doc.text(row[0],   12,  y+5);
+        doc.text(String(row[1]), 82,  y+5);
+        doc.text(String(row[2]), 132, y+5);
+        // Progress bar
+        const barX=200, barW=80, barH=4;
+        doc.setFillColor(229,231,235); doc.roundedRect(barX,y+2,barW,barH,1,1,'F');
+        const pctW = (row[3]/100)*barW;
+        const pctColor = row[3]>=75?[16,185,129]:row[3]>=50?[245,158,11]:[239,68,68];
+        doc.setFillColor(...pctColor);
+        if (pctW>0) doc.roundedRect(barX,y+2,pctW,barH,1,1,'F');
+        doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(...pctColor);
+        doc.text(row[3]+'%', barX+barW+3, y+5);
+      });
+
+      // ── Page 2: Project Breakdown ────────────────────────────────────────
+      setProgress(55, 'Building project breakdown…');
+      doc.addPage();
+      addHeader('Project Breakdown', 2);
+
+      doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(31,41,55);
+      doc.text('Per-Project Summary', 10, 28);
+
+      const projHeaders = ['Project','Scope','Handover','%','Plaster','Flooring','Fenest','Pend. Rev (Cr)'];
+      doc.setFillColor(74,30,6); doc.rect(10,30,277,7,'F');
+      [10,55,90,115,135,160,185,210].forEach((x,i) => {
+        doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(255,255,255);
+        doc.text(projHeaders[i], x+1, 35);
+      });
+
+      projects.slice(0, 20).forEach((proj, i) => {
+        const pd  = raw.filter(x=>x.Project===proj);
+        const sc  = pd.length;
+        const ho  = pd.filter(x=>x.Hand).length;
+        const pl  = pd.filter(x=>x.Plaster).length;
+        const fl  = pd.filter(x=>x.Floor).length;
+        const fe  = pd.filter(x=>x.Fenest).length;
+        const pp  = sc>0?Math.round((ho/sc)*100):0;
+        const rv  = (pd.filter(x=>!x.Hand).reduce((s,x)=>s+x.HandRev,0)/10000000).toFixed(1);
+        const y   = 38 + i*7;
+
+        if (i%2===0) { doc.setFillColor(249,250,251); doc.rect(10,y,277,7,'F'); }
+        doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(55,65,81);
+        const vals = [proj.substring(0,22), sc, ho, pp+'%', pl, fl, fe, '₹'+rv];
+        [10,55,90,115,135,160,185,210].forEach((x,vi) => doc.text(String(vals[vi]), x+1, y+5));
+
+        // colour % cell
+        const pColor = pp>=75?[16,185,129]:pp>=50?[245,158,11]:[239,68,68];
+        doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(...pColor);
+        doc.text(pp+'%', 116, y+5);
+      });
+
+      // ── Page 3: Smart Insights text ──────────────────────────────────────
+      setProgress(80, 'Adding insights page…');
+      doc.addPage();
+      addHeader('Smart Insights & Recommendations', 3);
+
+      const insEls = document.querySelectorAll('#insightsList .insight-item');
+      let iy = 30;
+      insEls.forEach((el,i) => {
+        const text = el.querySelector('.insight-text')?.textContent || '';
+        const type = el.classList.contains('good')?'good':el.classList.contains('warn')?'warn':'danger';
+        const color = type==='good'?[16,185,129]:type==='warn'?[245,158,11]:[239,68,68];
+        doc.setFillColor(...color.map(c=>c+(255-c)*0.9)); doc.roundedRect(10,iy,277,12,2,2,'F');
+        doc.setFillColor(...color); doc.rect(10,iy,3,12,'F');
+        doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(31,41,55);
+        const lines = doc.splitTextToSize(text.replace(/<[^>]+>/g,''), 260);
+        doc.text(lines[0], 16, iy+8);
+        iy += 16;
+        if (iy > 185) { doc.addPage(); addHeader('Smart Insights (cont.)', 4); iy = 30; }
+      });
+
+      // Footer on all pages
+      const pageCount = doc.getNumberOfPages();
+      for (let p = 1; p <= pageCount; p++) {
+        doc.setPage(p);
+        doc.setFillColor(248,250,252); doc.rect(0,H-10,W,10,'F');
+        doc.setFontSize(7); doc.setTextColor(107,114,128);
+        doc.text('Confidential — Business Intelligence Dashboard | Construction Analytics', W/2, H-4, {align:'center'});
+      }
+
+      setProgress(95, 'Saving file…');
+      await new Promise(r => setTimeout(r, 300));
+      doc.save(`BI_Dashboard_Report_${new Date().toLocaleDateString('en-IN').replace(/\//g,'-')}.pdf`);
+      setProgress(100, 'Done!');
+      setTimeout(() => { overlay.classList.remove('visible'); showToast('success','PDF Exported','Full dashboard report saved to your downloads.'); }, 500);
+
+    } catch(err) {
+      overlay.classList.remove('visible');
+      showToast('danger','Export Failed', err.message || 'Could not generate PDF. Please try again.');
+      console.error('PDF export error:', err);
+    }
+  }
+
+  // ── Confetti Celebration ───────────────────────────────────────────────
+  let _confettiActive = false;
+  function triggerConfetti() {
+    if (_confettiActive) return;
+    _confettiActive = true;
+    const canvas = document.getElementById('confettiCanvas');
+    if (!canvas) return;
+    canvas.style.display = 'block';
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+    const pieces = [];
+    const colors = ['#C65911','#FFC000','#10b981','#0ea5e9','#8b5cf6','#ef4444','#f59e0b'];
+
+    for (let i = 0; i < 120; i++) {
+      pieces.push({
+        x: Math.random() * canvas.width,
+        y: -10 - Math.random() * 200,
+        r: 4 + Math.random() * 6,
+        d: 1 + Math.random() * 3,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        tilt: (Math.random()-0.5)*10,
+        tiltAngle: Math.random()*Math.PI*2,
+        tiltSpeed: 0.05 + Math.random()*0.1,
+        shape: Math.random() > 0.5 ? 'rect' : 'circle'
+      });
+    }
+
+    let frame = 0;
+    const draw = () => {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      pieces.forEach(p => {
+        ctx.beginPath(); ctx.fillStyle = p.color;
+        if (p.shape==='rect') {
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.tiltAngle);
+          ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.5); ctx.restore();
+        } else {
+          ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+        }
+        p.y += p.d;
+        p.tiltAngle += p.tiltSpeed;
+        p.x += Math.sin(frame*0.02+pieces.indexOf(p)) * 0.5;
+      });
+      frame++;
+      if (frame < 250) { requestAnimationFrame(draw); }
+      else { ctx.clearRect(0,0,canvas.width,canvas.height); canvas.style.display='none'; _confettiActive=false; }
+    };
+    draw();
+    showToast('success','🎉 Outstanding!','Over 80% handover completion achieved!', 5000);
+  }
+
+  // ── Wire buildAnalytics into prepare() completion ──────────────────────
+  // Called from the prepare() function's tail (added inline below)
+  window._buildAnalytics = buildAnalytics;
+
   // ── Sticky Tab Navigation on Scroll ────────────────────────
   (function() {
     let stickyActive = false;
@@ -10970,5 +12051,82 @@
   </div>
 </div>
 <!-- ===== END PREMIUM ADMIN SETTINGS MODAL ===== -->
+
+<!-- ===== PROJECT COMPARISON MODAL ===== -->
+<div class="compare-overlay" id="compareOverlay" onclick="if(event.target===this)closeCompare()">
+  <div class="compare-modal">
+    <div class="compare-header">
+      <h3><i class="bi bi-columns-gap"></i> Project Comparison</h3>
+      <button onclick="closeCompare()" style="background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.2);color:white;width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="compare-body">
+      <div class="compare-selects">
+        <select class="compare-select" id="compareProjectA" onchange="renderComparison()">
+          <option value="">— Select Project A —</option>
+        </select>
+        <div class="compare-vs">VS</div>
+        <select class="compare-select" id="compareProjectB" onchange="renderComparison()">
+          <option value="">— Select Project B —</option>
+        </select>
+      </div>
+      <div class="compare-grid" id="compareGrid">
+        <div style="grid-column:1/-1;text-align:center;color:var(--gray-400);padding:2rem;font-size:0.85rem;">
+          <i class="bi bi-columns-gap" style="font-size:2rem;display:block;margin-bottom:0.75rem;opacity:0.4;"></i>
+          Select two projects above to compare their progress side by side.
+        </div>
+      </div>
+    </div>
+    <div class="compare-actions">
+      <button onclick="exportComparisonExcel()" style="background:linear-gradient(135deg,#059669,#10b981);color:white;border:none;padding:0.6rem 1.25rem;border-radius:9px;font-weight:600;font-size:0.82rem;cursor:pointer;display:flex;align-items:center;gap:0.4rem;">
+        <i class="bi bi-file-earmark-excel"></i> Export Comparison
+      </button>
+      <button onclick="closeCompare()" style="background:var(--gray-100);color:var(--gray-700);border:none;padding:0.6rem 1.25rem;border-radius:9px;font-weight:600;font-size:0.82rem;cursor:pointer;">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PDF EXPORT OVERLAY ===== -->
+<div class="pdf-overlay" id="pdfOverlay">
+  <div class="pdf-modal">
+    <div class="pdf-spinner"></div>
+    <h4>Generating PDF Report</h4>
+    <p id="pdfProgressText">Preparing dashboard data…</p>
+    <div class="pdf-progress-bar"><div class="pdf-progress-fill" id="pdfProgressFill"></div></div>
+  </div>
+</div>
+
+<!-- ===== STICKY SUMMARY BAR ===== -->
+<div class="sticky-summary-bar" id="stickySummaryBar">
+  <div class="sticky-summary-item">
+    <span class="sticky-summary-value" id="stickyTotal">—</span>
+    <span class="sticky-summary-label">Total Units</span>
+  </div>
+  <div class="sticky-summary-divider"></div>
+  <div class="sticky-summary-item">
+    <span class="sticky-summary-value" id="stickyHandover" style="color:#6ee7b7;">—</span>
+    <span class="sticky-summary-label">Handover Ready</span>
+  </div>
+  <div class="sticky-summary-divider"></div>
+  <div class="sticky-summary-item">
+    <span class="sticky-summary-value" id="stickyPct" style="color:#fcd34d;">—</span>
+    <span class="sticky-summary-label">Completion</span>
+  </div>
+  <div class="sticky-summary-divider"></div>
+  <div class="sticky-summary-item">
+    <span class="sticky-summary-value" id="stickyRevenue" style="color:#fca5a5;">—</span>
+    <span class="sticky-summary-label">Pending Rev (Cr)</span>
+  </div>
+  <div class="sticky-summary-divider"></div>
+  <div class="sticky-summary-item">
+    <span class="sticky-summary-value" id="stickyProjects">—</span>
+    <span class="sticky-summary-label">Projects</span>
+  </div>
+  <button onclick="switchTab('milestone');window.scrollTo({top:0,behavior:'smooth'})" style="background:rgba(198,89,17,0.25);border:1px solid rgba(198,89,17,0.4);color:#fcd34d;padding:0.35rem 0.8rem;border-radius:8px;font-size:0.72rem;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;">
+    <i class="bi bi-arrow-up"></i> Back to Top
+  </button>
+</div>
+
+<!-- ===== CONFETTI CANVAS ===== -->
+<canvas id="confettiCanvas"></canvas>
 </body>
 </html>
