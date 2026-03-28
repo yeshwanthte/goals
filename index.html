@@ -3437,6 +3437,224 @@
       font-size: 0.9rem;
       color: var(--gray-400);
     }
+
+    /* ===== COLUMN CUSTOMISER SIDE PANE ===== */
+    .col-pane-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 8800;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .col-pane-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .col-pane {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 340px;
+      max-width: 94vw;
+      height: 100vh;
+      background: #fff;
+      z-index: 8900;
+      box-shadow: -8px 0 40px rgba(0,0,0,0.18);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(110%);
+      transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+      border-radius: 0;
+    }
+    .col-pane.open {
+      transform: translateX(0);
+    }
+    .col-pane-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 1.1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .col-pane-header h6 {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .col-pane-close {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+    .col-pane-close:hover { background: rgba(255,255,255,0.3); }
+
+    .col-pane-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 1.1rem;
+    }
+    .col-pane-section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--gray-500);
+      margin: 1rem 0 0.5rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .col-pane-section-title:first-child { margin-top: 0; }
+
+    /* Fixed columns list (non-draggable) */
+    .col-fixed-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 0.25rem; }
+    .col-fixed-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.55rem 0.75rem;
+      background: var(--gray-50);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      color: var(--gray-500);
+      border: 1px solid var(--gray-200);
+    }
+    .col-fixed-item i { color: var(--gray-400); font-size: 0.85rem; }
+
+    /* Active optional columns — drag-to-reorder list */
+    .col-active-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-height: 32px;
+      margin-bottom: 0.25rem;
+    }
+    .col-active-list.drag-over-empty {
+      border: 2px dashed var(--primary);
+      border-radius: 8px;
+      min-height: 48px;
+    }
+    .col-active-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.6rem 0.75rem;
+      background: white;
+      border: 1.5px solid var(--primary-light);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      cursor: grab;
+      transition: box-shadow 0.15s, background 0.15s;
+      user-select: none;
+    }
+    .col-active-item:active { cursor: grabbing; }
+    .col-active-item.dragging {
+      opacity: 0.45;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    }
+    .col-active-item.drag-target-above { border-top: 3px solid var(--primary); }
+    .col-active-item.drag-target-below { border-bottom: 3px solid var(--primary); }
+    .col-active-item .drag-handle {
+      color: var(--gray-400);
+      font-size: 0.85rem;
+      cursor: grab;
+    }
+    .col-active-item .remove-col-btn {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--gray-400);
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: color 0.15s, background 0.15s;
+      flex-shrink: 0;
+    }
+    .col-active-item .remove-col-btn:hover { color: var(--danger); background: var(--danger-light); }
+
+    /* Available (inactive) optional columns */
+    .col-available-list { display: flex; flex-direction: column; gap: 4px; }
+    .col-available-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.55rem 0.75rem;
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      color: var(--gray-700);
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .col-available-item:hover { border-color: var(--primary); background: var(--primary-light); }
+    .add-col-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .add-col-btn:hover { background: var(--primary-dark); }
+
+    .col-pane-footer {
+      padding: 0.85rem 1.1rem;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+    .col-pane-apply {
+      flex: 1;
+      padding: 0.65rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .col-pane-apply:hover { opacity: 0.88; }
+    .col-pane-reset {
+      padding: 0.65rem 1rem;
+      background: white;
+      color: var(--gray-600);
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .col-pane-reset:hover { background: var(--gray-100); }
+    /* ===== END COLUMN CUSTOMISER ===== */
   </style>
 </head>
 
@@ -3775,6 +3993,9 @@
               Unit Details - <span id="detailsActivityName" class="activity-badge"></span>
             </h5>
             <div class="details-actions">
+              <button onclick="openColPane()" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;border:none;padding:0.5rem 1.1rem;border-radius:50px;font-size:0.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.45rem;box-shadow:0 2px 8px rgba(198,89,17,0.3);">
+                <i class="bi bi-layout-three-columns"></i> Columns
+              </button>
               <button class="btn-download-excel" onclick="downloadExcel()">
                 <i class="bi bi-file-earmark-excel"></i> Download Excel
               </button>
@@ -4499,6 +4720,40 @@
 </div>
 <!-- Excel-style column filter dropdown moved to body level — see bottom of page -->
 
+
+<!-- ===== COLUMN CUSTOMISER SIDE PANE ===== -->
+<div class="col-pane-overlay" id="colPaneOverlay" onclick="closeColPane()"></div>
+<div class="col-pane" id="colPane">
+  <div class="col-pane-header">
+    <h6><i class="bi bi-layout-three-columns"></i> Customise Columns</h6>
+    <button class="col-pane-close" onclick="closeColPane()"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <div class="col-pane-body">
+    <!-- Fixed columns -->
+    <div class="col-pane-section-title">Fixed Columns (always shown)</div>
+    <div class="col-fixed-list">
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Project</div>
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Phase</div>
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Tower</div>
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Unit No.</div>
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Customer Name</div>
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Revenue (₹ Cr)</div>
+    </div>
+
+    <!-- Active optional columns (draggable) -->
+    <div class="col-pane-section-title">Active Status Columns <span style="color:var(--gray-400);font-weight:400">(drag to reorder)</span></div>
+    <div class="col-active-list" id="colActiveList"></div>
+
+    <!-- Available columns to add -->
+    <div class="col-pane-section-title">Available Columns</div>
+    <div class="col-available-list" id="colAvailableList"></div>
+  </div>
+  <div class="col-pane-footer">
+    <button class="col-pane-apply" onclick="applyColPane()"><i class="bi bi-check2"></i> Apply</button>
+    <button class="col-pane-reset" onclick="resetColPane()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+  </div>
+</div>
+<!-- ===== END COLUMN CUSTOMISER ===== -->
 </main>
 
 <!-- Footer -->
@@ -4719,7 +4974,16 @@
     AFS_DATE: 61, // Column BJ (index 61)
     HO_AFS: 62, // Column BK (index 62)
     IDSA_DATE: 63, // Column BL (index 63)
-    HO_IDSA: 64  // Column BM (index 64)
+    HO_IDSA: 64,  // Column BM (index 64)
+    // Optional status columns (for the side pane)
+    MASONRY:   34,  // Column AI (index 34)
+    CONDUITING: 35, // Column AJ (index 35)
+    TOILET_WP:  37, // Column AL (index 37)
+    PLUMBING:   38, // Column AM (index 38)
+    HVAC_OPT:   40, // Column AP (index 40)  -- note: same col as HVAC
+    FALSE_CEIL: 42, // Column AQ (index 42) -- note: shares with FALSE
+    FURNITURE:  48, // Column AW (index 48)
+    KITCHEN:    49  // Column AX (index 49)
   };
 
   // File handling (only wire up if upload elements exist in the DOM)
@@ -4825,7 +5089,16 @@
       AFSDate: r[COL.AFS_DATE] || "",
       HOasPerAFS: r[COL.HO_AFS] || "",
       IDSADate: r[COL.IDSA_DATE] || "",
-      HOasPerIDSA: r[COL.HO_IDSA] || ""
+      HOasPerIDSA: r[COL.HO_IDSA] || "",
+      // Optional status fields
+      Masonry:   validDate(r[COL.MASONRY]),
+      Conduiting: validDate(r[COL.CONDUITING]),
+      ToiletWP:  validDate(r[COL.TOILET_WP]),
+      Plumbing:  validDate(r[COL.PLUMBING]),
+      HvacOpt:   validDate(r[COL.HVAC_OPT]),
+      FalseCeil: validDate(r[COL.FALSE_CEIL]),
+      Furniture: validDate(r[COL.FURNITURE]),
+      Kitchen:   validDate(r[COL.KITCHEN])
     }));
 
     // Update UI
@@ -5346,7 +5619,8 @@
 
     // Update details section
     document.getElementById("detailsActivityName").textContent = activityName;
-    
+
+    rebuildMilestoneTableHeader();
     renderDetailsTable();
 
     // Show details section
@@ -5442,11 +5716,12 @@
 
   function renderDetailsTable() {
     const tbody = document.getElementById("detailsTableBody");
+    const totalCols = 6 + activeColIds.length;
 
     if (currentDetailsData.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="11" style="text-align: center; padding: 2rem; color: var(--gray-400);">
+          <td colspan="${totalCols}" style="text-align: center; padding: 2rem; color: var(--gray-400);">
             <i class="bi bi-info-circle" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
             No pending units for this activity
           </td>
@@ -5454,26 +5729,17 @@
       return;
     }
 
-    // Helper: render tick/cross cell
+    // Helper: tick/cross status cell
     function statusCell(done) {
       return done
-        ? `<td style="text-align:center;"><i class="bi bi-check-circle-fill" style="color:#446A2C;font-size:1rem;"></i></td>`
-        : `<td style="text-align:center;"><i class="bi bi-x-circle-fill" style="color:#d1d5db;font-size:1rem;"></i></td>`;
-    }
-    // IDSA: tick/cross (same style as other status columns)
-    function idsaCell(hasDate) {
-      return hasDate
         ? `<td style="text-align:center;"><i class="bi bi-check-circle-fill" style="color:#446A2C;font-size:1rem;"></i></td>`
         : `<td style="text-align:center;"><i class="bi bi-x-circle-fill" style="color:#d1d5db;font-size:1rem;"></i></td>`;
     }
 
     // Apply column filters
     const displayData = applyMilestoneColumnFilters(currentDetailsData);
-
-    // Calculate total revenue from filtered set
     const totalRevenue = displayData.reduce((sum, unit) => sum + (unit[currentRevenueField] || 0), 0) / 10000000;
 
-    // Build all rows in one string — fast single DOM write
     const rows = [`
       <tr class="total-row">
         <td colspan="5">
@@ -5485,11 +5751,16 @@
         <td class="revenue-cell" style="font-size: 1.1rem;">
           <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
         </td>
-        <td colspan="5"></td>
+        <td colspan="${activeColIds.length}"></td>
       </tr>`];
 
     displayData.forEach(unit => {
       const revenue = ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
+      // Build dynamic status cells for active optional columns
+      const optCells = activeColIds.map(id => {
+        const col = OPTIONAL_COLS.find(c => c.id === id);
+        return col ? statusCell(!!unit[col.field]) : '<td></td>';
+      }).join('');
       rows.push(`
         <tr>
           <td>${unit.Project || 'N/A'}</td>
@@ -5498,16 +5769,12 @@
           <td class="unit-number">${unit.UnitNo}</td>
           <td class="customer-name">${unit.Customer}</td>
           <td class="revenue-cell">₹${revenue}</td>
-          ${idsaCell(!!unit.IDSADate)}
-          ${statusCell(!!unit.GFC)}
-          ${statusCell(!!unit.Plaster)}
-          ${statusCell(!!unit.Floor)}
-          ${statusCell(!!unit.Fenest)}
+          ${optCells}
         </tr>`);
     });
     tbody.innerHTML = rows.join('');
 
-    // Update sort indicators on sort-row
+    // Update sort indicators
     document.querySelectorAll('#milestoneDetailsTable thead tr.sort-row th.sortable').forEach((th, idx) => {
       th.classList.remove('asc', 'desc');
       if (idx === sortColumn) th.classList.add(sortAscending ? 'asc' : 'desc');
@@ -5515,7 +5782,6 @@
   }
 
   function sortTable(columnIndex) {
-    // Toggle sort direction if clicking the same column
     if (sortColumn === columnIndex) {
       sortAscending = !sortAscending;
     } else {
@@ -5523,50 +5789,26 @@
       sortAscending = true;
     }
 
-    // Sort the data
     currentDetailsData.sort((a, b) => {
       let valA, valB;
-
       switch(columnIndex) {
-        case 0: // Project
-          valA = a.Project || '';
-          valB = b.Project || '';
+        case 0: valA = a.Project  || ''; valB = b.Project  || ''; break;
+        case 1: valA = a.Phase    || ''; valB = b.Phase    || ''; break;
+        case 2: valA = a.Tower    || ''; valB = b.Tower    || ''; break;
+        case 3: valA = a.UnitNo   || ''; valB = b.UnitNo   || ''; break;
+        case 4: valA = a.Customer || ''; valB = b.Customer || ''; break;
+        case 5: valA = a[currentRevenueField] || 0; valB = b[currentRevenueField] || 0; break;
+        default: {
+          // Dynamic optional column
+          const optIdx = columnIndex - 6;
+          const colId  = activeColIds[optIdx];
+          const col    = OPTIONAL_COLS.find(c => c.id === colId);
+          valA = col && a[col.field] ? 1 : 0;
+          valB = col && b[col.field] ? 1 : 0;
           break;
-        case 1: // Phase
-          valA = a.Phase || '';
-          valB = b.Phase || '';
-          break;
-        case 2: // Tower
-          valA = a.Tower || '';
-          valB = b.Tower || '';
-          break;
-        case 3: // Unit No
-          valA = a.UnitNo || '';
-          valB = b.UnitNo || '';
-          break;
-        case 4: // Customer Name
-          valA = a.Customer || '';
-          valB = b.Customer || '';
-          break;
-        case 5: // Revenue
-          valA = a[currentRevenueField] || 0;
-          valB = b[currentRevenueField] || 0;
-          break;
-        case 6:  valA = a.IDSADate  ? 1 : 0; valB = b.IDSADate  ? 1 : 0; break;
-        case 7:  valA = a.GFC    ? 1 : 0; valB = b.GFC    ? 1 : 0; break;
-        case 8:  valA = a.Plaster ? 1 : 0; valB = b.Plaster ? 1 : 0; break;
-        case 9:  valA = a.Floor   ? 1 : 0; valB = b.Floor   ? 1 : 0; break;
-        case 10: valA = a.Fenest  ? 1 : 0; valB = b.Fenest  ? 1 : 0; break;
-        default:
-          return 0;
+        }
       }
-
-      // Numeric comparison for revenue and status columns
-      if (columnIndex >= 5) {
-        return sortAscending ? valA - valB : valB - valA;
-      }
-
-      // String comparison for other columns
+      if (columnIndex >= 5) return sortAscending ? valA - valB : valB - valA;
       if (valA < valB) return sortAscending ? -1 : 1;
       if (valA > valB) return sortAscending ? 1 : -1;
       return 0;
@@ -5581,62 +5823,37 @@
       return;
     }
 
-    // Prepare data for Excel
-    const excelData = [];
-    
-    // Add header row
-    excelData.push(['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', 'IDSA Status', 'GFC Released', 'Plaster', 'Flooring & Dado', 'Fenestration']);
-    
-    // Add total row
-    const totalRevenue = currentDetailsData.reduce((sum, unit) => sum + (unit[currentRevenueField] || 0), 0) / 10000000;
-    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue.toFixed(2), '', '', '', '', '']);
-    
-    // Add data rows
+    // Build dynamic headers from active optional columns
+    const optLabels = activeColIds.map(id => {
+      const col = OPTIONAL_COLS.find(c => c.id === id);
+      return col ? col.label : id;
+    });
+    const headers = ['Project','Phase','Tower','Unit No.','Customer Name','Revenue (₹ Cr)', ...optLabels];
+
+    const excelData = [headers];
+
+    const totalRevenue = currentDetailsData.reduce((s, u) => s + (u[currentRevenueField] || 0), 0) / 10000000;
+    excelData.push(['TOTAL','','',`${currentDetailsData.length} Units`,'', totalRevenue.toFixed(2),
+      ...activeColIds.map(() => '')]);
+
     currentDetailsData.forEach(unit => {
       const revenue = ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
+      const optVals = activeColIds.map(id => {
+        const col = OPTIONAL_COLS.find(c => c.id === id);
+        return col ? (unit[col.field] ? 'Done' : 'Pending') : '';
+      });
       excelData.push([
-        unit.Project || 'N/A',
-        unit.Phase || 'N/A',
-        unit.Tower || 'N/A',
-        unit.UnitNo,
-        unit.Customer,
-        revenue,
-        unit.IDSADate ? 'Yes' : 'No',
-        unit.GFC    ? 'Done' : 'Pending',
-        unit.Plaster ? 'Done' : 'Pending',
-        unit.Floor   ? 'Done' : 'Pending',
-        unit.Fenest  ? 'Done' : 'Pending'
+        unit.Project || 'N/A', unit.Phase || 'N/A', unit.Tower || 'N/A',
+        unit.UnitNo, unit.Customer, revenue, ...optVals
       ]);
     });
 
-    // Create workbook and worksheet
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(excelData);
-
-    // Set column widths
-    ws['!cols'] = [
-      { wch: 20 },  // Project
-      { wch: 12 },  // Phase
-      { wch: 12 },  // Tower
-      { wch: 12 },  // Unit No
-      { wch: 25 },  // Customer Name
-      { wch: 15 },  // Revenue
-      { wch: 13 },  // IDSA Status
-      { wch: 14 },  // GFC Released
-      { wch: 10 },  // Plaster
-      { wch: 16 },  // Flooring & Dado
-      { wch: 14 }   // Fenestration
-    ];
-
-    // Add worksheet to workbook
+    ws['!cols'] = headers.map((h, i) => ({ wch: i < 4 ? 14 : i === 4 ? 25 : 15 }));
     XLSX.utils.book_append_sheet(wb, ws, currentActivityName);
-
-    // Generate filename with timestamp
     const timestamp = new Date().toISOString().slice(0, 10);
-    const filename = `${currentActivityName.replace(/\s+/g, '_')}_${timestamp}.xlsx`;
-
-    // Save file
-    XLSX.writeFile(wb, filename);
+    XLSX.writeFile(wb, `${currentActivityName.replace(/\s+/g, '_')}_${timestamp}.xlsx`);
   }
 
   function closeDetails() {
@@ -6204,12 +6421,12 @@
       case 3: return (unit.UnitNo   || '').toString();
       case 4: return (unit.Customer || '').toString();
       case 5: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
-      case 6: return unit.IDSADate  ? 'Yes' : 'No';
-      case 7: return unit.GFC    ? 'Done' : 'Pending';
-      case 8: return unit.Plaster ? 'Done' : 'Pending';
-      case 9: return unit.Floor   ? 'Done' : 'Pending';
-      case 10: return unit.Fenest  ? 'Done' : 'Pending';
-      default: return '';
+      default: {
+        const optIdx = colIdx - 6;
+        const colId  = activeColIds[optIdx];
+        const col    = OPTIONAL_COLS.find(c => c.id === colId);
+        return col ? (unit[col.field] ? 'Done' : 'Pending') : '';
+      }
     }
   }
 
@@ -8640,6 +8857,201 @@
   }
 
   // ===== END SHELL TRACKER =====
+
+  // =====================================================
+  // COLUMN CUSTOMISER — state & logic
+  // =====================================================
+
+  // All optional columns definition
+  const OPTIONAL_COLS = [
+    { id: 'IDSADate',  label: 'IDSA',          field: 'IDSADate',  type: 'date' },
+    { id: 'GFC',       label: 'GFC',            field: 'GFC',       type: 'date' },
+    { id: 'Plaster',   label: 'Plaster',        field: 'Plaster',   type: 'date' },
+    { id: 'Floor',     label: 'Flooring',       field: 'Floor',     type: 'date' },
+    { id: 'Fenest',    label: 'Fenestration',   field: 'Fenest',    type: 'date' },
+    { id: 'Masonry',   label: 'Masonry',        field: 'Masonry',   type: 'date' },
+    { id: 'Conduiting',label: 'Conduiting',     field: 'Conduiting',type: 'date' },
+    { id: 'ToiletWP',  label: 'Toilet W/P',     field: 'ToiletWP',  type: 'date' },
+    { id: 'Plumbing',  label: 'Plumbing',       field: 'Plumbing',  type: 'date' },
+    { id: 'HvacOpt',   label: 'HVAC',           field: 'HvacOpt',   type: 'date' },
+    { id: 'FalseCeil', label: 'False Ceiling',  field: 'FalseCeil', type: 'date' },
+    { id: 'Furniture', label: 'Furniture',      field: 'Furniture', type: 'date' },
+    { id: 'Kitchen',   label: 'Kitchen',        field: 'Kitchen',   type: 'date' },
+  ];
+
+  // Default active columns (matches original table)
+  const DEFAULT_ACTIVE_COLS = ['IDSADate','GFC','Plaster','Floor','Fenest'];
+
+  // Currently active columns in display order — persisted in sessionStorage
+  function loadActiveColIds() {
+    try {
+      const s = sessionStorage.getItem('milestoneActiveCols');
+      if (s) return JSON.parse(s);
+    } catch(e) {}
+    return [...DEFAULT_ACTIVE_COLS];
+  }
+  function saveActiveColIds(ids) {
+    try { sessionStorage.setItem('milestoneActiveCols', JSON.stringify(ids)); } catch(e) {}
+  }
+
+  let activeColIds = loadActiveColIds();
+
+  // Working copy while pane is open
+  let _paneWorkingCols = [];
+  let _paneDragSrc = null;
+
+  function openColPane() {
+    _paneWorkingCols = [...activeColIds];
+    renderPaneContent();
+    document.getElementById('colPane').classList.add('open');
+    document.getElementById('colPaneOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeColPane() {
+    document.getElementById('colPane').classList.remove('open');
+    document.getElementById('colPaneOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function renderPaneContent() {
+    const activeList    = document.getElementById('colActiveList');
+    const availableList = document.getElementById('colAvailableList');
+
+    // ── Active (draggable) ──────────────────────────────────
+    activeList.innerHTML = '';
+    if (_paneWorkingCols.length === 0) {
+      activeList.innerHTML = '<div style="font-size:0.78rem;color:var(--gray-400);padding:0.6rem 0.75rem;text-align:center;">No active columns — add some below</div>';
+    } else {
+      _paneWorkingCols.forEach(id => {
+        const col = OPTIONAL_COLS.find(c => c.id === id);
+        if (!col) return;
+        const el = document.createElement('div');
+        el.className = 'col-active-item';
+        el.dataset.id = id;
+        el.draggable = true;
+        el.innerHTML = `
+          <i class="bi bi-grip-vertical drag-handle"></i>
+          <span>${col.label}</span>
+          <button class="remove-col-btn" data-id="${id}" title="Remove"><i class="bi bi-x-lg"></i></button>`;
+        // Drag events
+        el.addEventListener('dragstart', paneDragStart);
+        el.addEventListener('dragover',  paneDragOver);
+        el.addEventListener('drop',      paneDrop);
+        el.addEventListener('dragend',   paneDragEnd);
+        // Remove button
+        el.querySelector('.remove-col-btn').addEventListener('click', function(e) {
+          e.stopPropagation();
+          _paneWorkingCols = _paneWorkingCols.filter(c => c !== this.dataset.id);
+          renderPaneContent();
+        });
+        activeList.appendChild(el);
+      });
+    }
+
+    // ── Available (not yet active) ──────────────────────────
+    availableList.innerHTML = '';
+    const inactive = OPTIONAL_COLS.filter(c => !_paneWorkingCols.includes(c.id));
+    if (inactive.length === 0) {
+      availableList.innerHTML = '<div style="font-size:0.78rem;color:var(--gray-400);padding:0.5rem 0.75rem;">All columns are active</div>';
+    } else {
+      inactive.forEach(col => {
+        const el = document.createElement('div');
+        el.className = 'col-available-item';
+        el.innerHTML = `
+          <span>${col.label}</span>
+          <button class="add-col-btn" data-id="${col.id}" title="Add column"><i class="bi bi-plus-lg"></i></button>`;
+        el.querySelector('.add-col-btn').addEventListener('click', function() {
+          _paneWorkingCols.push(this.dataset.id);
+          renderPaneContent();
+        });
+        availableList.appendChild(el);
+      });
+    }
+  }
+
+  // ── Drag-to-reorder ────────────────────────────────────────
+  function paneDragStart(e) {
+    _paneDragSrc = e.currentTarget;
+    e.currentTarget.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  }
+  function paneDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    document.querySelectorAll('.col-active-item').forEach(el => el.classList.remove('drag-target-above','drag-target-below'));
+    if (e.currentTarget !== _paneDragSrc) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const mid  = rect.top + rect.height / 2;
+      e.currentTarget.classList.add(e.clientY < mid ? 'drag-target-above' : 'drag-target-below');
+    }
+  }
+  function paneDrop(e) {
+    e.preventDefault();
+    if (!_paneDragSrc || e.currentTarget === _paneDragSrc) return;
+    const srcId = _paneDragSrc.dataset.id;
+    const tgtId = e.currentTarget.dataset.id;
+    const rect  = e.currentTarget.getBoundingClientRect();
+    const before = e.clientY < rect.top + rect.height / 2;
+    _paneWorkingCols = _paneWorkingCols.filter(c => c !== srcId);
+    const tgtIdx = _paneWorkingCols.indexOf(tgtId);
+    _paneWorkingCols.splice(before ? tgtIdx : tgtIdx + 1, 0, srcId);
+    renderPaneContent();
+  }
+  function paneDragEnd(e) {
+    document.querySelectorAll('.col-active-item').forEach(el =>
+      el.classList.remove('dragging','drag-target-above','drag-target-below'));
+  }
+
+  function applyColPane() {
+    activeColIds = [..._paneWorkingCols];
+    saveActiveColIds(activeColIds);
+    closeColPane();
+    rebuildMilestoneTableHeader();
+    renderDetailsTable();
+  }
+
+  function resetColPane() {
+    _paneWorkingCols = [...DEFAULT_ACTIVE_COLS];
+    renderPaneContent();
+  }
+
+  // ── Rebuild the table header dynamically ──────────────────
+  function rebuildMilestoneTableHeader() {
+    const sortRow = document.querySelector('#milestoneDetailsTable thead tr.sort-row');
+    if (!sortRow) return;
+
+    // Fixed columns (indices 0–5)
+    const fixedHeaders = [
+      { label: 'Project',       colIdx: 0 },
+      { label: 'Phase',         colIdx: 1 },
+      { label: 'Tower',         colIdx: 2 },
+      { label: 'Unit No.',      colIdx: 3 },
+      { label: 'Customer Name', colIdx: 4 },
+      { label: 'Revenue (₹ Cr)',colIdx: 5 },
+    ];
+
+    let html = fixedHeaders.map(f => `
+      <th class="sortable" onclick="sortTable(${f.colIdx})">${f.label}
+        <button class="col-filter-btn" data-table="milestone" data-col="${f.colIdx}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button>
+      </th>`).join('');
+
+    // Dynamic optional columns (indices 6+)
+    activeColIds.forEach((id, i) => {
+      const col = OPTIONAL_COLS.find(c => c.id === id);
+      if (!col) return;
+      const ci = 6 + i;
+      html += `<th class="sortable" onclick="sortTable(${ci})" style="text-align:center;">${col.label}
+        <button class="col-filter-btn" data-table="milestone" data-col="${ci}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button>
+      </th>`;
+    });
+
+    sortRow.innerHTML = html;
+  }
+  // =====================================================
+  // END COLUMN CUSTOMISER
+  // =====================================================
+
 </script>
 
 <!-- Column Filter Dropdown — rendered at body level to avoid overflow clipping -->
