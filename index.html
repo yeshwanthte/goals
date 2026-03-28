@@ -4560,11 +4560,39 @@
 
 <script>
   // ========================================
+  // COLUMN CHOOSER — status column registry (defined first so all functions can reference it)
+  // ========================================
+  const MILESTONE_STATUS_COLS = [
+    { id:'idsa',      label:'IDSA',         colRef:'BL', key:'IDSADate',  fixed:true,  visible:true  },
+    { id:'gfc',       label:'GFC',           colRef:'Q',  key:'GFC',       fixed:true,  visible:true  },
+    { id:'plaster',   label:'Plaster',       colRef:'R',  key:'Plaster',   fixed:true,  visible:true  },
+    { id:'flooring',  label:'Flooring',      colRef:'V',  key:'Floor',     fixed:true,  visible:true  },
+    { id:'fenest',    label:'Fenestration',  colRef:'AS', key:'Fenest',    fixed:true,  visible:true  },
+    { id:'masonry',   label:'Masonry',       colRef:'AI', key:'Masonry',   fixed:false, visible:false },
+    { id:'conduiting',label:'Conduiting',    colRef:'AJ', key:'Conduiting',fixed:false, visible:false },
+    { id:'toilet_wp', label:'Toilet W/P',    colRef:'AL', key:'ToiletWP',  fixed:false, visible:false },
+    { id:'plumbing',  label:'Plumbing',      colRef:'AM', key:'Plumbing',  fixed:false, visible:false },
+    { id:'hvac_opt',  label:'HVAC',          colRef:'AP', key:'HVACOpt',   fixed:false, visible:false },
+    { id:'false_opt', label:'False Ceiling', colRef:'AQ', key:'FalseOpt',  fixed:false, visible:false },
+    { id:'furniture', label:'Furniture',     colRef:'AW', key:'Furniture', fixed:false, visible:false },
+    { id:'kitchen',   label:'Kitchen',       colRef:'AX', key:'Kitchen',   fixed:false, visible:false }
+  ];
+  // Restore saved order/visibility from localStorage
+  (function(){
+    try {
+      const saved = JSON.parse(localStorage.getItem('_ms_col_cfg')||'null');
+      if (!saved) return;
+      const ordered = [];
+      saved.forEach(s => { const c=MILESTONE_STATUS_COLS.find(x=>x.id===s.id); if(c){if(!c.fixed)c.visible=s.visible;ordered.push(c);} });
+      MILESTONE_STATUS_COLS.forEach(c=>{if(!ordered.includes(c))ordered.push(c);});
+      MILESTONE_STATUS_COLS.length=0; ordered.forEach(c=>MILESTONE_STATUS_COLS.push(c));
+    } catch(e){}
+  })();
+
+  // ========================================
   // GOOGLE SHEETS CONFIGURATION
   // ========================================
   const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRrl7XNihStokkflZZ2gfCKtnh3woP_Z-WphBEQziue2SgygVeAOESNAygsCDY6hGnc0-9tbE-m9dA/pub?output=csv';
-  // Shell - Master sheet: append &gid=<SHEET_GID> for the correct tab
-  // Replace SHELL_GID_HERE with the numeric gid of the "Shell - Master" tab
   const SHELL_MASTER_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRrl7XNihStokkflZZ2gfCKtnh3woP_Z-WphBEQziue2SgygVeAOESNAygsCDY6hGnc0-9tbE-m9dA/pub?output=csv&gid=1913984627';
 
   // ========================================
@@ -8696,39 +8724,7 @@
 </div>
 
 <script>
-  // ===== COLUMN CHOOSER =====
-  const MILESTONE_STATUS_COLS = [
-    { id:'idsa',      label:'IDSA',         colRef:'BL', key:'IDSADate',  fixed:true,  visible:true  },
-    { id:'gfc',       label:'GFC',           colRef:'Q',  key:'GFC',       fixed:true,  visible:true  },
-    { id:'plaster',   label:'Plaster',       colRef:'R',  key:'Plaster',   fixed:true,  visible:true  },
-    { id:'flooring',  label:'Flooring',      colRef:'V',  key:'Floor',     fixed:true,  visible:true  },
-    { id:'fenest',    label:'Fenestration',  colRef:'AS', key:'Fenest',    fixed:true,  visible:true  },
-    { id:'masonry',   label:'Masonry',       colRef:'AI', key:'Masonry',   fixed:false, visible:false },
-    { id:'conduiting',label:'Conduiting',    colRef:'AJ', key:'Conduiting',fixed:false, visible:false },
-    { id:'toilet_wp', label:'Toilet W/P',    colRef:'AL', key:'ToiletWP',  fixed:false, visible:false },
-    { id:'plumbing',  label:'Plumbing',      colRef:'AM', key:'Plumbing',  fixed:false, visible:false },
-    { id:'hvac_opt',  label:'HVAC',          colRef:'AP', key:'HVACOpt',   fixed:false, visible:false },
-    { id:'false_opt', label:'False Ceiling', colRef:'AQ', key:'FalseOpt',  fixed:false, visible:false },
-    { id:'furniture', label:'Furniture',     colRef:'AW', key:'Furniture', fixed:false, visible:false },
-    { id:'kitchen',   label:'Kitchen',       colRef:'AX', key:'Kitchen',   fixed:false, visible:false }
-  ];
-
-  // Restore saved config
-  (function(){
-    try {
-      const saved = JSON.parse(localStorage.getItem('_ms_col_cfg')||'null');
-      if (!saved) return;
-      const ordered = [];
-      saved.forEach(s => {
-        const c = MILESTONE_STATUS_COLS.find(x => x.id === s.id);
-        if (c) { if (!c.fixed) c.visible = s.visible; ordered.push(c); }
-      });
-      MILESTONE_STATUS_COLS.forEach(c => { if (!ordered.includes(c)) ordered.push(c); });
-      MILESTONE_STATUS_COLS.length = 0;
-      ordered.forEach(c => MILESTONE_STATUS_COLS.push(c));
-    } catch(e){}
-  })();
-
+  // ===== COLUMN CHOOSER UI FUNCTIONS =====
   function saveColConfig() {
     localStorage.setItem('_ms_col_cfg', JSON.stringify(MILESTONE_STATUS_COLS.map(c=>({id:c.id,visible:c.visible}))));
   }
