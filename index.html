@@ -2791,61 +2791,6 @@
     .villa-unit.stage-7 { background: #A9D08E; color: #000; border-color: #87A672; }
     .villa-unit.stage-8 { background: #446A2C; color: #fff; border-color: #2a4119; }
 
-    /* ===== COLUMN CHOOSER PANE ===== */
-    .col-chooser-backdrop {
-      position: fixed; inset: 0; z-index: 9980;
-      background: rgba(0,0,0,0.25);
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.25s;
-    }
-    .col-chooser-backdrop.open { opacity: 1; pointer-events: all; }
-    .col-chooser-pane {
-      position: fixed; top: 0; right: -360px; width: 340px; height: 100vh;
-      z-index: 9981; background: #fff;
-      box-shadow: -8px 0 32px rgba(0,0,0,0.18);
-      display: flex; flex-direction: column;
-      transition: right 0.3s cubic-bezier(0.22,1,0.36,1);
-    }
-    .col-chooser-pane.open { right: 0; }
-    .col-chooser-header {
-      background: linear-gradient(135deg, #4a1e06 0%, #833C0C 50%, #C65911 100%);
-      color: #fff; padding: 1.2rem 1.5rem;
-      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-    }
-    .col-chooser-header h3 { margin: 0; font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
-    .col-chooser-close { background: rgba(255,255,255,0.18); border: none; color: #fff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
-    .col-chooser-close:hover { background: rgba(255,255,255,0.35); }
-    .col-chooser-body { flex: 1; overflow-y: auto; padding: 1rem; }
-    .col-chooser-section-title { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #94a3b8; margin: 0.75rem 0 0.5rem; }
-    .col-chooser-row {
-      display: flex; align-items: center; gap: 0.6rem;
-      padding: 0.55rem 0.7rem; border-radius: 8px; margin-bottom: 3px;
-      background: #f8fafc; border: 1.5px solid #e2e8f0;
-      transition: background 0.15s, border-color 0.15s;
-      user-select: none;
-    }
-    .col-chooser-row:hover { background: #f1f5f9; border-color: #cbd5e1; }
-    .col-chooser-row.dragging { opacity: 0.45; border: 1.5px dashed #C65911; }
-    .col-chooser-row.drag-over { background: #FCE7DC; border-color: #C65911; }
-    .col-drag-handle { cursor: grab; color: #cbd5e1; font-size: 1rem; flex-shrink: 0; }
-    .col-drag-handle:active { cursor: grabbing; }
-    .col-chooser-toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
-    .col-chooser-toggle input { opacity: 0; width: 0; height: 0; }
-    .col-toggle-track { position: absolute; inset: 0; border-radius: 50px; background: #e2e8f0; cursor: pointer; transition: background 0.2s; }
-    .col-toggle-track::before { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: white; left: 3px; top: 3px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-    .col-chooser-toggle input:checked + .col-toggle-track { background: #C65911; }
-    .col-chooser-toggle input:checked + .col-toggle-track::before { transform: translateX(16px); }
-    .col-chooser-name { flex: 1; font-size: 0.82rem; font-weight: 600; color: #334155; }
-    .col-chooser-colref { font-size: 0.65rem; color: #94a3b8; font-weight: 500; }
-    .btn-open-col-chooser {
-      background: rgba(131,60,12,0.1); border: 1.5px solid rgba(198,89,17,0.4);
-      color: #C65911; padding: 0.45rem 0.85rem; border-radius: 7px;
-      font-weight: 600; font-size: 0.78rem; cursor: pointer;
-      display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s;
-    }
-    .btn-open-col-chooser:hover { background: #FCE7DC; border-color: #C65911; }
-    /* ===== END COLUMN CHOOSER PANE ===== */
-
     /* ===== UNIT DETAIL POPUP ===== */
     .unit-detail-overlay {
       position: fixed;
@@ -3830,9 +3775,6 @@
               Unit Details - <span id="detailsActivityName" class="activity-badge"></span>
             </h5>
             <div class="details-actions">
-              <button class="btn-open-col-chooser" onclick="openColChooser()">
-                <i class="bi bi-layout-three-columns"></i> Columns
-              </button>
               <button class="btn-download-excel" onclick="downloadExcel()">
                 <i class="bi bi-file-earmark-excel"></i> Download Excel
               </button>
@@ -3845,7 +3787,21 @@
         <div class="card-body-custom" style="padding: 0;">
           <div class="details-table-container">
             <table class="details-table" id="milestoneDetailsTable">
-              <thead id="milestoneDetailsTableHead"></thead>
+              <thead>
+                <tr class="sort-row">
+                  <th class="sortable" onclick="sortTable(0)">Project<button class="col-filter-btn" data-table="milestone" data-col="0" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(1)">Phase<button class="col-filter-btn" data-table="milestone" data-col="1" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(2)">Tower<button class="col-filter-btn" data-table="milestone" data-col="2" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(3)">Unit No.<button class="col-filter-btn" data-table="milestone" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(4)">Customer Name<button class="col-filter-btn" data-table="milestone" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(5)">Revenue (₹ Cr)<button class="col-filter-btn" data-table="milestone" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(6)" style="text-align:center;">IDSA<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(7)" style="text-align:center;">GFC<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(8)" style="text-align:center;">Plaster<button class="col-filter-btn" data-table="milestone" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(9)" style="text-align:center;">Flooring<button class="col-filter-btn" data-table="milestone" data-col="9" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(10)" style="text-align:center;">Fenestration<button class="col-filter-btn" data-table="milestone" data-col="10" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                </tr>
+              </thead>
               <tbody id="detailsTableBody"></tbody>
             </table>
           </div>
@@ -4560,39 +4516,11 @@
 
 <script>
   // ========================================
-  // COLUMN CHOOSER — status column registry (defined first so all functions can reference it)
-  // ========================================
-  const MILESTONE_STATUS_COLS = [
-    { id:'idsa',      label:'IDSA',         colRef:'BL', key:'IDSADate',  fixed:true,  visible:true  },
-    { id:'gfc',       label:'GFC',           colRef:'Q',  key:'GFC',       fixed:true,  visible:true  },
-    { id:'plaster',   label:'Plaster',       colRef:'R',  key:'Plaster',   fixed:true,  visible:true  },
-    { id:'flooring',  label:'Flooring',      colRef:'V',  key:'Floor',     fixed:true,  visible:true  },
-    { id:'fenest',    label:'Fenestration',  colRef:'AS', key:'Fenest',    fixed:true,  visible:true  },
-    { id:'masonry',   label:'Masonry',       colRef:'AI', key:'Masonry',   fixed:false, visible:false },
-    { id:'conduiting',label:'Conduiting',    colRef:'AJ', key:'Conduiting',fixed:false, visible:false },
-    { id:'toilet_wp', label:'Toilet W/P',    colRef:'AL', key:'ToiletWP',  fixed:false, visible:false },
-    { id:'plumbing',  label:'Plumbing',      colRef:'AM', key:'Plumbing',  fixed:false, visible:false },
-    { id:'hvac_opt',  label:'HVAC',          colRef:'AP', key:'HVACOpt',   fixed:false, visible:false },
-    { id:'false_opt', label:'False Ceiling', colRef:'AQ', key:'FalseOpt',  fixed:false, visible:false },
-    { id:'furniture', label:'Furniture',     colRef:'AW', key:'Furniture', fixed:false, visible:false },
-    { id:'kitchen',   label:'Kitchen',       colRef:'AX', key:'Kitchen',   fixed:false, visible:false }
-  ];
-  // Restore saved order/visibility from localStorage
-  (function(){
-    try {
-      const saved = JSON.parse(localStorage.getItem('_ms_col_cfg')||'null');
-      if (!saved) return;
-      const ordered = [];
-      saved.forEach(s => { const c=MILESTONE_STATUS_COLS.find(x=>x.id===s.id); if(c){if(!c.fixed)c.visible=s.visible;ordered.push(c);} });
-      MILESTONE_STATUS_COLS.forEach(c=>{if(!ordered.includes(c))ordered.push(c);});
-      MILESTONE_STATUS_COLS.length=0; ordered.forEach(c=>MILESTONE_STATUS_COLS.push(c));
-    } catch(e){}
-  })();
-
-  // ========================================
   // GOOGLE SHEETS CONFIGURATION
   // ========================================
   const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRrl7XNihStokkflZZ2gfCKtnh3woP_Z-WphBEQziue2SgygVeAOESNAygsCDY6hGnc0-9tbE-m9dA/pub?output=csv';
+  // Shell - Master sheet: append &gid=<SHEET_GID> for the correct tab
+  // Replace SHELL_GID_HERE with the numeric gid of the "Shell - Master" tab
   const SHELL_MASTER_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRrl7XNihStokkflZZ2gfCKtnh3woP_Z-WphBEQziue2SgygVeAOESNAygsCDY6hGnc0-9tbE-m9dA/pub?output=csv&gid=1913984627';
 
   // ========================================
@@ -4773,15 +4701,6 @@
     FALSE: 42,
     FENEST: 44,
     HAND: 51,
-    // Optional status columns for column chooser
-    MASONRY:    34, // Column AI
-    CONDUITING: 35, // Column AJ
-    TOILET_WP:  37, // Column AL
-    PLUMBING:   38, // Column AM
-    HVAC_OPT:   41, // Column AP
-    FALSE_OPT:  42, // Column AQ
-    FURNITURE:  48, // Column AW
-    KITCHEN:    49, // Column AX
     PLASTER_REV: 5,
     FLOOR_REV: 6,
     HAND_REV: 7,
@@ -4888,14 +4807,6 @@
       False: validDate(r[COL.FALSE]),
       Fenest: validDate(r[COL.FENEST]),
       Hand: validDate(r[COL.HAND]),
-      Masonry:    validDate(r[COL.MASONRY]),
-      Conduiting: validDate(r[COL.CONDUITING]),
-      ToiletWP:   validDate(r[COL.TOILET_WP]),
-      Plumbing:   validDate(r[COL.PLUMBING]),
-      HVACOpt:    validDate(r[COL.HVAC_OPT]),
-      FalseOpt:   validDate(r[COL.FALSE_OPT]),
-      Furniture:  validDate(r[COL.FURNITURE]),
-      Kitchen:    validDate(r[COL.KITCHEN]),
       PlasterRev: +r[COL.PLASTER_REV] || 0,
       FloorRev: +r[COL.FLOOR_REV] || 0,
       HandRev: +r[COL.HAND_REV] || 0,
@@ -5529,53 +5440,77 @@
     document.getElementById(countId).textContent = `${projects.length} Project${projects.length !== 1 ? 's' : ''}`;
   }
 
-  // renderDetailsTable — dynamic, driven by MILESTONE_STATUS_COLS
-  function getVisibleStatusCols() {
-    return MILESTONE_STATUS_COLS.filter(c => c.visible);
-  }
-
-  function renderMilestoneTableHeader() {
-    const FIXED = [
-      ['Project',0],['Phase',1],['Tower',2],['Unit No.',3],['Customer Name',4],['Revenue (₹ Cr)',5]
-    ];
-    const vis = getVisibleStatusCols();
-    let html = '<tr class="sort-row">';
-    FIXED.forEach(([lbl,si]) => {
-      html += `<th class="sortable" onclick="sortTable(${si})">${lbl}<button class="col-filter-btn" data-table="milestone" data-col="${si}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>`;
-    });
-    vis.forEach((c,i) => {
-      const ci = 6+i;
-      html += `<th class="sortable" onclick="sortTable(${ci})" style="text-align:center;">${c.label}<button class="col-filter-btn" data-table="milestone" data-col="${ci}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>`;
-    });
-    html += '</tr>';
-    document.getElementById('milestoneDetailsTableHead').innerHTML = html;
-  }
-
   function renderDetailsTable() {
     const tbody = document.getElementById("detailsTableBody");
-    const vis = getVisibleStatusCols();
-    const totalCols = 6 + vis.length;
-    renderMilestoneTableHeader();
+
     if (currentDetailsData.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="${totalCols}" style="text-align:center;padding:2rem;color:var(--gray-400);"><i class="bi bi-info-circle" style="font-size:2rem;margin-bottom:0.5rem;display:block;"></i>No pending units for this activity</td></tr>`;
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="11" style="text-align: center; padding: 2rem; color: var(--gray-400);">
+            <i class="bi bi-info-circle" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+            No pending units for this activity
+          </td>
+        </tr>`;
       return;
     }
+
+    // Helper: render tick/cross cell
     function statusCell(done) {
       return done
         ? `<td style="text-align:center;"><i class="bi bi-check-circle-fill" style="color:#446A2C;font-size:1rem;"></i></td>`
         : `<td style="text-align:center;"><i class="bi bi-x-circle-fill" style="color:#d1d5db;font-size:1rem;"></i></td>`;
     }
+    // IDSA: tick/cross (same style as other status columns)
+    function idsaCell(hasDate) {
+      return hasDate
+        ? `<td style="text-align:center;"><i class="bi bi-check-circle-fill" style="color:#446A2C;font-size:1rem;"></i></td>`
+        : `<td style="text-align:center;"><i class="bi bi-x-circle-fill" style="color:#d1d5db;font-size:1rem;"></i></td>`;
+    }
+
+    // Apply column filters
     const displayData = applyMilestoneColumnFilters(currentDetailsData);
-    const totalRevenue = displayData.reduce((sum,u) => sum+(u[currentRevenueField]||0),0)/10000000;
-    const rows = [`<tr class="total-row"><td colspan="5"><span class="total-label"><i class="bi bi-calculator"></i><strong>TOTAL - ${displayData.length} Units</strong></span></td><td class="revenue-cell" style="font-size:1.1rem;"><strong>₹${totalRevenue.toFixed(2)} Cr</strong></td>${vis.map(()=>'<td></td>').join('')}</tr>`];
+
+    // Calculate total revenue from filtered set
+    const totalRevenue = displayData.reduce((sum, unit) => sum + (unit[currentRevenueField] || 0), 0) / 10000000;
+
+    // Build all rows in one string — fast single DOM write
+    const rows = [`
+      <tr class="total-row">
+        <td colspan="5">
+          <span class="total-label">
+            <i class="bi bi-calculator"></i>
+            <strong>TOTAL - ${displayData.length} Units</strong>
+          </span>
+        </td>
+        <td class="revenue-cell" style="font-size: 1.1rem;">
+          <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
+        </td>
+        <td colspan="5"></td>
+      </tr>`];
+
     displayData.forEach(unit => {
-      const revenue = ((unit[currentRevenueField]||0)/10000000).toFixed(2);
-      rows.push(`<tr><td>${unit.Project||'N/A'}</td><td>${unit.Phase||'N/A'}</td><td>${unit.Tower||'N/A'}</td><td class="unit-number">${unit.UnitNo}</td><td class="customer-name">${unit.Customer}</td><td class="revenue-cell">₹${revenue}</td>${vis.map(c=>statusCell(!!unit[c.key])).join('')}</tr>`);
+      const revenue = ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
+      rows.push(`
+        <tr>
+          <td>${unit.Project || 'N/A'}</td>
+          <td>${unit.Phase || 'N/A'}</td>
+          <td>${unit.Tower || 'N/A'}</td>
+          <td class="unit-number">${unit.UnitNo}</td>
+          <td class="customer-name">${unit.Customer}</td>
+          <td class="revenue-cell">₹${revenue}</td>
+          ${idsaCell(!!unit.IDSADate)}
+          ${statusCell(!!unit.GFC)}
+          ${statusCell(!!unit.Plaster)}
+          ${statusCell(!!unit.Floor)}
+          ${statusCell(!!unit.Fenest)}
+        </tr>`);
     });
     tbody.innerHTML = rows.join('');
-    document.querySelectorAll('#milestoneDetailsTable thead tr.sort-row th.sortable').forEach((th,idx) => {
-      th.classList.remove('asc','desc');
-      if (idx === sortColumn) th.classList.add(sortAscending?'asc':'desc');
+
+    // Update sort indicators on sort-row
+    document.querySelectorAll('#milestoneDetailsTable thead tr.sort-row th.sortable').forEach((th, idx) => {
+      th.classList.remove('asc', 'desc');
+      if (idx === sortColumn) th.classList.add(sortAscending ? 'asc' : 'desc');
     });
   }
 
@@ -5617,11 +5552,11 @@
           valA = a[currentRevenueField] || 0;
           valB = b[currentRevenueField] || 0;
           break;
-        default: {
-          const c = getVisibleStatusCols()[columnIndex - 6];
-          if (c) { valA = a[c.key]?1:0; valB = b[c.key]?1:0; }
-          break;
-        }
+        case 6:  valA = a.IDSADate  ? 1 : 0; valB = b.IDSADate  ? 1 : 0; break;
+        case 7:  valA = a.GFC    ? 1 : 0; valB = b.GFC    ? 1 : 0; break;
+        case 8:  valA = a.Plaster ? 1 : 0; valB = b.Plaster ? 1 : 0; break;
+        case 9:  valA = a.Floor   ? 1 : 0; valB = b.Floor   ? 1 : 0; break;
+        case 10: valA = a.Fenest  ? 1 : 0; valB = b.Fenest  ? 1 : 0; break;
         default:
           return 0;
       }
@@ -5650,12 +5585,11 @@
     const excelData = [];
     
     // Add header row
-    const _visCols = getVisibleStatusCols();
-    excelData.push(['Project','Phase','Tower','Unit No.','Customer Name','Revenue (₹ Cr)',..._visCols.map(c=>c.label)]);
+    excelData.push(['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', 'IDSA Status', 'GFC Released', 'Plaster', 'Flooring & Dado', 'Fenestration']);
     
     // Add total row
     const totalRevenue = currentDetailsData.reduce((sum, unit) => sum + (unit[currentRevenueField] || 0), 0) / 10000000;
-    excelData.push(['TOTAL','','',`${currentDetailsData.length} Units`,'',totalRevenue.toFixed(2),..._visCols.map(()=>'')]); 
+    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue.toFixed(2), '', '', '', '', '']);
     
     // Add data rows
     currentDetailsData.forEach(unit => {
@@ -5667,7 +5601,11 @@
         unit.UnitNo,
         unit.Customer,
         revenue,
-        ..._visCols.map(c=>unit[c.key]?'Done':'Pending')
+        unit.IDSADate ? 'Yes' : 'No',
+        unit.GFC    ? 'Done' : 'Pending',
+        unit.Plaster ? 'Done' : 'Pending',
+        unit.Floor   ? 'Done' : 'Pending',
+        unit.Fenest  ? 'Done' : 'Pending'
       ]);
     });
 
@@ -5676,7 +5614,19 @@
     const ws = XLSX.utils.aoa_to_sheet(excelData);
 
     // Set column widths
-    ws['!cols'] = [{wch:20},{wch:12},{wch:12},{wch:12},{wch:25},{wch:15},..._visCols.map(()=>({wch:14}))];
+    ws['!cols'] = [
+      { wch: 20 },  // Project
+      { wch: 12 },  // Phase
+      { wch: 12 },  // Tower
+      { wch: 12 },  // Unit No
+      { wch: 25 },  // Customer Name
+      { wch: 15 },  // Revenue
+      { wch: 13 },  // IDSA Status
+      { wch: 14 },  // GFC Released
+      { wch: 10 },  // Plaster
+      { wch: 16 },  // Flooring & Dado
+      { wch: 14 }   // Fenestration
+    ];
 
     // Add worksheet to workbook
     XLSX.utils.book_append_sheet(wb, ws, currentActivityName);
@@ -6254,10 +6204,12 @@
       case 3: return (unit.UnitNo   || '').toString();
       case 4: return (unit.Customer || '').toString();
       case 5: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
-      default: {
-        const c = getVisibleStatusCols()[colIdx - 6];
-        return c ? (unit[c.key] ? 'Done' : 'Pending') : '';
-      }
+      case 6: return unit.IDSADate  ? 'Yes' : 'No';
+      case 7: return unit.GFC    ? 'Done' : 'Pending';
+      case 8: return unit.Plaster ? 'Done' : 'Pending';
+      case 9: return unit.Floor   ? 'Done' : 'Pending';
+      case 10: return unit.Fenest  ? 'Done' : 'Pending';
+      default: return '';
     }
   }
 
@@ -8707,60 +8659,5 @@
     <button class="cfd-btn-clear" onclick="clearCFD()">Clear Filter</button>
   </div>
 </div>
-<!-- ===== COLUMN CHOOSER SLIDE PANE ===== -->
-<div class="col-chooser-backdrop" id="colChooserBackdrop" onclick="closeColChooser()"></div>
-<div class="col-chooser-pane" id="colChooserPane">
-  <div class="col-chooser-header">
-    <h3><i class="bi bi-layout-three-columns"></i> Choose Columns</h3>
-    <button class="col-chooser-close" onclick="closeColChooser()"><i class="bi bi-x-lg"></i></button>
-  </div>
-  <div class="col-chooser-body">
-    <p style="font-size:0.78rem;color:#64748b;margin:0 0 1rem;">Toggle columns on/off and drag ⠿ to reorder. Changes apply instantly.</p>
-    <div class="col-chooser-section-title">Fixed Columns</div>
-    <div style="padding:0.4rem 0.7rem;font-size:0.78rem;color:#94a3b8;background:#f8fafc;border-radius:7px;margin-bottom:0.75rem;">Project · Phase · Tower · Unit No. · Customer · Revenue</div>
-    <div class="col-chooser-section-title">Status Columns — drag to reorder</div>
-    <div id="colChooserList"></div>
-  </div>
-</div>
-
-<script>
-  // ===== COLUMN CHOOSER UI FUNCTIONS =====
-  function saveColConfig() {
-    localStorage.setItem('_ms_col_cfg', JSON.stringify(MILESTONE_STATUS_COLS.map(c=>({id:c.id,visible:c.visible}))));
-  }
-
-  let _ccDrag = null;
-  function openColChooser() {
-    renderColChooserList();
-    document.getElementById('colChooserPane').classList.add('open');
-    document.getElementById('colChooserBackdrop').classList.add('open');
-  }
-  function closeColChooser() {
-    document.getElementById('colChooserPane').classList.remove('open');
-    document.getElementById('colChooserBackdrop').classList.remove('open');
-  }
-  function renderColChooserList() {
-    document.getElementById('colChooserList').innerHTML = MILESTONE_STATUS_COLS.map((col,i) => `
-      <div class="col-chooser-row" draggable="true" data-i="${i}"
-        ondragstart="ccDS(event,${i})" ondragover="ccDO(event)" ondrop="ccDP(event,${i})" ondragend="ccDE()">
-        <span class="col-drag-handle"><i class="bi bi-grip-vertical"></i></span>
-        <label class="col-chooser-toggle">
-          <input type="checkbox" ${col.visible?'checked':''} onchange="ccToggle(${i},this.checked)">
-          <span class="col-toggle-track"></span>
-        </label>
-        <span class="col-chooser-name">${col.label}</span>
-        <span class="col-chooser-colref">Col ${col.colRef}</span>
-      </div>`).join('');
-  }
-  function ccToggle(i, v) {
-    MILESTONE_STATUS_COLS[i].visible = v;
-    saveColConfig(); milestoneColumnFilters = {}; renderDetailsTable();
-  }
-  function ccDS(e,i){ _ccDrag=i; e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
-  function ccDO(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; document.querySelectorAll('.col-chooser-row').forEach(r=>r.classList.remove('drag-over')); e.currentTarget.classList.add('drag-over'); }
-  function ccDP(e,ti){ e.preventDefault(); if(_ccDrag===null||_ccDrag===ti)return; const m=MILESTONE_STATUS_COLS.splice(_ccDrag,1)[0]; MILESTONE_STATUS_COLS.splice(ti,0,m); saveColConfig(); milestoneColumnFilters={}; renderDetailsTable(); renderColChooserList(); }
-  function ccDE(){ _ccDrag=null; document.querySelectorAll('.col-chooser-row').forEach(r=>r.classList.remove('dragging','drag-over')); }
-  // ===== END COLUMN CHOOSER =====
-</script>
 </body>
 </html>
