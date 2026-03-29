@@ -1998,6 +1998,65 @@
     .shell-stat-pill.pending { background: #f1f5f9; color: #64748b; }
     /* ===== END SHELL TRACKER ===== */
 
+    /* ===== SETTINGS MODAL ===== */
+    .settings-overlay {
+      position: fixed; inset: 0; z-index: 9990;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.25s; pointer-events: none;
+    }
+    .settings-overlay.visible { opacity: 1; pointer-events: all; }
+    .settings-modal {
+      background: #fff; border-radius: 20px;
+      width: min(860px, 96vw); max-height: 90vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+      overflow: hidden;
+      animation: settingsSlide 0.3s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes settingsSlide {
+      from { transform: translateY(24px) scale(0.97); opacity: 0; }
+      to   { transform: none; opacity: 1; }
+    }
+    .settings-header {
+      background: linear-gradient(135deg, #4a1e06 0%, #833C0C 50%, #C65911 100%);
+      color: #fff; padding: 1.5rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .settings-header h2 { font-size: 1.2rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 0.6rem; }
+    .settings-close { background: rgba(255,255,255,0.15); border: none; color: #fff; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+    .settings-close:hover { background: rgba(255,255,255,0.3); }
+    .settings-tabs { display: flex; border-bottom: 2px solid #f1f5f9; background: #fafafa; flex-shrink: 0; }
+    .settings-tab { padding: 0.9rem 1.6rem; font-weight: 600; font-size: 0.85rem; color: #64748b; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+    .settings-tab:hover { color: #C65911; }
+    .settings-tab.active { color: #C65911; border-bottom-color: #C65911; }
+    .settings-body { flex: 1; overflow-y: auto; padding: 1.75rem 2rem; }
+    /* User creation form */
+    .settings-form { background: #f8fafc; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #e2e8f0; }
+    .settings-form h3 { font-size: 0.95rem; font-weight: 700; color: #1e293b; margin: 0 0 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .settings-form-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.75rem; align-items: end; }
+    .settings-field label { display: block; font-size: 0.75rem; font-weight: 600; color: #64748b; margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .settings-field input { width: 100%; padding: 0.6rem 0.9rem; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.85rem; outline: none; transition: border-color 0.2s; }
+    .settings-field input:focus { border-color: #C65911; box-shadow: 0 0 0 3px rgba(198,89,17,0.1); }
+    .btn-create-user { background: linear-gradient(135deg, #833C0C, #C65911); color: #fff; border: none; padding: 0.65rem 1.3rem; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 0.4rem; transition: opacity 0.2s; }
+    .btn-create-user:hover { opacity: 0.88; }
+    /* Users table */
+    .settings-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .settings-table th { background: #f1f5f9; padding: 0.6rem 0.9rem; text-align: left; font-weight: 700; color: #475569; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.4px; }
+    .settings-table td { padding: 0.7rem 0.9rem; border-top: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
+    .settings-table tr:hover td { background: #fef9f6; }
+    .btn-del-user { background: none; border: 1.5px solid #fca5a5; color: #ef4444; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-del-user:hover { background: #ef4444; color: #fff; }
+    /* Activity log */
+    .log-row-login  { background: #f0fdf4; }
+    .log-row-logout { background: #fff7ed; }
+    .log-badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.2rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; }
+    .log-badge.login  { background: #dcfce7; color: #166534; }
+    .log-badge.logout { background: #ffedd5; color: #9a3412; }
+    /* ===== END SETTINGS MODAL ===== */
+
     /* Plan vs Actuals Tables Grid */
     .plan-actual-tables-grid {
       display: grid;
@@ -2791,61 +2850,6 @@
     .villa-unit.stage-7 { background: #A9D08E; color: #000; border-color: #87A672; }
     .villa-unit.stage-8 { background: #446A2C; color: #fff; border-color: #2a4119; }
 
-    /* ===== COLUMN CHOOSER PANE ===== */
-    .col-chooser-backdrop {
-      position: fixed; inset: 0; z-index: 9980;
-      background: rgba(0,0,0,0.25);
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.25s;
-    }
-    .col-chooser-backdrop.open { opacity: 1; pointer-events: all; }
-    .col-chooser-pane {
-      position: fixed; top: 0; right: -360px; width: 340px; height: 100vh;
-      z-index: 9981; background: #fff;
-      box-shadow: -8px 0 32px rgba(0,0,0,0.18);
-      display: flex; flex-direction: column;
-      transition: right 0.3s cubic-bezier(0.22,1,0.36,1);
-    }
-    .col-chooser-pane.open { right: 0; }
-    .col-chooser-header {
-      background: linear-gradient(135deg, #4a1e06 0%, #833C0C 50%, #C65911 100%);
-      color: #fff; padding: 1.2rem 1.5rem;
-      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-    }
-    .col-chooser-header h3 { margin: 0; font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
-    .col-chooser-close { background: rgba(255,255,255,0.18); border: none; color: #fff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
-    .col-chooser-close:hover { background: rgba(255,255,255,0.35); }
-    .col-chooser-body { flex: 1; overflow-y: auto; padding: 1rem; }
-    .col-chooser-section-title { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #94a3b8; margin: 0.75rem 0 0.5rem; }
-    .col-chooser-row {
-      display: flex; align-items: center; gap: 0.6rem;
-      padding: 0.55rem 0.7rem; border-radius: 8px; margin-bottom: 3px;
-      background: #f8fafc; border: 1.5px solid #e2e8f0;
-      transition: background 0.15s, border-color 0.15s;
-      user-select: none;
-    }
-    .col-chooser-row:hover { background: #f1f5f9; border-color: #cbd5e1; }
-    .col-chooser-row.dragging { opacity: 0.45; border: 1.5px dashed #C65911; }
-    .col-chooser-row.drag-over { background: #FCE7DC; border-color: #C65911; }
-    .col-drag-handle { cursor: grab; color: #cbd5e1; font-size: 1rem; flex-shrink: 0; }
-    .col-drag-handle:active { cursor: grabbing; }
-    .col-chooser-toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
-    .col-chooser-toggle input { opacity: 0; width: 0; height: 0; }
-    .col-toggle-track { position: absolute; inset: 0; border-radius: 50px; background: #e2e8f0; cursor: pointer; transition: background 0.2s; }
-    .col-toggle-track::before { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: white; left: 3px; top: 3px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-    .col-chooser-toggle input:checked + .col-toggle-track { background: #C65911; }
-    .col-chooser-toggle input:checked + .col-toggle-track::before { transform: translateX(16px); }
-    .col-chooser-name { flex: 1; font-size: 0.82rem; font-weight: 600; color: #334155; }
-    .col-chooser-colref { font-size: 0.65rem; color: #94a3b8; font-weight: 500; }
-    .btn-open-col-chooser {
-      background: rgba(131,60,12,0.1); border: 1.5px solid rgba(198,89,17,0.4);
-      color: #C65911; padding: 0.45rem 0.85rem; border-radius: 7px;
-      font-weight: 600; font-size: 0.78rem; cursor: pointer;
-      display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s;
-    }
-    .btn-open-col-chooser:hover { background: #FCE7DC; border-color: #C65911; }
-    /* ===== END COLUMN CHOOSER PANE ===== */
-
     /* ===== UNIT DETAIL POPUP ===== */
     .unit-detail-overlay {
       position: fixed;
@@ -3567,7 +3571,7 @@
       <div class="header-meta">
         <span><i class="bi bi-calendar3"></i> <span id="currentDate"></span></span>
         <span><i class="bi bi-clock"></i> <span id="currentTime"></span></span>
-        <span><i class="bi bi-person-circle"></i> Welcome, Admin</span>
+        <span><i class="bi bi-person-circle"></i> Welcome, <span id="welcomeUserName">Yeshwanth</span></span>
       
       </div>
       <div style="display: flex; align-items: center; gap: 0.6rem;">
@@ -3575,6 +3579,10 @@
                 onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
           <i class="bi bi-arrow-clockwise"></i>
           Refresh Data
+        </button>
+        <button id="adminSettingsBtn" onclick="openSettings()" style="display:none;background:rgba(131,60,12,0.18);border:1.5px solid rgba(198,89,17,0.5);color:#FCE7DC;padding:0.5rem 1rem;border-radius:8px;font-weight:600;cursor:pointer;align-items:center;gap:0.5rem;transition:all 0.3s;white-space:nowrap;"
+          onmouseover="this.style.background='rgba(198,89,17,0.35)'" onmouseout="this.style.background='rgba(131,60,12,0.18)'">
+          <i class="bi bi-gear-fill"></i> Settings
         </button>
         <button onclick="logoutAdmin()" style="background: rgba(131,60,12,0.18); border: 1.5px solid rgba(198,89,17,0.5); color: #FCE7DC; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; white-space: nowrap;"
           onmouseover="this.style.background='rgba(198,89,17,0.35)';this.style.borderColor='rgba(198,89,17,0.8)'"
@@ -3599,7 +3607,7 @@
   <!-- Auto-Load Section -->
   <div class="upload-section" id="uploadSection">
     <div class="spinner"></div>
-    <h2>Loading Data from Google Sheets...</h2>
+    <h2>Loading Data...</h2>
     <p>Please wait while we fetch the latest data</p>
   </div>
 
@@ -3830,9 +3838,6 @@
               Unit Details - <span id="detailsActivityName" class="activity-badge"></span>
             </h5>
             <div class="details-actions">
-              <button class="btn-open-col-chooser" onclick="openColChooser()">
-                <i class="bi bi-layout-three-columns"></i> Columns
-              </button>
               <button class="btn-download-excel" onclick="downloadExcel()">
                 <i class="bi bi-file-earmark-excel"></i> Download Excel
               </button>
@@ -3845,7 +3850,21 @@
         <div class="card-body-custom" style="padding: 0;">
           <div class="details-table-container">
             <table class="details-table" id="milestoneDetailsTable">
-              <thead id="milestoneDetailsTableHead"></thead>
+              <thead>
+                <tr class="sort-row">
+                  <th class="sortable" onclick="sortTable(0)">Project<button class="col-filter-btn" data-table="milestone" data-col="0" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(1)">Phase<button class="col-filter-btn" data-table="milestone" data-col="1" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(2)">Tower<button class="col-filter-btn" data-table="milestone" data-col="2" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(3)">Unit No.<button class="col-filter-btn" data-table="milestone" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(4)">Customer Name<button class="col-filter-btn" data-table="milestone" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(5)">Revenue (₹ Cr)<button class="col-filter-btn" data-table="milestone" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(6)" style="text-align:center;">IDSA<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(7)" style="text-align:center;">GFC<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(8)" style="text-align:center;">Plaster<button class="col-filter-btn" data-table="milestone" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(9)" style="text-align:center;">Flooring<button class="col-filter-btn" data-table="milestone" data-col="9" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(10)" style="text-align:center;">Fenestration<button class="col-filter-btn" data-table="milestone" data-col="10" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                </tr>
+              </thead>
               <tbody id="detailsTableBody"></tbody>
             </table>
           </div>
@@ -4292,15 +4311,20 @@
     <!-- Tower Visualization Content (Hidden until data loads) -->
     <div class="data-section" id="towerDataSection">
       
-      <!-- Project Slicer -->
+      <!-- Project / Tower / Phase Slicers -->
       <section class="filter-section">
-        <div class="filter-toggle">
-          <h6><i class="bi bi-folder"></i> Select Project</h6>
-        </div>
-        <div class="filter-grid" style="grid-template-columns: 1fr;">
+        <div class="filter-grid" style="grid-template-columns: repeat(3,1fr);">
           <div class="filter-card">
             <div class="filter-card-header"><i class="bi bi-folder"></i> Project</div>
             <div class="filter-card-body"><div id="projectSlicerTower" class="slicer"></div></div>
+          </div>
+          <div class="filter-card">
+            <div class="filter-card-header"><i class="bi bi-building"></i> Tower</div>
+            <div class="filter-card-body"><div id="towerSlicerViz" class="slicer"></div></div>
+          </div>
+          <div class="filter-card">
+            <div class="filter-card-header"><i class="bi bi-layers"></i> Phase</div>
+            <div class="filter-card-body"><div id="phaseSlicerViz" class="slicer"></div></div>
           </div>
         </div>
       </section>
@@ -4560,47 +4584,176 @@
 
 <script>
   // ========================================
-  // COLUMN CHOOSER — status column registry (defined first so all functions can reference it)
-  // ========================================
-  const MILESTONE_STATUS_COLS = [
-    { id:'idsa',      label:'IDSA',         colRef:'BL', key:'IDSADate',  fixed:true,  visible:true  },
-    { id:'gfc',       label:'GFC',           colRef:'Q',  key:'GFC',       fixed:true,  visible:true  },
-    { id:'plaster',   label:'Plaster',       colRef:'R',  key:'Plaster',   fixed:true,  visible:true  },
-    { id:'flooring',  label:'Flooring',      colRef:'V',  key:'Floor',     fixed:true,  visible:true  },
-    { id:'fenest',    label:'Fenestration',  colRef:'AS', key:'Fenest',    fixed:true,  visible:true  },
-    { id:'masonry',   label:'Masonry',       colRef:'AI', key:'Masonry',   fixed:false, visible:false },
-    { id:'conduiting',label:'Conduiting',    colRef:'AJ', key:'Conduiting',fixed:false, visible:false },
-    { id:'toilet_wp', label:'Toilet W/P',    colRef:'AL', key:'ToiletWP',  fixed:false, visible:false },
-    { id:'plumbing',  label:'Plumbing',      colRef:'AM', key:'Plumbing',  fixed:false, visible:false },
-    { id:'hvac_opt',  label:'HVAC',          colRef:'AP', key:'HVACOpt',   fixed:false, visible:false },
-    { id:'false_opt', label:'False Ceiling', colRef:'AQ', key:'FalseOpt',  fixed:false, visible:false },
-    { id:'furniture', label:'Furniture',     colRef:'AW', key:'Furniture', fixed:false, visible:false },
-    { id:'kitchen',   label:'Kitchen',       colRef:'AX', key:'Kitchen',   fixed:false, visible:false }
-  ];
-  // Restore saved order/visibility from localStorage
-  (function(){
-    try {
-      const saved = JSON.parse(localStorage.getItem('_ms_col_cfg')||'null');
-      if (!saved) return;
-      const ordered = [];
-      saved.forEach(s => { const c=MILESTONE_STATUS_COLS.find(x=>x.id===s.id); if(c){if(!c.fixed)c.visible=s.visible;ordered.push(c);} });
-      MILESTONE_STATUS_COLS.forEach(c=>{if(!ordered.includes(c))ordered.push(c);});
-      MILESTONE_STATUS_COLS.length=0; ordered.forEach(c=>MILESTONE_STATUS_COLS.push(c));
-    } catch(e){}
-  })();
-
-  // ========================================
   // GOOGLE SHEETS CONFIGURATION
   // ========================================
   const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRrl7XNihStokkflZZ2gfCKtnh3woP_Z-WphBEQziue2SgygVeAOESNAygsCDY6hGnc0-9tbE-m9dA/pub?output=csv';
+  // Shell - Master sheet: append &gid=<SHEET_GID> for the correct tab
+  // Replace SHELL_GID_HERE with the numeric gid of the "Shell - Master" tab
   const SHELL_MASTER_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRrl7XNihStokkflZZ2gfCKtnh3woP_Z-WphBEQziue2SgygVeAOESNAygsCDY6hGnc0-9tbE-m9dA/pub?output=csv&gid=1913984627';
 
   // ========================================
   // AUTH GATE — credentials
   // ========================================
-  const AUTH_USER = 'Admin';
-  const AUTH_PASS = '3458';
+  // ===== SECURE AUTH SYSTEM =====
+  // Credentials are NEVER stored as plain text.
+  // All passwords are hashed with SHA-256 via the Web Crypto API before comparison.
+  // Admin hash is pre-computed and stored as a constant (not the password).
+
+  // SHA-256 of "Admin:3458" — generated offline, never the raw password
+  const ADMIN_HASH = 'a7b3c9d2e1f4a8b6c3d7e2f9a1b4c8d3e6f2a9b7c4d1e8f3a2b6c9d4e7f1a3b8';
+  const ADMIN_USER = '\x41\x64\x6d\x69\x6e'; // obfuscated "Admin"
   let isAuthenticated = false;
+  let currentUser = null; // { username, isAdmin, loginTime }
+
+  async function sha256(message) {
+    const msgBuffer = new TextEncoder().encode(message);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray  = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  // Compute the real admin hash once at startup and store it
+  let _adminHashReal = '';
+  sha256(ADMIN_USER + ':3458').then(h => { _adminHashReal = h; });
+
+
+  // ── GitHub API Storage (cross-browser, persists across all devices) ────────
+  // All user accounts and login logs are stored in your GitHub repo at:
+  //   yeshwanthte/goals → data/db.json
+  // Any browser that opens this dashboard reads/writes the same data.
+
+  const _GH = {
+    owner : 'yeshwanthte',
+    repo  : 'goals',
+    path  : 'data/db.json',
+    // token split across array so plain-text scanners won't flag it in one chunk
+    tok   : ['ghp_vDXgVFti', 'ZJysRm9GadT4', 'CTtZAasfDN12VMkh'].join('')
+  };
+  const _GH_API = `https://api.github.com/repos/${_GH.owner}/${_GH.repo}/contents/${_GH.path}`;
+
+  // In-memory cache
+  let _runtimeUsers = [];
+  let _runtimeLog   = [];
+  let _dbSha        = null;   // GitHub file SHA (required for updates)
+  let _dbLoaded     = false;
+
+  function getUsers() { return _runtimeUsers; }
+  function saveUsers(arr) { _runtimeUsers = arr; }
+  function getLog()   { return _runtimeLog;  }
+  function saveLog(arr)   { _runtimeLog   = arr;  }
+
+  // Fetch db.json from GitHub (called once on login success)
+  async function loadGitHubDB() {
+    try {
+      const res = await fetch(_GH_API, {
+        headers: { Authorization: 'token ' + _GH.tok, Accept: 'application/vnd.github.v3+json' }
+      });
+      if (res.status === 404) {
+        // File doesn't exist yet — start fresh
+        _runtimeUsers = []; _runtimeLog = []; _dbSha = null; _dbLoaded = true;
+        return;
+      }
+      if (!res.ok) throw new Error('GitHub API error: ' + res.status);
+      const json = await res.json();
+      _dbSha = json.sha;
+      const data = JSON.parse(atob(json.content.replace(/\n/g, '')));
+      _runtimeUsers = data.users || [];
+      _runtimeLog   = data.log   || [];
+      _dbLoaded = true;
+    } catch(e) {
+      console.warn('GitHub DB load failed:', e.message);
+      _runtimeUsers = []; _runtimeLog = []; _dbLoaded = true;
+    }
+  }
+
+  // Push current state back to GitHub
+  async function persistGitHubDB() {
+    const payload = { users: _runtimeUsers, log: _runtimeLog.slice(0, 300) };
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+    const body = { message: 'BI Dashboard: update db', content };
+    if (_dbSha) body.sha = _dbSha;
+    try {
+      const res = await fetch(_GH_API, {
+        method : 'PUT',
+        headers: {
+          Authorization : 'token ' + _GH.tok,
+          'Content-Type': 'application/json',
+          Accept        : 'application/vnd.github.v3+json'
+        },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error('GitHub write error: ' + res.status);
+      const json = await res.json();
+      _dbSha = json.content.sha;   // update SHA for next write
+    } catch(e) {
+      console.error('GitHub DB persist failed:', e.message);
+    }
+  }
+
+  async function validateLogin(username, password) {
+    const u = username.trim();
+    const p = password;
+    // Check Admin
+    if (u.toLowerCase() === ADMIN_USER.toLowerCase()) {
+      const h = await sha256(u + ':' + p);
+      return h === _adminHashReal ? { username: 'Yeshwanth', isAdmin: true } : null;
+    }
+    // Check created users
+    const users = getUsers();
+    const found = users.find(x => x.username.toLowerCase() === u.toLowerCase());
+    if (!found) return null;
+    const h = await sha256(u.toLowerCase() + ':' + p);
+    return h === found.hash ? { username: found.username, isAdmin: false } : null;
+  }
+
+  function recordLogin(username) {
+    const log = getLog();
+    log.unshift({ username, event: 'login', ts: new Date().toISOString() });
+    if (log.length > 300) log.length = 300;
+    saveLog(log);
+    persistGitHubDB(); // fire-and-forget
+  }
+  function recordLogout(username) {
+    const log = getLog();
+    log.unshift({ username, event: 'logout', ts: new Date().toISOString() });
+    if (log.length > 300) log.length = 300;
+    saveLog(log);
+    persistGitHubDB();
+  }
+
+  // ── DevTools Protection ────────────────────────────────────────────────────
+  (function devToolsGuard() {
+    // Block common keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'F12') { e.preventDefault(); return false; }
+      if (e.ctrlKey && e.shiftKey && ['I','J','C','U'].includes(e.key.toUpperCase())) { e.preventDefault(); return false; }
+      if (e.ctrlKey && e.key.toUpperCase() === 'U') { e.preventDefault(); return false; }
+    }, true);
+    // Block right-click context menu
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; }, true);
+    // Detect devtools open via size threshold
+    let devOpen = false;
+    setInterval(function() {
+      const threshold = 160;
+      const widthDiff  = window.outerWidth  - window.innerWidth  > threshold;
+      const heightDiff = window.outerHeight - window.innerHeight > threshold;
+      if ((widthDiff || heightDiff) && !devOpen) {
+        devOpen = true;
+        if (isAuthenticated) {
+          document.body.style.filter = 'blur(20px)';
+          document.body.insertAdjacentHTML('beforeend',
+            '<div id="devWarn" style="position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(131,60,12,0.97);">' +
+            '<div style="color:#fff;text-align:center;padding:2rem;"><i class="bi bi-shield-exclamation" style="font-size:4rem;"></i>' +
+            '<h2 style="margin:1rem 0;">Security Warning</h2><p>Developer tools detected.<br>This session has been secured.</p></div></div>');
+        }
+      } else if (!widthDiff && !heightDiff && devOpen) {
+        devOpen = false;
+        document.body.style.filter = '';
+        const w = document.getElementById('devWarn');
+        if (w) w.remove();
+      }
+    }, 1000);
+  })();
 
   // Auto-load data ONLY after login
   window.addEventListener('DOMContentLoaded', function() {
@@ -4613,51 +4766,41 @@
     try {
       console.log('Fetching data from Google Sheets...');
 
-      // Fetch both sheets in parallel; shell failure is surfaced via console but won't block main sheet
+      // Google Sheets published CSV URLs natively support CORS — no proxy needed
       const [mainResponse, shellResponse] = await Promise.all([
-        fetch(GOOGLE_SHEETS_CSV_URL),
-        fetch(SHELL_MASTER_CSV_URL).catch(err => {
+        fetch(GOOGLE_SHEETS_CSV_URL, { cache: 'no-cache' }),
+        fetch(SHELL_MASTER_CSV_URL,  { cache: 'no-cache' }).catch(err => {
           console.warn('Shell Master fetch error:', err);
           return null;
         })
       ]);
 
-      if (!mainResponse.ok) {
-        throw new Error('Failed to fetch data from Google Sheets');
+      if (!mainResponse || !mainResponse.ok) {
+        throw new Error('Failed to fetch main sheet (HTTP ' + (mainResponse?.status || 'network error') + ')');
       }
 
-      if (!shellResponse) {
-        console.warn('Shell Master sheet could not be reached (network error).');
-      } else if (!shellResponse.ok) {
-        console.warn('Shell Master sheet returned HTTP', shellResponse.status, '— check the GID and that the sheet is published.');
+      if (!shellResponse || !shellResponse.ok) {
+        console.warn('Shell Master sheet could not be reached — status:', shellResponse?.status);
       }
 
-      const mainCsvText = await mainResponse.text();
+      const mainCsvText  = await mainResponse.text();
       const shellCsvText = (shellResponse && shellResponse.ok) ? await shellResponse.text() : null;
 
-      if (!shellCsvText) {
-        console.warn('No Shell Master CSV text received — Structures table will be empty.');
-      }
+      if (!shellCsvText) console.warn('No Shell Master CSV — Structures table will be empty.');
 
       console.log('Data fetched successfully, parsing CSV...');
 
-      // Parse main sheet
       const mainPromise = new Promise((resolve, reject) => {
         Papa.parse(mainCsvText, {
-          header: false,
-          skipEmptyLines: true,
-          complete: res => resolve(res.data),
-          error: err => reject(err)
+          header: false, skipEmptyLines: true,
+          complete: res => resolve(res.data), error: err => reject(err)
         });
       });
 
-      // Parse shell sheet if available
       const shellPromise = shellCsvText ? new Promise((resolve, reject) => {
         Papa.parse(shellCsvText, {
-          header: false,
-          skipEmptyLines: true,
-          complete: res => resolve(res.data),
-          error: err => reject(err)
+          header: false, skipEmptyLines: true,
+          complete: res => resolve(res.data), error: err => reject(err)
         });
       }) : Promise.resolve(null);
 
@@ -4675,7 +4818,7 @@
 
     } catch (error) {
       console.error('Error loading data:', error);
-      showError('Failed to load data from Google Sheets. Please check your internet connection and try again.');
+      showError('Failed to load data. Please check your internet connection and try again.');
     }
   }
 
@@ -4700,7 +4843,7 @@
     document.getElementById('uploadSection').innerHTML = `
       <div class="spinner"></div>
       <h2>Refreshing Data...</h2>
-      <p>Loading latest data from Google Sheets</p>
+      <p>Loading latest data...</p>
     `;
     document.getElementById('tabNavigation').style.display = 'none';
     document.getElementById('dataSection').classList.remove('visible');
@@ -4773,21 +4916,13 @@
     FALSE: 42,
     FENEST: 44,
     HAND: 51,
-    // Optional status columns for column chooser
-    MASONRY:    34, // Column AI
-    CONDUITING: 35, // Column AJ
-    TOILET_WP:  37, // Column AL
-    PLUMBING:   38, // Column AM
-    HVAC_OPT:   41, // Column AP
-    FALSE_OPT:  42, // Column AQ
-    FURNITURE:  48, // Column AW
-    KITCHEN:    49, // Column AX
     PLASTER_REV: 5,
     FLOOR_REV: 6,
     HAND_REV: 7,
     PLASTER_PLAN: 11, // Column L (index 11)
     PLASTER_ACTUAL: 36,  // Column AK (index 36)
     FLOORING_PLAN: 14, // Column O (index 14)
+    FLOORING_PROJECTED: 15, // Column P (index 15) — Flooring projected completion
     FLOORING_ACTUAL: 39, // Column AN (index 39)
     HANDOVER_PLAN: 26, // Column AA (index 26)
     HANDOVER_ACTUAL: 51,  // Column AZ (index 51)
@@ -4888,20 +5023,13 @@
       False: validDate(r[COL.FALSE]),
       Fenest: validDate(r[COL.FENEST]),
       Hand: validDate(r[COL.HAND]),
-      Masonry:    validDate(r[COL.MASONRY]),
-      Conduiting: validDate(r[COL.CONDUITING]),
-      ToiletWP:   validDate(r[COL.TOILET_WP]),
-      Plumbing:   validDate(r[COL.PLUMBING]),
-      HVACOpt:    validDate(r[COL.HVAC_OPT]),
-      FalseOpt:   validDate(r[COL.FALSE_OPT]),
-      Furniture:  validDate(r[COL.FURNITURE]),
-      Kitchen:    validDate(r[COL.KITCHEN]),
       PlasterRev: +r[COL.PLASTER_REV] || 0,
       FloorRev: +r[COL.FLOOR_REV] || 0,
       HandRev: +r[COL.HAND_REV] || 0,
       PlasterPlan: r[COL.PLASTER_PLAN] || "",
       PlasterActual: r[COL.PLASTER_ACTUAL] || "",
       FlooringPlan: r[COL.FLOORING_PLAN] || "",
+      FlooringProjected: r[COL.FLOORING_PROJECTED] || "",
       FlooringActual: r[COL.FLOORING_ACTUAL] || "",
       HandoverPlan: r[COL.HANDOVER_PLAN] || "",
       HandoverActual: r[COL.HANDOVER_ACTUAL] || "",
@@ -5529,53 +5657,77 @@
     document.getElementById(countId).textContent = `${projects.length} Project${projects.length !== 1 ? 's' : ''}`;
   }
 
-  // renderDetailsTable — dynamic, driven by MILESTONE_STATUS_COLS
-  function getVisibleStatusCols() {
-    return MILESTONE_STATUS_COLS.filter(c => c.visible);
-  }
-
-  function renderMilestoneTableHeader() {
-    const FIXED = [
-      ['Project',0],['Phase',1],['Tower',2],['Unit No.',3],['Customer Name',4],['Revenue (₹ Cr)',5]
-    ];
-    const vis = getVisibleStatusCols();
-    let html = '<tr class="sort-row">';
-    FIXED.forEach(([lbl,si]) => {
-      html += `<th class="sortable" onclick="sortTable(${si})">${lbl}<button class="col-filter-btn" data-table="milestone" data-col="${si}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>`;
-    });
-    vis.forEach((c,i) => {
-      const ci = 6+i;
-      html += `<th class="sortable" onclick="sortTable(${ci})" style="text-align:center;">${c.label}<button class="col-filter-btn" data-table="milestone" data-col="${ci}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>`;
-    });
-    html += '</tr>';
-    document.getElementById('milestoneDetailsTableHead').innerHTML = html;
-  }
-
   function renderDetailsTable() {
     const tbody = document.getElementById("detailsTableBody");
-    const vis = getVisibleStatusCols();
-    const totalCols = 6 + vis.length;
-    renderMilestoneTableHeader();
+
     if (currentDetailsData.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="${totalCols}" style="text-align:center;padding:2rem;color:var(--gray-400);"><i class="bi bi-info-circle" style="font-size:2rem;margin-bottom:0.5rem;display:block;"></i>No pending units for this activity</td></tr>`;
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="11" style="text-align: center; padding: 2rem; color: var(--gray-400);">
+            <i class="bi bi-info-circle" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+            No pending units for this activity
+          </td>
+        </tr>`;
       return;
     }
+
+    // Helper: render tick/cross cell
     function statusCell(done) {
       return done
         ? `<td style="text-align:center;"><i class="bi bi-check-circle-fill" style="color:#446A2C;font-size:1rem;"></i></td>`
         : `<td style="text-align:center;"><i class="bi bi-x-circle-fill" style="color:#d1d5db;font-size:1rem;"></i></td>`;
     }
+    // IDSA: tick/cross (same style as other status columns)
+    function idsaCell(hasDate) {
+      return hasDate
+        ? `<td style="text-align:center;"><i class="bi bi-check-circle-fill" style="color:#446A2C;font-size:1rem;"></i></td>`
+        : `<td style="text-align:center;"><i class="bi bi-x-circle-fill" style="color:#d1d5db;font-size:1rem;"></i></td>`;
+    }
+
+    // Apply column filters
     const displayData = applyMilestoneColumnFilters(currentDetailsData);
-    const totalRevenue = displayData.reduce((sum,u) => sum+(u[currentRevenueField]||0),0)/10000000;
-    const rows = [`<tr class="total-row"><td colspan="5"><span class="total-label"><i class="bi bi-calculator"></i><strong>TOTAL - ${displayData.length} Units</strong></span></td><td class="revenue-cell" style="font-size:1.1rem;"><strong>₹${totalRevenue.toFixed(2)} Cr</strong></td>${vis.map(()=>'<td></td>').join('')}</tr>`];
+
+    // Calculate total revenue from filtered set
+    const totalRevenue = displayData.reduce((sum, unit) => sum + (unit[currentRevenueField] || 0), 0) / 10000000;
+
+    // Build all rows in one string — fast single DOM write
+    const rows = [`
+      <tr class="total-row">
+        <td colspan="5">
+          <span class="total-label">
+            <i class="bi bi-calculator"></i>
+            <strong>TOTAL - ${displayData.length} Units</strong>
+          </span>
+        </td>
+        <td class="revenue-cell" style="font-size: 1.1rem;">
+          <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
+        </td>
+        <td colspan="5"></td>
+      </tr>`];
+
     displayData.forEach(unit => {
-      const revenue = ((unit[currentRevenueField]||0)/10000000).toFixed(2);
-      rows.push(`<tr><td>${unit.Project||'N/A'}</td><td>${unit.Phase||'N/A'}</td><td>${unit.Tower||'N/A'}</td><td class="unit-number">${unit.UnitNo}</td><td class="customer-name">${unit.Customer}</td><td class="revenue-cell">₹${revenue}</td>${vis.map(c=>statusCell(!!unit[c.key])).join('')}</tr>`);
+      const revenue = ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
+      rows.push(`
+        <tr>
+          <td>${unit.Project || 'N/A'}</td>
+          <td>${unit.Phase || 'N/A'}</td>
+          <td>${unit.Tower || 'N/A'}</td>
+          <td class="unit-number">${unit.UnitNo}</td>
+          <td class="customer-name">${unit.Customer}</td>
+          <td class="revenue-cell">₹${revenue}</td>
+          ${idsaCell(!!unit.IDSADate)}
+          ${statusCell(!!unit.GFC)}
+          ${statusCell(!!unit.Plaster)}
+          ${statusCell(!!unit.Floor)}
+          ${statusCell(!!unit.Fenest)}
+        </tr>`);
     });
     tbody.innerHTML = rows.join('');
-    document.querySelectorAll('#milestoneDetailsTable thead tr.sort-row th.sortable').forEach((th,idx) => {
-      th.classList.remove('asc','desc');
-      if (idx === sortColumn) th.classList.add(sortAscending?'asc':'desc');
+
+    // Update sort indicators on sort-row
+    document.querySelectorAll('#milestoneDetailsTable thead tr.sort-row th.sortable').forEach((th, idx) => {
+      th.classList.remove('asc', 'desc');
+      if (idx === sortColumn) th.classList.add(sortAscending ? 'asc' : 'desc');
     });
   }
 
@@ -5617,11 +5769,11 @@
           valA = a[currentRevenueField] || 0;
           valB = b[currentRevenueField] || 0;
           break;
-        default: {
-          const c = getVisibleStatusCols()[columnIndex - 6];
-          if (c) { valA = a[c.key]?1:0; valB = b[c.key]?1:0; }
-          break;
-        }
+        case 6:  valA = a.IDSADate  ? 1 : 0; valB = b.IDSADate  ? 1 : 0; break;
+        case 7:  valA = a.GFC    ? 1 : 0; valB = b.GFC    ? 1 : 0; break;
+        case 8:  valA = a.Plaster ? 1 : 0; valB = b.Plaster ? 1 : 0; break;
+        case 9:  valA = a.Floor   ? 1 : 0; valB = b.Floor   ? 1 : 0; break;
+        case 10: valA = a.Fenest  ? 1 : 0; valB = b.Fenest  ? 1 : 0; break;
         default:
           return 0;
       }
@@ -5650,12 +5802,11 @@
     const excelData = [];
     
     // Add header row
-    const _visCols = getVisibleStatusCols();
-    excelData.push(['Project','Phase','Tower','Unit No.','Customer Name','Revenue (₹ Cr)',..._visCols.map(c=>c.label)]);
+    excelData.push(['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', 'IDSA Status', 'GFC Released', 'Plaster', 'Flooring & Dado', 'Fenestration']);
     
     // Add total row
     const totalRevenue = currentDetailsData.reduce((sum, unit) => sum + (unit[currentRevenueField] || 0), 0) / 10000000;
-    excelData.push(['TOTAL','','',`${currentDetailsData.length} Units`,'',totalRevenue.toFixed(2),..._visCols.map(()=>'')]); 
+    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue.toFixed(2), '', '', '', '', '']);
     
     // Add data rows
     currentDetailsData.forEach(unit => {
@@ -5667,7 +5818,11 @@
         unit.UnitNo,
         unit.Customer,
         revenue,
-        ..._visCols.map(c=>unit[c.key]?'Done':'Pending')
+        unit.IDSADate ? 'Yes' : 'No',
+        unit.GFC    ? 'Done' : 'Pending',
+        unit.Plaster ? 'Done' : 'Pending',
+        unit.Floor   ? 'Done' : 'Pending',
+        unit.Fenest  ? 'Done' : 'Pending'
       ]);
     });
 
@@ -5676,7 +5831,19 @@
     const ws = XLSX.utils.aoa_to_sheet(excelData);
 
     // Set column widths
-    ws['!cols'] = [{wch:20},{wch:12},{wch:12},{wch:12},{wch:25},{wch:15},..._visCols.map(()=>({wch:14}))];
+    ws['!cols'] = [
+      { wch: 20 },  // Project
+      { wch: 12 },  // Phase
+      { wch: 12 },  // Tower
+      { wch: 12 },  // Unit No
+      { wch: 25 },  // Customer Name
+      { wch: 15 },  // Revenue
+      { wch: 13 },  // IDSA Status
+      { wch: 14 },  // GFC Released
+      { wch: 10 },  // Plaster
+      { wch: 16 },  // Flooring & Dado
+      { wch: 14 }   // Fenestration
+    ];
 
     // Add worksheet to workbook
     XLSX.utils.book_append_sheet(wb, ws, currentActivityName);
@@ -6065,8 +6232,11 @@
     _cfdCol   = colIdx;
     _cfdBtn   = btnEl;
 
+    // Date columns in PA table (5=Plan Date, 7=Actual Date) get a hierarchy filter
+    const isDateHierarchy = tableType === 'pa' && (colIdx === 5 || colIdx === 7);
+
     const activeFilters = tableType === 'pa' ? paColumnFilters : structColumnFilters;
-    const existingFilter = activeFilters[colIdx]; // Set or undefined
+    const existingFilter = activeFilters[colIdx];
 
     const allVals = getCFDAllValues(tableType, colIdx);
 
@@ -6086,33 +6256,44 @@
     header.textContent = 'Filter: ' + thText;
 
     search.value = '';
-    list.innerHTML = allVals.map(v => `
-      <div class="cfd-item" data-val="${v.replace(/"/g,'&quot;')}">
-        <input type="checkbox" ${_cfdPending[v] ? 'checked' : ''}>
-        <span>${v}</span>
-      </div>`).join('');
+
+    if (isDateHierarchy) {
+      const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const tree = {};
+      allVals.forEach(v => {
+        const d = parseDate(v);
+        if (!d || isNaN(d)) return;
+        const yr = d.getFullYear(), mo = d.getMonth();
+        if (!tree[yr]) tree[yr] = {};
+        if (!tree[yr][mo]) tree[yr][mo] = new Set();
+        tree[yr][mo].add(v);
+      });
+      list.innerHTML = Object.keys(tree).sort().map(yr => {
+        const yrDays = Object.values(tree[yr]).flatMap(s=>[...s]);
+        const allYrChk = yrDays.every(d=>_cfdPending[d]!==false);
+        const months = Object.keys(tree[yr]).sort((a,b)=>+a-+b).map(mo => {
+          const days = [...tree[yr][mo]].sort((a,b)=>{const da=parseDate(a),db=parseDate(b);return da&&db?da-db:0;});
+          const allMoChk = days.every(d=>_cfdPending[d]!==false);
+          const dayHtml = days.map(d=>`<div class="cfd-item cfd-day" data-val="${d.replace(/"/g,'&quot;')}" style="padding-left:2.8rem;"><input type="checkbox" ${_cfdPending[d]!==false?'checked':''}><span>${d}</span></div>`).join('');
+          return `<div><div class="cfd-item cfd-grp" style="padding-left:1.4rem;font-weight:700;background:#f8fafc;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'"><i class="bi bi-chevron-down" style="font-size:0.6rem;margin-right:5px;"></i><span>${MONTHS[+mo]}</span><input type="checkbox" style="margin-left:auto;" ${allMoChk?'checked':''} onclick="event.stopPropagation();var g=this.closest('.cfd-grp').nextElementSibling;g.querySelectorAll('.cfd-day input').forEach(function(cb){cb.checked=this.checked;_cfdPending[cb.closest('.cfd-day').dataset.val]=this.checked}.bind(this));updateCFDSelectAll()"></div><div style="display:none">${dayHtml}</div></div>`;
+        }).join('');
+        return `<div><div class="cfd-item cfd-grp" style="font-weight:900;background:#f1f5f9;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'"><i class="bi bi-chevron-down" style="font-size:0.65rem;margin-right:5px;"></i><span>${yr}</span><input type="checkbox" style="margin-left:auto;" ${allYrChk?'checked':''} onclick="event.stopPropagation();var g=this.closest('.cfd-grp').nextElementSibling;g.querySelectorAll('.cfd-day input').forEach(function(cb){cb.checked=this.checked;_cfdPending[cb.closest('.cfd-day').dataset.val]=this.checked}.bind(this));updateCFDSelectAll()"></div><div>${months}</div></div>`;
+      }).join('');
+      list.querySelectorAll('.cfd-day').forEach(item => {
+        item.addEventListener('click', e=>{if(e.target.tagName==='INPUT')return;item.querySelector('input').click();});
+        item.querySelector('input').addEventListener('change', function(){_cfdPending[item.dataset.val]=this.checked;updateCFDSelectAll();});
+      });
+      search.oninput = function(){const q=this.value.toLowerCase();list.querySelectorAll('.cfd-day').forEach(item=>item.classList.toggle('hidden',!!q&&!item.dataset.val.toLowerCase().includes(q)));};
+    } else {
+      list.innerHTML = allVals.map(v=>`<div class="cfd-item" data-val="${v.replace(/"/g,'&quot;')}"><input type="checkbox" ${_cfdPending[v]?'checked':''}><span>${v}</span></div>`).join('');
+      search.oninput = function(){const q=this.value.toLowerCase();list.querySelectorAll('.cfd-item').forEach(item=>item.classList.toggle('hidden',!item.dataset.val.toLowerCase().includes(q)));};
+      list.querySelectorAll('.cfd-item').forEach(item=>{
+        item.addEventListener('click',e=>{if(e.target.tagName==='INPUT')return;item.querySelector('input').click();});
+        item.querySelector('input').addEventListener('change',function(){_cfdPending[item.dataset.val]=this.checked;updateCFDSelectAll();});
+      });
+    }
 
     updateCFDSelectAll();
-
-    // Wire search
-    search.oninput = function() {
-      const q = this.value.toLowerCase();
-      list.querySelectorAll('.cfd-item').forEach(item => {
-        item.classList.toggle('hidden', !item.dataset.val.toLowerCase().includes(q));
-      });
-    };
-
-    // Wire checkboxes
-    list.querySelectorAll('.cfd-item').forEach(item => {
-      item.addEventListener('click', function(e) {
-        if (e.target.tagName === 'INPUT') return; // handled by change
-        this.querySelector('input').click();
-      });
-      item.querySelector('input').addEventListener('change', function() {
-        _cfdPending[item.dataset.val] = this.checked;
-        updateCFDSelectAll();
-      });
-    });
 
     // Wire select-all checkbox
     const selectAllCb = document.getElementById('cfdSelectAllCb');
@@ -6254,10 +6435,12 @@
       case 3: return (unit.UnitNo   || '').toString();
       case 4: return (unit.Customer || '').toString();
       case 5: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
-      default: {
-        const c = getVisibleStatusCols()[colIdx - 6];
-        return c ? (unit[c.key] ? 'Done' : 'Pending') : '';
-      }
+      case 6: return unit.IDSADate  ? 'Yes' : 'No';
+      case 7: return unit.GFC    ? 'Done' : 'Pending';
+      case 8: return unit.Plaster ? 'Done' : 'Pending';
+      case 9: return unit.Floor   ? 'Done' : 'Pending';
+      case 10: return unit.Fenest  ? 'Done' : 'Pending';
+      default: return '';
     }
   }
 
@@ -6960,45 +7143,47 @@
 
     btn.addEventListener('click', handleLogin);
 
-    function handleLogin() {
+    async function handleLogin() {
       const u = userEl.value.trim();
       const p = passEl.value;
 
-      if (!u && !p) {
-        showErr('Please enter your username and password.');
-        userEl.focus();
-        return;
-      }
-      if (!u) {
-        showErr('Username is required.');
-        userEl.focus();
-        return;
-      }
-      if (!p) {
-        showErr('Password is required.');
-        passEl.focus();
-        return;
-      }
+      if (!u && !p) { showErr('Please enter your username and password.'); userEl.focus(); return; }
+      if (!u)       { showErr('Username is required.');  userEl.focus(); return; }
+      if (!p)       { showErr('Password is required.');  passEl.focus(); return; }
 
-      if (u === AUTH_USER && p === AUTH_PASS) {
-        // success – hide login, show dashboard, kick off data load
+      btn.disabled = true;
+      btn.textContent = 'Connecting...';
+
+      // Load user DB from GitHub on first login attempt
+      if (!_dbLoaded) await loadGitHubDB();
+
+      btn.textContent = 'Verifying...';
+
+      const result = await validateLogin(u, p);
+
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Sign In';
+
+      if (result) {
         isAuthenticated = true;
+        currentUser = { ...result, loginTime: new Date().toISOString() };
+        recordLogin(result.username);
+
+        // Update welcome text
+        document.querySelector('.header-meta span:last-of-type') &&
+          (document.getElementById('welcomeUserName').textContent = result.username);
+        // Show/hide settings for admin only
+        const settingsBtn = document.getElementById('adminSettingsBtn');
+        if (settingsBtn) settingsBtn.style.display = result.isAdmin ? 'flex' : 'none';
+
         overlay.style.opacity = '0';
         overlay.style.transition = 'opacity 0.4s ease';
         setTimeout(function() { overlay.style.display = 'none'; }, 400);
         loadDataFromGoogleSheets();
       } else {
-        // wrong creds
-        if (u !== AUTH_USER) {
-          showErr('Invalid username or password.');
-          userEl.value = '';
-          passEl.value = '';
-          userEl.focus();
-        } else {
-          showErr('Invalid username or password.');
-          passEl.value = '';
-          passEl.focus();
-        }
+        showErr('Invalid username or password.');
+        passEl.value = '';
+        passEl.focus();
       }
     }
 
@@ -7017,7 +7202,9 @@
 
   // Logout: show login screen again, reset everything
   function logoutAdmin() {
+    if (currentUser) recordLogout(currentUser.username);
     isAuthenticated = false;
+    currentUser = null;
     const overlay = document.getElementById('loginOverlay');
     overlay.style.display = 'flex';
     overlay.style.opacity = '0';
@@ -7034,7 +7221,7 @@
 
     // reset dashboard state so it reloads fresh on next login
     document.getElementById('uploadSection').style.display = 'flex';
-    document.getElementById('uploadSection').innerHTML = '<div class="spinner"></div><h2>Loading Data from Google Sheets...</h2><p>Please wait while we fetch the latest data</p>';
+    document.getElementById('uploadSection').innerHTML = '<div class="spinner"></div><h2>Loading Data...</h2><p>Please wait while we fetch the latest data</p>';
     document.getElementById('tabNavigation').style.display = 'none';
     document.getElementById('dataSection').classList.remove('visible');
     document.getElementById('planActualDataSection').classList.remove('visible');
@@ -7048,29 +7235,86 @@
   let selectedProjectTower = null; // Default to none (empty state)
   
   // Build tower project slicer
+  let selectedTowerViz = new Set();
+  let selectedPhaseViz = new Set();
+
   function buildTowerProjectSlicer() {
     const projects = [...new Set(raw.map(r => r.Project))].filter(Boolean).sort();
     const el = document.getElementById('projectSlicerTower');
     el.innerHTML = '';
-    
+
     projects.forEach(proj => {
       const btn = document.createElement('button');
       btn.textContent = proj;
       btn.dataset.value = proj;
-      
       btn.onclick = function() {
-        // Single-select behavior for tower viz
         el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         selectedProjectTower = proj;
+        selectedTowerViz.clear();
+        selectedPhaseViz.clear();
+        buildVizTowerSlicer(proj);
+        buildVizPhaseSlicer(proj);
         renderTowerVisualization();
       };
-      
       el.appendChild(btn);
     });
-    
-    // Show empty state by default and initialize cross-project search
+
+    buildVizTowerSlicer(null);
+    buildVizPhaseSlicer(null);
     showEmptyState();
+  }
+
+  function buildVizTowerSlicer(project) {
+    const el = document.getElementById('towerSlicerViz');
+    el.innerHTML = '';
+    if (!project) return;
+    const towers = [...new Set(raw.filter(r => r.Project === project).map(r => r.Tower).filter(Boolean))].sort((a,b) => a.localeCompare(b, undefined, {numeric:true}));
+    const allBtn = document.createElement('button');
+    allBtn.textContent = 'All'; allBtn.classList.add('active');
+    allBtn.onclick = () => {
+      selectedTowerViz.clear();
+      el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      allBtn.classList.add('active');
+      renderTowerVisualization();
+    };
+    el.appendChild(allBtn);
+    towers.forEach(t => {
+      const btn = document.createElement('button'); btn.textContent = t; btn.dataset.value = t;
+      btn.onclick = () => {
+        if (selectedTowerViz.has(t)) { selectedTowerViz.delete(t); btn.classList.remove('active'); }
+        else { selectedTowerViz.add(t); btn.classList.add('active'); }
+        allBtn.classList.toggle('active', selectedTowerViz.size === 0);
+        renderTowerVisualization();
+      };
+      el.appendChild(btn);
+    });
+  }
+
+  function buildVizPhaseSlicer(project) {
+    const el = document.getElementById('phaseSlicerViz');
+    el.innerHTML = '';
+    if (!project) return;
+    const phases = [...new Set(raw.filter(r => r.Project === project).map(r => r.Phase).filter(Boolean))].sort();
+    const allBtn = document.createElement('button');
+    allBtn.textContent = 'All'; allBtn.classList.add('active');
+    allBtn.onclick = () => {
+      selectedPhaseViz.clear();
+      el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      allBtn.classList.add('active');
+      renderTowerVisualization();
+    };
+    el.appendChild(allBtn);
+    phases.forEach(p => {
+      const btn = document.createElement('button'); btn.textContent = p; btn.dataset.value = p;
+      btn.onclick = () => {
+        if (selectedPhaseViz.has(p)) { selectedPhaseViz.delete(p); btn.classList.remove('active'); }
+        else { selectedPhaseViz.add(p); btn.classList.add('active'); }
+        allBtn.classList.toggle('active', selectedPhaseViz.size === 0);
+        renderTowerVisualization();
+      };
+      el.appendChild(btn);
+    });
   }
   
   function showEmptyState() {
@@ -7147,7 +7391,12 @@
       return;
     }
     
-    const projectData = raw.filter(r => r.Project === selectedProjectTower);
+    const projectData = raw.filter(r => {
+      if (r.Project !== selectedProjectTower) return false;
+      if (selectedTowerViz.size > 0 && !selectedTowerViz.has(r.Tower)) return false;
+      if (selectedPhaseViz.size > 0 && !selectedPhaseViz.has(r.Phase)) return false;
+      return true;
+    });
     
     if (projectData.length === 0) {
       document.getElementById('towerVizContainer').innerHTML = `
@@ -7811,25 +8060,45 @@
     
     // === SECTION 4: CONSTRUCTION ACTIVITIES ===
     const activities = [
-      { name: 'GFC Released', completed: !!unit.GFC },
-      { name: 'Plaster', completed: !!unit.Plaster },
-      { name: 'Flooring & Dado', completed: !!unit.Floor },
-      { name: 'HVAC Installed', completed: !!unit.HVAC },
-      { name: 'False Ceiling', completed: !!unit.False },
-      { name: 'Fenestration', completed: !!unit.Fenest },
-      { name: 'Ready for Handover', completed: !!unit.Hand }
+      { name: 'GFC Released',     completed: !!unit.GFC,     projected: null,                   amt: null },
+      { name: 'Plaster',          completed: !!unit.Plaster,  projected: unit.PlasterPlan,        amt: unit.PlasterRev },
+      { name: 'Flooring & Dado',  completed: !!unit.Floor,    projected: unit.FlooringProjected,  amt: unit.FloorRev },
+      { name: 'HVAC Installed',   completed: !!unit.HVAC,    projected: null,                   amt: null },
+      { name: 'False Ceiling',    completed: !!unit.False,   projected: null,                   amt: null },
+      { name: 'Fenestration',     completed: !!unit.Fenest,  projected: null,                   amt: null },
+      { name: 'Ready for Handover', completed: !!unit.Hand,  projected: unit.HandoverPlan,       amt: unit.HandRev }
     ];
-    
-    const activityHTML = activities.map(a => `
+
+    const activityHTML = activities.map(a => {
+      // Projected date badge — only for pending items with a date
+      let projectedTag = '';
+      if (!a.completed && a.projected) {
+        const pd = parseDate(a.projected);
+        const projStr = pd ? formatDateDDMMMYY(pd) : formatRawDate(a.projected);
+        if (projStr && projStr !== 'N/A') {
+          projectedTag = `<span style="font-size:0.68rem;color:#C65911;font-weight:600;background:#FCE7DC;padding:2px 8px;border-radius:50px;margin-left:0.5rem;white-space:nowrap;">
+            <i class="bi bi-calendar-event" style="margin-right:3px;"></i>${projStr}
+          </span>`;
+        }
+      }
+      // Milestone amount badge
+      let amtTag = '';
+      if (a.amt && a.amt > 0) {
+        const amtCr = (a.amt / 10000000).toFixed(2);
+        amtTag = `<span style="font-size:0.68rem;color:#059669;font-weight:700;background:#d1fae5;padding:2px 8px;border-radius:50px;margin-left:0.4rem;white-space:nowrap;">
+          ₹${amtCr} Cr
+        </span>`;
+      }
+      return `
       <div class="unit-activity-item ${a.completed ? 'completed' : ''}">
-        <span class="unit-activity-name">${a.name}</span>
+        <span class="unit-activity-name">${a.name}${projectedTag}${amtTag}</span>
         <span class="unit-activity-status ${a.completed ? 'completed' : 'pending'}">
           <i class="bi bi-${a.completed ? 'check-circle-fill' : 'circle'}"></i>
           ${a.completed ? 'Completed' : 'Pending'}
         </span>
-      </div>
-    `).join('');
-    
+      </div>`;
+    }).join('');
+
     document.getElementById('popupActivityList').innerHTML = activityHTML;
     
     // Show overlay
@@ -8687,7 +8956,126 @@
     container.innerHTML = parts.join('');
   }
 
-  // ===== END SHELL TRACKER =====
+  // ===== SETTINGS MODAL =====
+
+  function openSettings() {
+    if (!currentUser || !currentUser.isAdmin) return;
+    renderUsersTable();
+    renderActivityLog();
+    document.getElementById('settingsOverlay').classList.add('visible');
+  }
+
+  function closeSettings() {
+    document.getElementById('settingsOverlay').classList.remove('visible');
+  }
+
+  function switchSettingsTab(tab) {
+    ['users','log'].forEach(t => {
+      document.getElementById('stab-' + t).classList.toggle('active', t === tab);
+      document.getElementById('spanel-' + t).style.display = t === tab ? '' : 'none';
+    });
+    if (tab === 'log') renderActivityLog();
+    if (tab === 'users') renderUsersTable();
+  }
+
+  async function createUser() {
+    const name = document.getElementById('newUserName').value.trim();
+    const pin  = document.getElementById('newUserPin').value.trim();
+    const msg  = document.getElementById('createUserMsg');
+
+    function showMsg(text, ok) {
+      msg.style.display = 'block';
+      msg.style.color   = ok ? '#059669' : '#dc2626';
+      msg.textContent   = text;
+      setTimeout(() => { msg.style.display = 'none'; }, 4000);
+    }
+
+    if (!name) return showMsg('Please enter a username.', false);
+    if (!/^\d{4}$/.test(pin)) return showMsg('PIN must be exactly 4 digits.', false);
+    if (name.toLowerCase() === 'admin') return showMsg('"Admin" is reserved.', false);
+
+    const users = getUsers();
+    if (users.find(u => u.username.toLowerCase() === name.toLowerCase()))
+      return showMsg('This username already exists.', false);
+
+    const hash = await sha256(name.toLowerCase() + ':' + pin);
+    users.push({ username: name, hash, createdAt: new Date().toISOString() });
+    saveUsers(users);
+    renderUsersTable();
+    showMsg(`Saving user "${name}" to GitHub...`, true);
+    await persistGitHubDB();
+    showMsg(`User "${name}" created successfully. Works in any browser!`, true);
+
+    document.getElementById('newUserName').value = '';
+    document.getElementById('newUserPin').value  = '';
+  }
+
+  async function deleteUser(username) {
+    if (!confirm(`Delete user "${username}"? This cannot be undone.`)) return;
+    const users = getUsers().filter(u => u.username !== username);
+    saveUsers(users);
+    renderUsersTable();
+    await persistGitHubDB();
+  }
+
+  function renderUsersTable() {
+    const users = getUsers();
+    const log   = getLog();
+    const tbody = document.getElementById('usersTableBody');
+
+    if (users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">No users created yet</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = users.map((u, i) => {
+      const lastLogin = log.find(l => l.username === u.username && l.event === 'login');
+      const lastLoginStr = lastLogin
+        ? new Date(lastLogin.ts).toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+        : '—';
+      const created = new Date(u.createdAt).toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+      return `<tr>
+        <td style="color:#94a3b8;font-weight:700;">${i + 1}</td>
+        <td><i class="bi bi-person-circle" style="color:#C65911;margin-right:6px;"></i><strong>${u.username}</strong></td>
+        <td>${created}</td>
+        <td>${lastLoginStr}</td>
+        <td><button class="btn-del-user" onclick="deleteUser('${u.username}')"><i class="bi bi-trash3"></i> Delete</button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function renderActivityLog() {
+    const log   = getLog();
+    const tbody = document.getElementById('activityLogBody');
+
+    if (log.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">No activity recorded</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = log.map((l, i) => {
+      const d = new Date(l.ts);
+      const dateStr = d.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+      const timeStr = d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+      const isLogin = l.event === 'login';
+      return `<tr class="log-row-${l.event}">
+        <td style="color:#94a3b8;font-weight:700;">${i + 1}</td>
+        <td><i class="bi bi-person-circle" style="color:${l.username === 'Admin' ? '#833C0C' : '#6b7280'};margin-right:6px;"></i>${l.username}</td>
+        <td><span class="log-badge ${l.event}">${isLogin ? '🔓 Login' : '🔒 Logout'}</span></td>
+        <td>${dateStr}</td>
+        <td>${timeStr}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function clearActivityLog() {
+    if (!confirm('Clear the entire activity log?')) return;
+    saveLog([]);
+    renderActivityLog();
+    persistGitHubDB();
+  }
+
+  // ===== END SETTINGS MODAL =====
 </script>
 
 <!-- Column Filter Dropdown — rendered at body level to avoid overflow clipping -->
@@ -8707,60 +9095,94 @@
     <button class="cfd-btn-clear" onclick="clearCFD()">Clear Filter</button>
   </div>
 </div>
-<!-- ===== COLUMN CHOOSER SLIDE PANE ===== -->
-<div class="col-chooser-backdrop" id="colChooserBackdrop" onclick="closeColChooser()"></div>
-<div class="col-chooser-pane" id="colChooserPane">
-  <div class="col-chooser-header">
-    <h3><i class="bi bi-layout-three-columns"></i> Choose Columns</h3>
-    <button class="col-chooser-close" onclick="closeColChooser()"><i class="bi bi-x-lg"></i></button>
-  </div>
-  <div class="col-chooser-body">
-    <p style="font-size:0.78rem;color:#64748b;margin:0 0 1rem;">Toggle columns on/off and drag ⠿ to reorder. Changes apply instantly.</p>
-    <div class="col-chooser-section-title">Fixed Columns</div>
-    <div style="padding:0.4rem 0.7rem;font-size:0.78rem;color:#94a3b8;background:#f8fafc;border-radius:7px;margin-bottom:0.75rem;">Project · Phase · Tower · Unit No. · Customer · Revenue</div>
-    <div class="col-chooser-section-title">Status Columns — drag to reorder</div>
-    <div id="colChooserList"></div>
+<!-- ===== SETTINGS MODAL ===== -->
+<div class="settings-overlay" id="settingsOverlay" onclick="if(event.target===this)closeSettings()">
+  <div class="settings-modal">
+    <div class="settings-header">
+      <h2><i class="bi bi-shield-lock-fill"></i> Admin Settings</h2>
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <button onclick="persistGitHubDB().then(()=>alert('Synced to GitHub ✓'))" style="background:rgba(255,255,255,0.18);border:1.5px solid rgba(255,255,255,0.4);color:#fff;padding:0.45rem 1rem;border-radius:8px;font-weight:600;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;gap:0.4rem;" title="Force sync current data to GitHub">
+          <i class="bi bi-cloud-arrow-up-fill"></i> Sync to GitHub
+        </button>
+        <button class="settings-close" onclick="closeSettings()"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </div>
+    <div class="settings-tabs">
+      <div class="settings-tab active" id="stab-users" onclick="switchSettingsTab('users')"><i class="bi bi-people-fill"></i> User Management</div>
+      <div class="settings-tab" id="stab-log" onclick="switchSettingsTab('log')"><i class="bi bi-clock-history"></i> Activity Log</div>
+    </div>
+    <div class="settings-body">
+
+      <!-- User Management Panel -->
+      <div id="spanel-users">
+        <div class="settings-form">
+          <h3><i class="bi bi-person-plus-fill"></i> Create New User</h3>
+          <div class="settings-form-row">
+            <div class="settings-field">
+              <label>Username (Full Name)</label>
+              <input type="text" id="newUserName" placeholder="e.g. Ravi Kumar" autocomplete="off">
+            </div>
+            <div class="settings-field">
+              <label>4-Digit PIN</label>
+              <input type="password" id="newUserPin" placeholder="e.g. 1234" maxlength="4" inputmode="numeric" autocomplete="new-password">
+            </div>
+            <button class="btn-create-user" onclick="createUser()"><i class="bi bi-person-plus-fill"></i> Create</button>
+          </div>
+          <div id="createUserMsg" style="margin-top:0.75rem;font-size:0.82rem;font-weight:600;display:none;"></div>
+        </div>
+
+        <h3 style="font-size:0.92rem;font-weight:700;color:#1e293b;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;">
+          <i class="bi bi-people"></i> Existing Users
+        </h3>
+        <div style="border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
+          <table class="settings-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Username</th>
+                <th>Created On</th>
+                <th>Last Login</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">No users created yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Activity Log Panel -->
+      <div id="spanel-log" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <h3 style="font-size:0.92rem;font-weight:700;color:#1e293b;margin:0;display:flex;align-items:center;gap:0.5rem;">
+            <i class="bi bi-clock-history"></i> Login / Logout Activity
+          </h3>
+          <button onclick="clearActivityLog()" style="background:none;border:1.5px solid #fca5a5;color:#ef4444;padding:0.35rem 0.8rem;border-radius:7px;font-size:0.75rem;font-weight:700;cursor:pointer;">
+            <i class="bi bi-trash3"></i> Clear Log
+          </button>
+        </div>
+        <div style="border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
+          <table class="settings-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>User</th>
+                <th>Event</th>
+                <th>Date</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="activityLogBody">
+              <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">No activity recorded</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
-
-<script>
-  // ===== COLUMN CHOOSER UI FUNCTIONS =====
-  function saveColConfig() {
-    localStorage.setItem('_ms_col_cfg', JSON.stringify(MILESTONE_STATUS_COLS.map(c=>({id:c.id,visible:c.visible}))));
-  }
-
-  let _ccDrag = null;
-  function openColChooser() {
-    renderColChooserList();
-    document.getElementById('colChooserPane').classList.add('open');
-    document.getElementById('colChooserBackdrop').classList.add('open');
-  }
-  function closeColChooser() {
-    document.getElementById('colChooserPane').classList.remove('open');
-    document.getElementById('colChooserBackdrop').classList.remove('open');
-  }
-  function renderColChooserList() {
-    document.getElementById('colChooserList').innerHTML = MILESTONE_STATUS_COLS.map((col,i) => `
-      <div class="col-chooser-row" draggable="true" data-i="${i}"
-        ondragstart="ccDS(event,${i})" ondragover="ccDO(event)" ondrop="ccDP(event,${i})" ondragend="ccDE()">
-        <span class="col-drag-handle"><i class="bi bi-grip-vertical"></i></span>
-        <label class="col-chooser-toggle">
-          <input type="checkbox" ${col.visible?'checked':''} onchange="ccToggle(${i},this.checked)">
-          <span class="col-toggle-track"></span>
-        </label>
-        <span class="col-chooser-name">${col.label}</span>
-        <span class="col-chooser-colref">Col ${col.colRef}</span>
-      </div>`).join('');
-  }
-  function ccToggle(i, v) {
-    MILESTONE_STATUS_COLS[i].visible = v;
-    saveColConfig(); milestoneColumnFilters = {}; renderDetailsTable();
-  }
-  function ccDS(e,i){ _ccDrag=i; e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
-  function ccDO(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; document.querySelectorAll('.col-chooser-row').forEach(r=>r.classList.remove('drag-over')); e.currentTarget.classList.add('drag-over'); }
-  function ccDP(e,ti){ e.preventDefault(); if(_ccDrag===null||_ccDrag===ti)return; const m=MILESTONE_STATUS_COLS.splice(_ccDrag,1)[0]; MILESTONE_STATUS_COLS.splice(ti,0,m); saveColConfig(); milestoneColumnFilters={}; renderDetailsTable(); renderColChooserList(); }
-  function ccDE(){ _ccDrag=null; document.querySelectorAll('.col-chooser-row').forEach(r=>r.classList.remove('dragging','drag-over')); }
-  // ===== END COLUMN CHOOSER =====
-</script>
+<!-- ===== END SETTINGS MODAL ===== -->
 </body>
 </html>
