@@ -3497,121 +3497,40 @@
       color: var(--gray-400);
     }
 
-    /* ═══════════════════════════════════════════
-       COLUMN CUSTOMISER SIDE PANE
-    ═══════════════════════════════════════════ */
-    .col-pane-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.4);
-      z-index: 8800; opacity: 0; pointer-events: none;
-      transition: opacity 0.28s ease;
-    }
-    .col-pane-overlay.open { opacity: 1; pointer-events: auto; }
-    .col-pane {
-      position: fixed; top: 0; right: 0;
-      width: 340px; max-width: 95vw; height: 100vh;
-      background: #fff; z-index: 8900;
-      box-shadow: -8px 0 48px rgba(0,0,0,0.18);
-      display: flex; flex-direction: column;
-      transform: translateX(110%);
-      transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
-    }
-    .col-pane.open { transform: translateX(0); }
-    .col-pane-header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      color: white; padding: 1.1rem 1.25rem;
-      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-    }
-    .col-pane-header h6 {
-      margin: 0; font-size: 0.95rem; font-weight: 700;
-      display: flex; align-items: center; gap: 0.5rem;
-    }
-    .col-pane-close {
-      background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3);
-      color: white; border-radius: 8px; width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 1rem; transition: background 0.2s;
-    }
-    .col-pane-close:hover { background: rgba(255,255,255,0.32); }
-    .col-pane-body { flex: 1; overflow-y: auto; padding: 1rem 1.1rem; }
-    .col-pane-section-title {
-      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.6px; color: var(--gray-500);
-      margin: 1rem 0 0.45rem; padding-bottom: 0.3rem;
-      border-bottom: 1px solid var(--gray-200);
-    }
-    .col-pane-section-title:first-child { margin-top: 0; }
-    .col-fixed-list { display: flex; flex-direction: column; gap: 3px; margin-bottom: 0.2rem; }
-    .col-fixed-item {
-      display: flex; align-items: center; gap: 0.55rem;
-      padding: 0.45rem 0.7rem; background: var(--gray-50);
-      border-radius: 7px; font-size: 0.8rem; color: var(--gray-500);
+    /* ── Slicer Ctrl-key hint ─────────────────────────────── */
+    .ctrl-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.62rem;
+      font-weight: 600;
+      color: var(--gray-400);
+      background: var(--gray-100);
       border: 1px solid var(--gray-200);
+      border-radius: 4px;
+      padding: 1px 5px;
+      margin-left: auto;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      user-select: none;
     }
-    .col-fixed-item i { color: var(--gray-400); font-size: 0.8rem; }
-    .col-active-list {
-      display: flex; flex-direction: column; gap: 4px;
-      min-height: 28px; margin-bottom: 0.2rem;
+    .ctrl-hint kbd {
+      font-family: inherit;
+      font-size: 0.6rem;
+      font-weight: 700;
+      background: white;
+      border: 1px solid var(--gray-300);
+      border-radius: 3px;
+      padding: 0 3px;
+      color: var(--gray-600);
     }
-    .col-active-list-empty {
-      font-size: 0.77rem; color: var(--gray-400); padding: 0.55rem 0.7rem;
-      text-align: center; border: 1.5px dashed var(--gray-300); border-radius: 7px;
+    /* Pulse ring on the slicer container when Ctrl is held */
+    .slicer-multi-mode {
+      outline: 2px solid rgba(198,89,17,0.45);
+      outline-offset: 2px;
+      border-radius: 8px;
     }
-    .col-active-item {
-      display: flex; align-items: center; gap: 0.55rem;
-      padding: 0.58rem 0.7rem; background: white;
-      border: 1.5px solid var(--primary-light); border-radius: 8px;
-      font-size: 0.81rem; font-weight: 600; color: var(--gray-700);
-      cursor: grab; user-select: none;
-      transition: box-shadow 0.15s, background 0.15s;
-    }
-    .col-active-item:active { cursor: grabbing; }
-    .col-active-item.dragging { opacity: 0.42; box-shadow: 0 6px 20px rgba(0,0,0,0.14); }
-    .col-active-item.drag-target-above { border-top: 3px solid var(--primary); }
-    .col-active-item.drag-target-below { border-bottom: 3px solid var(--primary); }
-    .col-drag-handle { color: var(--gray-400); font-size: 0.82rem; cursor: grab; flex-shrink: 0; }
-    .remove-col-btn {
-      margin-left: auto; background: none; border: none;
-      color: var(--gray-400); cursor: pointer; font-size: 0.82rem;
-      padding: 2px 4px; border-radius: 4px; flex-shrink: 0;
-      transition: color 0.15s, background 0.15s;
-    }
-    .remove-col-btn:hover { color: var(--danger); background: var(--danger-light); }
-    .col-available-list { display: flex; flex-direction: column; gap: 3px; }
-    .col-available-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.5rem 0.7rem; background: white;
-      border: 1px solid var(--gray-200); border-radius: 7px;
-      font-size: 0.81rem; color: var(--gray-700);
-      transition: border-color 0.15s, background 0.15s;
-    }
-    .col-available-item:hover { border-color: var(--primary); background: var(--primary-light); }
-    .add-col-btn {
-      background: var(--primary); color: white; border: none;
-      border-radius: 6px; width: 26px; height: 26px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 0.82rem; flex-shrink: 0;
-      transition: background 0.15s;
-    }
-    .add-col-btn:hover { background: var(--primary-dark); }
-    .col-pane-footer {
-      padding: 0.85rem 1.1rem; border-top: 1px solid var(--gray-200);
-      display: flex; gap: 0.5rem; flex-shrink: 0;
-    }
-    .col-pane-apply {
-      flex: 1; padding: 0.65rem;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white; border: none; border-radius: 8px;
-      font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
-    }
-    .col-pane-apply:hover { opacity: 0.87; }
-    .col-pane-reset {
-      padding: 0.65rem 1rem; background: white; color: var(--gray-600);
-      border: 1px solid var(--gray-200); border-radius: 8px;
-      font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: background 0.15s;
-    }
-    .col-pane-reset:hover { background: var(--gray-100); }
-    /* ═══════════════════════════════════════════ */
+    /* ── End Ctrl-key hint ───────────────────────────────── */
   </style>
 </head>
 
@@ -3806,31 +3725,31 @@
       </div>
       <div class="filter-grid">
         <div class="filter-card">
-          <div class="filter-card-header"><i class="bi bi-folder"></i> Project</div>
+          <div class="filter-card-header"><i class="bi bi-folder"></i> Project<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
           <div class="filter-card-body"><div id="projectSlicer" class="slicer"></div></div>
         </div>
         <div class="filter-card">
-          <div class="filter-card-header"><i class="bi bi-building"></i> Tower</div>
+          <div class="filter-card-header"><i class="bi bi-building"></i> Tower<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
           <div class="filter-card-body"><div id="towerSlicer" class="slicer"></div></div>
         </div>
         <div class="filter-card">
-          <div class="filter-card-header"><i class="bi bi-layers"></i> Phase</div>
+          <div class="filter-card-header"><i class="bi bi-layers"></i> Phase<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
           <div class="filter-card-body"><div id="phaseSlicer" class="slicer"></div></div>
         </div>
         <div class="filter-card">
-          <div class="filter-card-header"><i class="bi bi-grid"></i> Inventory</div>
+          <div class="filter-card-header"><i class="bi bi-grid"></i> Inventory<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
           <div class="filter-card-body"><div id="inventorySlicer" class="slicer"></div></div>
         </div>
         <div class="filter-card">
-          <div class="filter-card-header"><i class="bi bi-calendar-check"></i> IDSA Status</div>
+          <div class="filter-card-header"><i class="bi bi-calendar-check"></i> IDSA Status<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
           <div class="filter-card-body"><div id="idsaSlicer" class="slicer"></div></div>
         </div>
         <div class="filter-card">
-          <div class="filter-card-header"><i class="bi bi-file-check"></i> GFC Status</div>
+          <div class="filter-card-header"><i class="bi bi-file-check"></i> GFC Status<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
           <div class="filter-card-body"><div id="gfcSlicer" class="slicer"></div></div>
         </div>
         <div class="filter-card">
-          <div class="filter-card-header"><i class="bi bi-patch-check"></i> OC Status</div>
+          <div class="filter-card-header"><i class="bi bi-patch-check"></i> OC Status<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
           <div class="filter-card-body"><div id="ocSlicer" class="slicer"></div></div>
         </div>
       </div>
@@ -3954,9 +3873,6 @@
               Unit Details - <span id="detailsActivityName" class="activity-badge"></span>
             </h5>
             <div class="details-actions">
-              <button onclick="openColPane()" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;border:none;padding:0.5rem 1.1rem;border-radius:50px;font-size:0.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.45rem;box-shadow:0 2px 8px rgba(198,89,17,0.3);">
-                <i class="bi bi-layout-three-columns"></i> Columns
-              </button>
               <button class="btn-download-excel" onclick="downloadExcel()">
                 <i class="bi bi-file-earmark-excel"></i> Download Excel
               </button>
@@ -4201,35 +4117,35 @@
         </div>
         <div class="filter-grid">
           <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-folder"></i> Project</div>
+            <div class="filter-card-header"><i class="bi bi-folder"></i> Project<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="projectSlicerPA" class="slicer"></div></div>
           </div>
           <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-building"></i> Tower</div>
+            <div class="filter-card-header"><i class="bi bi-building"></i> Tower<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="towerSlicerPA" class="slicer"></div></div>
           </div>
           <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-layers"></i> Phase</div>
+            <div class="filter-card-header"><i class="bi bi-layers"></i> Phase<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="phaseSlicerPA" class="slicer"></div></div>
           </div>
           <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-grid"></i> Inventory</div>
+            <div class="filter-card-header"><i class="bi bi-grid"></i> Inventory<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="inventorySlicerPA" class="slicer"></div></div>
           </div>
           <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-calendar-check"></i> IDSA Status</div>
+            <div class="filter-card-header"><i class="bi bi-calendar-check"></i> IDSA Status<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="idsaSlicerPA" class="slicer"></div></div>
           </div>
           <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-file-check"></i> GFC Status</div>
+            <div class="filter-card-header"><i class="bi bi-file-check"></i> GFC Status<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="gfcSlicerPA" class="slicer"></div></div>
           </div>
           <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-patch-check"></i> OC Status</div>
+            <div class="filter-card-header"><i class="bi bi-patch-check"></i> OC Status<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="ocSlicerPA" class="slicer"></div></div>
           </div>
           <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-calendar-range"></i> Select Year</div>
+            <div class="filter-card-header"><i class="bi bi-calendar-range"></i> Select Year<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body">
               <div class="year-dropdown-wrapper">
                 <select id="yearDropdownPA" class="year-dropdown" onchange="onYearChange()">
@@ -4434,15 +4350,15 @@
       <section class="filter-section">
         <div class="filter-grid" style="grid-template-columns: repeat(3,1fr);">
           <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-folder"></i> Project</div>
+            <div class="filter-card-header"><i class="bi bi-folder"></i> Project<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="projectSlicerTower" class="slicer"></div></div>
           </div>
           <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-building"></i> Tower</div>
+            <div class="filter-card-header"><i class="bi bi-building"></i> Tower<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="towerSlicerViz" class="slicer"></div></div>
           </div>
           <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-layers"></i> Phase</div>
+            <div class="filter-card-header"><i class="bi bi-layers"></i> Phase<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="phaseSlicerViz" class="slicer"></div></div>
           </div>
         </div>
@@ -4576,13 +4492,13 @@
       <section class="filter-section" style="margin-bottom:1rem;">
         <div class="filter-grid" style="grid-template-columns: repeat(2, 1fr);">
           <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-folder"></i> Project</div>
+            <div class="filter-card-header"><i class="bi bi-folder"></i> Project<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body">
               <div id="shellProjectSlicer" class="slicer"></div>
             </div>
           </div>
           <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-building"></i> Tower</div>
+            <div class="filter-card-header"><i class="bi bi-building"></i> Tower<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body">
               <div id="shellTowerSlicer" class="slicer"></div>
             </div>
@@ -5054,16 +4970,7 @@
     AFS_DATE: 61, // Column BJ (index 61)
     HO_AFS: 62, // Column BK (index 62)
     IDSA_DATE: 63, // Column BL (index 63)
-    HO_IDSA: 64,   // Column BM (index 64)
-    // ── Optional status columns (slide-pane controlled) ──
-    MASONRY:     34, // Column AI
-    CONDUITING:  35, // Column AJ
-    TOILET_WP:   37, // Column AL
-    PLUMBING:    38, // Column AM
-    HVAC_OPT:    40, // Column AP
-    FALSE_CEIL:  42, // Column AQ
-    FURNITURE:   48, // Column AW
-    KITCHEN:     49  // Column AX
+    HO_IDSA: 64  // Column BM (index 64)
   };
 
   // File handling (only wire up if upload elements exist in the DOM)
@@ -5170,16 +5077,7 @@
       AFSDate: r[COL.AFS_DATE] || "",
       HOasPerAFS: r[COL.HO_AFS] || "",
       IDSADate: r[COL.IDSA_DATE] || "",
-      HOasPerIDSA: r[COL.HO_IDSA] || "",
-      // Optional status fields (slide-pane columns)
-      Masonry:     validDate(r[COL.MASONRY]),
-      Conduiting:  validDate(r[COL.CONDUITING]),
-      ToiletWP:    validDate(r[COL.TOILET_WP]),
-      Plumbing:    validDate(r[COL.PLUMBING]),
-      HvacOpt:     validDate(r[COL.HVAC_OPT]),
-      FalseCeil:   validDate(r[COL.FALSE_CEIL]),
-      Furniture:   validDate(r[COL.FURNITURE]),
-      Kitchen:     validDate(r[COL.KITCHEN])
+      HOasPerIDSA: r[COL.HO_IDSA] || ""
     }));
 
     // Update UI
@@ -5259,7 +5157,7 @@
   function buildSlicer(id, vals, store) {
     const el = document.getElementById(id);
     el.innerHTML = "";
-    
+
     const all = document.createElement("button");
     all.innerText = "All";
     all.classList.add("active");
@@ -5276,9 +5174,18 @@
       const b = document.createElement("button");
       b.innerText = v;
       b.dataset.value = v;
-      b.onclick = () => {
-        store.has(v) ? store.delete(v) : store.add(v);
-        b.classList.toggle("active");
+      b.onclick = (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          // ── Ctrl+click → multi-select toggle ──
+          store.has(v) ? store.delete(v) : store.add(v);
+          b.classList.toggle("active");
+        } else {
+          // ── Plain click → single-select ──
+          store.clear();
+          el.querySelectorAll("button").forEach(x => x.classList.remove("active"));
+          store.add(v);
+          b.classList.add("active");
+        }
         all.classList.toggle("active", store.size === 0);
         render();
       };
@@ -5416,7 +5323,7 @@
   function buildSlicerPA(id, vals, store) {
     const el = document.getElementById(id);
     el.innerHTML = "";
-    
+
     const all = document.createElement("button");
     all.innerText = "All";
     all.classList.add("active");
@@ -5433,9 +5340,18 @@
       const b = document.createElement("button");
       b.innerText = v;
       b.dataset.value = v;
-      b.onclick = () => {
-        store.has(v) ? store.delete(v) : store.add(v);
-        b.classList.toggle("active");
+      b.onclick = (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          // ── Ctrl+click → multi-select toggle ──
+          store.has(v) ? store.delete(v) : store.add(v);
+          b.classList.toggle("active");
+        } else {
+          // ── Plain click → single-select ──
+          store.clear();
+          el.querySelectorAll("button").forEach(x => x.classList.remove("active"));
+          store.add(v);
+          b.classList.add("active");
+        }
         all.classList.toggle("active", store.size === 0);
         generatePlanVsActuals();
       };
@@ -5700,8 +5616,7 @@
 
     // Update details section
     document.getElementById("detailsActivityName").textContent = activityName;
-
-    rebuildMilestoneTableHeader();  // sync <thead> with current activeColIds
+    
     renderDetailsTable();
 
     // Show details section
@@ -5797,29 +5712,38 @@
 
   function renderDetailsTable() {
     const tbody = document.getElementById("detailsTableBody");
-    const totalCols = 6 + activeColIds.length;
 
     if (currentDetailsData.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="${totalCols}" style="text-align:center;padding:2rem;color:var(--gray-400);">
-            <i class="bi bi-info-circle" style="font-size:2rem;margin-bottom:0.5rem;display:block;"></i>
+          <td colspan="11" style="text-align: center; padding: 2rem; color: var(--gray-400);">
+            <i class="bi bi-info-circle" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
             No pending units for this activity
           </td>
         </tr>`;
       return;
     }
 
-    // Tick / cross helper
+    // Helper: render tick/cross cell
     function statusCell(done) {
       return done
         ? `<td style="text-align:center;"><i class="bi bi-check-circle-fill" style="color:#446A2C;font-size:1rem;"></i></td>`
         : `<td style="text-align:center;"><i class="bi bi-x-circle-fill" style="color:#d1d5db;font-size:1rem;"></i></td>`;
     }
+    // IDSA: tick/cross (same style as other status columns)
+    function idsaCell(hasDate) {
+      return hasDate
+        ? `<td style="text-align:center;"><i class="bi bi-check-circle-fill" style="color:#446A2C;font-size:1rem;"></i></td>`
+        : `<td style="text-align:center;"><i class="bi bi-x-circle-fill" style="color:#d1d5db;font-size:1rem;"></i></td>`;
+    }
 
+    // Apply column filters
     const displayData = applyMilestoneColumnFilters(currentDetailsData);
-    const totalRevenue = displayData.reduce((s, u) => s + (u[currentRevenueField] || 0), 0) / 10000000;
 
+    // Calculate total revenue from filtered set
+    const totalRevenue = displayData.reduce((sum, unit) => sum + (unit[currentRevenueField] || 0), 0) / 10000000;
+
+    // Build all rows in one string — fast single DOM write
     const rows = [`
       <tr class="total-row">
         <td colspan="5">
@@ -5828,19 +5752,14 @@
             <strong>TOTAL - ${displayData.length} Units</strong>
           </span>
         </td>
-        <td class="revenue-cell" style="font-size:1.1rem;">
+        <td class="revenue-cell" style="font-size: 1.1rem;">
           <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
         </td>
-        <td colspan="${activeColIds.length}"></td>
+        <td colspan="5"></td>
       </tr>`];
 
     displayData.forEach(unit => {
       const revenue = ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
-      // Build one tick/cross cell per active optional column
-      const optCells = activeColIds.map(id => {
-        const col = OPTIONAL_COLS.find(c => c.id === id);
-        return col ? statusCell(!!unit[col.field]) : '<td></td>';
-      }).join('');
       rows.push(`
         <tr>
           <td>${unit.Project || 'N/A'}</td>
@@ -5849,11 +5768,16 @@
           <td class="unit-number">${unit.UnitNo}</td>
           <td class="customer-name">${unit.Customer}</td>
           <td class="revenue-cell">₹${revenue}</td>
-          ${optCells}
+          ${idsaCell(!!unit.IDSADate)}
+          ${statusCell(!!unit.GFC)}
+          ${statusCell(!!unit.Plaster)}
+          ${statusCell(!!unit.Floor)}
+          ${statusCell(!!unit.Fenest)}
         </tr>`);
     });
     tbody.innerHTML = rows.join('');
 
+    // Update sort indicators on sort-row
     document.querySelectorAll('#milestoneDetailsTable thead tr.sort-row th.sortable').forEach((th, idx) => {
       th.classList.remove('asc', 'desc');
       if (idx === sortColumn) th.classList.add(sortAscending ? 'asc' : 'desc');
@@ -5861,64 +5785,128 @@
   }
 
   function sortTable(columnIndex) {
-    if (sortColumn === columnIndex) { sortAscending = !sortAscending; }
-    else { sortColumn = columnIndex; sortAscending = true; }
+    // Toggle sort direction if clicking the same column
+    if (sortColumn === columnIndex) {
+      sortAscending = !sortAscending;
+    } else {
+      sortColumn = columnIndex;
+      sortAscending = true;
+    }
 
+    // Sort the data
     currentDetailsData.sort((a, b) => {
       let valA, valB;
-      switch (columnIndex) {
-        case 0: valA = a.Project  || ''; valB = b.Project  || ''; break;
-        case 1: valA = a.Phase    || ''; valB = b.Phase    || ''; break;
-        case 2: valA = a.Tower    || ''; valB = b.Tower    || ''; break;
-        case 3: valA = a.UnitNo   || ''; valB = b.UnitNo   || ''; break;
-        case 4: valA = a.Customer || ''; valB = b.Customer || ''; break;
-        case 5: valA = a[currentRevenueField] || 0; valB = b[currentRevenueField] || 0; break;
-        default: {
-          // Dynamic optional column: index 6+ maps into activeColIds
-          const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 6]);
-          valA = col && a[col.field] ? 1 : 0;
-          valB = col && b[col.field] ? 1 : 0;
+
+      switch(columnIndex) {
+        case 0: // Project
+          valA = a.Project || '';
+          valB = b.Project || '';
           break;
-        }
+        case 1: // Phase
+          valA = a.Phase || '';
+          valB = b.Phase || '';
+          break;
+        case 2: // Tower
+          valA = a.Tower || '';
+          valB = b.Tower || '';
+          break;
+        case 3: // Unit No
+          valA = a.UnitNo || '';
+          valB = b.UnitNo || '';
+          break;
+        case 4: // Customer Name
+          valA = a.Customer || '';
+          valB = b.Customer || '';
+          break;
+        case 5: // Revenue
+          valA = a[currentRevenueField] || 0;
+          valB = b[currentRevenueField] || 0;
+          break;
+        case 6:  valA = a.IDSADate  ? 1 : 0; valB = b.IDSADate  ? 1 : 0; break;
+        case 7:  valA = a.GFC    ? 1 : 0; valB = b.GFC    ? 1 : 0; break;
+        case 8:  valA = a.Plaster ? 1 : 0; valB = b.Plaster ? 1 : 0; break;
+        case 9:  valA = a.Floor   ? 1 : 0; valB = b.Floor   ? 1 : 0; break;
+        case 10: valA = a.Fenest  ? 1 : 0; valB = b.Fenest  ? 1 : 0; break;
+        default:
+          return 0;
       }
-      if (columnIndex >= 5) return sortAscending ? valA - valB : valB - valA;
+
+      // Numeric comparison for revenue and status columns
+      if (columnIndex >= 5) {
+        return sortAscending ? valA - valB : valB - valA;
+      }
+
+      // String comparison for other columns
       if (valA < valB) return sortAscending ? -1 : 1;
       if (valA > valB) return sortAscending ? 1 : -1;
       return 0;
     });
+
     renderDetailsTable();
   }
 
   function downloadExcel() {
-    if (currentDetailsData.length === 0) { alert('No data to download'); return; }
+    if (currentDetailsData.length === 0) {
+      alert('No data to download');
+      return;
+    }
 
-    // Build headers dynamically from whatever columns are currently active
-    const optLabels = activeColIds.map(id => (OPTIONAL_COLS.find(c => c.id === id) || {label: id}).label);
-    const headers = ['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', ...optLabels];
-    const excelData = [headers];
-
-    const totalRevenue = currentDetailsData.reduce((s, u) => s + (u[currentRevenueField] || 0), 0) / 10000000;
-    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue.toFixed(2),
-      ...activeColIds.map(() => '')]);
-
+    // Prepare data for Excel
+    const excelData = [];
+    
+    // Add header row
+    excelData.push(['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', 'IDSA Status', 'GFC Released', 'Plaster', 'Flooring & Dado', 'Fenestration']);
+    
+    // Add total row
+    const totalRevenue = currentDetailsData.reduce((sum, unit) => sum + (unit[currentRevenueField] || 0), 0) / 10000000;
+    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue.toFixed(2), '', '', '', '', '']);
+    
+    // Add data rows
     currentDetailsData.forEach(unit => {
       const revenue = ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
-      const optVals = activeColIds.map(id => {
-        const col = OPTIONAL_COLS.find(c => c.id === id);
-        return col ? (unit[col.field] ? 'Done' : 'Pending') : '';
-      });
       excelData.push([
-        unit.Project || 'N/A', unit.Phase || 'N/A', unit.Tower || 'N/A',
-        unit.UnitNo, unit.Customer, revenue, ...optVals
+        unit.Project || 'N/A',
+        unit.Phase || 'N/A',
+        unit.Tower || 'N/A',
+        unit.UnitNo,
+        unit.Customer,
+        revenue,
+        unit.IDSADate ? 'Yes' : 'No',
+        unit.GFC    ? 'Done' : 'Pending',
+        unit.Plaster ? 'Done' : 'Pending',
+        unit.Floor   ? 'Done' : 'Pending',
+        unit.Fenest  ? 'Done' : 'Pending'
       ]);
     });
 
+    // Create workbook and worksheet
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(excelData);
-    ws['!cols'] = headers.map((_, i) => ({ wch: i===0?20 : i===4?25 : i===5?15 : 14 }));
+
+    // Set column widths
+    ws['!cols'] = [
+      { wch: 20 },  // Project
+      { wch: 12 },  // Phase
+      { wch: 12 },  // Tower
+      { wch: 12 },  // Unit No
+      { wch: 25 },  // Customer Name
+      { wch: 15 },  // Revenue
+      { wch: 13 },  // IDSA Status
+      { wch: 14 },  // GFC Released
+      { wch: 10 },  // Plaster
+      { wch: 16 },  // Flooring & Dado
+      { wch: 14 }   // Fenestration
+    ];
+
+    // Add worksheet to workbook
     XLSX.utils.book_append_sheet(wb, ws, currentActivityName);
+
+    // Generate filename with timestamp
     const timestamp = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(wb, `${currentActivityName.replace(/\s+/g, '_')}_${timestamp}.xlsx`);
+    const filename = `${currentActivityName.replace(/\s+/g, '_')}_${timestamp}.xlsx`;
+
+    // Save file
+    XLSX.writeFile(wb, filename);
   }
 
   function closeDetails() {
@@ -6500,11 +6488,12 @@
       case 3: return (unit.UnitNo   || '').toString();
       case 4: return (unit.Customer || '').toString();
       case 5: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
-      default: {
-        // Dynamic optional column — look up by position in activeColIds
-        const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - 6]);
-        return col ? (unit[col.field] ? 'Done' : 'Pending') : '';
-      }
+      case 6: return unit.IDSADate  ? 'Yes' : 'No';
+      case 7: return unit.GFC    ? 'Done' : 'Pending';
+      case 8: return unit.Plaster ? 'Done' : 'Pending';
+      case 9: return unit.Floor   ? 'Done' : 'Pending';
+      case 10: return unit.Fenest  ? 'Done' : 'Pending';
+      default: return '';
     }
   }
 
@@ -7345,9 +7334,18 @@
     el.appendChild(allBtn);
     towers.forEach(t => {
       const btn = document.createElement('button'); btn.textContent = t; btn.dataset.value = t;
-      btn.onclick = () => {
-        if (selectedTowerViz.has(t)) { selectedTowerViz.delete(t); btn.classList.remove('active'); }
-        else { selectedTowerViz.add(t); btn.classList.add('active'); }
+      btn.onclick = (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          // Ctrl+click → multi-select toggle
+          if (selectedTowerViz.has(t)) { selectedTowerViz.delete(t); btn.classList.remove('active'); }
+          else { selectedTowerViz.add(t); btn.classList.add('active'); }
+        } else {
+          // Plain click → single-select
+          selectedTowerViz.clear();
+          el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+          selectedTowerViz.add(t);
+          btn.classList.add('active');
+        }
         allBtn.classList.toggle('active', selectedTowerViz.size === 0);
         renderTowerVisualization();
       };
@@ -7371,9 +7369,18 @@
     el.appendChild(allBtn);
     phases.forEach(p => {
       const btn = document.createElement('button'); btn.textContent = p; btn.dataset.value = p;
-      btn.onclick = () => {
-        if (selectedPhaseViz.has(p)) { selectedPhaseViz.delete(p); btn.classList.remove('active'); }
-        else { selectedPhaseViz.add(p); btn.classList.add('active'); }
+      btn.onclick = (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          // Ctrl+click → multi-select toggle
+          if (selectedPhaseViz.has(p)) { selectedPhaseViz.delete(p); btn.classList.remove('active'); }
+          else { selectedPhaseViz.add(p); btn.classList.add('active'); }
+        } else {
+          // Plain click → single-select
+          selectedPhaseViz.clear();
+          el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+          selectedPhaseViz.add(p);
+          btn.classList.add('active');
+        }
         allBtn.classList.toggle('active', selectedPhaseViz.size === 0);
         renderTowerVisualization();
       };
@@ -8886,11 +8893,15 @@
       const btn = document.createElement('button');
       btn.textContent = t;
       btn.dataset.value = t;
-      btn.onclick = function () {
-        if (shellSelectedTowers.has(t)) {
-          shellSelectedTowers.delete(t);
-          btn.classList.remove('active');
+      btn.onclick = function (e) {
+        if (e.ctrlKey || e.metaKey) {
+          // Ctrl+click → multi-select toggle
+          if (shellSelectedTowers.has(t)) { shellSelectedTowers.delete(t); btn.classList.remove('active'); }
+          else { shellSelectedTowers.add(t); btn.classList.add('active'); }
         } else {
+          // Plain click → single-select
+          shellSelectedTowers.clear();
+          towerEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
           shellSelectedTowers.add(t);
           btn.classList.add('active');
         }
@@ -9139,227 +9150,26 @@
     persistGitHubDB();
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // COLUMN CUSTOMISER — state & pane logic
-  // ═══════════════════════════════════════════════════════════
-
-  // Full catalogue of all 13 optional status columns
-  const OPTIONAL_COLS = [
-    { id: 'IDSADate',   label: 'IDSA',          field: 'IDSADate'   },
-    { id: 'GFC',        label: 'GFC',            field: 'GFC'        },
-    { id: 'Plaster',    label: 'Plaster',        field: 'Plaster'    },
-    { id: 'Floor',      label: 'Flooring',       field: 'Floor'      },
-    { id: 'Fenest',     label: 'Fenestration',   field: 'Fenest'     },
-    { id: 'Masonry',    label: 'Masonry',        field: 'Masonry'    },
-    { id: 'Conduiting', label: 'Conduiting',     field: 'Conduiting' },
-    { id: 'ToiletWP',   label: 'Toilet W/P',     field: 'ToiletWP'   },
-    { id: 'Plumbing',   label: 'Plumbing',       field: 'Plumbing'   },
-    { id: 'HvacOpt',    label: 'HVAC',           field: 'HvacOpt'    },
-    { id: 'FalseCeil',  label: 'False Ceiling',  field: 'FalseCeil'  },
-    { id: 'Furniture',  label: 'Furniture',      field: 'Furniture'  },
-    { id: 'Kitchen',    label: 'Kitchen',        field: 'Kitchen'    },
-  ];
-
-  // Columns shown by default (original 5)
-  const DEFAULT_ACTIVE_COLS = ['IDSADate', 'GFC', 'Plaster', 'Floor', 'Fenest'];
-
-  // Persist across page session
-  function _loadActiveCols() {
-    try { const s = sessionStorage.getItem('milestoneActiveCols'); if (s) return JSON.parse(s); }
-    catch(e) {}
-    return [...DEFAULT_ACTIVE_COLS];
-  }
-  function _saveActiveCols(ids) {
-    try { sessionStorage.setItem('milestoneActiveCols', JSON.stringify(ids)); } catch(e) {}
-  }
-
-  let activeColIds  = _loadActiveCols(); // currently visible optional cols, in order
-  let _paneWork     = [];                // working copy while the pane is open
-  let _paneDragSrc  = null;
-
-  // ── Open / Close ────────────────────────────────────────────
-  function openColPane() {
-    _paneWork = [...activeColIds];
-    _renderPaneContent();
-    document.getElementById('colPane').classList.add('open');
-    document.getElementById('colPaneOverlay').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeColPane() {
-    document.getElementById('colPane').classList.remove('open');
-    document.getElementById('colPaneOverlay').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  // ── Render pane lists ────────────────────────────────────────
-  function _renderPaneContent() {
-    // Active list
-    const activeEl = document.getElementById('colActiveList');
-    activeEl.innerHTML = '';
-    if (_paneWork.length === 0) {
-      activeEl.innerHTML = '<div class="col-active-list-empty">No active columns — add some below</div>';
-    } else {
-      _paneWork.forEach(id => {
-        const col = OPTIONAL_COLS.find(c => c.id === id);
-        if (!col) return;
-        const el = document.createElement('div');
-        el.className = 'col-active-item';
-        el.dataset.id = id;
-        el.draggable = true;
-        el.innerHTML = `
-          <i class="bi bi-grip-vertical col-drag-handle"></i>
-          <span>${col.label}</span>
-          <button class="remove-col-btn" data-id="${id}" title="Remove"><i class="bi bi-x-lg"></i></button>`;
-        el.addEventListener('dragstart', _pDragStart);
-        el.addEventListener('dragover',  _pDragOver);
-        el.addEventListener('drop',      _pDrop);
-        el.addEventListener('dragend',   _pDragEnd);
-        el.querySelector('.remove-col-btn').addEventListener('click', function(e) {
-          e.stopPropagation();
-          _paneWork = _paneWork.filter(c => c !== this.dataset.id);
-          _renderPaneContent();
-        });
-        activeEl.appendChild(el);
+  // ── Ctrl-key visual feedback on all slicers ─────────────────
+  (function () {
+    function setSlicer(on) {
+      document.querySelectorAll('.slicer').forEach(el => {
+        el.classList.toggle('slicer-multi-mode', on);
       });
     }
-
-    // Available list (cols not yet active)
-    const availEl = document.getElementById('colAvailableList');
-    availEl.innerHTML = '';
-    const inactive = OPTIONAL_COLS.filter(c => !_paneWork.includes(c.id));
-    if (inactive.length === 0) {
-      availEl.innerHTML = '<div style="font-size:0.78rem;color:var(--gray-400);padding:0.45rem 0.7rem;">All columns are active</div>';
-    } else {
-      inactive.forEach(col => {
-        const el = document.createElement('div');
-        el.className = 'col-available-item';
-        el.innerHTML = `<span>${col.label}</span>
-          <button class="add-col-btn" data-id="${col.id}" title="Add"><i class="bi bi-plus-lg"></i></button>`;
-        el.querySelector('.add-col-btn').addEventListener('click', function() {
-          _paneWork.push(this.dataset.id);
-          _renderPaneContent();
-        });
-        availEl.appendChild(el);
-      });
-    }
-  }
-
-  // ── Drag-and-drop reordering ─────────────────────────────────
-  function _pDragStart(e) {
-    _paneDragSrc = e.currentTarget;
-    e.currentTarget.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
-  }
-  function _pDragOver(e) {
-    e.preventDefault(); e.dataTransfer.dropEffect = 'move';
-    document.querySelectorAll('.col-active-item')
-      .forEach(el => el.classList.remove('drag-target-above', 'drag-target-below'));
-    if (e.currentTarget !== _paneDragSrc) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      e.currentTarget.classList.add(
-        e.clientY < rect.top + rect.height / 2 ? 'drag-target-above' : 'drag-target-below');
-    }
-  }
-  function _pDrop(e) {
-    e.preventDefault();
-    if (!_paneDragSrc || e.currentTarget === _paneDragSrc) return;
-    const srcId = _paneDragSrc.dataset.id;
-    const tgtId = e.currentTarget.dataset.id;
-    const rect   = e.currentTarget.getBoundingClientRect();
-    const before = e.clientY < rect.top + rect.height / 2;
-    _paneWork = _paneWork.filter(c => c !== srcId);
-    const ti = _paneWork.indexOf(tgtId);
-    _paneWork.splice(before ? ti : ti + 1, 0, srcId);
-    _renderPaneContent();
-  }
-  function _pDragEnd() {
-    document.querySelectorAll('.col-active-item')
-      .forEach(el => el.classList.remove('dragging', 'drag-target-above', 'drag-target-below'));
-  }
-
-  // ── Apply / Reset ────────────────────────────────────────────
-  function applyColPane() {
-    activeColIds = [..._paneWork];
-    _saveActiveCols(activeColIds);
-    closeColPane();
-    rebuildMilestoneTableHeader();
-    renderDetailsTable();
-  }
-  function resetColPane() {
-    _paneWork = [...DEFAULT_ACTIVE_COLS];
-    _renderPaneContent();
-  }
-
-  // ── Rebuild <thead> to exactly match activeColIds ─────────────
-  function rebuildMilestoneTableHeader() {
-    const sortRow = document.querySelector('#milestoneDetailsTable thead tr.sort-row');
-    if (!sortRow) return;
-
-    // Fixed columns (indices 0–5)
-    const fixed = [
-      { label: 'Project',        ci: 0 },
-      { label: 'Phase',          ci: 1 },
-      { label: 'Tower',          ci: 2 },
-      { label: 'Unit No.',       ci: 3 },
-      { label: 'Customer Name',  ci: 4 },
-      { label: 'Revenue (₹ Cr)', ci: 5 },
-    ];
-    let h = fixed.map(f => `
-      <th class="sortable" onclick="sortTable(${f.ci})">${f.label}
-        <button class="col-filter-btn" data-table="milestone" data-col="${f.ci}"
-          onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button>
-      </th>`).join('');
-
-    // Dynamic optional columns (index 6+)
-    activeColIds.forEach((id, i) => {
-      const col = OPTIONAL_COLS.find(c => c.id === id);
-      if (!col) return;
-      const ci = 6 + i;
-      h += `
-      <th class="sortable" onclick="sortTable(${ci})" style="text-align:center;">${col.label}
-        <button class="col-filter-btn" data-table="milestone" data-col="${ci}"
-          onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button>
-      </th>`;
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Control' || e.key === 'Meta') setSlicer(true);
     });
-    sortRow.innerHTML = h;
-  }
-  // ═══════════════════════════════════════════════════════════
-  // END COLUMN CUSTOMISER
-  // ═══════════════════════════════════════════════════════════
+    document.addEventListener('keyup', e => {
+      if (e.key === 'Control' || e.key === 'Meta') setSlicer(false);
+    });
+    // Safety: clear if window loses focus
+    window.addEventListener('blur', () => setSlicer(false));
+  })();
+  // ── End Ctrl-key feedback ────────────────────────────────────
 
   // ===== END SETTINGS MODAL =====
 </script>
-
-<!-- ═══ COLUMN CUSTOMISER SIDE PANE ═══ -->
-<div class="col-pane-overlay" id="colPaneOverlay" onclick="closeColPane()"></div>
-<div class="col-pane" id="colPane">
-  <div class="col-pane-header">
-    <h6><i class="bi bi-layout-three-columns"></i> Customise Columns</h6>
-    <button class="col-pane-close" onclick="closeColPane()"><i class="bi bi-x-lg"></i></button>
-  </div>
-  <div class="col-pane-body">
-    <div class="col-pane-section-title">Fixed Columns (always shown)</div>
-    <div class="col-fixed-list">
-      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Project</div>
-      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Phase</div>
-      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Tower</div>
-      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Unit No.</div>
-      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Customer Name</div>
-      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Revenue (₹ Cr)</div>
-    </div>
-    <div class="col-pane-section-title">Active Status Columns
-      <span style="color:var(--gray-400);font-weight:400;text-transform:none;letter-spacing:0;">&nbsp;(drag to reorder)</span>
-    </div>
-    <div class="col-active-list" id="colActiveList"></div>
-    <div class="col-pane-section-title">Available Columns</div>
-    <div class="col-available-list" id="colAvailableList"></div>
-  </div>
-  <div class="col-pane-footer">
-    <button class="col-pane-apply" onclick="applyColPane()"><i class="bi bi-check2"></i> Apply</button>
-    <button class="col-pane-reset" onclick="resetColPane()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
-  </div>
-</div>
-<!-- ═══ END COLUMN CUSTOMISER ═══ -->
 
 <!-- Column Filter Dropdown — rendered at body level to avoid overflow clipping -->
 <div class="col-filter-dropdown" id="colFilterDropdown" style="display:none;position:fixed;z-index:99999;">
