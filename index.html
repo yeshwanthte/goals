@@ -4582,6 +4582,15 @@
               </div>
             </div>
           </div>
+          <!-- Quarter slicer -->
+          <div class="pa-multi-card" style="max-width:200px;">
+            <div class="pa-multi-header" style="background:linear-gradient(135deg,#475569,#334155);">
+              <i class="bi bi-calendar3"></i><span>Select Quarter</span>
+            </div>
+            <div class="pa-multi-body" style="padding:0.5rem 0.7rem;">
+              <div class="slicer" id="shellQuarterSlicer" style="gap:0.3rem;"></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -8831,6 +8840,7 @@
   let shellSelectedProject = null;
   let shellSelectedTowers  = new Set();   // empty = show all towers for project
   let shellSelectedYear    = '';          // '' = all years
+  let shellSelectedQuarter = '';          // '' = all quarters, '1'-'4'
 
   function buildShellTrackerSlicers() {
     // ── Year dropdown from Shell Master dates ──
@@ -8892,8 +8902,48 @@
     // Tower slicer placeholder
     buildShellTowerSlicer(null);
 
+    // Build quarter slicer
+    buildShellQuarterSlicer();
+
     // Initial KPI calc
     updateShellKPIs();
+  }
+
+  function buildShellQuarterSlicer() {
+    const el = document.getElementById('shellQuarterSlicer');
+    if (!el) return;
+    el.innerHTML = '';
+    const quarters = [
+      { label: 'All', value: '' },
+      { label: 'Q1', value: '1' },
+      { label: 'Q2', value: '2' },
+      { label: 'Q3', value: '3' },
+      { label: 'Q4', value: '4' }
+    ];
+    quarters.forEach(q => {
+      const btn = document.createElement('button');
+      btn.textContent = q.label;
+      if (q.value === shellSelectedQuarter) btn.classList.add('active');
+      if (q.value === '' && shellSelectedQuarter === '') btn.classList.add('active');
+      btn.onclick = () => {
+        el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        shellSelectedQuarter = q.value;
+        updateShellKPIs();
+        renderShellTracker();
+      };
+      el.appendChild(btn);
+    });
+  }
+
+  // Returns true if a date falls in the selected quarter (Jan-Mar=Q1, Apr-Jun=Q2, Jul-Sep=Q3, Oct-Dec=Q4)
+  function dateInShellQuarter(dateStr) {
+    if (!shellSelectedQuarter) return true;
+    const d = parseDate(dateStr);
+    if (!d) return false;
+    const month = d.getMonth(); // 0-11
+    const q = Math.floor(month / 3) + 1; // 1-4
+    return q.toString() === shellSelectedQuarter;
   }
 
   function onShellYearChange() {
@@ -8960,11 +9010,13 @@
 
     rows.forEach(r => {
       const pd = parseDate(r.PlanDate);
-      if (pd && (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear)) {
+      if (pd && (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear)
+             && dateInShellQuarter(r.PlanDate)) {
         planRev += r.DetailAmt; planNos++;
       }
       const ad = parseDate(r.ActualDate);
-      if (ad && (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear)) {
+      if (ad && (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear)
+             && dateInShellQuarter(r.ActualDate)) {
         actualRev += r.DetailAmt; actualNos++;
       }
     });
@@ -8981,13 +9033,18 @@
 
     let rows = getShellFilteredRows();
 
-    // Year filter for visualization
-    if (shellSelectedYear) {
+    // Year + Quarter filter for visualization
+    if (shellSelectedYear || shellSelectedQuarter) {
       rows = rows.filter(r => {
         const pd = parseDate(r.PlanDate);
         const ad = parseDate(r.ActualDate);
-        return (pd && pd.getFullYear().toString() === shellSelectedYear) ||
-               (ad && ad.getFullYear().toString() === shellSelectedYear);
+        const pdMatch = pd &&
+          (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear) &&
+          dateInShellQuarter(r.PlanDate);
+        const adMatch = ad &&
+          (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear) &&
+          dateInShellQuarter(r.ActualDate);
+        return pdMatch || adMatch;
       });
     }
 
@@ -9066,15 +9123,20 @@
   }
 
   function downloadShellTrackerExcel() {
-    // Collect all Shell Master rows matching current filters (project, tower, year)
+    // Collect all Shell Master rows matching current filters (project, tower, year, quarter)
     let rows = getShellFilteredRows();
 
-    if (shellSelectedYear) {
+    if (shellSelectedYear || shellSelectedQuarter) {
       rows = rows.filter(r => {
         const pd = parseDate(r.PlanDate);
         const ad = parseDate(r.ActualDate);
-        return (pd && pd.getFullYear().toString() === shellSelectedYear) ||
-               (ad && ad.getFullYear().toString() === shellSelectedYear);
+        const pdMatch = pd &&
+          (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear) &&
+          dateInShellQuarter(r.PlanDate);
+        const adMatch = ad &&
+          (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear) &&
+          dateInShellQuarter(r.ActualDate);
+        return pdMatch || adMatch;
       });
     }
 
