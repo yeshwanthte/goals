@@ -4604,6 +4604,11 @@
       </section>
 
       <!-- Building Visualization -->
+      <div style="display:flex;justify-content:flex-end;margin-bottom:0.6rem;">
+        <button class="btn-download-excel" onclick="downloadShellTrackerExcel()">
+          <i class="bi bi-file-earmark-excel"></i> Download Excel
+        </button>
+      </div>
       <div id="shellTrackerContainer" class="shell-tracker-container">
         <div class="shell-tracker-empty">
           <i class="bi bi-building-fill-gear"></i>
@@ -9060,7 +9065,81 @@
     container.innerHTML = parts.join('');
   }
 
-  // ===== SETTINGS MODAL =====
+  function downloadShellTrackerExcel() {
+    // Collect all Shell Master rows matching current filters (project, tower, year)
+    let rows = getShellFilteredRows();
+
+    if (shellSelectedYear) {
+      rows = rows.filter(r => {
+        const pd = parseDate(r.PlanDate);
+        const ad = parseDate(r.ActualDate);
+        return (pd && pd.getFullYear().toString() === shellSelectedYear) ||
+               (ad && ad.getFullYear().toString() === shellSelectedYear);
+      });
+    }
+
+    if (rows.length === 0) {
+      alert('No data to download with the current filters.');
+      return;
+    }
+
+    // ── Build Excel data ────────────────────────────────────────────────────
+    const header = [
+      'Project',
+      'Tower',
+      'Milestone Name',
+      'Milestone Amount (₹ Cr)',
+      'Planned Date',
+      'Actual Date'
+    ];
+
+    const dataRows = rows.map(r => {
+      const pd  = parseDate(r.PlanDate);
+      const ad  = parseDate(r.ActualDate);
+      const amt = r.DetailAmt > 0 ? (r.DetailAmt / 10000000).toFixed(2) : '';
+      return [
+        r.Project        || '',
+        r.Tower          || '',
+        r.MilestoneName  || r.Category || '',
+        amt,
+        pd ? formatDateDDMMMYY(pd) : '',
+        ad ? formatDateDDMMMYY(ad) : ''
+      ];
+    });
+
+    // Group rows by Project then Tower for visual separation
+    dataRows.sort((a, b) => {
+      const projCmp = a[0].localeCompare(b[0]);
+      if (projCmp !== 0) return projCmp;
+      return a[1].localeCompare(b[1], undefined, { numeric: true });
+    });
+
+    const excelData = [header, ...dataRows];
+
+    // ── Create workbook with styling via SheetJS ────────────────────────────
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+
+    // Column widths
+    ws['!cols'] = [
+      { wch: 22 },  // Project
+      { wch: 18 },  // Tower
+      { wch: 35 },  // Milestone Name
+      { wch: 22 },  // Amount
+      { wch: 16 },  // Planned Date
+      { wch: 16 }   // Actual Date
+    ];
+
+    // Freeze top header row
+    ws['!freeze'] = { xSplit: 0, ySplit: 1 };
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Shell Tracker');
+
+    const timestamp = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(wb, `Shell_Tracker_${timestamp}.xlsx`);
+  }
+
+
 
   function openSettings() {
     if (!currentUser || !currentUser.isAdmin) return;
