@@ -3709,6 +3709,10 @@
           <i class="bi bi-arrow-clockwise"></i>
           Refresh Data
         </button>
+        <button id="ctgToggleBtn" onclick="toggleCTGTab()" style="display:none;background:rgba(131,60,12,0.18);border:1.5px solid rgba(198,89,17,0.5);color:#FCE7DC;padding:0.5rem 1rem;border-radius:8px;font-weight:600;cursor:pointer;display:none;align-items:center;gap:0.5rem;transition:all 0.3s;white-space:nowrap;"
+          onmouseover="this.style.background='rgba(198,89,17,0.35)'" onmouseout="this.style.background='rgba(131,60,12,0.18)'">
+          <i class="bi bi-eye" id="ctgToggleIcon"></i> <span id="ctgToggleLabel">Show CTG Tab</span>
+        </button>
         <button id="adminSettingsBtn" onclick="openSettings()" style="display:none;background:rgba(131,60,12,0.18);border:1.5px solid rgba(198,89,17,0.5);color:#FCE7DC;padding:0.5rem 1rem;border-radius:8px;font-weight:600;cursor:pointer;align-items:center;gap:0.5rem;transition:all 0.3s;white-space:nowrap;"
           onmouseover="this.style.background='rgba(198,89,17,0.35)'" onmouseout="this.style.background='rgba(131,60,12,0.18)'">
           <i class="bi bi-gear-fill"></i> Settings
@@ -3749,6 +3753,10 @@
     <button class="tab-button" onclick="switchTab('planactual')">
       <i class="bi bi-graph-up-arrow"></i>
       Plan Vs Actuals Dashboard
+    </button>
+    <button class="tab-button" id="ctgTabBtn" style="display:none;" onclick="switchTab('ctg')">
+      <i class="bi bi-graph-up-arrow"></i>
+      Plan Vs Actuals Bal. CTG
     </button>
     <button class="tab-button" onclick="switchTab('tower')">
       <i class="bi bi-building"></i>
@@ -4437,6 +4445,102 @@
 
   </div>
   <!-- End Plan Actual Tab -->
+  <!-- Plan Vs Actuals Bal. CTG Tab -->
+  <div class="tab-content" id="ctgTab">
+    <div class="data-section visible" id="ctgDataSection">
+
+      <div style="background:linear-gradient(135deg,#4a1e06,#833C0C,#C65911);color:#fff;padding:0.75rem 1.5rem;border-radius:var(--radius-md);margin-bottom:1.25rem;display:flex;align-items:center;gap:0.7rem;font-weight:700;font-size:0.9rem;">
+        <i class="bi bi-calculator-fill"></i> Plan Vs Actuals Bal. CTG — with Cost-to-Go (CTG) amounts
+      </div>
+
+      <!-- Plaster CTG Table -->
+      <section style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="card-header-custom">
+            <div class="details-header" style="width:100%;">
+              <h5><i class="bi bi-paint-bucket"></i> Plaster — Unit Details with CTG</h5>
+              <div class="details-actions">
+                <button class="btn-download-excel" onclick="downloadCTGExcel('plaster')"><i class="bi bi-file-earmark-excel"></i> Download Excel</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body-custom" style="padding:0;">
+            <div class="details-table-container">
+              <table class="details-table" id="ctgPlasterTable">
+                <thead>
+                  <tr class="sort-row">
+                    <th>Project</th><th>Phase</th><th>Tower</th><th>Unit No.</th><th>Customer Name</th>
+                    <th>Plan Date</th><th>Plan Amt (₹ Cr)</th><th>Actual Date</th><th>Actual Amt (₹ Cr)</th>
+                    <th style="background:rgba(198,89,17,0.1);color:#833C0C;font-weight:800;">CTG (₹ Cr)</th>
+                  </tr>
+                </thead>
+                <tbody id="ctgPlasterBody"><tr><td colspan="10" style="text-align:center;padding:2rem;color:#94a3b8;">Loading…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Flooring CTG Table -->
+      <section style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="card-header-custom">
+            <div class="details-header" style="width:100%;">
+              <h5><i class="bi bi-grid-3x3"></i> Flooring &amp; Dado — Unit Details with CTG</h5>
+              <div class="details-actions">
+                <button class="btn-download-excel" onclick="downloadCTGExcel('flooring')"><i class="bi bi-file-earmark-excel"></i> Download Excel</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body-custom" style="padding:0;">
+            <div class="details-table-container">
+              <table class="details-table" id="ctgFlooringTable">
+                <thead>
+                  <tr class="sort-row">
+                    <th>Project</th><th>Phase</th><th>Tower</th><th>Unit No.</th><th>Customer Name</th>
+                    <th>Plan Date</th><th>Plan Amt (₹ Cr)</th><th>Actual Date</th><th>Actual Amt (₹ Cr)</th>
+                    <th style="background:rgba(198,89,17,0.1);color:#833C0C;font-weight:800;">CTG (₹ Cr)</th>
+                  </tr>
+                </thead>
+                <tbody id="ctgFlooringBody"><tr><td colspan="10" style="text-align:center;padding:2rem;color:#94a3b8;">Loading…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Handover CTG Table -->
+      <section style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="card-header-custom">
+            <div class="details-header" style="width:100%;">
+              <h5><i class="bi bi-check-circle"></i> Ready for Handover — Unit Details with CTG</h5>
+              <div class="details-actions">
+                <button class="btn-download-excel" onclick="downloadCTGExcel('handover')"><i class="bi bi-file-earmark-excel"></i> Download Excel</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body-custom" style="padding:0;">
+            <div class="details-table-container">
+              <table class="details-table" id="ctgHandoverTable">
+                <thead>
+                  <tr class="sort-row">
+                    <th>Project</th><th>Phase</th><th>Tower</th><th>Unit No.</th><th>Customer Name</th>
+                    <th>Plan Date</th><th>Plan Amt (₹ Cr)</th><th>Actual Date</th><th>Actual Amt (₹ Cr)</th>
+                    <th style="background:rgba(198,89,17,0.1);color:#833C0C;font-weight:800;">CTG (₹ Cr)</th>
+                  </tr>
+                </thead>
+                <tbody id="ctgHandoverBody"><tr><td colspan="10" style="text-align:center;padding:2rem;color:#94a3b8;">Loading…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+  <!-- End CTG Tab -->
+
   <!-- Graphical Representation (Tower Visualization) Tab Content -->
   <div class="tab-content" id="towerTab">
     
@@ -4582,15 +4686,6 @@
               </div>
             </div>
           </div>
-          <!-- Quarter slicer -->
-          <div class="pa-multi-card" style="max-width:200px;">
-            <div class="pa-multi-header" style="background:linear-gradient(135deg,#475569,#334155);">
-              <i class="bi bi-calendar3"></i><span>Select Quarter</span>
-            </div>
-            <div class="pa-multi-body" style="padding:0.5rem 0.7rem;">
-              <div class="slicer" id="shellQuarterSlicer" style="gap:0.3rem;"></div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -4613,11 +4708,6 @@
       </section>
 
       <!-- Building Visualization -->
-      <div style="display:flex;justify-content:flex-end;margin-bottom:0.6rem;">
-        <button class="btn-download-excel" onclick="downloadShellTrackerExcel()">
-          <i class="bi bi-file-earmark-excel"></i> Download Excel
-        </button>
-      </div>
       <div id="shellTrackerContainer" class="shell-tracker-container">
         <div class="shell-tracker-empty">
           <i class="bi bi-building-fill-gear"></i>
@@ -5090,7 +5180,16 @@
     HVAC_OPT:    40, // Column AP
     FALSE_CEIL:  42, // Column AQ
     FURNITURE:   48, // Column AW
-    KITCHEN:     49  // Column AX
+    KITCHEN:     49, // Column AX
+    // Plaster CTG backup columns
+    CTG_MISC_STATUS: 34, // Column AI — Misc Works status (same as MASONRY)
+    CTG_MASONRY_STATUS: 34, // Column AI — Masonry status
+    CTG_ELEC_STATUS: 35,  // Column AJ — Electrical Conduiting status
+    CTG_PLASTER_STATUS: 36, // Column AK — Plaster status
+    CTG_BP:  67, // Column BP — Misc Works CTG amount
+    CTG_BQ:  68, // Column BQ — Masonry CTG amount
+    CTG_BR:  69, // Column BR — Electrical Conduiting CTG amount
+    CTG_BS:  70  // Column BS — Plaster CTG amount
   };
 
   // File handling (only wire up if upload elements exist in the DOM)
@@ -5206,7 +5305,12 @@
       HvacOpt:     validDate(r[COL.HVAC_OPT]),
       FalseCeil:   validDate(r[COL.FALSE_CEIL]),
       Furniture:   validDate(r[COL.FURNITURE]),
-      Kitchen:     validDate(r[COL.KITCHEN])
+      Kitchen:     validDate(r[COL.KITCHEN]),
+      // CTG backup values
+      CTG_BP:  +r[COL.CTG_BP]  || 0,
+      CTG_BQ:  +r[COL.CTG_BQ]  || 0,
+      CTG_BR:  +r[COL.CTG_BR]  || 0,
+      CTG_BS:  +r[COL.CTG_BS]  || 0
     }));
 
     // Update UI
@@ -5979,6 +6083,9 @@
       document.getElementById('planActualTab').classList.add('active');
     } else if (tabName === 'tower') {
       document.getElementById('towerTab').classList.add('active');
+    } else if (tabName === 'ctg') {
+      document.getElementById('ctgTab').classList.add('active');
+      generateCTGTables();
     } else if (tabName === 'shelltracker') {
       document.getElementById('shellTrackerTab').classList.add('active');
     }
@@ -7277,6 +7384,8 @@
         // Show/hide settings for admin only
         const settingsBtn = document.getElementById('adminSettingsBtn');
         if (settingsBtn) settingsBtn.style.display = result.isAdmin ? 'flex' : 'none';
+        const ctgBtn = document.getElementById('ctgToggleBtn');
+        if (ctgBtn) ctgBtn.style.display = result.isAdmin ? 'flex' : 'none';
 
         overlay.style.opacity = '0';
         overlay.style.transition = 'opacity 0.4s ease';
@@ -8840,7 +8949,6 @@
   let shellSelectedProject = null;
   let shellSelectedTowers  = new Set();   // empty = show all towers for project
   let shellSelectedYear    = '';          // '' = all years
-  let shellSelectedQuarter = '';          // '' = all quarters, '1'-'4'
 
   function buildShellTrackerSlicers() {
     // ── Year dropdown from Shell Master dates ──
@@ -8902,48 +9010,8 @@
     // Tower slicer placeholder
     buildShellTowerSlicer(null);
 
-    // Build quarter slicer
-    buildShellQuarterSlicer();
-
     // Initial KPI calc
     updateShellKPIs();
-  }
-
-  function buildShellQuarterSlicer() {
-    const el = document.getElementById('shellQuarterSlicer');
-    if (!el) return;
-    el.innerHTML = '';
-    const quarters = [
-      { label: 'All', value: '' },
-      { label: 'Q1', value: '1' },
-      { label: 'Q2', value: '2' },
-      { label: 'Q3', value: '3' },
-      { label: 'Q4', value: '4' }
-    ];
-    quarters.forEach(q => {
-      const btn = document.createElement('button');
-      btn.textContent = q.label;
-      if (q.value === shellSelectedQuarter) btn.classList.add('active');
-      if (q.value === '' && shellSelectedQuarter === '') btn.classList.add('active');
-      btn.onclick = () => {
-        el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        shellSelectedQuarter = q.value;
-        updateShellKPIs();
-        renderShellTracker();
-      };
-      el.appendChild(btn);
-    });
-  }
-
-  // Returns true if a date falls in the selected quarter (Jan-Mar=Q1, Apr-Jun=Q2, Jul-Sep=Q3, Oct-Dec=Q4)
-  function dateInShellQuarter(dateStr) {
-    if (!shellSelectedQuarter) return true;
-    const d = parseDate(dateStr);
-    if (!d) return false;
-    const month = d.getMonth(); // 0-11
-    const q = Math.floor(month / 3) + 1; // 1-4
-    return q.toString() === shellSelectedQuarter;
   }
 
   function onShellYearChange() {
@@ -9010,13 +9078,11 @@
 
     rows.forEach(r => {
       const pd = parseDate(r.PlanDate);
-      if (pd && (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear)
-             && dateInShellQuarter(r.PlanDate)) {
+      if (pd && (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear)) {
         planRev += r.DetailAmt; planNos++;
       }
       const ad = parseDate(r.ActualDate);
-      if (ad && (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear)
-             && dateInShellQuarter(r.ActualDate)) {
+      if (ad && (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear)) {
         actualRev += r.DetailAmt; actualNos++;
       }
     });
@@ -9033,18 +9099,13 @@
 
     let rows = getShellFilteredRows();
 
-    // Year + Quarter filter for visualization
-    if (shellSelectedYear || shellSelectedQuarter) {
+    // Year filter for visualization
+    if (shellSelectedYear) {
       rows = rows.filter(r => {
         const pd = parseDate(r.PlanDate);
         const ad = parseDate(r.ActualDate);
-        const pdMatch = pd &&
-          (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear) &&
-          dateInShellQuarter(r.PlanDate);
-        const adMatch = ad &&
-          (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear) &&
-          dateInShellQuarter(r.ActualDate);
-        return pdMatch || adMatch;
+        return (pd && pd.getFullYear().toString() === shellSelectedYear) ||
+               (ad && ad.getFullYear().toString() === shellSelectedYear);
       });
     }
 
@@ -9122,86 +9183,120 @@
     container.innerHTML = parts.join('');
   }
 
-  function downloadShellTrackerExcel() {
-    // Collect all Shell Master rows matching current filters (project, tower, year, quarter)
-    let rows = getShellFilteredRows();
+  // ===== PLAN VS ACTUALS BAL. CTG =====
 
-    if (shellSelectedYear || shellSelectedQuarter) {
-      rows = rows.filter(r => {
-        const pd = parseDate(r.PlanDate);
-        const ad = parseDate(r.ActualDate);
-        const pdMatch = pd &&
-          (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear) &&
-          dateInShellQuarter(r.PlanDate);
-        const adMatch = ad &&
-          (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear) &&
-          dateInShellQuarter(r.ActualDate);
-        return pdMatch || adMatch;
-      });
-    }
+  let _ctgVisible = false;
 
-    if (rows.length === 0) {
-      alert('No data to download with the current filters.');
+  function toggleCTGTab() {
+    _ctgVisible = !_ctgVisible;
+    const btn    = document.getElementById('ctgTabBtn');
+    const label  = document.getElementById('ctgToggleLabel');
+    const icon   = document.getElementById('ctgToggleIcon');
+    if (btn)   btn.style.display   = _ctgVisible ? 'inline-flex' : 'none';
+    if (label) label.textContent   = _ctgVisible ? 'Hide CTG Tab' : 'Show CTG Tab';
+    if (icon)  icon.className      = _ctgVisible ? 'bi bi-eye-slash' : 'bi bi-eye';
+  }
+
+  // Calculate Plaster CTG for a unit:
+  // Adds BP if Misc Works pending (no date in col AI = Masonry field)
+  // Adds BQ if Masonry pending (no date in col AI)
+  // Adds BR if Electrical Conduiting pending (no date in col AJ)
+  // Adds BS if Plaster pending (no date in col AK = Plaster field)
+  function calcPlasterCTG(unit) {
+    let ctg = 0;
+    if (!unit.Masonry)    ctg += unit.CTG_BP;  // Misc Works pending
+    if (!unit.Masonry)    ctg += unit.CTG_BQ;  // Masonry pending (same status col AI)
+    if (!unit.Conduiting) ctg += unit.CTG_BR;  // Electrical Conduiting pending (col AJ)
+    if (!unit.Plaster)    ctg += unit.CTG_BS;  // Plaster pending (col AK)
+    return ctg;
+  }
+
+  // For Flooring & Handover — CTG = unit revenue not yet received (placeholder pending full spec)
+  function calcFlooringCTG(unit) {
+    // No specific backup cols defined yet — use FloorRev if actual not done
+    return unit.Floor ? 0 : (unit.FloorRev || 0);
+  }
+  function calcHandoverCTG(unit) {
+    return unit.Hand ? 0 : (unit.HandRev || 0);
+  }
+
+  function generateCTGTables() {
+    const allData = raw;
+    renderCTGTable('plaster',  allData.filter(u => !u.Plaster), 'PlasterRev', 'PlasterPlan', 'PlasterActual', calcPlasterCTG);
+    renderCTGTable('flooring', allData.filter(u => !u.Floor),   'FloorRev',   'FlooringPlan','FlooringActual', calcFlooringCTG);
+    renderCTGTable('handover', allData.filter(u => !u.Hand),    'HandRev',    'HandoverPlan','HandoverActual', calcHandoverCTG);
+  }
+
+  function renderCTGTable(type, data, revField, planField, actualField, ctgFn) {
+    const tbody = document.getElementById('ctg' + type.charAt(0).toUpperCase() + type.slice(1) + 'Body');
+    if (!tbody) return;
+
+    if (data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2rem;color:#94a3b8;">No pending units</td></tr>';
       return;
     }
 
-    // ── Build Excel data ────────────────────────────────────────────────────
-    const header = [
-      'Project',
-      'Tower',
-      'Milestone Name',
-      'Milestone Amount (₹ Cr)',
-      'Planned Date',
-      'Actual Date'
-    ];
+    let totalPlan = 0, totalActual = 0, totalCTG = 0;
+    const rows = [];
 
-    const dataRows = rows.map(r => {
-      const pd  = parseDate(r.PlanDate);
-      const ad  = parseDate(r.ActualDate);
-      const amt = r.DetailAmt > 0 ? (r.DetailAmt / 10000000).toFixed(2) : '';
-      return [
-        r.Project        || '',
-        r.Tower          || '',
-        r.MilestoneName  || r.Category || '',
-        amt,
-        pd ? formatDateDDMMMYY(pd) : '',
-        ad ? formatDateDDMMMYY(ad) : ''
-      ];
+    data.forEach(unit => {
+      const pd  = parseDate(unit[planField]);
+      const ad  = parseDate(unit[actualField]);
+      const planAmt   = pd ? ((unit[revField] || 0) / 10000000) : 0;
+      const actualAmt = ad ? ((unit[revField] || 0) / 10000000) : 0;
+      const ctgRaw    = ctgFn(unit);
+      const ctgAmt    = ctgRaw / 10000000;
+
+      totalPlan   += planAmt;
+      totalActual += actualAmt;
+      totalCTG    += ctgAmt;
+
+      const pdText = pd ? formatDateDDMMMYY(pd) : '-';
+      const adText = ad ? formatDateDDMMMYY(ad) : '-';
+      const ctgCell = ctgAmt > 0
+        ? `<td style="text-align:right;font-weight:700;color:#833C0C;">₹${ctgAmt.toFixed(2)}</td>`
+        : `<td style="text-align:right;color:#94a3b8;">-</td>`;
+
+      rows.push(`<tr>
+        <td>${unit.Project || 'N/A'}</td>
+        <td>${unit.Phase   || 'N/A'}</td>
+        <td>${unit.Tower   || 'N/A'}</td>
+        <td class="unit-number">${unit.UnitNo}</td>
+        <td class="customer-name">${unit.Customer || 'N/A'}</td>
+        <td>${pdText}</td>
+        <td class="revenue-cell">${planAmt > 0 ? '₹' + planAmt.toFixed(2) : '-'}</td>
+        <td>${adText}</td>
+        <td class="revenue-cell">${actualAmt > 0 ? '₹' + actualAmt.toFixed(2) : '-'}</td>
+        ${ctgCell}
+      </tr>`);
     });
 
-    // Group rows by Project then Tower for visual separation
-    dataRows.sort((a, b) => {
-      const projCmp = a[0].localeCompare(b[0]);
-      if (projCmp !== 0) return projCmp;
-      return a[1].localeCompare(b[1], undefined, { numeric: true });
-    });
+    // Total row at top
+    const totalRow = `<tr class="total-row">
+      <td colspan="5"><span class="total-label"><i class="bi bi-calculator"></i><strong>TOTAL — ${data.length} Units</strong></span></td>
+      <td colspan="2" class="revenue-cell"><strong>₹${totalPlan.toFixed(2)} Cr</strong></td>
+      <td colspan="2" class="revenue-cell"><strong>₹${totalActual.toFixed(2)} Cr</strong></td>
+      <td style="text-align:right;font-weight:800;color:#833C0C;font-size:1rem;">₹${totalCTG.toFixed(2)} Cr</td>
+    </tr>`;
 
-    const excelData = [header, ...dataRows];
-
-    // ── Create workbook with styling via SheetJS ────────────────────────────
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(excelData);
-
-    // Column widths
-    ws['!cols'] = [
-      { wch: 22 },  // Project
-      { wch: 18 },  // Tower
-      { wch: 35 },  // Milestone Name
-      { wch: 22 },  // Amount
-      { wch: 16 },  // Planned Date
-      { wch: 16 }   // Actual Date
-    ];
-
-    // Freeze top header row
-    ws['!freeze'] = { xSplit: 0, ySplit: 1 };
-
-    XLSX.utils.book_append_sheet(wb, ws, 'Shell Tracker');
-
-    const timestamp = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(wb, `Shell_Tracker_${timestamp}.xlsx`);
+    tbody.innerHTML = totalRow + rows.join('');
   }
 
+  function downloadCTGExcel(type) {
+    const tableId = 'ctg' + type.charAt(0).toUpperCase() + type.slice(1) + 'Table';
+    const table   = document.getElementById(tableId);
+    if (!table) return;
 
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.table_to_sheet(table);
+    ws['!cols'] = [{wch:20},{wch:12},{wch:14},{wch:12},{wch:28},{wch:14},{wch:16},{wch:14},{wch:16},{wch:14}];
+    XLSX.utils.book_append_sheet(wb, ws, 'CTG_' + type.charAt(0).toUpperCase() + type.slice(1));
+    XLSX.writeFile(wb, `PlanVsActuals_CTG_${type}_${new Date().toISOString().slice(0,10)}.xlsx`);
+  }
+
+  // ===== END CTG =====
+
+  // ===== SETTINGS MODAL =====
 
   function openSettings() {
     if (!currentUser || !currentUser.isAdmin) return;
