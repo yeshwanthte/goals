@@ -5232,7 +5232,13 @@
   }
 
   function validDate(v) {
-    return v && v !== "00-01-1900";
+    if (v === null || v === undefined) return false;
+    // Reject numeric zero (Excel blank date serial) and string "0"
+    const n = Number(v);
+    if (!isNaN(n) && n === 0) return false;
+    const s = String(v).trim();
+    if (s === '' || s === '0' || s === '00-01-1900' || s === '01/00/1900' || s === '0/0/1900') return false;
+    return v;
   }
 
   function prepare(rows) {
@@ -5288,6 +5294,18 @@
       CtgBR: +r[COL.CTG_BR] || 0,  // Conduiting CTG amount (Col BR)
       CtgBS: +r[COL.CTG_BS] || 0   // Plaster CTG amount    (Col BS)
     }));
+
+    // ── CTG Debug: log first 5 units with their pending flags and CTG amounts ──
+    console.group('CTG Debug — first 5 units after prepare()');
+    raw.slice(0, 5).forEach(u => {
+      const ctg = computeCtgUnit(u);
+      console.log(
+        `Unit ${u.UnitNo} | Masonry(AI)=${JSON.stringify(u.Masonry)} Conduiting(AJ)=${JSON.stringify(u.Conduiting)} Plaster(AK)=${JSON.stringify(u.Plaster)}`,
+        `| BP=${u.CtgBP} BQ=${u.CtgBQ} BR=${u.CtgBR} BS=${u.CtgBS}`,
+        `| CTG=₹${(ctg/10000000).toFixed(2)}Cr`
+      );
+    });
+    console.groupEnd();
 
     // Update UI
     const statusBadge = document.getElementById("statusBadge");
