@@ -2850,6 +2850,47 @@
     .villa-unit.stage-7 { background: #A9D08E; color: #000; border-color: #87A672; }
     .villa-unit.stage-8 { background: #446A2C; color: #fff; border-color: #2a4119; }
 
+    /* ===== CTG MEASURES PANE ===== */
+    .ctg-pane-backdrop { position:fixed;inset:0;z-index:9980;background:rgba(0,0,0,0.25);opacity:0;pointer-events:none;transition:opacity 0.25s; }
+    .ctg-pane-backdrop.open { opacity:1;pointer-events:all; }
+    .ctg-pane {
+      position:fixed;top:0;right:-400px;width:380px;height:100vh;z-index:9981;
+      background:#fff;box-shadow:-8px 0 32px rgba(0,0,0,0.18);
+      display:flex;flex-direction:column;transition:right 0.3s cubic-bezier(0.22,1,0.36,1);
+    }
+    .ctg-pane.open { right:0; }
+    .ctg-pane-header {
+      background:linear-gradient(135deg,#4a1e06 0%,#833C0C 50%,#C65911 100%);
+      color:#fff;padding:1.2rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+    }
+    .ctg-pane-header h3 { margin:0;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:0.5rem; }
+    .ctg-pane-close { background:rgba(255,255,255,0.18);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center; }
+    .ctg-pane-close:hover { background:rgba(255,255,255,0.35); }
+    .ctg-pane-body { flex:1;overflow-y:auto;padding:1.25rem; }
+    .ctg-measure-row {
+      background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;
+      padding:0.9rem 1rem;margin-bottom:0.75rem;transition:border-color 0.2s;
+    }
+    .ctg-measure-row:hover { border-color:#C65911; }
+    .ctg-measure-label { font-size:0.78rem;font-weight:700;color:#334155;margin-bottom:0.35rem;display:flex;align-items:center;gap:0.5rem; }
+    .ctg-measure-logic { font-size:0.7rem;color:#64748b;line-height:1.5; }
+    .ctg-measure-cols { font-size:0.65rem;font-weight:600;color:#94a3b8;margin-top:0.25rem; }
+    .ctg-total-row {
+      background:linear-gradient(135deg,rgba(131,60,12,0.08),rgba(198,89,17,0.06));
+      border:2px solid rgba(198,89,17,0.3);border-radius:10px;
+      padding:1rem 1.2rem;margin-top:1rem;
+    }
+    .ctg-total-label { font-size:0.85rem;font-weight:800;color:#833C0C;margin-bottom:0.3rem; }
+    .ctg-total-desc { font-size:0.72rem;color:#C65911;line-height:1.5; }
+    .btn-open-ctg-pane {
+      background:rgba(131,60,12,0.1);border:1.5px solid rgba(198,89,17,0.4);
+      color:#C65911;padding:0.45rem 0.85rem;border-radius:7px;
+      font-weight:600;font-size:0.78rem;cursor:pointer;
+      display:flex;align-items:center;gap:0.4rem;transition:all 0.2s;
+    }
+    .btn-open-ctg-pane:hover { background:#FCE7DC;border-color:#C65911; }
+    /* ===== END CTG MEASURES PANE ===== */
+
     /* ===== UNIT DETAIL POPUP ===== */
     .unit-detail-overlay {
       position: fixed;
@@ -3625,65 +3666,6 @@
       outline: 2px solid rgba(198,89,17,0.45);
       outline-offset: 2px; border-radius: 8px;
     }
-    /* ── CTG Measure Cards ── */
-    .ctg-measure-card {
-      background: #fff;
-      border-radius: 10px;
-      border: 1px solid #e5e7eb;
-      padding: 0.85rem 1rem;
-      margin-bottom: 0.85rem;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    }
-    .ctg-measure-title {
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: #1e293b;
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      margin-bottom: 0.5rem;
-    }
-    .ctg-measure-col {
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      margin-bottom: 0.5rem;
-      flex-wrap: wrap;
-    }
-    .ctg-badge {
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 0.15rem 0.5rem;
-      border-radius: 5px;
-      border: 1px solid;
-      white-space: nowrap;
-    }
-    .ctg-badge-check  { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
-    .ctg-badge-arrow  { background: transparent; color: #9ca3af; border-color: transparent; font-size: 0.8rem; font-weight: 700; }
-    .ctg-badge-source { background: #fce7dc; color: #C65911; border-color: #f8c4a7; }
-    .ctg-measure-logic {
-      font-size: 0.77rem;
-      color: #64748b;
-      line-height: 1.5;
-    }
-    /* CTG column in PA details table */
-    .ctg-col-header {
-      background: rgba(198,89,17,0.08) !important;
-      color: #C65911 !important;
-      font-weight: 700 !important;
-    }
-    .ctg-cell-val {
-      background: rgba(198,89,17,0.08);
-      color: #C65911;
-      font-weight: 700;
-      padding: 0.2rem 0.45rem;
-      border-radius: 6px;
-      display: inline-block;
-      font-size: 0.78rem;
-      min-width: 52px;
-      text-align: right;
-    }
-
   </style>
 </head>
 
@@ -3768,18 +3750,14 @@
           <i class="bi bi-arrow-clockwise"></i>
           Refresh Data
         </button>
+        <button id="ctgToggleBtn" onclick="toggleCTGTab()" style="display:none;background:rgba(131,60,12,0.18);border:1.5px solid rgba(198,89,17,0.5);color:#FCE7DC;padding:0.5rem 1rem;border-radius:8px;font-weight:600;cursor:pointer;display:none;align-items:center;gap:0.5rem;transition:all 0.3s;white-space:nowrap;"
+          onmouseover="this.style.background='rgba(198,89,17,0.35)'" onmouseout="this.style.background='rgba(131,60,12,0.18)'">
+          <i class="bi bi-eye" id="ctgToggleIcon"></i> <span id="ctgToggleLabel">Show CTG Tab</span>
+        </button>
         <button id="adminSettingsBtn" onclick="openSettings()" style="display:none;background:rgba(131,60,12,0.18);border:1.5px solid rgba(198,89,17,0.5);color:#FCE7DC;padding:0.5rem 1rem;border-radius:8px;font-weight:600;cursor:pointer;align-items:center;gap:0.5rem;transition:all 0.3s;white-space:nowrap;"
           onmouseover="this.style.background='rgba(198,89,17,0.35)'" onmouseout="this.style.background='rgba(131,60,12,0.18)'">
           <i class="bi bi-gear-fill"></i> Settings
         </button>
-        <!-- CTG Toggle Switch -->
-        <div id="ctgToggleBtn" onclick="toggleCTGPane()" title="Show / Hide CTG Measures" style="display:flex;align-items:center;gap:0.45rem;background:rgba(131,60,12,0.18);border:1.5px solid rgba(198,89,17,0.5);padding:0.4rem 0.85rem;border-radius:8px;cursor:pointer;user-select:none;transition:all 0.3s;">
-          <i class="bi bi-calculator" style="color:#FCE7DC;font-size:0.9rem;"></i>
-          <span style="color:#FCE7DC;font-size:0.8rem;font-weight:600;white-space:nowrap;">CTG</span>
-          <div id="ctgToggleTrack" style="position:relative;width:36px;height:20px;background:rgba(255,255,255,0.2);border-radius:10px;transition:background 0.25s;flex-shrink:0;">
-            <div id="ctgToggleThumb" style="position:absolute;top:3px;left:3px;width:14px;height:14px;background:white;border-radius:50%;transition:left 0.25s;"></div>
-          </div>
-        </div>
         <button onclick="logoutAdmin()" style="background: rgba(131,60,12,0.18); border: 1.5px solid rgba(198,89,17,0.5); color: #FCE7DC; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; white-space: nowrap;"
           onmouseover="this.style.background='rgba(198,89,17,0.35)';this.style.borderColor='rgba(198,89,17,0.8)'"
           onmouseout="this.style.background='rgba(131,60,12,0.18)';this.style.borderColor='rgba(198,89,17,0.5)'"
@@ -3816,6 +3794,10 @@
     <button class="tab-button" onclick="switchTab('planactual')">
       <i class="bi bi-graph-up-arrow"></i>
       Plan Vs Actuals Dashboard
+    </button>
+    <button class="tab-button" id="ctgTabBtn" style="display:none;" onclick="switchTab('ctg')">
+      <i class="bi bi-graph-up-arrow"></i>
+      Plan Vs Actuals Bal. CTG
     </button>
     <button class="tab-button" onclick="switchTab('tower')">
       <i class="bi bi-building"></i>
@@ -4428,6 +4410,9 @@
                 Unit Details - <span id="planActualActivityName" class="activity-badge"></span>
               </h5>
               <div class="details-actions">
+                <button class="btn-open-ctg-pane" id="ctgPaneBtn" onclick="openCTGPane()" style="display:none;">
+                  <i class="bi bi-calculator-fill"></i> CTG Measures
+                </button>
                 <button class="btn-download-excel" onclick="downloadPlanActualExcel()">
                   <i class="bi bi-file-earmark-excel"></i> Download Excel
                 </button>
@@ -4451,7 +4436,7 @@
                     <th class="sortable" onclick="sortPlanActualTable(6)">Plan Amt (₹ Cr)<button class="col-filter-btn" data-table="pa" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                     <th class="sortable" onclick="sortPlanActualTable(7)">Actual Date<button class="col-filter-btn" data-table="pa" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                     <th class="sortable" onclick="sortPlanActualTable(8)">Actual Amt (₹ Cr)<button class="col-filter-btn" data-table="pa" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                    <th class="sortable ctg-col-header" id="ctgColHeader" onclick="sortPlanActualTable(9)" style="display:none;"><i class="bi bi-sigma"></i> CTG Till Plaster (₹ Cr)</th>
+                    <th id="ctgColHeader" style="display:none;background:rgba(198,89,17,0.1);color:#833C0C;font-weight:800;text-align:right;white-space:nowrap;">CTG till Plaster (₹ Cr)</th>
                   </tr>
                 </thead>
                 <tbody id="planActualDetailsTableBody"></tbody>
@@ -4505,6 +4490,102 @@
 
   </div>
   <!-- End Plan Actual Tab -->
+  <!-- Plan Vs Actuals Bal. CTG Tab -->
+  <div class="tab-content" id="ctgTab">
+    <div class="data-section visible" id="ctgDataSection">
+
+      <div style="background:linear-gradient(135deg,#4a1e06,#833C0C,#C65911);color:#fff;padding:0.75rem 1.5rem;border-radius:var(--radius-md);margin-bottom:1.25rem;display:flex;align-items:center;gap:0.7rem;font-weight:700;font-size:0.9rem;">
+        <i class="bi bi-calculator-fill"></i> Plan Vs Actuals Bal. CTG — with Cost-to-Go (CTG) amounts
+      </div>
+
+      <!-- Plaster CTG Table -->
+      <section style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="card-header-custom">
+            <div class="details-header" style="width:100%;">
+              <h5><i class="bi bi-paint-bucket"></i> Plaster — Unit Details with CTG</h5>
+              <div class="details-actions">
+                <button class="btn-download-excel" onclick="downloadCTGExcel('plaster')"><i class="bi bi-file-earmark-excel"></i> Download Excel</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body-custom" style="padding:0;">
+            <div class="details-table-container">
+              <table class="details-table" id="ctgPlasterTable">
+                <thead>
+                  <tr class="sort-row">
+                    <th>Project</th><th>Phase</th><th>Tower</th><th>Unit No.</th><th>Customer Name</th>
+                    <th>Plan Date</th><th>Plan Amt (₹ Cr)</th><th>Actual Date</th><th>Actual Amt (₹ Cr)</th>
+                    <th style="background:rgba(198,89,17,0.1);color:#833C0C;font-weight:800;">CTG (₹ Cr)</th>
+                  </tr>
+                </thead>
+                <tbody id="ctgPlasterBody"><tr><td colspan="10" style="text-align:center;padding:2rem;color:#94a3b8;">Loading…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Flooring CTG Table -->
+      <section style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="card-header-custom">
+            <div class="details-header" style="width:100%;">
+              <h5><i class="bi bi-grid-3x3"></i> Flooring &amp; Dado — Unit Details with CTG</h5>
+              <div class="details-actions">
+                <button class="btn-download-excel" onclick="downloadCTGExcel('flooring')"><i class="bi bi-file-earmark-excel"></i> Download Excel</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body-custom" style="padding:0;">
+            <div class="details-table-container">
+              <table class="details-table" id="ctgFlooringTable">
+                <thead>
+                  <tr class="sort-row">
+                    <th>Project</th><th>Phase</th><th>Tower</th><th>Unit No.</th><th>Customer Name</th>
+                    <th>Plan Date</th><th>Plan Amt (₹ Cr)</th><th>Actual Date</th><th>Actual Amt (₹ Cr)</th>
+                    <th style="background:rgba(198,89,17,0.1);color:#833C0C;font-weight:800;">CTG (₹ Cr)</th>
+                  </tr>
+                </thead>
+                <tbody id="ctgFlooringBody"><tr><td colspan="10" style="text-align:center;padding:2rem;color:#94a3b8;">Loading…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Handover CTG Table -->
+      <section style="margin-bottom:1.5rem;">
+        <div class="card">
+          <div class="card-header-custom">
+            <div class="details-header" style="width:100%;">
+              <h5><i class="bi bi-check-circle"></i> Ready for Handover — Unit Details with CTG</h5>
+              <div class="details-actions">
+                <button class="btn-download-excel" onclick="downloadCTGExcel('handover')"><i class="bi bi-file-earmark-excel"></i> Download Excel</button>
+              </div>
+            </div>
+          </div>
+          <div class="card-body-custom" style="padding:0;">
+            <div class="details-table-container">
+              <table class="details-table" id="ctgHandoverTable">
+                <thead>
+                  <tr class="sort-row">
+                    <th>Project</th><th>Phase</th><th>Tower</th><th>Unit No.</th><th>Customer Name</th>
+                    <th>Plan Date</th><th>Plan Amt (₹ Cr)</th><th>Actual Date</th><th>Actual Amt (₹ Cr)</th>
+                    <th style="background:rgba(198,89,17,0.1);color:#833C0C;font-weight:800;">CTG (₹ Cr)</th>
+                  </tr>
+                </thead>
+                <tbody id="ctgHandoverBody"><tr><td colspan="10" style="text-align:center;padding:2rem;color:#94a3b8;">Loading…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+  <!-- End CTG Tab -->
+
   <!-- Graphical Representation (Tower Visualization) Tab Content -->
   <div class="tab-content" id="towerTab">
     
@@ -4650,15 +4731,6 @@
               </div>
             </div>
           </div>
-          <!-- Quarter slicer -->
-          <div class="pa-multi-card" style="max-width:200px;">
-            <div class="pa-multi-header" style="background:linear-gradient(135deg,#475569,#334155);">
-              <i class="bi bi-calendar3"></i><span>Select Quarter</span>
-            </div>
-            <div class="pa-multi-body" style="padding:0.5rem 0.7rem;">
-              <div class="slicer" id="shellQuarterSlicer" style="gap:0.3rem;"></div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -4681,11 +4753,6 @@
       </section>
 
       <!-- Building Visualization -->
-      <div style="display:flex;justify-content:flex-end;margin-bottom:0.6rem;">
-        <button class="btn-download-excel" onclick="downloadShellTrackerExcel()">
-          <i class="bi bi-file-earmark-excel"></i> Download Excel
-        </button>
-      </div>
       <div id="shellTrackerContainer" class="shell-tracker-container">
         <div class="shell-tracker-empty">
           <i class="bi bi-building-fill-gear"></i>
@@ -5096,8 +5163,6 @@
   let projectSelPA = new Set(), towerSelPA = new Set(), phaseSelPA = new Set(),
       inventorySelPA = new Set(), idsaSelPA = new Set(), gfcSelPA = new Set(), ocSelPA = new Set();
   let selectedYearPA = '2026'; // Default year
-  // CTG visibility toggle (controls CTG column in PA Unit Details table)
-  let ctgVisible = false;
   
   // Plan Actual Details (Plaster / Flooring / Handover)
   let currentPlanActualData = [];
@@ -5161,11 +5226,15 @@
     FALSE_CEIL:  42, // Column AQ
     FURNITURE:   48, // Column AW
     KITCHEN:     49, // Column AX
-    // CTG Backup columns (0-indexed: BP=67, BQ=68, BR=69, BS=70)
-    CTG_BP: 67,  // Column BP — Misc Works pending amount
-    CTG_BQ: 68,  // Column BQ — Masonry pending amount
-    CTG_BR: 69,  // Column BR — Electrical Conduiting pending amount
-    CTG_BS: 70   // Column BS — Plaster pending amount
+    // Plaster CTG backup columns
+    CTG_MISC_STATUS: 34, // Column AI — Misc Works status (same as MASONRY)
+    CTG_MASONRY_STATUS: 34, // Column AI — Masonry status
+    CTG_ELEC_STATUS: 35,  // Column AJ — Electrical Conduiting status
+    CTG_PLASTER_STATUS: 36, // Column AK — Plaster status
+    CTG_BP:  67, // Column BP — Misc Works CTG amount
+    CTG_BQ:  68, // Column BQ — Masonry CTG amount
+    CTG_BR:  69, // Column BR — Electrical Conduiting CTG amount
+    CTG_BS:  70  // Column BS — Plaster CTG amount
   };
 
   // File handling (only wire up if upload elements exist in the DOM)
@@ -5232,13 +5301,7 @@
   }
 
   function validDate(v) {
-    if (v === null || v === undefined) return false;
-    // Reject numeric zero (Excel blank date serial) and string "0"
-    const n = Number(v);
-    if (!isNaN(n) && n === 0) return false;
-    const s = String(v).trim();
-    if (s === '' || s === '0' || s === '00-01-1900' || s === '01/00/1900' || s === '0/0/1900') return false;
-    return v;
+    return v && v !== "00-01-1900";
   }
 
   function prepare(rows) {
@@ -5288,24 +5351,12 @@
       FalseCeil:   validDate(r[COL.FALSE_CEIL]),
       Furniture:   validDate(r[COL.FURNITURE]),
       Kitchen:     validDate(r[COL.KITCHEN]),
-      // CTG Backup amounts (raw numbers from columns BP–BS)
-      CtgBP: +r[COL.CTG_BP] || 0,  // Misc Works CTG amount (Col BP)
-      CtgBQ: +r[COL.CTG_BQ] || 0,  // Masonry CTG amount    (Col BQ)
-      CtgBR: +r[COL.CTG_BR] || 0,  // Conduiting CTG amount (Col BR)
-      CtgBS: +r[COL.CTG_BS] || 0   // Plaster CTG amount    (Col BS)
+      // CTG backup values
+      CTG_BP:  +r[COL.CTG_BP]  || 0,
+      CTG_BQ:  +r[COL.CTG_BQ]  || 0,
+      CTG_BR:  +r[COL.CTG_BR]  || 0,
+      CTG_BS:  +r[COL.CTG_BS]  || 0
     }));
-
-    // ── CTG Debug: log first 5 units with their pending flags and CTG amounts ──
-    console.group('CTG Debug — first 5 units after prepare()');
-    raw.slice(0, 5).forEach(u => {
-      const ctg = computeCtgUnit(u);
-      console.log(
-        `Unit ${u.UnitNo} | Masonry(AI)=${JSON.stringify(u.Masonry)} Conduiting(AJ)=${JSON.stringify(u.Conduiting)} Plaster(AK)=${JSON.stringify(u.Plaster)}`,
-        `| BP=${u.CtgBP} BQ=${u.CtgBQ} BR=${u.CtgBR} BS=${u.CtgBS}`,
-        `| CTG=₹${(ctg/10000000).toFixed(2)}Cr`
-      );
-    });
-    console.groupEnd();
 
     // Update UI
     const statusBadge = document.getElementById("statusBadge");
@@ -6077,6 +6128,9 @@
       document.getElementById('planActualTab').classList.add('active');
     } else if (tabName === 'tower') {
       document.getElementById('towerTab').classList.add('active');
+    } else if (tabName === 'ctg') {
+      document.getElementById('ctgTab').classList.add('active');
+      generateCTGTables();
     } else if (tabName === 'shelltracker') {
       document.getElementById('shellTrackerTab').classList.add('active');
     }
@@ -6611,9 +6665,6 @@
       case 6: { const d = parseDate(unit[planField]);   return d ? ((unit[currentPlanActualRevField]||0)/10000000).toFixed(2) : '-'; }
       case 7: { const d = parseDate(unit[actualField]); return d ? formatDateDDMMMYY(d) : '-'; }
       case 8: { const d = parseDate(unit[actualField]); return d ? ((unit[currentPlanActualRevField]||0)/10000000).toFixed(2) : '-'; }
-      case 9: { // CTG Till Plaster
-        return (computeCtgUnit(unit) / 10000000).toFixed(2);
-      }
       default: return '';
     }
   }
@@ -6790,20 +6841,22 @@
     const tbody = document.getElementById('planActualDetailsTableBody');
     const isPlaster = currentPlanActualRevField === 'PlasterRev';
 
+    // Show/hide CTG button and column header
+    const ctgBtn = document.getElementById('ctgPaneBtn');
+    const ctgHdr = document.getElementById('ctgColHeader');
+    if (ctgBtn) ctgBtn.style.display = isPlaster ? 'flex' : 'none';
+    if (ctgHdr) ctgHdr.style.display = isPlaster ? '' : 'none';
+
     if (currentPlanActualData.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="${isPlaster && ctgVisible ? 10 : 9}" style="text-align:center;padding:2rem;color:var(--gray-400);">
+          <td colspan="${isPlaster ? 10 : 9}" style="text-align:center;padding:2rem;color:var(--gray-400);">
             <i class="bi bi-info-circle" style="font-size:2rem;margin-bottom:0.5rem;display:block;"></i>
             No units found for this activity
           </td>
         </tr>`;
       return;
     }
-
-    // Show/hide CTG column header
-    const ctgHeader = document.getElementById('ctgColHeader');
-    if (ctgHeader) ctgHeader.style.display = (isPlaster && ctgVisible) ? '' : 'none';
 
     // Apply column filters
     const displayData = applyPAColumnFilters(currentPlanActualData);
@@ -6825,24 +6878,21 @@
       ad: parseDate(unit[actualField])
     }));
 
-    // Helper: compute CTG Till Plaster for a unit (uses shared computeCtgUnit)
-    function computeCtg(unit) { return computeCtgUnit(unit); }
-
     // Totals
-    let totalPlanAmt = 0, totalActualAmt = 0, totalCtg = 0;
+    let totalPlanAmt = 0, totalActualAmt = 0, totalCTG = 0;
     parsed.forEach(({ unit, pd, ad }) => {
       if (pd) totalPlanAmt   += (unit[currentPlanActualRevField] || 0);
       if (ad) totalActualAmt += (unit[currentPlanActualRevField] || 0);
-      if (isPlaster && ctgVisible) totalCtg += computeCtg(unit);
+      if (isPlaster) totalCTG += calcCTGtillPlaster(unit);
     });
     totalPlanAmt   /= 10000000;
     totalActualAmt /= 10000000;
-    totalCtg       /= 10000000;
+    totalCTG       /= 10000000;
 
-    const showCtg = isPlaster && ctgVisible;
-    const colSpan  = showCtg ? 10 : 9;
-
-    // Build HTML as array then join once
+    // Build HTML as array then join once — much faster than innerHTML +=
+    const ctgTotalCell = isPlaster
+      ? `<td style="text-align:right;font-weight:800;color:#833C0C;font-size:1rem;">₹${totalCTG.toFixed(2)} Cr</td>`
+      : '';
     const rows = [`
       <tr class="total-row">
         <td colspan="5">
@@ -6857,7 +6907,7 @@
         <td colspan="2" class="revenue-cell" style="font-size:1rem;">
           <strong>₹${totalActualAmt.toFixed(2)} Cr</strong>
         </td>
-        ${showCtg ? `<td class="revenue-cell" style="font-size:1rem;"><strong><span class="ctg-cell-val">₹${totalCtg.toFixed(2)}</span></strong></td>` : ''}
+        ${ctgTotalCell}
       </tr>`];
 
     parsed.forEach(({ unit, pd, ad }) => {
@@ -6865,7 +6915,13 @@
       const actualDateText = ad ? formatDateDDMMMYY(ad) : '-';
       const planAmt   = pd ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
       const actualAmt = ad ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
-      const ctgAmt    = showCtg ? (computeCtg(unit) / 10000000).toFixed(2) : null;
+      let ctgCell = '';
+      if (isPlaster) {
+        const ctgVal = calcCTGtillPlaster(unit) / 10000000;
+        ctgCell = ctgVal > 0
+          ? `<td style="text-align:right;font-weight:700;color:#833C0C;">₹${ctgVal.toFixed(2)}</td>`
+          : `<td style="text-align:right;color:#94a3b8;">-</td>`;
+      }
       rows.push(`
         <tr>
           <td>${unit.Project  || 'N/A'}</td>
@@ -6877,17 +6933,38 @@
           <td class="revenue-cell">${planAmt !== '-' ? '₹' + planAmt : '-'}</td>
           <td>${actualDateText}</td>
           <td class="revenue-cell">${actualAmt !== '-' ? '₹' + actualAmt : '-'}</td>
-          ${showCtg ? `<td><span class="ctg-cell-val">₹${ctgAmt}</span></td>` : ''}
+          ${ctgCell}
         </tr>`);
     });
 
-    tbody.innerHTML = rows.join('');   // Single DOM write
+    tbody.innerHTML = rows.join('');   // Single DOM write — fast
 
     // Update sort indicators
     document.querySelectorAll('#planActualDetailsTable thead tr.sort-row th.sortable').forEach((th, idx) => {
       th.classList.remove('asc', 'desc');
       if (idx === sortColumnPA) th.classList.add(sortAscendingPA ? 'asc' : 'desc');
     });
+  }
+
+  // ── CTG Measure Calculations ──────────────────────────────────────────────
+  // Returns raw value (paise/rupees as stored) — divide by 10000000 for Crores
+  function calcCTGtillPlaster(unit) {
+    let ctg = 0;
+    if (!unit.Masonry)    ctg += (unit.CTG_BP || 0);  // Misc Works: status=col AI, amt=col BP
+    if (!unit.Masonry)    ctg += (unit.CTG_BQ || 0);  // Masonry: status=col AI, amt=col BQ
+    if (!unit.Conduiting) ctg += (unit.CTG_BR || 0);  // Electrical Conduiting: status=col AJ, amt=col BR
+    if (!unit.Plaster)    ctg += (unit.CTG_BS || 0);  // Plaster: status=col AK, amt=col BS
+    return ctg;
+  }
+
+  // ── CTG Pane open/close ───────────────────────────────────────────────────
+  function openCTGPane() {
+    document.getElementById('ctgPane').classList.add('open');
+    document.getElementById('ctgPaneBackdrop').classList.add('open');
+  }
+  function closeCTGPane() {
+    document.getElementById('ctgPane').classList.remove('open');
+    document.getElementById('ctgPaneBackdrop').classList.remove('open');
   }
 
   function sortPlanActualTable(columnIndex) {
@@ -6940,13 +7017,10 @@
           valA = parseDate(a[actualField]) ? (a[currentPlanActualRevField] || 0) : 0;
           valB = parseDate(b[actualField]) ? (b[currentPlanActualRevField] || 0) : 0;
           break;
-        case 9: // CTG Till Plaster
-          valA = computeCtgUnit(a); valB = computeCtgUnit(b);
-          break;
         default: return 0;
       }
       
-      if (columnIndex >= 5 && columnIndex <= 9) {
+      if (columnIndex >= 5 && columnIndex <= 8) {
         return sortAscendingPA ? valA - valB : valB - valA;
       }
       
@@ -6962,9 +7036,6 @@
     document.getElementById("planActualDetailsSection").classList.remove("visible");
     document.querySelectorAll('.plan-actual-card').forEach(card => card.classList.remove('selected'));
     clearPAColumnFilters();
-    // Always hide CTG header when closing
-    const ctgHeader = document.getElementById('ctgColHeader');
-    if (ctgHeader) ctgHeader.style.display = 'none';
   }
 
   // ===== STRUCTURES (SHELL MASTER) =====
@@ -7252,12 +7323,6 @@
       return;
     }
     
-    const isPlaster = currentPlanActualRevField === 'PlasterRev';
-    const includeCtg = isPlaster && ctgVisible;
-
-    // Helper: compute CTG Till Plaster (uses shared computeCtgUnit)
-    function _ctgVal(unit) { return computeCtgUnit(unit) / 10000000; }
-
     // Get plan and actual field names
     let planField, actualField;
     if (currentPlanActualRevField === 'PlasterRev') {
@@ -7270,15 +7335,13 @@
       planField = 'HandoverPlan';
       actualField = 'HandoverActual';
     }
-
-    const headers = [
-      'Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name',
+    
+    const excelData = [];
+    excelData.push([
+      'Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 
       'Plan Date', `Plan Amt - ${currentPlanActualActivity} (₹ Cr)`,
       'Actual Date', `Actual Amt - ${currentPlanActualActivity} (₹ Cr)`
-    ];
-    if (includeCtg) headers.push('CTG Till Plaster (₹ Cr)');
-
-    const excelData = [headers];
+    ]);
     
     // Calculate totals
     const totalPlanAmt = currentPlanActualData.reduce((sum, unit) => {
@@ -7290,42 +7353,34 @@
       const actualDate = parseDate(unit[actualField]);
       return actualDate ? sum + (unit[currentPlanActualRevField] || 0) : sum;
     }, 0) / 10000000;
-
-    const totalCtgAmt = includeCtg
-      ? currentPlanActualData.reduce((s, u) => s + _ctgVal(u), 0)
-      : null;
-
-    const totalRow = [
-      'TOTAL', '', '', `${currentPlanActualData.length} Units`, '',
+    
+    excelData.push([
+      'TOTAL', '', '', `${currentPlanActualData.length} Units`, '', 
       '', totalPlanAmt.toFixed(2),
       '', totalActualAmt.toFixed(2)
-    ];
-    if (includeCtg) totalRow.push(totalCtgAmt.toFixed(2));
-    excelData.push(totalRow);
+    ]);
     
     currentPlanActualData.forEach(unit => {
-      const planDate   = parseDate(unit[planField]);
+      const planDate = parseDate(unit[planField]);
       const actualDate = parseDate(unit[actualField]);
       
-      const planDateText   = formatDateDDMMMYY(planDate);
+      const planDateText = formatDateDDMMMYY(planDate);
       const actualDateText = formatDateDDMMMYY(actualDate);
       
-      const planAmt   = planDate   ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
+      const planAmt = planDate ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
       const actualAmt = actualDate ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
       
-      const row = [
-        unit.Project  || 'N/A',
-        unit.Phase    || 'N/A',
-        unit.Tower    || 'N/A',
+      excelData.push([
+        unit.Project || 'N/A',
+        unit.Phase || 'N/A',
+        unit.Tower || 'N/A',
         unit.UnitNo,
         unit.Customer,
         planDateText,
         planAmt,
         actualDateText,
         actualAmt
-      ];
-      if (includeCtg) row.push(_ctgVal(unit).toFixed(2));
-      excelData.push(row);
+      ]);
     });
     
     const wb = XLSX.utils.book_new();
@@ -7340,8 +7395,7 @@
       { wch: 12 },  // Plan Date
       { wch: 18 },  // Plan Amt
       { wch: 12 },  // Actual Date
-      { wch: 18 },  // Actual Amt
-      ...(includeCtg ? [{ wch: 22 }] : [])  // CTG Till Plaster
+      { wch: 18 }   // Actual Amt
     ];
     
     XLSX.utils.book_append_sheet(wb, ws, currentPlanActualActivity);
@@ -7417,6 +7471,8 @@
         // Show/hide settings for admin only
         const settingsBtn = document.getElementById('adminSettingsBtn');
         if (settingsBtn) settingsBtn.style.display = result.isAdmin ? 'flex' : 'none';
+        const ctgBtn = document.getElementById('ctgToggleBtn');
+        if (ctgBtn) ctgBtn.style.display = result.isAdmin ? 'flex' : 'none';
 
         overlay.style.opacity = '0';
         overlay.style.transition = 'opacity 0.4s ease';
@@ -8980,7 +9036,6 @@
   let shellSelectedProject = null;
   let shellSelectedTowers  = new Set();   // empty = show all towers for project
   let shellSelectedYear    = '';          // '' = all years
-  let shellSelectedQuarter = '';          // '' = all quarters, '1'-'4'
 
   function buildShellTrackerSlicers() {
     // ── Year dropdown from Shell Master dates ──
@@ -9042,48 +9097,8 @@
     // Tower slicer placeholder
     buildShellTowerSlicer(null);
 
-    // Build quarter slicer
-    buildShellQuarterSlicer();
-
     // Initial KPI calc
     updateShellKPIs();
-  }
-
-  function buildShellQuarterSlicer() {
-    const el = document.getElementById('shellQuarterSlicer');
-    if (!el) return;
-    el.innerHTML = '';
-    const quarters = [
-      { label: 'All', value: '' },
-      { label: 'Q1', value: '1' },
-      { label: 'Q2', value: '2' },
-      { label: 'Q3', value: '3' },
-      { label: 'Q4', value: '4' }
-    ];
-    quarters.forEach(q => {
-      const btn = document.createElement('button');
-      btn.textContent = q.label;
-      if (q.value === shellSelectedQuarter) btn.classList.add('active');
-      if (q.value === '' && shellSelectedQuarter === '') btn.classList.add('active');
-      btn.onclick = () => {
-        el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        shellSelectedQuarter = q.value;
-        updateShellKPIs();
-        renderShellTracker();
-      };
-      el.appendChild(btn);
-    });
-  }
-
-  // Returns true if a date falls in the selected quarter (Jan-Mar=Q1, Apr-Jun=Q2, Jul-Sep=Q3, Oct-Dec=Q4)
-  function dateInShellQuarter(dateStr) {
-    if (!shellSelectedQuarter) return true;
-    const d = parseDate(dateStr);
-    if (!d) return false;
-    const month = d.getMonth(); // 0-11
-    const q = Math.floor(month / 3) + 1; // 1-4
-    return q.toString() === shellSelectedQuarter;
   }
 
   function onShellYearChange() {
@@ -9150,13 +9165,11 @@
 
     rows.forEach(r => {
       const pd = parseDate(r.PlanDate);
-      if (pd && (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear)
-             && dateInShellQuarter(r.PlanDate)) {
+      if (pd && (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear)) {
         planRev += r.DetailAmt; planNos++;
       }
       const ad = parseDate(r.ActualDate);
-      if (ad && (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear)
-             && dateInShellQuarter(r.ActualDate)) {
+      if (ad && (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear)) {
         actualRev += r.DetailAmt; actualNos++;
       }
     });
@@ -9173,18 +9186,13 @@
 
     let rows = getShellFilteredRows();
 
-    // Year + Quarter filter for visualization
-    if (shellSelectedYear || shellSelectedQuarter) {
+    // Year filter for visualization
+    if (shellSelectedYear) {
       rows = rows.filter(r => {
         const pd = parseDate(r.PlanDate);
         const ad = parseDate(r.ActualDate);
-        const pdMatch = pd &&
-          (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear) &&
-          dateInShellQuarter(r.PlanDate);
-        const adMatch = ad &&
-          (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear) &&
-          dateInShellQuarter(r.ActualDate);
-        return pdMatch || adMatch;
+        return (pd && pd.getFullYear().toString() === shellSelectedYear) ||
+               (ad && ad.getFullYear().toString() === shellSelectedYear);
       });
     }
 
@@ -9262,86 +9270,120 @@
     container.innerHTML = parts.join('');
   }
 
-  function downloadShellTrackerExcel() {
-    // Collect all Shell Master rows matching current filters (project, tower, year, quarter)
-    let rows = getShellFilteredRows();
+  // ===== PLAN VS ACTUALS BAL. CTG =====
 
-    if (shellSelectedYear || shellSelectedQuarter) {
-      rows = rows.filter(r => {
-        const pd = parseDate(r.PlanDate);
-        const ad = parseDate(r.ActualDate);
-        const pdMatch = pd &&
-          (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear) &&
-          dateInShellQuarter(r.PlanDate);
-        const adMatch = ad &&
-          (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear) &&
-          dateInShellQuarter(r.ActualDate);
-        return pdMatch || adMatch;
-      });
-    }
+  let _ctgVisible = false;
 
-    if (rows.length === 0) {
-      alert('No data to download with the current filters.');
+  function toggleCTGTab() {
+    _ctgVisible = !_ctgVisible;
+    const btn    = document.getElementById('ctgTabBtn');
+    const label  = document.getElementById('ctgToggleLabel');
+    const icon   = document.getElementById('ctgToggleIcon');
+    if (btn)   btn.style.display   = _ctgVisible ? 'inline-flex' : 'none';
+    if (label) label.textContent   = _ctgVisible ? 'Hide CTG Tab' : 'Show CTG Tab';
+    if (icon)  icon.className      = _ctgVisible ? 'bi bi-eye-slash' : 'bi bi-eye';
+  }
+
+  // Calculate Plaster CTG for a unit:
+  // Adds BP if Misc Works pending (no date in col AI = Masonry field)
+  // Adds BQ if Masonry pending (no date in col AI)
+  // Adds BR if Electrical Conduiting pending (no date in col AJ)
+  // Adds BS if Plaster pending (no date in col AK = Plaster field)
+  function calcPlasterCTG(unit) {
+    let ctg = 0;
+    if (!unit.Masonry)    ctg += unit.CTG_BP;  // Misc Works pending
+    if (!unit.Masonry)    ctg += unit.CTG_BQ;  // Masonry pending (same status col AI)
+    if (!unit.Conduiting) ctg += unit.CTG_BR;  // Electrical Conduiting pending (col AJ)
+    if (!unit.Plaster)    ctg += unit.CTG_BS;  // Plaster pending (col AK)
+    return ctg;
+  }
+
+  // For Flooring & Handover — CTG = unit revenue not yet received (placeholder pending full spec)
+  function calcFlooringCTG(unit) {
+    // No specific backup cols defined yet — use FloorRev if actual not done
+    return unit.Floor ? 0 : (unit.FloorRev || 0);
+  }
+  function calcHandoverCTG(unit) {
+    return unit.Hand ? 0 : (unit.HandRev || 0);
+  }
+
+  function generateCTGTables() {
+    const allData = raw;
+    renderCTGTable('plaster',  allData.filter(u => !u.Plaster), 'PlasterRev', 'PlasterPlan', 'PlasterActual', calcPlasterCTG);
+    renderCTGTable('flooring', allData.filter(u => !u.Floor),   'FloorRev',   'FlooringPlan','FlooringActual', calcFlooringCTG);
+    renderCTGTable('handover', allData.filter(u => !u.Hand),    'HandRev',    'HandoverPlan','HandoverActual', calcHandoverCTG);
+  }
+
+  function renderCTGTable(type, data, revField, planField, actualField, ctgFn) {
+    const tbody = document.getElementById('ctg' + type.charAt(0).toUpperCase() + type.slice(1) + 'Body');
+    if (!tbody) return;
+
+    if (data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2rem;color:#94a3b8;">No pending units</td></tr>';
       return;
     }
 
-    // ── Build Excel data ────────────────────────────────────────────────────
-    const header = [
-      'Project',
-      'Tower',
-      'Milestone Name',
-      'Milestone Amount (₹ Cr)',
-      'Planned Date',
-      'Actual Date'
-    ];
+    let totalPlan = 0, totalActual = 0, totalCTG = 0;
+    const rows = [];
 
-    const dataRows = rows.map(r => {
-      const pd  = parseDate(r.PlanDate);
-      const ad  = parseDate(r.ActualDate);
-      const amt = r.DetailAmt > 0 ? (r.DetailAmt / 10000000).toFixed(2) : '';
-      return [
-        r.Project        || '',
-        r.Tower          || '',
-        r.MilestoneName  || r.Category || '',
-        amt,
-        pd ? formatDateDDMMMYY(pd) : '',
-        ad ? formatDateDDMMMYY(ad) : ''
-      ];
+    data.forEach(unit => {
+      const pd  = parseDate(unit[planField]);
+      const ad  = parseDate(unit[actualField]);
+      const planAmt   = pd ? ((unit[revField] || 0) / 10000000) : 0;
+      const actualAmt = ad ? ((unit[revField] || 0) / 10000000) : 0;
+      const ctgRaw    = ctgFn(unit);
+      const ctgAmt    = ctgRaw / 10000000;
+
+      totalPlan   += planAmt;
+      totalActual += actualAmt;
+      totalCTG    += ctgAmt;
+
+      const pdText = pd ? formatDateDDMMMYY(pd) : '-';
+      const adText = ad ? formatDateDDMMMYY(ad) : '-';
+      const ctgCell = ctgAmt > 0
+        ? `<td style="text-align:right;font-weight:700;color:#833C0C;">₹${ctgAmt.toFixed(2)}</td>`
+        : `<td style="text-align:right;color:#94a3b8;">-</td>`;
+
+      rows.push(`<tr>
+        <td>${unit.Project || 'N/A'}</td>
+        <td>${unit.Phase   || 'N/A'}</td>
+        <td>${unit.Tower   || 'N/A'}</td>
+        <td class="unit-number">${unit.UnitNo}</td>
+        <td class="customer-name">${unit.Customer || 'N/A'}</td>
+        <td>${pdText}</td>
+        <td class="revenue-cell">${planAmt > 0 ? '₹' + planAmt.toFixed(2) : '-'}</td>
+        <td>${adText}</td>
+        <td class="revenue-cell">${actualAmt > 0 ? '₹' + actualAmt.toFixed(2) : '-'}</td>
+        ${ctgCell}
+      </tr>`);
     });
 
-    // Group rows by Project then Tower for visual separation
-    dataRows.sort((a, b) => {
-      const projCmp = a[0].localeCompare(b[0]);
-      if (projCmp !== 0) return projCmp;
-      return a[1].localeCompare(b[1], undefined, { numeric: true });
-    });
+    // Total row at top
+    const totalRow = `<tr class="total-row">
+      <td colspan="5"><span class="total-label"><i class="bi bi-calculator"></i><strong>TOTAL — ${data.length} Units</strong></span></td>
+      <td colspan="2" class="revenue-cell"><strong>₹${totalPlan.toFixed(2)} Cr</strong></td>
+      <td colspan="2" class="revenue-cell"><strong>₹${totalActual.toFixed(2)} Cr</strong></td>
+      <td style="text-align:right;font-weight:800;color:#833C0C;font-size:1rem;">₹${totalCTG.toFixed(2)} Cr</td>
+    </tr>`;
 
-    const excelData = [header, ...dataRows];
-
-    // ── Create workbook with styling via SheetJS ────────────────────────────
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(excelData);
-
-    // Column widths
-    ws['!cols'] = [
-      { wch: 22 },  // Project
-      { wch: 18 },  // Tower
-      { wch: 35 },  // Milestone Name
-      { wch: 22 },  // Amount
-      { wch: 16 },  // Planned Date
-      { wch: 16 }   // Actual Date
-    ];
-
-    // Freeze top header row
-    ws['!freeze'] = { xSplit: 0, ySplit: 1 };
-
-    XLSX.utils.book_append_sheet(wb, ws, 'Shell Tracker');
-
-    const timestamp = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(wb, `Shell_Tracker_${timestamp}.xlsx`);
+    tbody.innerHTML = totalRow + rows.join('');
   }
 
+  function downloadCTGExcel(type) {
+    const tableId = 'ctg' + type.charAt(0).toUpperCase() + type.slice(1) + 'Table';
+    const table   = document.getElementById(tableId);
+    if (!table) return;
 
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.table_to_sheet(table);
+    ws['!cols'] = [{wch:20},{wch:12},{wch:14},{wch:12},{wch:28},{wch:14},{wch:16},{wch:14},{wch:16},{wch:14}];
+    XLSX.utils.book_append_sheet(wb, ws, 'CTG_' + type.charAt(0).toUpperCase() + type.slice(1));
+    XLSX.writeFile(wb, `PlanVsActuals_CTG_${type}_${new Date().toISOString().slice(0,10)}.xlsx`);
+  }
+
+  // ===== END CTG =====
+
+  // ===== SETTINGS MODAL =====
 
   function openSettings() {
     if (!currentUser || !currentUser.isAdmin) return;
@@ -9609,60 +9651,6 @@
   })();
   // ── End Ctrl-key ring ────────────────────────────────────
 
-  // ===== CTG SLIDE PANE =====
-  let _ctgPaneOpen = false;
-
-  // Shared CTG computation helper (used in render + sort + download)
-  function computeCtgUnit(unit) {
-    let c = 0;
-    if (!unit.Masonry)    c += unit.CtgBP || 0;  // Misc Works  (col AI → BP)
-    if (!unit.Masonry)    c += unit.CtgBQ || 0;  // Masonry     (col AI → BQ)
-    if (!unit.Conduiting) c += unit.CtgBR || 0;  // Conduiting  (col AJ → BR)
-    if (!unit.Plaster)    c += unit.CtgBS || 0;  // Plaster     (col AK → BS)
-    return c;
-  }
-
-  function toggleCTGPane() {
-    _ctgPaneOpen = !_ctgPaneOpen;
-    const pane    = document.getElementById('ctgPane');
-    const overlay = document.getElementById('ctgPaneOverlay');
-    // Header toggle visual
-    const track = document.getElementById('ctgToggleTrack');
-    const thumb = document.getElementById('ctgToggleThumb');
-    if (_ctgPaneOpen) {
-      pane.style.right = '0';
-      overlay.style.display = 'block';
-      setTimeout(() => overlay.style.opacity = '0.4', 10);
-      if (track) { track.style.background = '#C65911'; }
-      if (thumb) { thumb.style.left = '19px'; }
-    } else {
-      pane.style.right = '-420px';
-      overlay.style.opacity = '0';
-      setTimeout(() => overlay.style.display = 'none', 320);
-      if (track) { track.style.background = 'rgba(255,255,255,0.2)'; }
-      if (thumb) { thumb.style.left = '3px'; }
-    }
-  }
-
-  function toggleCTGColumn() {
-    ctgVisible = !ctgVisible;
-    const track = document.getElementById('ctgColToggleTrack');
-    const thumb = document.getElementById('ctgColToggleThumb');
-    if (ctgVisible) {
-      if (track) track.style.background = '#C65911';
-      if (thumb) thumb.style.left = '23px';
-    } else {
-      if (track) track.style.background = '#d1d5db';
-      if (thumb) thumb.style.left = '3px';
-    }
-    // Re-render PA details table if currently open (Plaster only)
-    if (currentPlanActualRevField === 'PlasterRev' &&
-        document.getElementById('planActualDetailsSection').classList.contains('visible')) {
-      renderPlanActualDetailsTable();
-    }
-  }
-  // ===== END CTG SLIDE PANE =====
-
   // ===== END SETTINGS MODAL =====
 </script>
 
@@ -9803,85 +9791,46 @@
   </div>
 </div>
 <!-- ===== END SETTINGS MODAL ===== -->
-<!-- ═══ CTG MEASURES SLIDE PANE ═══ -->
-<div class="col-pane-overlay" id="ctgPaneOverlay" onclick="toggleCTGPane()" style="display:none;opacity:0;"></div>
-<div id="ctgPane" style="position:fixed;top:0;right:-420px;width:400px;height:100vh;background:#fff;z-index:9000;box-shadow:-8px 0 32px rgba(0,0,0,0.18);display:flex;flex-direction:column;transition:right 0.32s cubic-bezier(0.4,0,0.2,1);border-left:1px solid #e5e7eb;">
-  <!-- Pane Header -->
-  <div style="background:linear-gradient(135deg,#833C0C,#C65911);padding:1.1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-    <div style="display:flex;align-items:center;gap:0.65rem;color:white;">
-      <i class="bi bi-calculator-fill" style="font-size:1.2rem;"></i>
-      <span style="font-size:1rem;font-weight:700;">CTG Measures</span>
-    </div>
-    <button onclick="toggleCTGPane()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;width:30px;height:30px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
-      <i class="bi bi-x-lg"></i>
-    </button>
+<!-- ===== CTG MEASURES SLIDE PANE ===== -->
+<div class="ctg-pane-backdrop" id="ctgPaneBackdrop" onclick="closeCTGPane()"></div>
+<div class="ctg-pane" id="ctgPane">
+  <div class="ctg-pane-header">
+    <h3><i class="bi bi-calculator-fill"></i> CTG Measures — Plaster</h3>
+    <button class="ctg-pane-close" onclick="closeCTGPane()"><i class="bi bi-x-lg"></i></button>
   </div>
-  <!-- Pane Description -->
-  <div style="padding:1rem 1.25rem 0.75rem;background:#fef3c7;border-bottom:1px solid #fde68a;font-size:0.8rem;color:#92400e;line-height:1.5;flex-shrink:0;">
-    <i class="bi bi-info-circle-fill" style="margin-right:5px;"></i>
-    CTG (Cost-to-Go) is calculated per unit based on pending work stages. Enable the toggle to show <strong>CTG Till Plaster</strong> in the Plaster Unit Details table.
-  </div>
-  <!-- Measure Cards -->
-  <div style="flex:1;overflow-y:auto;padding:1rem 1.25rem;">
-
-    <!-- Measure 1: Misc Works -->
-    <div class="ctg-measure-card" style="border-left:4px solid #f59e0b;">
-      <div class="ctg-measure-title"><i class="bi bi-tools" style="color:#f59e0b;"></i> Misc Works CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AI</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BP</span></div>
-      <div class="ctg-measure-logic">If <strong>Misc Works is pending</strong> (no date in Col AI), the CTG for that unit = value in <strong>Column BP</strong>.</div>
+  <div class="ctg-pane-body">
+    <p style="font-size:0.75rem;color:#64748b;margin:0 0 1rem;line-height:1.6;">
+      Each measure shows the pending cost for that work item. <strong>CTG till Plaster</strong> is the sum of all pending measures for each unit.
+    </p>
+    <div class="ctg-measure-row">
+      <div class="ctg-measure-label"><i class="bi bi-wrench" style="color:#C65911;"></i> Misc Works CTG</div>
+      <div class="ctg-measure-logic">If Misc Works (Col AI) is <strong>pending</strong> → unit's value in Column BP</div>
+      <div class="ctg-measure-cols">Status: Col AI &nbsp;|&nbsp; Amount: Col BP</div>
     </div>
-
-    <!-- Measure 2: Masonry -->
-    <div class="ctg-measure-card" style="border-left:4px solid #8b5cf6;">
-      <div class="ctg-measure-title"><i class="bi bi-bricks" style="color:#8b5cf6;"></i> Masonry CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AI</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BQ</span></div>
-      <div class="ctg-measure-logic">If <strong>Masonry is pending</strong> (no date in Col AI), the CTG for that unit = value in <strong>Column BQ</strong>.</div>
+    <div class="ctg-measure-row">
+      <div class="ctg-measure-label"><i class="bi bi-bricks" style="color:#C65911;"></i> Masonry CTG</div>
+      <div class="ctg-measure-logic">If Masonry (Col AI) is <strong>pending</strong> → unit's value in Column BQ</div>
+      <div class="ctg-measure-cols">Status: Col AI &nbsp;|&nbsp; Amount: Col BQ</div>
     </div>
-
-    <!-- Measure 3: Electrical Conduiting -->
-    <div class="ctg-measure-card" style="border-left:4px solid #0ea5e9;">
-      <div class="ctg-measure-title"><i class="bi bi-lightning-charge" style="color:#0ea5e9;"></i> Electrical Conduiting CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AJ</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BR</span></div>
-      <div class="ctg-measure-logic">If <strong>Electrical Conduiting is pending</strong> (no date in Col AJ), the CTG for that unit = value in <strong>Column BR</strong>.</div>
+    <div class="ctg-measure-row">
+      <div class="ctg-measure-label"><i class="bi bi-lightning-charge" style="color:#C65911;"></i> Electrical Conduiting CTG</div>
+      <div class="ctg-measure-logic">If Electrical Conduiting (Col AJ) is <strong>pending</strong> → unit's value in Column BR</div>
+      <div class="ctg-measure-cols">Status: Col AJ &nbsp;|&nbsp; Amount: Col BR</div>
     </div>
-
-    <!-- Measure 4: Plaster -->
-    <div class="ctg-measure-card" style="border-left:4px solid #10b981;">
-      <div class="ctg-measure-title"><i class="bi bi-paint-bucket" style="color:#10b981;"></i> Plaster CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AK</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BS</span></div>
-      <div class="ctg-measure-logic">If <strong>Plaster is pending</strong> (no date in Col AK), the CTG for that unit = value in <strong>Column BS</strong>.</div>
+    <div class="ctg-measure-row">
+      <div class="ctg-measure-label"><i class="bi bi-paint-bucket" style="color:#C65911;"></i> Plaster CTG</div>
+      <div class="ctg-measure-logic">If Plaster (Col AK) is <strong>pending</strong> → unit's value in Column BS</div>
+      <div class="ctg-measure-cols">Status: Col AK &nbsp;|&nbsp; Amount: Col BS</div>
     </div>
-
-    <!-- Total: CTG Till Plaster -->
-    <div class="ctg-measure-card" style="border-left:4px solid #C65911;background:linear-gradient(135deg,rgba(198,89,17,0.06),rgba(131,60,12,0.04));">
-      <div class="ctg-measure-title" style="color:#C65911;"><i class="bi bi-sigma" style="color:#C65911;"></i> CTG Till Plaster (Total)</div>
-      <div class="ctg-measure-col">
-        <span class="ctg-badge" style="background:#FEF3C7;color:#92400e;border-color:#FDE68A;">BP</span>
-        <span class="ctg-badge ctg-badge-arrow">+</span>
-        <span class="ctg-badge" style="background:#EDE9FE;color:#6d28d9;border-color:#DDD6FE;">BQ</span>
-        <span class="ctg-badge ctg-badge-arrow">+</span>
-        <span class="ctg-badge" style="background:#E0F2FE;color:#0369a1;border-color:#BAE6FD;">BR</span>
-        <span class="ctg-badge ctg-badge-arrow">+</span>
-        <span class="ctg-badge" style="background:#D1FAE5;color:#065f46;border-color:#A7F3D0;">BS</span>
-      </div>
-      <div class="ctg-measure-logic">Sum of all 4 measures above (only for pending stages). This is the <strong>CTG Till Plaster</strong> column shown in the Plaster Unit Details table (in ₹ Cr).</div>
-    </div>
-
-  </div>
-  <!-- Pane Footer: Show in Table toggle -->
-  <div style="padding:1rem 1.25rem;border-top:1px solid #e5e7eb;flex-shrink:0;background:#f9fafb;">
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div style="font-size:0.85rem;font-weight:700;color:#1e293b;">Show CTG in Plaster Unit Details</div>
-        <div style="font-size:0.75rem;color:#64748b;margin-top:2px;">Adds a CTG Till Plaster column to the unit details table</div>
-      </div>
-      <div onclick="toggleCTGColumn()" id="ctgColToggleTrack" style="position:relative;width:46px;height:26px;background:#d1d5db;border-radius:13px;cursor:pointer;transition:background 0.25s;flex-shrink:0;">
-        <div id="ctgColToggleThumb" style="position:absolute;top:3px;left:3px;width:20px;height:20px;background:white;border-radius:50%;transition:left 0.25s;box-shadow:0 1px 4px rgba(0,0,0,0.2);"></div>
+    <div class="ctg-total-row">
+      <div class="ctg-total-label"><i class="bi bi-sigma"></i> CTG till Plaster</div>
+      <div class="ctg-total-desc">
+        = Misc Works CTG + Masonry CTG + Electrical Conduiting CTG + Plaster CTG<br>
+        <strong>Only pending items are included.</strong> Completed items contribute ₹0.
       </div>
     </div>
   </div>
 </div>
-<!-- ═══ END CTG MEASURES SLIDE PANE ═══ -->
-
+<!-- ===== END CTG MEASURES SLIDE PANE ===== -->
 </body>
 </html>
