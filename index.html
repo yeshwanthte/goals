@@ -4451,7 +4451,7 @@
                     <th class="sortable" onclick="sortPlanActualTable(6)">Plan Amt (₹ Cr)<button class="col-filter-btn" data-table="pa" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                     <th class="sortable" onclick="sortPlanActualTable(7)">Actual Date<button class="col-filter-btn" data-table="pa" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                     <th class="sortable" onclick="sortPlanActualTable(8)">Actual Amt (₹ Cr)<button class="col-filter-btn" data-table="pa" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                    <th class="sortable ctg-col-header" id="ctgColHeader" onclick="sortPlanActualTable(9)" style="display:none;"><i class="bi bi-sigma"></i> CTG Till Plaster (₹ Cr)</th>
+                    <th class="sortable ctg-col-header" id="ctgColHeader" onclick="sortPlanActualTable(9)" style="display:none;"><i class="bi bi-sigma"></i> <span id="ctgColHeaderLabel">CTG (₹ Cr)</span></th>
                   </tr>
                 </thead>
                 <tbody id="planActualDetailsTableBody"></tbody>
@@ -5161,11 +5161,18 @@
     FALSE_CEIL:  42, // Column AQ
     FURNITURE:   48, // Column AW
     KITCHEN:     49, // Column AX
-    // CTG Backup columns (0-indexed: BP=67, BQ=68, BR=69, BS=70)
+    // CTG Backup columns — Plaster (BP=67, BQ=68, BR=69, BS=70)
     CTG_BP: 67,  // Column BP — Misc Works pending amount
     CTG_BQ: 68,  // Column BQ — Masonry pending amount
     CTG_BR: 69,  // Column BR — Electrical Conduiting pending amount
-    CTG_BS: 70   // Column BS — Plaster pending amount
+    CTG_BS: 70,  // Column BS — Plaster pending amount
+    // CTG Backup columns — Flooring & Dado (BT=71, BU=72, BV=73, BW=74)
+    // Pending date checks reuse existing fields: ToiletWP(AL=37), Plumbing(AM=38), Floor(AN=39)
+    WET_FLOOR_DATE: 40, // Column AO (index 40) — Wet Flooring completion date (new field)
+    CTG_BT: 71,  // Column BT — Toilet Plumbing pending amount
+    CTG_BU: 72,  // Column BU — Toilet Waterproofing pending amount
+    CTG_BV: 73,  // Column BV — Dry Flooring pending amount
+    CTG_BW: 74   // Column BW — Wet Flooring pending amount
   };
 
   // File handling (only wire up if upload elements exist in the DOM)
@@ -5288,21 +5295,32 @@
       FalseCeil:   validDate(r[COL.FALSE_CEIL]),
       Furniture:   validDate(r[COL.FURNITURE]),
       Kitchen:     validDate(r[COL.KITCHEN]),
-      // CTG Backup amounts (raw numbers from columns BP–BS)
+      // CTG Backup amounts — Plaster (raw numbers from columns BP–BS)
       CtgBP: +r[COL.CTG_BP] || 0,  // Misc Works CTG amount (Col BP)
       CtgBQ: +r[COL.CTG_BQ] || 0,  // Masonry CTG amount    (Col BQ)
       CtgBR: +r[COL.CTG_BR] || 0,  // Conduiting CTG amount (Col BR)
-      CtgBS: +r[COL.CTG_BS] || 0   // Plaster CTG amount    (Col BS)
+      CtgBS: +r[COL.CTG_BS] || 0,  // Plaster CTG amount    (Col BS)
+      // Wet Flooring pending date (Col AO=40 — only new date field needed for Flooring CTG)
+      // ToiletWP(AL=37), Plumbing(AM=38), Floor(AN=39) already captured above as existing fields
+      WetFloorDate: validDate(r[COL.WET_FLOOR_DATE]),  // Col AO (index 40)
+      // CTG Backup amounts — Flooring & Dado (raw numbers from columns BT–BW)
+      CtgBT: +r[COL.CTG_BT] || 0,  // Toilet Plumbing CTG amount      (Col BT)
+      CtgBU: +r[COL.CTG_BU] || 0,  // Toilet Waterproofing CTG amount (Col BU)
+      CtgBV: +r[COL.CTG_BV] || 0,  // Dry Flooring CTG amount         (Col BV)
+      CtgBW: +r[COL.CTG_BW] || 0   // Wet Flooring CTG amount         (Col BW)
     }));
 
     // ── CTG Debug: log first 5 units with their pending flags and CTG amounts ──
     console.group('CTG Debug — first 5 units after prepare()');
     raw.slice(0, 5).forEach(u => {
-      const ctg = computeCtgUnit(u);
+      const ctgP = computeCtgUnit(u);
+      const ctgF = computeCtgFloorUnit(u);
       console.log(
-        `Unit ${u.UnitNo} | Masonry(AI)=${JSON.stringify(u.Masonry)} Conduiting(AJ)=${JSON.stringify(u.Conduiting)} Plaster(AK)=${JSON.stringify(u.Plaster)}`,
-        `| BP=${u.CtgBP} BQ=${u.CtgBQ} BR=${u.CtgBR} BS=${u.CtgBS}`,
-        `| CTG=₹${(ctg/10000000).toFixed(2)}Cr`
+        `Unit ${u.UnitNo}`,
+        `| Masonry(AI)=${JSON.stringify(u.Masonry)} Conduiting(AJ)=${JSON.stringify(u.Conduiting)} Plaster(AK)=${JSON.stringify(u.Plaster)}`,
+        `| BP=${u.CtgBP} BQ=${u.CtgBQ} BR=${u.CtgBR} BS=${u.CtgBS} → CTG-Plaster=₹${(ctgP/10000000).toFixed(2)}Cr`,
+        `| ToiletWP(AL)=${JSON.stringify(u.ToiletWP)} Plumbing(AM)=${JSON.stringify(u.Plumbing)} Floor(AN)=${JSON.stringify(u.Floor)} WetFloor(AO)=${JSON.stringify(u.WetFloorDate)}`,
+        `| BT=${u.CtgBT} BU=${u.CtgBU} BV=${u.CtgBV} BW=${u.CtgBW} → CTG-Flooring=₹${(ctgF/10000000).toFixed(2)}Cr`
       );
     });
     console.groupEnd();
@@ -6611,8 +6629,9 @@
       case 6: { const d = parseDate(unit[planField]);   return d ? ((unit[currentPlanActualRevField]||0)/10000000).toFixed(2) : '-'; }
       case 7: { const d = parseDate(unit[actualField]); return d ? formatDateDDMMMYY(d) : '-'; }
       case 8: { const d = parseDate(unit[actualField]); return d ? ((unit[currentPlanActualRevField]||0)/10000000).toFixed(2) : '-'; }
-      case 9: { // CTG Till Plaster
-        return (computeCtgUnit(unit) / 10000000).toFixed(2);
+      case 9: { // CTG — Plaster or Flooring depending on current activity
+        const _f = currentPlanActualRevField === 'FloorRev';
+        return ((_f ? computeCtgFloorUnit(unit) : computeCtgUnit(unit)) / 10000000).toFixed(2);
       }
       default: return '';
     }
@@ -6788,12 +6807,14 @@
 
   function renderPlanActualDetailsTable() {
     const tbody = document.getElementById('planActualDetailsTableBody');
-    const isPlaster = currentPlanActualRevField === 'PlasterRev';
+    const isPlaster  = currentPlanActualRevField === 'PlasterRev';
+    const isFlooring = currentPlanActualRevField === 'FloorRev';
+    const showCtg = ctgVisible && (isPlaster || isFlooring);
 
     if (currentPlanActualData.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="${isPlaster && ctgVisible ? 10 : 9}" style="text-align:center;padding:2rem;color:var(--gray-400);">
+          <td colspan="${showCtg ? 10 : 9}" style="text-align:center;padding:2rem;color:var(--gray-400);">
             <i class="bi bi-info-circle" style="font-size:2rem;margin-bottom:0.5rem;display:block;"></i>
             No units found for this activity
           </td>
@@ -6801,48 +6822,49 @@
       return;
     }
 
-    // Show/hide CTG column header
+    // Show/hide and relabel CTG column header
     const ctgHeader = document.getElementById('ctgColHeader');
-    if (ctgHeader) ctgHeader.style.display = (isPlaster && ctgVisible) ? '' : 'none';
+    const ctgLabel  = document.getElementById('ctgColHeaderLabel');
+    if (ctgHeader) ctgHeader.style.display = showCtg ? '' : 'none';
+    if (ctgLabel)  ctgLabel.textContent = isFlooring
+      ? 'CTG Till Flooring & Dado (₹ Cr)'
+      : 'CTG Till Plaster (₹ Cr)';
 
     // Apply column filters
     const displayData = applyPAColumnFilters(currentPlanActualData);
 
-    // Resolve field names once
+    // Resolve plan/actual field names
     let planField, actualField;
-    if (currentPlanActualRevField === 'PlasterRev') {
-      planField = 'PlasterPlan'; actualField = 'PlasterActual';
-    } else if (currentPlanActualRevField === 'FloorRev') {
-      planField = 'FlooringPlan'; actualField = 'FlooringActual';
-    } else {
-      planField = 'HandoverPlan'; actualField = 'HandoverActual';
-    }
+    if (isPlaster)       { planField = 'PlasterPlan';  actualField = 'PlasterActual';  }
+    else if (isFlooring) { planField = 'FlooringPlan'; actualField = 'FlooringActual'; }
+    else                 { planField = 'HandoverPlan'; actualField = 'HandoverActual'; }
 
-    // Pre-parse all dates once (avoids re-parsing per-row multiple times)
+    // Pre-parse all dates once
     const parsed = displayData.map(unit => ({
       unit,
       pd: parseDate(unit[planField]),
       ad: parseDate(unit[actualField])
     }));
 
-    // Helper: compute CTG Till Plaster for a unit (uses shared computeCtgUnit)
-    function computeCtg(unit) { return computeCtgUnit(unit); }
+    // CTG dispatcher — picks correct formula per activity
+    function getCtg(unit) {
+      if (isPlaster)  return computeCtgUnit(unit);
+      if (isFlooring) return computeCtgFloorUnit(unit);
+      return 0;
+    }
 
     // Totals
     let totalPlanAmt = 0, totalActualAmt = 0, totalCtg = 0;
     parsed.forEach(({ unit, pd, ad }) => {
       if (pd) totalPlanAmt   += (unit[currentPlanActualRevField] || 0);
       if (ad) totalActualAmt += (unit[currentPlanActualRevField] || 0);
-      if (isPlaster && ctgVisible) totalCtg += computeCtg(unit);
+      if (showCtg) totalCtg  += getCtg(unit);
     });
     totalPlanAmt   /= 10000000;
     totalActualAmt /= 10000000;
     totalCtg       /= 10000000;
 
-    const showCtg = isPlaster && ctgVisible;
-    const colSpan  = showCtg ? 10 : 9;
-
-    // Build HTML as array then join once
+    // Build HTML rows
     const rows = [`
       <tr class="total-row">
         <td colspan="5">
@@ -6865,7 +6887,7 @@
       const actualDateText = ad ? formatDateDDMMMYY(ad) : '-';
       const planAmt   = pd ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
       const actualAmt = ad ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
-      const ctgAmt    = showCtg ? (computeCtg(unit) / 10000000).toFixed(2) : null;
+      const ctgAmt    = showCtg ? (getCtg(unit) / 10000000).toFixed(2) : null;
       rows.push(`
         <tr>
           <td>${unit.Project  || 'N/A'}</td>
@@ -6881,7 +6903,7 @@
         </tr>`);
     });
 
-    tbody.innerHTML = rows.join('');   // Single DOM write
+    tbody.innerHTML = rows.join('');
 
     // Update sort indicators
     document.querySelectorAll('#planActualDetailsTable thead tr.sort-row th.sortable').forEach((th, idx) => {
@@ -6940,8 +6962,10 @@
           valA = parseDate(a[actualField]) ? (a[currentPlanActualRevField] || 0) : 0;
           valB = parseDate(b[actualField]) ? (b[currentPlanActualRevField] || 0) : 0;
           break;
-        case 9: // CTG Till Plaster
-          valA = computeCtgUnit(a); valB = computeCtgUnit(b);
+        case 9: // CTG (Plaster or Flooring depending on current activity)
+          { const _isFloor = currentPlanActualRevField === 'FloorRev';
+            valA = _isFloor ? computeCtgFloorUnit(a) : computeCtgUnit(a);
+            valB = _isFloor ? computeCtgFloorUnit(b) : computeCtgUnit(b); }
           break;
         default: return 0;
       }
@@ -7252,11 +7276,20 @@
       return;
     }
     
-    const isPlaster = currentPlanActualRevField === 'PlasterRev';
-    const includeCtg = isPlaster && ctgVisible;
+    const isPlaster  = currentPlanActualRevField === 'PlasterRev';
+    const isFlooring = currentPlanActualRevField === 'FloorRev';
+    const includeCtg = ctgVisible && (isPlaster || isFlooring);
 
-    // Helper: compute CTG Till Plaster (uses shared computeCtgUnit)
-    function _ctgVal(unit) { return computeCtgUnit(unit) / 10000000; }
+    // Helper: compute CTG for the current activity
+    function _ctgVal(unit) {
+      if (isPlaster)  return computeCtgUnit(unit)      / 10000000;
+      if (isFlooring) return computeCtgFloorUnit(unit) / 10000000;
+      return 0;
+    }
+
+    const ctgColLabel = isFlooring
+      ? 'CTG Till Flooring & Dado (₹ Cr)'
+      : 'CTG Till Plaster (₹ Cr)';
 
     // Get plan and actual field names
     let planField, actualField;
@@ -7276,7 +7309,7 @@
       'Plan Date', `Plan Amt - ${currentPlanActualActivity} (₹ Cr)`,
       'Actual Date', `Actual Amt - ${currentPlanActualActivity} (₹ Cr)`
     ];
-    if (includeCtg) headers.push('CTG Till Plaster (₹ Cr)');
+    if (includeCtg) headers.push(ctgColLabel);
 
     const excelData = [headers];
     
@@ -9612,13 +9645,23 @@
   // ===== CTG SLIDE PANE =====
   let _ctgPaneOpen = false;
 
-  // Shared CTG computation helper (used in render + sort + download)
+  // Shared CTG computation helper — Plaster (used in render + sort + download)
   function computeCtgUnit(unit) {
     let c = 0;
     if (!unit.Masonry)    c += unit.CtgBP || 0;  // Misc Works  (col AI → BP)
     if (!unit.Masonry)    c += unit.CtgBQ || 0;  // Masonry     (col AI → BQ)
     if (!unit.Conduiting) c += unit.CtgBR || 0;  // Conduiting  (col AJ → BR)
     if (!unit.Plaster)    c += unit.CtgBS || 0;  // Plaster     (col AK → BS)
+    return c;
+  }
+
+  // Shared CTG computation helper — Flooring & Dado (CTG till Plaster + 4 Flooring measures)
+  function computeCtgFloorUnit(unit) {
+    let c = computeCtgUnit(unit);                  // includes all 4 Plaster CTG measures
+    if (!unit.ToiletWP)    c += unit.CtgBU || 0;  // Toilet Waterproofing (col AL → BU)
+    if (!unit.Plumbing)    c += unit.CtgBT || 0;  // Toilet Plumbing      (col AM → BT)
+    if (!unit.Floor)       c += unit.CtgBV || 0;  // Dry Flooring         (col AN → BV)
+    if (!unit.WetFloorDate)c += unit.CtgBW || 0;  // Wet Flooring         (col AO → BW)
     return c;
   }
 
@@ -9646,17 +9689,18 @@
 
   function toggleCTGColumn() {
     ctgVisible = !ctgVisible;
-    const track = document.getElementById('ctgColToggleTrack');
-    const thumb = document.getElementById('ctgColToggleThumb');
-    if (ctgVisible) {
-      if (track) track.style.background = '#C65911';
-      if (thumb) thumb.style.left = '23px';
-    } else {
-      if (track) track.style.background = '#d1d5db';
-      if (thumb) thumb.style.left = '3px';
-    }
-    // Re-render PA details table if currently open (Plaster only)
-    if (currentPlanActualRevField === 'PlasterRev' &&
+    // Sync both toggle tracks in the pane footer
+    ['ctgColToggleTrack','ctgFloorToggleTrack'].forEach(id => {
+      const track = document.getElementById(id);
+      if (track) track.style.background = ctgVisible ? '#C65911' : '#d1d5db';
+    });
+    ['ctgColToggleThumb','ctgFloorToggleThumb'].forEach(id => {
+      const thumb = document.getElementById(id);
+      if (thumb) thumb.style.left = ctgVisible ? '23px' : '3px';
+    });
+    // Re-render PA details table if currently open (Plaster or Flooring)
+    const isPlasterOrFlooring = currentPlanActualRevField === 'PlasterRev' || currentPlanActualRevField === 'FloorRev';
+    if (isPlasterOrFlooring &&
         document.getElementById('planActualDetailsSection').classList.contains('visible')) {
       renderPlanActualDetailsTable();
     }
@@ -9819,42 +9863,43 @@
   <!-- Pane Description -->
   <div style="padding:1rem 1.25rem 0.75rem;background:#fef3c7;border-bottom:1px solid #fde68a;font-size:0.8rem;color:#92400e;line-height:1.5;flex-shrink:0;">
     <i class="bi bi-info-circle-fill" style="margin-right:5px;"></i>
-    CTG (Cost-to-Go) is calculated per unit based on pending work stages. Enable the toggle to show <strong>CTG Till Plaster</strong> in the Plaster Unit Details table.
+    CTG (Cost-to-Go) per unit = sum of pending stage amounts. Enable the toggle at the bottom to show CTG columns in the respective Unit Details tables.
   </div>
   <!-- Measure Cards -->
   <div style="flex:1;overflow-y:auto;padding:1rem 1.25rem;">
 
-    <!-- Measure 1: Misc Works -->
+    <!-- ── PLASTER SECTION ── -->
+    <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:#64748b;margin-bottom:0.6rem;padding-bottom:0.3rem;border-bottom:1px solid #e5e7eb;">
+      <i class="bi bi-paint-bucket" style="margin-right:4px;color:#3b82f6;"></i>Plaster CTG Measures
+    </div>
+
     <div class="ctg-measure-card" style="border-left:4px solid #f59e0b;">
       <div class="ctg-measure-title"><i class="bi bi-tools" style="color:#f59e0b;"></i> Misc Works CTG</div>
       <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AI</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BP</span></div>
-      <div class="ctg-measure-logic">If <strong>Misc Works is pending</strong> (no date in Col AI), the CTG for that unit = value in <strong>Column BP</strong>.</div>
+      <div class="ctg-measure-logic">If <strong>Misc Works is pending</strong> (no date in Col AI) → value in <strong>Col BP</strong></div>
     </div>
 
-    <!-- Measure 2: Masonry -->
     <div class="ctg-measure-card" style="border-left:4px solid #8b5cf6;">
       <div class="ctg-measure-title"><i class="bi bi-bricks" style="color:#8b5cf6;"></i> Masonry CTG</div>
       <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AI</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BQ</span></div>
-      <div class="ctg-measure-logic">If <strong>Masonry is pending</strong> (no date in Col AI), the CTG for that unit = value in <strong>Column BQ</strong>.</div>
+      <div class="ctg-measure-logic">If <strong>Masonry is pending</strong> (no date in Col AI) → value in <strong>Col BQ</strong></div>
     </div>
 
-    <!-- Measure 3: Electrical Conduiting -->
     <div class="ctg-measure-card" style="border-left:4px solid #0ea5e9;">
       <div class="ctg-measure-title"><i class="bi bi-lightning-charge" style="color:#0ea5e9;"></i> Electrical Conduiting CTG</div>
       <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AJ</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BR</span></div>
-      <div class="ctg-measure-logic">If <strong>Electrical Conduiting is pending</strong> (no date in Col AJ), the CTG for that unit = value in <strong>Column BR</strong>.</div>
+      <div class="ctg-measure-logic">If <strong>Electrical Conduiting is pending</strong> (no date in Col AJ) → value in <strong>Col BR</strong></div>
     </div>
 
-    <!-- Measure 4: Plaster -->
     <div class="ctg-measure-card" style="border-left:4px solid #10b981;">
       <div class="ctg-measure-title"><i class="bi bi-paint-bucket" style="color:#10b981;"></i> Plaster CTG</div>
       <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AK</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BS</span></div>
-      <div class="ctg-measure-logic">If <strong>Plaster is pending</strong> (no date in Col AK), the CTG for that unit = value in <strong>Column BS</strong>.</div>
+      <div class="ctg-measure-logic">If <strong>Plaster is pending</strong> (no date in Col AK) → value in <strong>Col BS</strong></div>
     </div>
 
-    <!-- Total: CTG Till Plaster -->
-    <div class="ctg-measure-card" style="border-left:4px solid #C65911;background:linear-gradient(135deg,rgba(198,89,17,0.06),rgba(131,60,12,0.04));">
-      <div class="ctg-measure-title" style="color:#C65911;"><i class="bi bi-sigma" style="color:#C65911;"></i> CTG Till Plaster (Total)</div>
+    <!-- CTG Till Plaster total -->
+    <div class="ctg-measure-card" style="border-left:4px solid #3b82f6;background:linear-gradient(135deg,rgba(59,130,246,0.06),rgba(37,99,235,0.03));margin-bottom:1.25rem;">
+      <div class="ctg-measure-title" style="color:#2563eb;"><i class="bi bi-sigma" style="color:#2563eb;"></i> CTG Till Plaster (Total)</div>
       <div class="ctg-measure-col">
         <span class="ctg-badge" style="background:#FEF3C7;color:#92400e;border-color:#FDE68A;">BP</span>
         <span class="ctg-badge ctg-badge-arrow">+</span>
@@ -9864,19 +9909,76 @@
         <span class="ctg-badge ctg-badge-arrow">+</span>
         <span class="ctg-badge" style="background:#D1FAE5;color:#065f46;border-color:#A7F3D0;">BS</span>
       </div>
-      <div class="ctg-measure-logic">Sum of all 4 measures above (only for pending stages). This is the <strong>CTG Till Plaster</strong> column shown in the Plaster Unit Details table (in ₹ Cr).</div>
+      <div class="ctg-measure-logic">Sum of all 4 Plaster measures. Shown in <strong>Plaster Unit Details</strong> table.</div>
+    </div>
+
+    <!-- ── FLOORING SECTION ── -->
+    <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:#64748b;margin-bottom:0.6rem;padding-bottom:0.3rem;border-bottom:1px solid #e5e7eb;">
+      <i class="bi bi-grid-3x3" style="margin-right:4px;color:#0d9488;"></i>Flooring &amp; Dado CTG Measures
+    </div>
+
+    <div class="ctg-measure-card" style="border-left:4px solid #f97316;">
+      <div class="ctg-measure-title"><i class="bi bi-droplet-half" style="color:#f97316;"></i> Dry Flooring CTG</div>
+      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AN</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BV</span></div>
+      <div class="ctg-measure-logic">If <strong>Dry Flooring is pending</strong> (no date in Col AN) → value in <strong>Col BV</strong></div>
+    </div>
+
+    <div class="ctg-measure-card" style="border-left:4px solid #06b6d4;">
+      <div class="ctg-measure-title"><i class="bi bi-shield-check" style="color:#06b6d4;"></i> Toilet Waterproofing CTG</div>
+      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AL</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BU</span></div>
+      <div class="ctg-measure-logic">If <strong>Toilet Waterproofing is pending</strong> (no date in Col AL) → value in <strong>Col BU</strong></div>
+    </div>
+
+    <div class="ctg-measure-card" style="border-left:4px solid #6366f1;">
+      <div class="ctg-measure-title"><i class="bi bi-wrench-adjustable" style="color:#6366f1;"></i> Toilet Plumbing CTG</div>
+      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AM</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BT</span></div>
+      <div class="ctg-measure-logic">If <strong>Toilet Plumbing is pending</strong> (no date in Col AM) → value in <strong>Col BT</strong></div>
+    </div>
+
+    <div class="ctg-measure-card" style="border-left:4px solid #ec4899;">
+      <div class="ctg-measure-title"><i class="bi bi-droplet" style="color:#ec4899;"></i> Wet Flooring CTG</div>
+      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AO</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BW</span></div>
+      <div class="ctg-measure-logic">If <strong>Wet Flooring is pending</strong> (no date in Col AO) → value in <strong>Col BW</strong></div>
+    </div>
+
+    <!-- CTG Till Flooring total -->
+    <div class="ctg-measure-card" style="border-left:4px solid #0d9488;background:linear-gradient(135deg,rgba(13,148,136,0.06),rgba(15,118,110,0.03));">
+      <div class="ctg-measure-title" style="color:#0d9488;"><i class="bi bi-sigma" style="color:#0d9488;"></i> CTG Till Flooring &amp; Dado (Total)</div>
+      <div class="ctg-measure-col" style="flex-wrap:wrap;gap:0.3rem;">
+        <span class="ctg-badge" style="background:#dbeafe;color:#1d4ed8;border-color:#bfdbfe;">CTG Till Plaster</span>
+        <span class="ctg-badge ctg-badge-arrow">+</span>
+        <span class="ctg-badge" style="background:#ffedd5;color:#c2410c;border-color:#fed7aa;">BV</span>
+        <span class="ctg-badge ctg-badge-arrow">+</span>
+        <span class="ctg-badge" style="background:#cffafe;color:#0e7490;border-color:#a5f3fc;">BU</span>
+        <span class="ctg-badge ctg-badge-arrow">+</span>
+        <span class="ctg-badge" style="background:#e0e7ff;color:#4338ca;border-color:#c7d2fe;">BT</span>
+        <span class="ctg-badge ctg-badge-arrow">+</span>
+        <span class="ctg-badge" style="background:#fce7f3;color:#be185d;border-color:#fbcfe8;">BW</span>
+      </div>
+      <div class="ctg-measure-logic">CTG Till Plaster + all 4 Flooring measures. Shown in <strong>Flooring &amp; Dado Unit Details</strong> table.</div>
     </div>
 
   </div>
-  <!-- Pane Footer: Show in Table toggle -->
-  <div style="padding:1rem 1.25rem;border-top:1px solid #e5e7eb;flex-shrink:0;background:#f9fafb;">
+  <!-- Pane Footer: two toggles -->
+  <div style="padding:1rem 1.25rem;border-top:1px solid #e5e7eb;flex-shrink:0;background:#f9fafb;display:flex;flex-direction:column;gap:0.75rem;">
+    <!-- Plaster toggle -->
     <div style="display:flex;align-items:center;justify-content:space-between;">
       <div>
-        <div style="font-size:0.85rem;font-weight:700;color:#1e293b;">Show CTG in Plaster Unit Details</div>
-        <div style="font-size:0.75rem;color:#64748b;margin-top:2px;">Adds a CTG Till Plaster column to the unit details table</div>
+        <div style="font-size:0.82rem;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:0.4rem;"><i class="bi bi-paint-bucket" style="color:#3b82f6;font-size:0.8rem;"></i> Show CTG in Plaster Details</div>
+        <div style="font-size:0.72rem;color:#64748b;margin-top:2px;">Adds CTG Till Plaster column</div>
       </div>
       <div onclick="toggleCTGColumn()" id="ctgColToggleTrack" style="position:relative;width:46px;height:26px;background:#d1d5db;border-radius:13px;cursor:pointer;transition:background 0.25s;flex-shrink:0;">
         <div id="ctgColToggleThumb" style="position:absolute;top:3px;left:3px;width:20px;height:20px;background:white;border-radius:50%;transition:left 0.25s;box-shadow:0 1px 4px rgba(0,0,0,0.2);"></div>
+      </div>
+    </div>
+    <!-- Flooring toggle (same ctgVisible flag — one toggle controls both) -->
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:0.82rem;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:0.4rem;"><i class="bi bi-grid-3x3" style="color:#0d9488;font-size:0.8rem;"></i> Show CTG in Flooring Details</div>
+        <div style="font-size:0.72rem;color:#64748b;margin-top:2px;">Adds CTG Till Flooring &amp; Dado column</div>
+      </div>
+      <div onclick="toggleCTGColumn()" id="ctgFloorToggleTrack" style="position:relative;width:46px;height:26px;background:#d1d5db;border-radius:13px;cursor:pointer;transition:background 0.25s;flex-shrink:0;">
+        <div id="ctgFloorToggleThumb" style="position:absolute;top:3px;left:3px;width:20px;height:20px;background:white;border-radius:50%;transition:left 0.25s;box-shadow:0 1px 4px rgba(0,0,0,0.2);"></div>
       </div>
     </div>
   </div>
