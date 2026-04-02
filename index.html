@@ -3773,7 +3773,7 @@
           <i class="bi bi-gear-fill"></i> Settings
         </button>
         <!-- CTG Toggle Switch -->
-        <div id="ctgToggleBtn" onclick="toggleCTGPane()" title="Show / Hide CTG Measures" style="display:flex;align-items:center;gap:0.45rem;background:rgba(131,60,12,0.18);border:1.5px solid rgba(198,89,17,0.5);padding:0.4rem 0.85rem;border-radius:8px;cursor:pointer;user-select:none;transition:all 0.3s;">
+        <div id="ctgToggleBtn" onclick="toggleCTGColumn()" title="Show / Hide CTG column in Unit Details" style="display:flex;align-items:center;gap:0.45rem;background:rgba(131,60,12,0.18);border:1.5px solid rgba(198,89,17,0.5);padding:0.4rem 0.85rem;border-radius:8px;cursor:pointer;user-select:none;transition:all 0.3s;">
           <i class="bi bi-calculator" style="color:#FCE7DC;font-size:0.9rem;"></i>
           <span style="color:#FCE7DC;font-size:0.8rem;font-weight:600;white-space:nowrap;">CTG</span>
           <div id="ctgToggleTrack" style="position:relative;width:36px;height:20px;background:rgba(255,255,255,0.2);border-radius:10px;transition:background 0.25s;flex-shrink:0;">
@@ -4428,6 +4428,9 @@
                 Unit Details - <span id="planActualActivityName" class="activity-badge"></span>
               </h5>
               <div class="details-actions">
+                <button onclick="openPAColPane()" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;border:none;padding:0.5rem 1.1rem;border-radius:50px;font-size:0.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.45rem;box-shadow:0 2px 8px rgba(198,89,17,0.3);">
+                  <i class="bi bi-layout-three-columns"></i> Columns
+                </button>
                 <button class="btn-download-excel" onclick="downloadPlanActualExcel()">
                   <i class="bi bi-file-earmark-excel"></i> Download Excel
                 </button>
@@ -6857,25 +6860,23 @@
     const isFlooring = currentPlanActualRevField === 'FloorRev';
     const isHandover = currentPlanActualRevField === 'HandRev';
     const showCtg = ctgVisible && (isPlaster || isFlooring || isHandover);
+    const optCols = paActiveColIds.map(id => _getPAColDef(id)).filter(Boolean);
+    const totalCols = 9 + (showCtg ? 1 : 0) + optCols.length;
 
     if (currentPlanActualData.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="${showCtg ? 10 : 9}" style="text-align:center;padding:2rem;color:var(--gray-400);">
+          <td colspan="${totalCols}" style="text-align:center;padding:2rem;color:var(--gray-400);">
             <i class="bi bi-info-circle" style="font-size:2rem;margin-bottom:0.5rem;display:block;"></i>
             No units found for this activity
           </td>
         </tr>`;
+      _syncPATableHeader(showCtg, optCols);
       return;
     }
 
-    // Show/hide and relabel CTG column header
-    const ctgHeader = document.getElementById('ctgColHeader');
-    const ctgLabel  = document.getElementById('ctgColHeaderLabel');
-    if (ctgHeader) ctgHeader.style.display = showCtg ? '' : 'none';
-    if (ctgLabel)  ctgLabel.textContent = isFlooring ? 'CTG Till Flooring & Dado (₹ Cr)'
-      : isHandover ? 'CTG Till Ready for Handover (₹ Cr)'
-      : 'CTG Till Plaster (₹ Cr)';
+    // Sync header (CTG th + optional col ths)
+    _syncPATableHeader(showCtg, optCols);
 
     // Apply column filters
     const displayData = applyPAColumnFilters(currentPlanActualData);
@@ -6893,12 +6894,19 @@
       ad: parseDate(unit[actualField])
     }));
 
-    // CTG dispatcher — picks correct formula per activity
+    // CTG dispatcher
     function getCtg(unit) {
       if (isPlaster)  return computeCtgUnit(unit);
       if (isFlooring) return computeCtgFloorUnit(unit);
       if (isHandover) return computeCtgHandoverUnit(unit);
       return 0;
+    }
+
+    // Helper: render a status tick/cross cell
+    function statusCell(done) {
+      return done
+        ? `<td style="text-align:center;"><i class="bi bi-check-circle-fill" style="color:#446A2C;font-size:1rem;"></i></td>`
+        : `<td style="text-align:center;"><i class="bi bi-x-circle-fill" style="color:#d1d5db;font-size:1rem;"></i></td>`;
     }
 
     // Totals
@@ -6928,6 +6936,7 @@
           <strong>₹${totalActualAmt.toFixed(2)} Cr</strong>
         </td>
         ${showCtg ? `<td class="revenue-cell" style="font-size:1rem;"><strong><span class="ctg-cell-val">₹${totalCtg.toFixed(2)}</span></strong></td>` : ''}
+        ${optCols.map(() => '<td></td>').join('')}
       </tr>`];
 
     parsed.forEach(({ unit, pd, ad }) => {
@@ -6936,6 +6945,16 @@
       const planAmt   = pd ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
       const actualAmt = ad ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
       const ctgAmt    = showCtg ? (getCtg(unit) / 10000000).toFixed(2) : null;
+
+      const optCells = optCols.map(col => {
+        if (col.type === 'status') return statusCell(!!unit[col.field]);
+        if (col.type === 'ctg') {
+          const v = (col.calc(unit) / 10000000).toFixed(2);
+          return `<td style="text-align:right;"><span class="ctg-cell-val">₹${v}</span></td>`;
+        }
+        return '<td></td>';
+      }).join('');
+
       rows.push(`
         <tr>
           <td>${unit.Project  || 'N/A'}</td>
@@ -6948,6 +6967,7 @@
           <td>${actualDateText}</td>
           <td class="revenue-cell">${actualAmt !== '-' ? '₹' + actualAmt : '-'}</td>
           ${showCtg ? `<td><span class="ctg-cell-val">₹${ctgAmt}</span></td>` : ''}
+          ${optCells}
         </tr>`);
     });
 
@@ -6957,6 +6977,33 @@
     document.querySelectorAll('#planActualDetailsTable thead tr.sort-row th.sortable').forEach((th, idx) => {
       th.classList.remove('asc', 'desc');
       if (idx === sortColumnPA) th.classList.add(sortAscendingPA ? 'asc' : 'desc');
+    });
+  }
+
+  // Sync the thead of the PA table: CTG th + optional col ths
+  function _syncPATableHeader(showCtg, optCols) {
+    const ctgHeader = document.getElementById('ctgColHeader');
+    const ctgLabel  = document.getElementById('ctgColHeaderLabel');
+    const isFlooring = currentPlanActualRevField === 'FloorRev';
+    const isHandover = currentPlanActualRevField === 'HandRev';
+    if (ctgHeader) ctgHeader.style.display = showCtg ? '' : 'none';
+    if (ctgLabel)  ctgLabel.textContent = isFlooring ? 'CTG Till Flooring & Dado (₹ Cr)'
+      : isHandover ? 'CTG Till Ready for Handover (₹ Cr)'
+      : 'CTG Till Plaster (₹ Cr)';
+
+    // Remove any previously injected optional th elements
+    document.querySelectorAll('#planActualDetailsTable thead th.pa-opt-col').forEach(el => el.remove());
+
+    // Append new optional th elements after the CTG header
+    const sortRow = document.querySelector('#planActualDetailsTable thead tr.sort-row');
+    if (!sortRow) return;
+    optCols.forEach(col => {
+      const th = document.createElement('th');
+      th.className = 'pa-opt-col' + (col.type === 'ctg' ? ' ctg-col-header' : '');
+      th.style.textAlign = col.type === 'ctg' ? 'right' : 'center';
+      th.style.whiteSpace = 'nowrap';
+      th.textContent = col.label;
+      sortRow.appendChild(th);
     });
   }
 
@@ -7362,6 +7409,9 @@
     ];
     if (includeCtg) headers.push(ctgColLabel);
 
+    const optCols = paActiveColIds.map(id => _getPAColDef(id)).filter(Boolean);
+    if (optCols.length) optCols.forEach(col => headers.push(col.label));
+
     const excelData = [headers];
     
     // Calculate totals
@@ -7385,6 +7435,7 @@
       '', totalActualAmt.toFixed(2)
     ];
     if (includeCtg) totalRow.push(totalCtgAmt.toFixed(2));
+    optCols.forEach(() => totalRow.push(''));
     excelData.push(totalRow);
     
     currentPlanActualData.forEach(unit => {
@@ -7409,6 +7460,11 @@
         actualAmt
       ];
       if (includeCtg) row.push(_ctgVal(unit).toFixed(2));
+      optCols.forEach(col => {
+        if (col.type === 'status') row.push(unit[col.field] ? 'Done' : 'Pending');
+        else if (col.type === 'ctg') row.push((col.calc(unit) / 10000000).toFixed(2));
+        else row.push('');
+      });
       excelData.push(row);
     });
     
@@ -7425,7 +7481,8 @@
       { wch: 18 },  // Plan Amt
       { wch: 12 },  // Actual Date
       { wch: 18 },  // Actual Amt
-      ...(includeCtg ? [{ wch: 22 }] : [])  // CTG Till Plaster
+      ...(includeCtg ? [{ wch: 28 }] : []),
+      ...optCols.map(col => ({ wch: col.type === 'ctg' ? 26 : 14 }))
     ];
     
     XLSX.utils.book_append_sheet(wb, ws, currentPlanActualActivity);
@@ -9693,9 +9750,7 @@
   })();
   // ── End Ctrl-key ring ────────────────────────────────────
 
-  // ===== CTG SLIDE PANE =====
-  let _ctgPaneOpen = false;
-
+  // ===== CTG HELPERS =====
   // Shared CTG computation helper — Plaster (used in render + sort + download)
   function computeCtgUnit(unit) {
     let c = 0;
@@ -9736,39 +9791,13 @@
     return c;
   }
 
-  function toggleCTGPane() {
-    _ctgPaneOpen = !_ctgPaneOpen;
-    const pane    = document.getElementById('ctgPane');
-    const overlay = document.getElementById('ctgPaneOverlay');
-    // Header toggle visual
-    const track = document.getElementById('ctgToggleTrack');
-    const thumb = document.getElementById('ctgToggleThumb');
-    if (_ctgPaneOpen) {
-      pane.style.right = '0';
-      overlay.style.display = 'block';
-      setTimeout(() => overlay.style.opacity = '0.4', 10);
-      if (track) { track.style.background = '#C65911'; }
-      if (thumb) { thumb.style.left = '19px'; }
-    } else {
-      pane.style.right = '-420px';
-      overlay.style.opacity = '0';
-      setTimeout(() => overlay.style.display = 'none', 320);
-      if (track) { track.style.background = 'rgba(255,255,255,0.2)'; }
-      if (thumb) { thumb.style.left = '3px'; }
-    }
-  }
-
   function toggleCTGColumn() {
     ctgVisible = !ctgVisible;
-    // Sync both toggle tracks in the pane footer
-    ['ctgColToggleTrack','ctgFloorToggleTrack','ctgHandToggleTrack'].forEach(id => {
-      const track = document.getElementById(id);
-      if (track) track.style.background = ctgVisible ? '#C65911' : '#d1d5db';
-    });
-    ['ctgColToggleThumb','ctgFloorToggleThumb','ctgHandToggleThumb'].forEach(id => {
-      const thumb = document.getElementById(id);
-      if (thumb) thumb.style.left = ctgVisible ? '23px' : '3px';
-    });
+    // Sync header toggle (small track in top bar)
+    const hTrack = document.getElementById('ctgToggleTrack');
+    const hThumb = document.getElementById('ctgToggleThumb');
+    if (hTrack) hTrack.style.background = ctgVisible ? '#C65911' : 'rgba(255,255,255,0.2)';
+    if (hThumb) hThumb.style.left = ctgVisible ? '19px' : '3px';
     // Re-render PA details table if currently open (Plaster, Flooring or Handover)
     const isAnyCtgActivity = ['PlasterRev','FloorRev','HandRev'].includes(currentPlanActualRevField);
     if (isAnyCtgActivity &&
@@ -9776,7 +9805,165 @@
       renderPlanActualDetailsTable();
     }
   }
-  // ===== END CTG SLIDE PANE =====
+  // ===== END CTG HELPERS =====
+
+  // ===== PA COLUMN CUSTOMISER =====
+
+  // Status columns (show tick/cross based on truthy field value)
+  const PA_STATUS_COLS = [
+    { id: 'pa_IDSADate',   label: 'IDSA',              field: 'IDSADate',    type: 'status' },
+    { id: 'pa_GFC',        label: 'GFC',               field: 'GFC',         type: 'status' },
+    { id: 'pa_Masonry',    label: 'Masonry',            field: 'Masonry',     type: 'status' },
+    { id: 'pa_Conduiting', label: 'Conduiting',         field: 'Conduiting',  type: 'status' },
+    { id: 'pa_Plaster',    label: 'Plaster',            field: 'Plaster',     type: 'status' },
+    { id: 'pa_ToiletWP',   label: 'Toilet W/P',         field: 'ToiletWP',    type: 'status' },
+    { id: 'pa_Plumbing',   label: 'Plumbing',           field: 'Plumbing',    type: 'status' },
+    { id: 'pa_Floor',      label: 'Flooring',           field: 'Floor',       type: 'status' },
+    { id: 'pa_HVAC',       label: 'HVAC',               field: 'HVAC',        type: 'status' },
+    { id: 'pa_False',      label: 'False Ceiling',      field: 'False',       type: 'status' },
+    { id: 'pa_Fenest',     label: 'Fenestration',       field: 'Fenest',      type: 'status' },
+    { id: 'pa_Furniture',  label: 'Furniture',          field: 'Furniture',   type: 'status' },
+    { id: 'pa_Kitchen',    label: 'Kitchen',            field: 'Kitchen',     type: 'status' },
+  ];
+
+  // CTG measure columns (show ₹ value in Cr)
+  const PA_CTG_COLS = [
+    { id: 'ctg_BP',  label: 'Misc Works CTG',              type: 'ctg', calc: u => u.Masonry    ? 0 : (u.CtgBP||0) },
+    { id: 'ctg_BQ',  label: 'Masonry CTG',                 type: 'ctg', calc: u => u.Masonry    ? 0 : (u.CtgBQ||0) },
+    { id: 'ctg_BR',  label: 'Electrical Conduiting CTG',   type: 'ctg', calc: u => u.Conduiting ? 0 : (u.CtgBR||0) },
+    { id: 'ctg_BS',  label: 'Plaster CTG',                 type: 'ctg', calc: u => u.Plaster    ? 0 : (u.CtgBS||0) },
+    { id: 'ctg_BV',  label: 'Dry Flooring CTG',            type: 'ctg', calc: u => u.Floor      ? 0 : (u.CtgBV||0) },
+    { id: 'ctg_BU',  label: 'Toilet Waterproofing CTG',    type: 'ctg', calc: u => u.ToiletWP   ? 0 : (u.CtgBU||0) },
+    { id: 'ctg_BT',  label: 'Toilet Plumbing CTG',         type: 'ctg', calc: u => u.Plumbing   ? 0 : (u.CtgBT||0) },
+    { id: 'ctg_BW',  label: 'Wet Flooring CTG',            type: 'ctg', calc: u => u.WetFloorDate ? 0 : (u.CtgBW||0) },
+    { id: 'ctg_BX',  label: 'HVAC CTG',                    type: 'ctg', calc: u => u.HVAC       ? 0 : (u.CtgBX||0) },
+    { id: 'ctg_CB',  label: 'False Ceiling CTG',           type: 'ctg', calc: u => u.False      ? 0 : (u.CtgCB||0) },
+    { id: 'ctg_CD',  label: 'Painting 1st Coat CTG',       type: 'ctg', calc: u => u.Paint1Date ? 0 : (u.CtgCD||0) },
+    { id: 'ctg_CE',  label: 'Fenestration CTG',            type: 'ctg', calc: u => u.Fenest     ? 0 : (u.CtgCE||0) },
+    { id: 'ctg_CC',  label: 'Steel Fabrication CTG',       type: 'ctg', calc: u => u.Fenest     ? 0 : (u.CtgCC||0) },
+    { id: 'ctg_CF',  label: 'Painting 2nd Coat CTG',       type: 'ctg', calc: u => u.Paint2Date ? 0 : (u.CtgCF||0) },
+    { id: 'ctg_CG',  label: 'Electrical Wiring & Switches CTG', type: 'ctg', calc: u => u.ElecDate ? 0 : (u.CtgCG||0) },
+    { id: 'ctg_CA',  label: 'Central Vacuum CTG',          type: 'ctg', calc: u => u.ElecDate   ? 0 : (u.CtgCA||0) },
+    { id: 'ctg_CH',  label: 'PNS CTG',                     type: 'ctg', calc: u => u.PnsDate    ? 0 : (u.CtgCH||0) },
+    { id: 'ctg_CI',  label: 'Furniture CTG',               type: 'ctg', calc: u => u.Furniture  ? 0 : (u.CtgCI||0) },
+    { id: 'ctg_CJ',  label: 'Kitchen CTG',                 type: 'ctg', calc: u => u.Kitchen    ? 0 : (u.CtgCJ||0) },
+    { id: 'ctg_CK',  label: 'Landscape CTG',               type: 'ctg', calc: u => u.LandscapeDate ? 0 : (u.CtgCK||0) },
+    { id: 'ctg_CL',  label: 'Lighting & Signage CTG',      type: 'ctg', calc: u => u.LightingDate  ? 0 : (u.CtgCL||0) },
+    { id: 'ctg_BZ',  label: 'Reticulated Gas CTG',         type: 'ctg', calc: u => u.LightingDate  ? 0 : (u.CtgBZ||0) },
+  ];
+
+  const PA_ALL_OPTIONAL = [...PA_STATUS_COLS, ...PA_CTG_COLS];
+
+  function _getPAColDef(id) { return PA_ALL_OPTIONAL.find(c => c.id === id); }
+
+  // Active column IDs for PA table (persisted in sessionStorage)
+  function _loadPAActiveCols() {
+    try { const s = sessionStorage.getItem('paActiveCols'); if (s) return JSON.parse(s); } catch(e) {}
+    return [];
+  }
+  function _savePAActiveCols(ids) {
+    try { sessionStorage.setItem('paActiveCols', JSON.stringify(ids)); } catch(e) {}
+  }
+  let paActiveColIds = _loadPAActiveCols();
+  let _paPaneWork = [];
+  let _paPaneDragSrc = null;
+
+  function openPAColPane() {
+    _paPaneWork = [...paActiveColIds];
+    _renderPAColPane();
+    document.getElementById('paPaneOverlay').classList.add('open');
+    document.getElementById('paColPane').classList.add('open');
+  }
+  function closePAColPane() {
+    document.getElementById('paPaneOverlay').classList.remove('open');
+    document.getElementById('paColPane').classList.remove('open');
+  }
+  function applyPAColPane() {
+    paActiveColIds = [..._paPaneWork];
+    _savePAActiveCols(paActiveColIds);
+    closePAColPane();
+    renderPlanActualDetailsTable();
+  }
+  function resetPAColPane() { _paPaneWork = []; _renderPAColPane(); }
+
+  function _renderPAColPane() {
+    const activeList    = document.getElementById('paColActiveList');
+    const statusList    = document.getElementById('paColStatusList');
+    const ctgList       = document.getElementById('paColCtgList');
+    const activeIds     = new Set(_paPaneWork);
+
+    // Active columns
+    if (_paPaneWork.length === 0) {
+      activeList.innerHTML = '<div class="col-active-list-empty">No optional columns added</div>';
+    } else {
+      activeList.innerHTML = '';
+      _paPaneWork.forEach(id => {
+        const col = _getPAColDef(id); if (!col) return;
+        const el = document.createElement('div');
+        el.className = 'col-active-item'; el.draggable = true; el.dataset.id = id;
+        el.innerHTML = `<i class="bi bi-grip-vertical col-drag-handle"></i>
+          <span style="flex:1">${col.label}</span>
+          <span style="font-size:0.68rem;padding:1px 5px;border-radius:4px;margin-right:4px;${col.type==='ctg'?'background:#FCE7DC;color:#C65911':'background:#dbeafe;color:#1d4ed8'}">${col.type==='ctg'?'CTG':'Status'}</span>
+          <button class="remove-col-btn" data-id="${id}" title="Remove"><i class="bi bi-x-lg"></i></button>`;
+        el.querySelector('.remove-col-btn').addEventListener('click', function(e) {
+          e.stopPropagation(); _paPaneWork = _paPaneWork.filter(c => c !== this.dataset.id); _renderPAColPane();
+        });
+        el.addEventListener('dragstart', _paDragStart);
+        el.addEventListener('dragover',  _paDragOver);
+        el.addEventListener('drop',      _paDrop);
+        el.addEventListener('dragend',   _paDragEnd);
+        activeList.appendChild(el);
+      });
+    }
+
+    // Available status columns
+    statusList.innerHTML = '';
+    PA_STATUS_COLS.filter(c => !activeIds.has(c.id)).forEach(col => {
+      const el = document.createElement('div');
+      el.className = 'col-available-item';
+      el.innerHTML = `<span>${col.label}</span><button class="add-col-btn" data-id="${col.id}" title="Add"><i class="bi bi-plus-lg"></i></button>`;
+      el.querySelector('.add-col-btn').addEventListener('click', function() { _paPaneWork.push(this.dataset.id); _renderPAColPane(); });
+      statusList.appendChild(el);
+    });
+    if (statusList.children.length === 0) statusList.innerHTML = '<div style="font-size:0.75rem;color:var(--gray-400);padding:0.4rem 0.7rem;">All status columns added</div>';
+
+    // Available CTG columns
+    ctgList.innerHTML = '';
+    PA_CTG_COLS.filter(c => !activeIds.has(c.id)).forEach(col => {
+      const el = document.createElement('div');
+      el.className = 'col-available-item';
+      el.innerHTML = `<span>${col.label}</span><button class="add-col-btn" data-id="${col.id}" title="Add"><i class="bi bi-plus-lg"></i></button>`;
+      el.querySelector('.add-col-btn').addEventListener('click', function() { _paPaneWork.push(this.dataset.id); _renderPAColPane(); });
+      ctgList.appendChild(el);
+    });
+    if (ctgList.children.length === 0) ctgList.innerHTML = '<div style="font-size:0.75rem;color:var(--gray-400);padding:0.4rem 0.7rem;">All CTG columns added</div>';
+  }
+
+  function _paDragStart(e) { _paPaneDragSrc = e.currentTarget; e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
+  function _paDragOver(e) {
+    e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+    document.querySelectorAll('#paColActiveList .col-active-item').forEach(el => el.classList.remove('drag-target-above','drag-target-below'));
+    if (e.currentTarget !== _paPaneDragSrc) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      e.currentTarget.classList.add(e.clientY < rect.top + rect.height / 2 ? 'drag-target-above' : 'drag-target-below');
+    }
+  }
+  function _paDrop(e) {
+    e.preventDefault();
+    if (!_paPaneDragSrc || e.currentTarget === _paPaneDragSrc) return;
+    const srcId = _paPaneDragSrc.dataset.id, tgtId = e.currentTarget.dataset.id;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const before = e.clientY < rect.top + rect.height / 2;
+    _paPaneWork = _paPaneWork.filter(c => c !== srcId);
+    const ti = _paPaneWork.indexOf(tgtId);
+    _paPaneWork.splice(before ? ti : ti + 1, 0, srcId);
+    _renderPAColPane();
+  }
+  function _paDragEnd() {
+    document.querySelectorAll('#paColActiveList .col-active-item').forEach(el => el.classList.remove('dragging','drag-target-above','drag-target-below'));
+  }
+
+  // ===== END PA COLUMN CUSTOMISER =====
 
   // ===== END SETTINGS MODAL =====
 </script>
@@ -9918,240 +10105,46 @@
   </div>
 </div>
 <!-- ===== END SETTINGS MODAL ===== -->
-<!-- ═══ CTG MEASURES SLIDE PANE ═══ -->
-<div class="col-pane-overlay" id="ctgPaneOverlay" onclick="toggleCTGPane()" style="display:none;opacity:0;"></div>
-<div id="ctgPane" style="position:fixed;top:0;right:-420px;width:400px;height:100vh;background:#fff;z-index:9000;box-shadow:-8px 0 32px rgba(0,0,0,0.18);display:flex;flex-direction:column;transition:right 0.32s cubic-bezier(0.4,0,0.2,1);border-left:1px solid #e5e7eb;">
-  <!-- Pane Header -->
-  <div style="background:linear-gradient(135deg,#833C0C,#C65911);padding:1.1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-    <div style="display:flex;align-items:center;gap:0.65rem;color:white;">
-      <i class="bi bi-calculator-fill" style="font-size:1.2rem;"></i>
-      <span style="font-size:1rem;font-weight:700;">CTG Measures</span>
-    </div>
-    <button onclick="toggleCTGPane()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:white;width:30px;height:30px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
-      <i class="bi bi-x-lg"></i>
-    </button>
+<!-- ═══ PA COLUMN CUSTOMISER SIDE PANE ═══ -->
+<div class="col-pane-overlay" id="paPaneOverlay" onclick="closePAColPane()"></div>
+<div class="col-pane" id="paColPane" style="z-index:9100;">
+  <div class="col-pane-header">
+    <h6><i class="bi bi-layout-three-columns"></i> Customise Columns</h6>
+    <button class="col-pane-close" onclick="closePAColPane()"><i class="bi bi-x-lg"></i></button>
   </div>
-  <!-- Pane Description -->
-  <div style="padding:1rem 1.25rem 0.75rem;background:#fef3c7;border-bottom:1px solid #fde68a;font-size:0.8rem;color:#92400e;line-height:1.5;flex-shrink:0;">
-    <i class="bi bi-info-circle-fill" style="margin-right:5px;"></i>
-    CTG (Cost-to-Go) per unit = sum of pending stage amounts. Enable the toggle at the bottom to show CTG columns in the respective Unit Details tables.
+  <div class="col-pane-body">
+    <!-- Fixed columns -->
+    <div class="col-pane-section-title">Fixed Columns (always shown)</div>
+    <div class="col-fixed-list">
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Project</div>
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Phase</div>
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Tower</div>
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Unit No.</div>
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Customer Name</div>
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Plan Date</div>
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Plan Amt (₹ Cr)</div>
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Actual Date</div>
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> Actual Amt (₹ Cr)</div>
+      <div class="col-fixed-item"><i class="bi bi-lock-fill"></i> CTG (when toggle ON)</div>
+    </div>
+    <!-- Active optional columns -->
+    <div class="col-pane-section-title">Active Optional Columns
+      <span style="color:var(--gray-400);font-weight:400;text-transform:none;letter-spacing:0;">&nbsp;(drag to reorder)</span>
+    </div>
+    <div class="col-active-list" id="paColActiveList"></div>
+    <!-- Status columns -->
+    <div class="col-pane-section-title">Status Columns</div>
+    <div class="col-available-list" id="paColStatusList"></div>
+    <!-- CTG Measure columns -->
+    <div class="col-pane-section-title">CTG Measure Columns</div>
+    <div class="col-available-list" id="paColCtgList"></div>
   </div>
-  <!-- Measure Cards -->
-  <div style="flex:1;overflow-y:auto;padding:1rem 1.25rem;">
-
-    <!-- ── PLASTER SECTION ── -->
-    <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:#64748b;margin-bottom:0.6rem;padding-bottom:0.3rem;border-bottom:1px solid #e5e7eb;">
-      <i class="bi bi-paint-bucket" style="margin-right:4px;color:#3b82f6;"></i>Plaster CTG Measures
-    </div>
-
-    <div class="ctg-measure-card" style="border-left:4px solid #f59e0b;">
-      <div class="ctg-measure-title"><i class="bi bi-tools" style="color:#f59e0b;"></i> Misc Works CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AI</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BP</span></div>
-      <div class="ctg-measure-logic">If <strong>Misc Works is pending</strong> (no date in Col AI) → value in <strong>Col BP</strong></div>
-    </div>
-
-    <div class="ctg-measure-card" style="border-left:4px solid #8b5cf6;">
-      <div class="ctg-measure-title"><i class="bi bi-bricks" style="color:#8b5cf6;"></i> Masonry CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AI</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BQ</span></div>
-      <div class="ctg-measure-logic">If <strong>Masonry is pending</strong> (no date in Col AI) → value in <strong>Col BQ</strong></div>
-    </div>
-
-    <div class="ctg-measure-card" style="border-left:4px solid #0ea5e9;">
-      <div class="ctg-measure-title"><i class="bi bi-lightning-charge" style="color:#0ea5e9;"></i> Electrical Conduiting CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AJ</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BR</span></div>
-      <div class="ctg-measure-logic">If <strong>Electrical Conduiting is pending</strong> (no date in Col AJ) → value in <strong>Col BR</strong></div>
-    </div>
-
-    <div class="ctg-measure-card" style="border-left:4px solid #10b981;">
-      <div class="ctg-measure-title"><i class="bi bi-paint-bucket" style="color:#10b981;"></i> Plaster CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AK</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BS</span></div>
-      <div class="ctg-measure-logic">If <strong>Plaster is pending</strong> (no date in Col AK) → value in <strong>Col BS</strong></div>
-    </div>
-
-    <!-- CTG Till Plaster total -->
-    <div class="ctg-measure-card" style="border-left:4px solid #3b82f6;background:linear-gradient(135deg,rgba(59,130,246,0.06),rgba(37,99,235,0.03));margin-bottom:1.25rem;">
-      <div class="ctg-measure-title" style="color:#2563eb;"><i class="bi bi-sigma" style="color:#2563eb;"></i> CTG Till Plaster (Total)</div>
-      <div class="ctg-measure-col">
-        <span class="ctg-badge" style="background:#FEF3C7;color:#92400e;border-color:#FDE68A;">BP</span>
-        <span class="ctg-badge ctg-badge-arrow">+</span>
-        <span class="ctg-badge" style="background:#EDE9FE;color:#6d28d9;border-color:#DDD6FE;">BQ</span>
-        <span class="ctg-badge ctg-badge-arrow">+</span>
-        <span class="ctg-badge" style="background:#E0F2FE;color:#0369a1;border-color:#BAE6FD;">BR</span>
-        <span class="ctg-badge ctg-badge-arrow">+</span>
-        <span class="ctg-badge" style="background:#D1FAE5;color:#065f46;border-color:#A7F3D0;">BS</span>
-      </div>
-      <div class="ctg-measure-logic">Sum of all 4 Plaster measures. Shown in <strong>Plaster Unit Details</strong> table.</div>
-    </div>
-
-    <!-- ── FLOORING SECTION ── -->
-    <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:#64748b;margin-bottom:0.6rem;padding-bottom:0.3rem;border-bottom:1px solid #e5e7eb;">
-      <i class="bi bi-grid-3x3" style="margin-right:4px;color:#0d9488;"></i>Flooring &amp; Dado CTG Measures
-    </div>
-
-    <div class="ctg-measure-card" style="border-left:4px solid #f97316;">
-      <div class="ctg-measure-title"><i class="bi bi-droplet-half" style="color:#f97316;"></i> Dry Flooring CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AN</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BV</span></div>
-      <div class="ctg-measure-logic">If <strong>Dry Flooring is pending</strong> (no date in Col AN) → value in <strong>Col BV</strong></div>
-    </div>
-
-    <div class="ctg-measure-card" style="border-left:4px solid #06b6d4;">
-      <div class="ctg-measure-title"><i class="bi bi-shield-check" style="color:#06b6d4;"></i> Toilet Waterproofing CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AL</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BU</span></div>
-      <div class="ctg-measure-logic">If <strong>Toilet Waterproofing is pending</strong> (no date in Col AL) → value in <strong>Col BU</strong></div>
-    </div>
-
-    <div class="ctg-measure-card" style="border-left:4px solid #6366f1;">
-      <div class="ctg-measure-title"><i class="bi bi-wrench-adjustable" style="color:#6366f1;"></i> Toilet Plumbing CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AM</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BT</span></div>
-      <div class="ctg-measure-logic">If <strong>Toilet Plumbing is pending</strong> (no date in Col AM) → value in <strong>Col BT</strong></div>
-    </div>
-
-    <div class="ctg-measure-card" style="border-left:4px solid #ec4899;">
-      <div class="ctg-measure-title"><i class="bi bi-droplet" style="color:#ec4899;"></i> Wet Flooring CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AO</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BW</span></div>
-      <div class="ctg-measure-logic">If <strong>Wet Flooring is pending</strong> (no date in Col AO) → value in <strong>Col BW</strong></div>
-    </div>
-
-    <!-- CTG Till Flooring total -->
-    <div class="ctg-measure-card" style="border-left:4px solid #0d9488;background:linear-gradient(135deg,rgba(13,148,136,0.06),rgba(15,118,110,0.03));">
-      <div class="ctg-measure-title" style="color:#0d9488;"><i class="bi bi-sigma" style="color:#0d9488;"></i> CTG Till Flooring &amp; Dado (Total)</div>
-      <div class="ctg-measure-col" style="flex-wrap:wrap;gap:0.3rem;">
-        <span class="ctg-badge" style="background:#dbeafe;color:#1d4ed8;border-color:#bfdbfe;">CTG Till Plaster</span>
-        <span class="ctg-badge ctg-badge-arrow">+</span>
-        <span class="ctg-badge" style="background:#ffedd5;color:#c2410c;border-color:#fed7aa;">BV</span>
-        <span class="ctg-badge ctg-badge-arrow">+</span>
-        <span class="ctg-badge" style="background:#cffafe;color:#0e7490;border-color:#a5f3fc;">BU</span>
-        <span class="ctg-badge ctg-badge-arrow">+</span>
-        <span class="ctg-badge" style="background:#e0e7ff;color:#4338ca;border-color:#c7d2fe;">BT</span>
-        <span class="ctg-badge ctg-badge-arrow">+</span>
-        <span class="ctg-badge" style="background:#fce7f3;color:#be185d;border-color:#fbcfe8;">BW</span>
-      </div>
-      <div class="ctg-measure-logic">CTG Till Plaster + all 4 Flooring measures. Shown in <strong>Flooring &amp; Dado Unit Details</strong> table.</div>
-    </div>
-
-    <!-- ── HANDOVER SECTION ── -->
-    <div style="font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;color:#64748b;margin-bottom:0.6rem;padding-bottom:0.3rem;border-bottom:1px solid #e5e7eb;">
-      <i class="bi bi-check-circle" style="margin-right:4px;color:#059669;"></i>Ready for Handover CTG Measures
-    </div>
-
-    <div class="ctg-measure-card" style="border-left:4px solid #64748b;">
-      <div class="ctg-measure-title"><i class="bi bi-fan" style="color:#64748b;"></i> HVAC CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AP</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BX</span></div>
-      <div class="ctg-measure-logic">If <strong>HVAC is pending</strong> (no date in Col AP) → value in <strong>Col BX</strong></div>
-    </div>
-    <div class="ctg-measure-card" style="border-left:4px solid #94a3b8;">
-      <div class="ctg-measure-title"><i class="bi bi-layout-wtf" style="color:#94a3b8;"></i> False Ceiling CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AQ</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col CB</span></div>
-      <div class="ctg-measure-logic">If <strong>False Ceiling is pending</strong> (no date in Col AQ) → value in <strong>Col CB</strong></div>
-    </div>
-    <div class="ctg-measure-card" style="border-left:4px solid #f59e0b;">
-      <div class="ctg-measure-title"><i class="bi bi-brush" style="color:#f59e0b;"></i> Painting 1st Coat CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AR</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col CD</span></div>
-      <div class="ctg-measure-logic">If <strong>Painting 1st Coat is pending</strong> (no date in Col AR) → value in <strong>Col CD</strong></div>
-    </div>
-    <div class="ctg-measure-card" style="border-left:4px solid #f97316;">
-      <div class="ctg-measure-title"><i class="bi bi-brush-fill" style="color:#f97316;"></i> Painting 2nd Coat CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AT</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col CF</span></div>
-      <div class="ctg-measure-logic">If <strong>Painting 2nd Coat is pending</strong> (no date in Col AT) → value in <strong>Col CF</strong></div>
-    </div>
-    <div class="ctg-measure-card" style="border-left:4px solid #0ea5e9;">
-      <div class="ctg-measure-title"><i class="bi bi-window-fullscreen" style="color:#0ea5e9;"></i> Fenestration CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AS</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col CE</span></div>
-      <div class="ctg-measure-logic">If <strong>Fenestration is pending</strong> (no date in Col AS) → value in <strong>Col CE</strong></div>
-    </div>
-    <div class="ctg-measure-card" style="border-left:4px solid #78716c;">
-      <div class="ctg-measure-title"><i class="bi bi-tools" style="color:#78716c;"></i> Steel Fabrication CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AS</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col CC</span></div>
-      <div class="ctg-measure-logic">If <strong>Steel Fabrication is pending</strong> (no date in Col AS) → value in <strong>Col CC</strong></div>
-    </div>
-    <div class="ctg-measure-card" style="border-left:4px solid #6366f1;">
-      <div class="ctg-measure-title"><i class="bi bi-plug" style="color:#6366f1;"></i> Electrical Wiring &amp; Switches CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AU</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col CG</span></div>
-      <div class="ctg-measure-logic">If <strong>Electrical Wiring &amp; Switches is pending</strong> (no date in Col AU) → value in <strong>Col CG</strong></div>
-    </div>
-    <div class="ctg-measure-card" style="border-left:4px solid #a855f7;">
-      <div class="ctg-measure-title"><i class="bi bi-tornado" style="color:#a855f7;"></i> Central Vacuum CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AU</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col CA</span></div>
-      <div class="ctg-measure-logic">If <strong>Central Vacuum is pending</strong> (no date in Col AU) → value in <strong>Col CA</strong></div>
-    </div>
-    <div class="ctg-measure-card" style="border-left:4px solid #ec4899;">
-      <div class="ctg-measure-title"><i class="bi bi-clipboard2-check" style="color:#ec4899;"></i> PNS CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AV</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col CH</span></div>
-      <div class="ctg-measure-logic">If <strong>PNS is pending</strong> (no date in Col AV) → value in <strong>Col CH</strong></div>
-    </div>
-    <div class="ctg-measure-card" style="border-left:4px solid #8b5cf6;">
-      <div class="ctg-measure-title"><i class="bi bi-table" style="color:#8b5cf6;"></i> Furniture CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AW</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col CI</span></div>
-      <div class="ctg-measure-logic">If <strong>Furniture is pending</strong> (no date in Col AW) → value in <strong>Col CI</strong></div>
-    </div>
-    <div class="ctg-measure-card" style="border-left:4px solid #10b981;">
-      <div class="ctg-measure-title"><i class="bi bi-cup-hot" style="color:#10b981;"></i> Kitchen CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AX</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col CJ</span></div>
-      <div class="ctg-measure-logic">If <strong>Kitchen is pending</strong> (no date in Col AX) → value in <strong>Col CJ</strong></div>
-    </div>
-    <div class="ctg-measure-card" style="border-left:4px solid #22c55e;">
-      <div class="ctg-measure-title"><i class="bi bi-tree" style="color:#22c55e;"></i> Landscape CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col AY</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col CK</span></div>
-      <div class="ctg-measure-logic">If <strong>Landscape is pending</strong> (no date in Col AY) → value in <strong>Col CK</strong></div>
-    </div>
-    <div class="ctg-measure-card" style="border-left:4px solid #eab308;">
-      <div class="ctg-measure-title"><i class="bi bi-lightbulb" style="color:#eab308;"></i> Lighting &amp; Signage CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col BA</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col CL</span></div>
-      <div class="ctg-measure-logic">If <strong>Lighting &amp; Signage is pending</strong> (no date in Col BA) → value in <strong>Col CL</strong></div>
-    </div>
-    <div class="ctg-measure-card" style="border-left:4px solid #06b6d4;">
-      <div class="ctg-measure-title"><i class="bi bi-fire" style="color:#06b6d4;"></i> Reticulated Gas CTG</div>
-      <div class="ctg-measure-col"><span class="ctg-badge ctg-badge-check">Col BA</span><span class="ctg-badge ctg-badge-arrow">→</span><span class="ctg-badge ctg-badge-source">Col BZ</span></div>
-      <div class="ctg-measure-logic">If <strong>Reticulated Gas is pending</strong> (no date in Col BA) → value in <strong>Col BZ</strong></div>
-    </div>
-
-    <!-- CTG Till Handover total -->
-    <div class="ctg-measure-card" style="border-left:4px solid #059669;background:linear-gradient(135deg,rgba(5,150,105,0.06),rgba(4,120,87,0.03));">
-      <div class="ctg-measure-title" style="color:#059669;"><i class="bi bi-sigma" style="color:#059669;"></i> CTG Till Ready for Handover (Total)</div>
-      <div class="ctg-measure-col" style="flex-wrap:wrap;gap:0.3rem;">
-        <span class="ctg-badge" style="background:#dbeafe;color:#1d4ed8;border-color:#bfdbfe;">CTG Till Flooring</span>
-        <span class="ctg-badge ctg-badge-arrow">+</span>
-        <span class="ctg-badge ctg-badge-source">BX+CB+CD+CE+CC+CF+CG+CA+CH+CI+CJ+CK+CL+BZ</span>
-      </div>
-      <div class="ctg-measure-logic">CTG Till Flooring &amp; Dado + all 14 Handover measures. Shown in <strong>Ready for Handover Unit Details</strong> table.</div>
-    </div>
-
-  </div>
-  <!-- Pane Footer: three toggles (all share one ctgVisible flag) -->
-  <div style="padding:0.85rem 1.25rem;border-top:1px solid #e5e7eb;flex-shrink:0;background:#f9fafb;display:flex;flex-direction:column;gap:0.65rem;">
-    <!-- Plaster toggle -->
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div style="font-size:0.8rem;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:0.4rem;"><i class="bi bi-paint-bucket" style="color:#3b82f6;font-size:0.78rem;"></i> Show CTG in Plaster Details</div>
-        <div style="font-size:0.7rem;color:#64748b;margin-top:1px;">Adds CTG Till Plaster column</div>
-      </div>
-      <div onclick="toggleCTGColumn()" id="ctgColToggleTrack" style="position:relative;width:46px;height:26px;background:#d1d5db;border-radius:13px;cursor:pointer;transition:background 0.25s;flex-shrink:0;">
-        <div id="ctgColToggleThumb" style="position:absolute;top:3px;left:3px;width:20px;height:20px;background:white;border-radius:50%;transition:left 0.25s;box-shadow:0 1px 4px rgba(0,0,0,0.2);"></div>
-      </div>
-    </div>
-    <!-- Flooring toggle -->
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div style="font-size:0.8rem;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:0.4rem;"><i class="bi bi-grid-3x3" style="color:#0d9488;font-size:0.78rem;"></i> Show CTG in Flooring Details</div>
-        <div style="font-size:0.7rem;color:#64748b;margin-top:1px;">Adds CTG Till Flooring &amp; Dado column</div>
-      </div>
-      <div onclick="toggleCTGColumn()" id="ctgFloorToggleTrack" style="position:relative;width:46px;height:26px;background:#d1d5db;border-radius:13px;cursor:pointer;transition:background 0.25s;flex-shrink:0;">
-        <div id="ctgFloorToggleThumb" style="position:absolute;top:3px;left:3px;width:20px;height:20px;background:white;border-radius:50%;transition:left 0.25s;box-shadow:0 1px 4px rgba(0,0,0,0.2);"></div>
-      </div>
-    </div>
-    <!-- Handover toggle -->
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div style="font-size:0.8rem;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:0.4rem;"><i class="bi bi-check-circle" style="color:#059669;font-size:0.78rem;"></i> Show CTG in Handover Details</div>
-        <div style="font-size:0.7rem;color:#64748b;margin-top:1px;">Adds CTG Till Ready for Handover column</div>
-      </div>
-      <div onclick="toggleCTGColumn()" id="ctgHandToggleTrack" style="position:relative;width:46px;height:26px;background:#d1d5db;border-radius:13px;cursor:pointer;transition:background 0.25s;flex-shrink:0;">
-        <div id="ctgHandToggleThumb" style="position:absolute;top:3px;left:3px;width:20px;height:20px;background:white;border-radius:50%;transition:left 0.25s;box-shadow:0 1px 4px rgba(0,0,0,0.2);"></div>
-      </div>
-    </div>
+  <div class="col-pane-footer">
+    <button class="col-pane-apply" onclick="applyPAColPane()"><i class="bi bi-check2"></i> Apply</button>
+    <button class="col-pane-reset" onclick="resetPAColPane()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
   </div>
 </div>
-<!-- ═══ END CTG MEASURES SLIDE PANE ═══ -->
+<!-- ═══ END PA COLUMN CUSTOMISER ═══ -->
 
 </body>
 </html>
