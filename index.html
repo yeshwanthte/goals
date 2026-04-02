@@ -6025,6 +6025,12 @@
     const displayData = applyMilestoneColumnFilters(currentDetailsData);
     const totalRevenue = displayData.reduce((s, u) => s + (u[currentRevenueField] || 0), 0) / 10000000;
 
+    // Compute done-count per active status column
+    const statusTotals = activeColIds.map(id => {
+      const col = OPTIONAL_COLS.find(c => c.id === id);
+      return col ? displayData.filter(u => !!u[col.field]).length : null;
+    });
+
     const rows = [`
       <tr class="total-row">
         <td colspan="5">
@@ -6036,7 +6042,10 @@
         <td class="revenue-cell" style="font-size:1.1rem;">
           <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
         </td>
-        <td colspan="${activeColIds.length}"></td>
+        ${statusTotals.map(t => t !== null
+          ? `<td style="text-align:center;font-weight:700;color:#446A2C;">${t} <span style="font-size:0.7rem;font-weight:500;color:var(--gray-500);">Done</span></td>`
+          : '<td></td>'
+        ).join('')}
       </tr>`];
 
     displayData.forEach(unit => {
