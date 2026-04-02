@@ -9,6 +9,11 @@
   "log": [
     {
       "username": "Karthick",
+      "event": "logout",
+      "ts": "2026-04-02T05:03:05.591Z"
+    },
+    {
+      "username": "Karthick",
       "event": "login",
       "ts": "2026-04-02T04:54:26.992Z"
     },
