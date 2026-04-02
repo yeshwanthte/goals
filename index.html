@@ -5890,6 +5890,9 @@
     currentActivityName = activityName;
     currentRevenueField = revenueField;
 
+    // Load per-activity column selection (falls back to activity-specific defaults)
+    activeColIds = _loadActiveCols(activityName);
+
     // Reset filters whenever a new activity is opened
     clearMilestoneColumnFilters();
     
@@ -9673,16 +9676,35 @@
     { id: 'Furniture',  label: 'Furniture',      field: 'Furniture'  },
     { id: 'Kitchen',    label: 'Kitchen',        field: 'Kitchen'    },
   ];
-  const DEFAULT_ACTIVE_COLS = ['IDSADate', 'GFC', 'Plaster', 'Floor', 'Fenest'];
+  const DEFAULT_ACTIVE_COLS = ['IDSADate', 'GFC', 'Plaster', 'Floor', 'Fenest']; // fallback
 
-  function _loadActiveCols() {
-    try { const s = sessionStorage.getItem('milestoneActiveCols'); if (s) return JSON.parse(s); } catch(e) {}
-    return [...DEFAULT_ACTIVE_COLS];
+  // Per-activity default status columns for Milestone Unit Details
+  const ACTIVITY_DEFAULT_COLS = {
+    'Plaster':            ['IDSADate', 'GFC', 'Masonry', 'Conduiting'],
+    'Flooring & Dado':    ['IDSADate', 'GFC', 'Plaster', 'ToiletWP', 'Plumbing'],
+    'Ready for Handover': ['IDSADate', 'GFC', 'Plaster', 'Floor', 'ToiletWP', 'Plumbing', 'Fenest'],
+  };
+
+  function _activityStorageKey(activityName) {
+    return 'milestoneActiveCols_' + (activityName || 'default').replace(/\s+/g, '_');
   }
-  function _saveActiveCols(ids) {
-    try { sessionStorage.setItem('milestoneActiveCols', JSON.stringify(ids)); } catch(e) {}
+
+  function _loadActiveCols(activityName) {
+    try {
+      const key = _activityStorageKey(activityName);
+      const s = sessionStorage.getItem(key);
+      if (s) return JSON.parse(s);
+    } catch(e) {}
+    // Fall back to per-activity default, or global default
+    return [...(ACTIVITY_DEFAULT_COLS[activityName] || DEFAULT_ACTIVE_COLS)];
   }
-  let activeColIds = _loadActiveCols();
+
+  function _saveActiveCols(ids, activityName) {
+    try {
+      sessionStorage.setItem(_activityStorageKey(activityName), JSON.stringify(ids));
+    } catch(e) {}
+  }
+  let activeColIds = _loadActiveCols(); // initialise with fallback (no activity yet)
   let _paneWork    = [];
   let _paneDragSrc = null;
 
@@ -9765,10 +9787,14 @@
     document.querySelectorAll('.col-active-item').forEach(el => el.classList.remove('dragging','drag-target-above','drag-target-below'));
   }
   function applyColPane() {
-    activeColIds = [..._paneWork]; _saveActiveCols(activeColIds);
+    activeColIds = [..._paneWork];
+    _saveActiveCols(activeColIds, currentActivityName);
     closeColPane(); rebuildMilestoneTableHeader(); renderDetailsTable();
   }
-  function resetColPane() { _paneWork = [...DEFAULT_ACTIVE_COLS]; _renderPaneContent(); }
+  function resetColPane() {
+    _paneWork = [...(ACTIVITY_DEFAULT_COLS[currentActivityName] || DEFAULT_ACTIVE_COLS)];
+    _renderPaneContent();
+  }
 
   function rebuildMilestoneTableHeader() {
     const sortRow = document.querySelector('#milestoneDetailsTable thead tr.sort-row');
