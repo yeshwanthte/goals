@@ -6527,7 +6527,9 @@
     if (isDateHierarchy) {
       const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
       const tree = {};
+      let hasBlank = false;
       allVals.forEach(v => {
+        if (v === '(Blank)') { hasBlank = true; return; }
         const d = parseDate(v);
         if (!d || isNaN(d)) return;
         const yr = d.getFullYear(), mo = d.getMonth();
@@ -6535,7 +6537,11 @@
         if (!tree[yr][mo]) tree[yr][mo] = new Set();
         tree[yr][mo].add(v);
       });
-      list.innerHTML = Object.keys(tree).sort().map(yr => {
+
+      // Build (Blank) row at top if any blanks exist
+      const blankRow = hasBlank ? `<div class="cfd-item cfd-day" data-val="(Blank)" style="padding-left:0.7rem;font-style:italic;"><input type="checkbox" ${_cfdPending['(Blank)']!==false?'checked':''}><span>(Blank — no date)</span></div>` : '';
+
+      list.innerHTML = blankRow + Object.keys(tree).sort().map(yr => {
         const yrDays = Object.values(tree[yr]).flatMap(s=>[...s]);
         const allYrChk = yrDays.every(d=>_cfdPending[d]!==false);
         const months = Object.keys(tree[yr]).sort((a,b)=>+a-+b).map(mo => {
@@ -6672,9 +6678,9 @@
       case 2: return (unit.Tower    || '').toString();
       case 3: return (unit.UnitNo   || '').toString();
       case 4: return (unit.Customer || '').toString();
-      case 5: { const d = parseDate(unit[planField]);   return d ? formatDateDDMMMYY(d) : '-'; }
+      case 5: { const d = parseDate(unit[planField]);   return d ? formatDateDDMMMYY(d) : '(Blank)'; }
       case 6: { const d = parseDate(unit[planField]);   return d ? ((unit[currentPlanActualRevField]||0)/10000000).toFixed(2) : '-'; }
-      case 7: { const d = parseDate(unit[actualField]); return d ? formatDateDDMMMYY(d) : '-'; }
+      case 7: { const d = parseDate(unit[actualField]); return d ? formatDateDDMMMYY(d) : '(Blank)'; }
       case 8: { const d = parseDate(unit[actualField]); return d ? ((unit[currentPlanActualRevField]||0)/10000000).toFixed(2) : '-'; }
       case 9: { // CTG — Plaster / Flooring / Handover depending on current activity
         const _f = currentPlanActualRevField === 'FloorRev';
@@ -6682,7 +6688,17 @@
         const _v = _f ? computeCtgFloorUnit(unit) : _h ? computeCtgHandoverUnit(unit) : computeCtgUnit(unit);
         return (_v / 10000000).toFixed(2);
       }
-      default: return '';
+      default: {
+        // Dynamic optional columns — index relative to base (9 fixed + 1 if CTG shown)
+        const showCtg = ctgVisible && ['PlasterRev','FloorRev','HandRev'].includes(currentPlanActualRevField);
+        const baseIdx = 9 + (showCtg ? 1 : 0);
+        const optIdx  = colIdx - baseIdx;
+        const col = paActiveColIds.map(id => _getPAColDef(id)).filter(Boolean)[optIdx];
+        if (!col) return '';
+        if (col.type === 'status') return unit[col.field] ? 'Done' : 'Pending';
+        if (col.type === 'ctg')    return (col.calc(unit) / 10000000).toFixed(2);
+        return '';
+      }
     }
   }
 
@@ -6920,6 +6936,13 @@
     totalActualAmt /= 10000000;
     totalCtg       /= 10000000;
 
+    // Compute optional column totals across displayData
+    const optTotals = optCols.map(col => {
+      if (col.type === 'status') return displayData.filter(u => !!u[col.field]).length;
+      if (col.type === 'ctg')    return displayData.reduce((s, u) => s + col.calc(u), 0) / 10000000;
+      return null;
+    });
+
     // Build HTML rows
     const rows = [`
       <tr class="total-row">
@@ -6936,7 +6959,12 @@
           <strong>₹${totalActualAmt.toFixed(2)} Cr</strong>
         </td>
         ${showCtg ? `<td class="revenue-cell" style="font-size:1rem;"><strong><span class="ctg-cell-val">₹${totalCtg.toFixed(2)}</span></strong></td>` : ''}
-        ${optCols.map(() => '<td></td>').join('')}
+        ${optCols.map((col, i) => {
+          const t = optTotals[i];
+          if (col.type === 'status') return `<td style="text-align:center;font-weight:700;color:#446A2C;">${t} <span style="font-size:0.7rem;font-weight:500;color:var(--gray-500);">Done</span></td>`;
+          if (col.type === 'ctg')    return `<td style="text-align:right;font-weight:700;"><span class="ctg-cell-val">₹${t.toFixed(2)}</span></td>`;
+          return '<td></td>';
+        }).join('')}
       </tr>`];
 
     parsed.forEach(({ unit, pd, ad }) => {
@@ -6997,12 +7025,20 @@
     // Append new optional th elements after the CTG header
     const sortRow = document.querySelector('#planActualDetailsTable thead tr.sort-row');
     if (!sortRow) return;
-    optCols.forEach(col => {
+    // Fixed cols: 0-8 (9 fixed) + col 9 = CTG when shown
+    const baseIdx = 9 + (showCtg ? 1 : 0); // first optional col index
+    optCols.forEach((col, i) => {
+      const colIdx = baseIdx + i;
+      const isCtg  = col.type === 'ctg';
       const th = document.createElement('th');
-      th.className = 'pa-opt-col' + (col.type === 'ctg' ? ' ctg-col-header' : '');
-      th.style.textAlign = col.type === 'ctg' ? 'right' : 'center';
-      th.style.whiteSpace = 'nowrap';
-      th.textContent = col.label;
+      th.className = 'sortable pa-opt-col' + (isCtg ? ' ctg-col-header' : '');
+      th.style.textAlign   = isCtg ? 'right' : 'center';
+      th.style.whiteSpace  = 'nowrap';
+      th.style.cursor      = 'pointer';
+      th.setAttribute('onclick', `sortPlanActualTable(${colIdx})`);
+      th.innerHTML = `${col.label}<button class="col-filter-btn" data-table="pa" data-col="${colIdx}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button>`;
+      // Restore active filter indicator if a filter is set
+      if (paColumnFilters[colIdx]) th.querySelector('.col-filter-btn').classList.add('active');
       sortRow.appendChild(th);
     });
   }
@@ -7063,10 +7099,19 @@
             valA = _isFloor ? computeCtgFloorUnit(a) : _isHand ? computeCtgHandoverUnit(a) : computeCtgUnit(a);
             valB = _isFloor ? computeCtgFloorUnit(b) : _isHand ? computeCtgHandoverUnit(b) : computeCtgUnit(b); }
           break;
-        default: return 0;
+        default: {
+          // Dynamic optional columns
+          const showCtg = ctgVisible && ['PlasterRev','FloorRev','HandRev'].includes(currentPlanActualRevField);
+          const baseIdx = 9 + (showCtg ? 1 : 0);
+          const col = paActiveColIds.map(id => _getPAColDef(id)).filter(Boolean)[columnIndex - baseIdx];
+          if (!col) return 0;
+          if (col.type === 'status') { valA = a[col.field] ? 1 : 0; valB = b[col.field] ? 1 : 0; break; }
+          if (col.type === 'ctg')    { valA = col.calc(a);          valB = col.calc(b);          break; }
+          return 0;
+        }
       }
       
-      if (columnIndex >= 5 && columnIndex <= 9) {
+      if (columnIndex >= 5) {
         return sortAscendingPA ? valA - valB : valB - valA;
       }
       
