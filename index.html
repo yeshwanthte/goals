@@ -7683,6 +7683,22 @@
     const el = document.getElementById('projectSlicerTower');
     el.innerHTML = '';
 
+    // All button
+    const allBtn = document.createElement('button');
+    allBtn.textContent = 'All';
+    allBtn.classList.add('active');
+    allBtn.onclick = function() {
+      el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      allBtn.classList.add('active');
+      selectedProjectTower = null;
+      selectedTowerViz.clear();
+      selectedPhaseViz.clear();
+      buildVizTowerSlicer(null, true);  // all-projects mode
+      buildVizPhaseSlicer(null, true);
+      renderTowerVisualization();
+    };
+    el.appendChild(allBtn);
+
     projects.forEach(proj => {
       const btn = document.createElement('button');
       btn.textContent = proj;
@@ -7700,16 +7716,18 @@
       el.appendChild(btn);
     });
 
-    buildVizTowerSlicer(null);
-    buildVizPhaseSlicer(null);
-    showEmptyState();
+    // Default: All selected → populate Tower/Phase slicers across all projects and render
+    buildVizTowerSlicer(null, true);
+    buildVizPhaseSlicer(null, true);
+    renderTowerVisualization();
   }
 
-  function buildVizTowerSlicer(project) {
+  function buildVizTowerSlicer(project, allProjects) {
     const el = document.getElementById('towerSlicerViz');
     el.innerHTML = '';
-    if (!project) return;
-    const towers = [...new Set(raw.filter(r => r.Project === project).map(r => r.Tower).filter(Boolean))].sort((a,b) => a.localeCompare(b, undefined, {numeric:true}));
+    const sourceData = allProjects ? raw : (project ? raw.filter(r => r.Project === project) : []);
+    if (!allProjects && !project) return;
+    const towers = [...new Set(sourceData.map(r => r.Tower).filter(Boolean))].sort((a,b) => a.localeCompare(b, undefined, {numeric:true}));
     const allBtn = document.createElement('button');
     allBtn.textContent = 'All'; allBtn.classList.add('active');
     allBtn.onclick = () => {
@@ -7738,11 +7756,12 @@
     });
   }
 
-  function buildVizPhaseSlicer(project) {
+  function buildVizPhaseSlicer(project, allProjects) {
     const el = document.getElementById('phaseSlicerViz');
     el.innerHTML = '';
-    if (!project) return;
-    const phases = [...new Set(raw.filter(r => r.Project === project).map(r => r.Phase).filter(Boolean))].sort();
+    const sourceData = allProjects ? raw : (project ? raw.filter(r => r.Project === project) : []);
+    if (!allProjects && !project) return;
+    const phases = [...new Set(sourceData.map(r => r.Phase).filter(Boolean))].sort();
     const allBtn = document.createElement('button');
     allBtn.textContent = 'All'; allBtn.classList.add('active');
     allBtn.onclick = () => {
@@ -7839,14 +7858,9 @@
   }
   
   function renderTowerVisualization() {
-    // Show empty state if no project selected
-    if (!selectedProjectTower) {
-      showEmptyState();
-      return;
-    }
-    
+    // When selectedProjectTower is null → All projects selected
     const projectData = raw.filter(r => {
-      if (r.Project !== selectedProjectTower) return false;
+      if (selectedProjectTower && r.Project !== selectedProjectTower) return false;
       if (selectedTowerViz.size > 0 && !selectedTowerViz.has(r.Tower)) return false;
       if (selectedPhaseViz.size > 0 && !selectedPhaseViz.has(r.Phase)) return false;
       return true;
@@ -7856,7 +7870,7 @@
       document.getElementById('towerVizContainer').innerHTML = `
         <div style="text-align: center; padding: 3rem; color: var(--gray-400); width: 100%;">
           <i class="bi bi-building" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
-          <p>No units found for project "${selectedProjectTower}"</p>
+          <p>No units found for ${selectedProjectTower ? `project "${selectedProjectTower}"` : 'the selected filters'}</p>
         </div>`;
       document.getElementById('stageKpiGrid').innerHTML = '';
       return;
