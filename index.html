@@ -1855,8 +1855,8 @@
       flex-direction: column;
       align-items: center;
       flex-shrink: 0;
-      min-width: 220px;
-      max-width: 260px;
+      min-width: 320px;
+      max-width: 380px;
     }
 
     .shell-tower-label {
@@ -1887,118 +1887,165 @@
       box-shadow: 0 8px 28px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
     }
 
-    /* ── Slab Row ── */
-    .shell-slab {
-      display: flex;
-      align-items: stretch;
-      border-top: 1.5px solid #e2e8f0;
-      background: white;
-      transition: background 0.18s;
-      position: relative;
-    }
-    .shell-slab:first-child { border-top: none; }
-    .shell-slab:hover { background: #f1f5f9; }
+    /* ══════════════════════════════════════════════
+       SHELL TRACKER — Premium Fixed-Column Layout
+       ══════════════════════════════════════════════ */
 
-    /* Slab left accent bar — colour by status */
-    .shell-slab::before {
-      content: '';
-      width: 5px;
+    /* Fixed column widths — used identically in header + every data row */
+    :root {
+      --shell-col-name:     1fr;      /* Milestone Name — grows to fill */
+      --shell-col-baseline: 82px;     /* Baseline Plan */
+      --shell-col-date:     100px;    /* Actual / Projected */
+      --shell-col-amt:      58px;     /* Value */
+      --shell-accent:       4px;      /* Left accent bar */
+    }
+
+    /* ── Slab Row — shared grid ── */
+    .shell-slab,
+    .shell-slab-header {
+      display: grid;
+      grid-template-columns:
+        var(--shell-accent)
+        var(--shell-col-name)
+        var(--shell-col-baseline)
+        var(--shell-col-date)
+        var(--shell-col-amt);
+      align-items: stretch;
+      width: 100%;
+    }
+
+    /* ── Data rows ── */
+    .shell-slab {
+      border-top: 1px solid #e9eef4;
+      background: white;
+      transition: background 0.15s;
+      min-height: 36px;
+    }
+    .shell-slab:nth-child(even) { background: #fafbfc; }
+    .shell-slab:hover { background: #eef4ff; }
+
+    /* Left accent bar cell */
+    .shell-slab-accent {
+      width: var(--shell-accent);
       background: #cbd5e1;
       flex-shrink: 0;
     }
-    .shell-slab.slab-actual::before  { background: linear-gradient(180deg, #059669, #10b981); }
-    .shell-slab.slab-planned::before { background: linear-gradient(180deg, #94a3b8, #cbd5e1); }
-    .shell-slab.slab-projected::before { background: linear-gradient(180deg, #94a3b8, #cbd5e1); }
+    .shell-slab.slab-actual    .shell-slab-accent { background: linear-gradient(180deg, #059669, #10b981); }
+    .shell-slab.slab-projected .shell-slab-accent { background: linear-gradient(180deg, #94a3b8, #cbd5e1); }
 
+    /* Milestone Name */
     .shell-slab-name {
-      flex: 1;
-      padding: 0.45rem 0.65rem;
-      font-size: 0.72rem;
+      padding: 0.5rem 0.7rem;
+      font-size: 0.73rem;
       font-weight: 600;
-      color: var(--gray-700);
+      color: #1e293b;
       line-height: 1.3;
       display: flex;
       align-items: center;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .shell-slab-name span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .shell-slab-date {
-      padding: 0.45rem 0.65rem 0.45rem 0;
-      font-size: 0.68rem;
-      font-weight: 700;
-      white-space: nowrap;
+    /* Baseline Plan */
+    .shell-slab-baseline {
+      width: var(--shell-col-baseline);
+      padding: 0.5rem 0.4rem;
+      font-size: 0.67rem;
+      font-weight: 500;
+      color: #475569;
+      background: #f8fafc;
+      border-left: 1px solid #e9eef4;
       display: flex;
       align-items: center;
-      letter-spacing: 0.2px;
+      justify-content: center;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
     }
-    .shell-slab-date.actual    { color: #059669; font-weight: 700; }
-    .shell-slab-date.planned   { color: #94a3b8; }
-    .shell-slab-date.projected { color: #94a3b8; font-style: italic; }
 
-    /* Column header row inside each tower */
-    .shell-slab-header {
+    /* Actual / Projected */
+    .shell-slab-date {
+      width: var(--shell-col-date);
+      padding: 0.5rem 0.5rem;
+      font-size: 0.67rem;
+      font-weight: 600;
+      border-left: 1px solid #e9eef4;
       display: flex;
-      align-items: stretch;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      gap: 3px;
+    }
+    .shell-slab-date.actual {
+      color: #059669;
+      background: rgba(5, 150, 105, 0.04);
+    }
+    .shell-slab-date.projected {
+      color: #64748b;
+      font-style: italic;
+    }
+    .shell-slab-date.planned { color: #94a3b8; }
+
+    /* Value (₹ Cr) */
+    .shell-slab-level {
+      width: var(--shell-col-amt);
+      padding: 0.4rem 0.3rem;
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: #475569;
+      background: #f1f5f9;
+      border-left: 1px solid #e9eef4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.25;
+    }
+
+    /* ── Column Header Row ── */
+    .shell-slab-header {
       background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-      border-top: none;
+      min-height: 30px;
       position: sticky;
       top: 0;
-      z-index: 2;
+      z-index: 3;
     }
     .shell-slab-header > div {
-      padding: 0.3rem 0.5rem;
-      font-size: 0.6rem;
-      font-weight: 700;
+      padding: 0.38rem 0.4rem;
+      font-size: 0.58rem;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: rgba(255,255,255,0.8);
+      letter-spacing: 0.55px;
+      color: rgba(255, 255, 255, 0.75);
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
+      line-height: 1.2;
     }
-    .shell-slab-header > div:first-child {
-      flex: 1;
+    /* First cell in header = accent bar spacer */
+    .shell-slab-header .shell-hdr-accent {
+      width: var(--shell-accent);
+      background: rgba(255,255,255,0.08);
+    }
+    /* Milestone Name header = left-aligned */
+    .shell-slab-header .shell-hdr-name {
       justify-content: flex-start;
-      padding-left: 0.9rem;
+      padding-left: 0.7rem;
+      border-left: none;
+    }
+    .shell-slab-header .shell-hdr-col {
+      border-left: 1px solid rgba(255,255,255,0.1);
     }
 
-    /* Baseline Plan column */
-    .shell-slab-baseline {
-      min-width: 70px;
-      max-width: 78px;
-      padding: 0.45rem 0.4rem;
-      font-size: 0.65rem;
-      font-weight: 600;
-      color: #64748b;
-      background: #f8fafc;
-      border-left: 1px solid #e2e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      white-space: nowrap;
-      flex-shrink: 0;
-      letter-spacing: 0.1px;
-    }
 
-    /* Milestone amount on right edge */
-    .shell-slab-level {
-      min-width: 52px;
-      max-width: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 0.3rem 0.4rem;
-      font-size: 0.6rem;
-      font-weight: 700;
-      color: #64748b;
-      background: #f8fafc;
-      border-left: 1px solid #e2e8f0;
-      flex-shrink: 0;
-      line-height: 1.3;
-      word-break: break-all;
-    }
 
     /* Roof cap */
     .shell-tower-roof {
@@ -9518,20 +9565,22 @@
 
         return `
           <div class="shell-slab ${statusClass}">
-            <div class="shell-slab-name">${m.MilestoneName || m.Category || '—'}</div>
+            <div class="shell-slab-accent"></div>
+            <div class="shell-slab-name"><span>${m.MilestoneName || m.Category || '—'}</span></div>
             <div class="shell-slab-baseline">${baselineText}</div>
             <div class="shell-slab-date ${dateClass}">${dateText}</div>
-            <div class="shell-slab-level" title="Milestone Amount">${amtDisplay}</div>
+            <div class="shell-slab-level">${amtDisplay}</div>
           </div>`;
       });
 
       // Column header row for this tower
       const headerRow = `
         <div class="shell-slab-header">
-          <div>Milestone Name</div>
-          <div style="min-width:70px;max-width:78px;border-left:1px solid rgba(255,255,255,0.15);">Baseline Plan</div>
-          <div style="min-width:90px;border-left:1px solid rgba(255,255,255,0.15);">Actual / Projected</div>
-          <div style="min-width:52px;max-width:64px;border-left:1px solid rgba(255,255,255,0.15);">Value (₹ Cr)</div>
+          <div class="shell-hdr-accent"></div>
+          <div class="shell-hdr-name">Milestone Name</div>
+          <div class="shell-hdr-col">Baseline<br>Plan</div>
+          <div class="shell-hdr-col">Actual /<br>Projected</div>
+          <div class="shell-hdr-col">Value<br>(₹ Cr)</div>
         </div>`;
 
       return `
