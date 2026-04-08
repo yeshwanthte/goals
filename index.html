@@ -3780,6 +3780,303 @@
       text-align: right;
     }
 
+    /* ═══════════════════════════════════════════════════════
+       DATE RANGE PICKER — Premium Enterprise Style
+       ═══════════════════════════════════════════════════════ */
+
+    .drp-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    /* Trigger button */
+    .drp-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.48rem 0.85rem;
+      background: white;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #1e293b;
+      white-space: nowrap;
+      transition: all 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      user-select: none;
+    }
+    .drp-trigger:hover {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(198,89,17,0.1);
+      color: var(--primary);
+    }
+    .drp-trigger.active {
+      border-color: var(--primary);
+      background: rgba(198,89,17,0.05);
+      color: var(--primary);
+    }
+    .drp-trigger .drp-icon {
+      font-size: 0.9rem;
+      opacity: 0.75;
+    }
+    .drp-trigger .drp-caret {
+      font-size: 0.65rem;
+      opacity: 0.5;
+      margin-left: 2px;
+      transition: transform 0.2s;
+    }
+    .drp-trigger.open .drp-caret { transform: rotate(180deg); }
+    .drp-clear-btn {
+      margin-left: 2px;
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 0.75rem;
+      padding: 0 2px;
+      border-radius: 3px;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+    }
+    .drp-clear-btn:hover { background: rgba(198,89,17,0.1); }
+
+    /* Dropdown panel */
+    .drp-panel {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 9500;
+      background: white;
+      border-radius: 16px;
+      box-shadow:
+        0 24px 60px rgba(0,0,0,0.14),
+        0 6px 20px rgba(0,0,0,0.08),
+        0 0 0 1px rgba(0,0,0,0.06);
+      min-width: 560px;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(-8px) scale(0.98);
+      pointer-events: none;
+      transition: opacity 0.2s cubic-bezier(0.4,0,0.2,1), transform 0.2s cubic-bezier(0.4,0,0.2,1);
+    }
+    .drp-panel.open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    /* Mobile: position right-aligned */
+    @media (max-width: 768px) {
+      .drp-panel {
+        min-width: calc(100vw - 2rem);
+        left: 50%;
+        transform: translateX(-50%) translateY(-8px) scale(0.98);
+      }
+      .drp-panel.open { transform: translateX(-50%) translateY(0) scale(1); }
+    }
+
+    /* Quick presets sidebar */
+    .drp-body {
+      display: flex;
+    }
+    .drp-presets {
+      width: 148px;
+      flex-shrink: 0;
+      background: #f8fafc;
+      border-right: 1px solid #f1f5f9;
+      padding: 0.6rem 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .drp-presets-label {
+      font-size: 0.6rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: #94a3b8;
+      padding: 0.35rem 0.5rem 0.2rem;
+    }
+    .drp-preset-btn {
+      background: none;
+      border: none;
+      border-radius: 8px;
+      padding: 0.42rem 0.6rem;
+      text-align: left;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .drp-preset-btn:hover { background: #e9f0fb; color: var(--primary); font-weight: 600; }
+    .drp-preset-btn.selected { background: rgba(198,89,17,0.1); color: var(--primary); font-weight: 700; }
+
+    /* Calendar area */
+    .drp-calendars {
+      flex: 1;
+      padding: 1rem 1rem 0.75rem;
+    }
+    .drp-cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.7rem;
+    }
+    .drp-cal-nav {
+      background: none;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: #64748b;
+      transition: all 0.15s;
+    }
+    .drp-cal-nav:hover { border-color: var(--primary); color: var(--primary); background: rgba(198,89,17,0.06); }
+    .drp-cal-month-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #1e293b;
+      cursor: pointer;
+    }
+
+    .drp-cal-months {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    @media (max-width: 580px) {
+      .drp-cal-months { grid-template-columns: 1fr; }
+    }
+
+    .drp-cal-grid {
+      width: 100%;
+    }
+    .drp-cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      margin-bottom: 4px;
+    }
+    .drp-cal-wd {
+      text-align: center;
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: #94a3b8;
+      padding: 3px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .drp-cal-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+    }
+    .drp-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.74rem;
+      font-weight: 500;
+      color: #334155;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.12s;
+      position: relative;
+      user-select: none;
+    }
+    .drp-day:hover:not(.drp-day-other):not(.drp-day-disabled) {
+      background: rgba(198,89,17,0.12);
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .drp-day-other { color: #d1d5db; pointer-events: none; }
+    .drp-day-disabled { color: #e5e7eb; pointer-events: none; }
+    .drp-day-today::after {
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--primary);
+    }
+    .drp-day-start, .drp-day-end {
+      background: var(--primary) !important;
+      color: white !important;
+      font-weight: 700 !important;
+      border-radius: 7px !important;
+    }
+    .drp-day-in-range {
+      background: rgba(198,89,17,0.1);
+      color: var(--primary);
+      font-weight: 600;
+      border-radius: 0;
+    }
+    .drp-day-start.drp-day-in-range { border-radius: 7px 0 0 7px !important; }
+    .drp-day-end.drp-day-in-range   { border-radius: 0 7px 7px 0 !important; }
+    .drp-day-start.drp-day-end      { border-radius: 7px !important; }
+
+    /* Month name label */
+    .drp-month-name {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    /* Footer */
+    .drp-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1rem 0.75rem;
+      border-top: 1px solid #f1f5f9;
+      gap: 0.5rem;
+    }
+    .drp-range-display {
+      font-size: 0.78rem;
+      color: #64748b;
+      font-weight: 500;
+      flex: 1;
+    }
+    .drp-range-display strong { color: #1e293b; }
+    .drp-btn {
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+    .drp-btn-apply {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: 0 2px 8px rgba(198,89,17,0.3);
+    }
+    .drp-btn-apply:hover { opacity: 0.88; }
+    .drp-btn-cancel {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+    .drp-btn-cancel:hover { background: #e2e8f0; }
+
+    /* Overlay to close when clicking outside */
+    .drp-overlay { position: fixed; inset: 0; z-index: 9499; }
+
   </style>
 </head>
 
@@ -4405,12 +4702,14 @@
             <div class="filter-card-body"><div id="ocSlicerPA" class="slicer"></div></div>
           </div>
           <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-calendar-range"></i> Select Year<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
+            <div class="filter-card-header"><i class="bi bi-calendar-range"></i> Date Range</div>
             <div class="filter-card-body">
-              <div class="year-dropdown-wrapper">
-                <select id="yearDropdownPA" class="year-dropdown" onchange="onYearChange()">
-                  <option value="">All Years</option>
-                </select>
+              <div class="drp-wrapper" id="drpWrapperPA">
+                <button class="drp-trigger" id="drpTriggerPA" onclick="drpOpen('PA')">
+                  <i class="bi bi-calendar2-range drp-icon"></i>
+                  <span id="drpLabelPA">All Dates</span>
+                  <i class="bi bi-chevron-down drp-caret"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -4736,26 +5035,19 @@
               </div>
             </div>
           </div>
-          <!-- Year filter as a KPI-style card -->
-          <div class="pa-multi-card" style="max-width:160px;">
+          <!-- Date Range Picker for Shell Tracker -->
+          <div class="pa-multi-card" style="max-width:260px;">
             <div class="pa-multi-header" style="background:linear-gradient(135deg,#475569,#334155);">
-              <i class="bi bi-calendar-range"></i><span>Select Year</span>
+              <i class="bi bi-calendar2-range"></i><span>Date Range</span>
             </div>
-            <div class="pa-multi-body" style="padding:0.5rem 0.7rem;">
-              <div class="year-dropdown-wrapper" style="width:100%;">
-                <select id="shellYearDropdown" class="year-dropdown" onchange="onShellYearChange()" style="width:100%;">
-                  <option value="">All Years</option>
-                </select>
+            <div class="pa-multi-body" style="padding:0.5rem 0.7rem;align-items:center;">
+              <div class="drp-wrapper" id="drpWrapperShell">
+                <button class="drp-trigger" id="drpTriggerShell" onclick="drpOpen('Shell')" style="width:100%;">
+                  <i class="bi bi-calendar2-range drp-icon"></i>
+                  <span id="drpLabelShell">All Dates</span>
+                  <i class="bi bi-chevron-down drp-caret"></i>
+                </button>
               </div>
-            </div>
-          </div>
-          <!-- Quarter slicer -->
-          <div class="pa-multi-card" style="max-width:200px;">
-            <div class="pa-multi-header" style="background:linear-gradient(135deg,#475569,#334155);">
-              <i class="bi bi-calendar3"></i><span>Select Quarter</span>
-            </div>
-            <div class="pa-multi-body" style="padding:0.5rem 0.7rem;">
-              <div class="slicer" id="shellQuarterSlicer" style="gap:0.3rem;"></div>
             </div>
           </div>
         </div>
@@ -5194,7 +5486,7 @@
   // Plan vs Actuals filters
   let projectSelPA = new Set(), towerSelPA = new Set(), phaseSelPA = new Set(),
       inventorySelPA = new Set(), idsaSelPA = new Set(), gfcSelPA = new Set(), ocSelPA = new Set();
-  let selectedYearPA = '2026'; // Default year
+  let selectedYearPA = ''; // kept for legacy reference — date range replaces year filter
   // CTG visibility toggle (controls CTG column in PA Unit Details table)
   let ctgVisible = false;
   
@@ -5505,8 +5797,6 @@
     render();
     buildPlanActualSlicers();
     
-    // Default year is already set in selectedYearPA = '2026'
-    
     generatePlanVsActuals();
     
     // Build tower visualization
@@ -5695,40 +5985,10 @@
     buildSlicerPA("gfcSlicerPA", ["Yes", "No"], gfcSelPA);
     buildSlicerPA("ocSlicerPA", ["OC recvd", "OC not recvd"], ocSelPA);
     
-    // Build Year dropdown from all plan/actual dates (main sheet + shell master)
-    const years = new Set();
-    raw.forEach(r => {
-      [r.PlasterPlan, r.PlasterActual, r.FlooringPlan, r.FlooringActual, r.HandoverPlan, r.HandoverActual].forEach(dateStr => {
-        const date = parseDate(dateStr);
-        if (date) years.add(date.getFullYear().toString());
-      });
-    });
-    // Include Shell Master dates
-    rawShell.forEach(r => {
-      [r.PlanDate, r.ActualDate].forEach(dateStr => {
-        const date = parseDate(dateStr);
-        if (date) years.add(date.getFullYear().toString());
-      });
-    });
-    
-    const yearDropdown = document.getElementById('yearDropdownPA');
-    yearDropdown.innerHTML = '<option value="">All Years</option>';
-    [...years].sort().forEach(year => {
-      const option = document.createElement('option');
-      option.value = year;
-      option.textContent = year;
-      if (year === '2026') option.selected = true;
-      yearDropdown.appendChild(option);
-    });
+    // Year dropdown replaced by date range picker — no year population needed
   }
 
-  function onYearChange() {
-    selectedYearPA = document.getElementById('yearDropdownPA').value || '';
-    document.getElementById('structureDetailsSection').classList.remove('visible');
-    document.getElementById('planActualDetailsSection').classList.remove('visible');
-    document.querySelectorAll('.plan-actual-card').forEach(c => c.classList.remove('selected'));
-    generatePlanVsActuals();
-  }
+  // onYearChange replaced by drpApplyPA
 
   function buildSlicerPA(id, vals, store) {
     const el = document.getElementById(id);
@@ -5841,9 +6101,8 @@
     });
     document.querySelectorAll("#planActualDataSection .slicer button:first-child").forEach(b => b.classList.add("active"));
     
-    // Reset year dropdown to 2026
-    selectedYearPA = '2026';
-    document.getElementById('yearDropdownPA').value = '2026';
+    // Clear date range for PA
+    drpClear('PA');
 
     // Close any open detail sections
     document.getElementById('structureDetailsSection').classList.remove('visible');
@@ -6401,8 +6660,8 @@
         const year = planDate.getFullYear().toString();
         const quarter = getQuarter(planDate);
         
-        // Apply year filter
-        if (!selectedYearPA || year === selectedYearPA) {
+        // Apply date range filter
+        if (drpInRange(planDate, 'PA')) {
           const key = `${year}-Q${quarter}`;
           
           if (!data[key]) {
@@ -6428,8 +6687,8 @@
         const year = actualDate.getFullYear().toString();
         const quarter = getQuarter(actualDate);
         
-        // Apply year filter
-        if (!selectedYearPA || year === selectedYearPA) {
+        // Apply date range filter
+        if (drpInRange(actualDate, 'PA')) {
           const key = `${year}-Q${quarter}`;
           
           if (!data[key]) {
@@ -6520,29 +6779,29 @@
 
     filteredData.forEach(row => {
       const plasterPlan = parseDate(row.PlasterPlan);
-      if (plasterPlan && (!selectedYearPA || plasterPlan.getFullYear().toString() === selectedYearPA)) {
+      if (plasterPlan && drpInRange(plasterPlan, 'PA')) {
         plasterPlanRev += row.PlasterRev; plasterPlanNos++;
       }
       const plasterActual = parseDate(row.PlasterActual);
-      if (plasterActual && (!selectedYearPA || plasterActual.getFullYear().toString() === selectedYearPA)) {
+      if (plasterActual && drpInRange(plasterActual, 'PA')) {
         plasterActualRev += row.PlasterRev; plasterActualNos++;
       }
 
       const flooringPlan = parseDate(row.FlooringPlan);
-      if (flooringPlan && (!selectedYearPA || flooringPlan.getFullYear().toString() === selectedYearPA)) {
+      if (flooringPlan && drpInRange(flooringPlan, 'PA')) {
         flooringPlanRev += row.FloorRev; flooringPlanNos++;
       }
       const flooringActual = parseDate(row.FlooringActual);
-      if (flooringActual && (!selectedYearPA || flooringActual.getFullYear().toString() === selectedYearPA)) {
+      if (flooringActual && drpInRange(flooringActual, 'PA')) {
         flooringActualRev += row.FloorRev; flooringActualNos++;
       }
 
       const handoverPlan = parseDate(row.HandoverPlan);
-      if (handoverPlan && (!selectedYearPA || handoverPlan.getFullYear().toString() === selectedYearPA)) {
+      if (handoverPlan && drpInRange(handoverPlan, 'PA')) {
         handoverPlanRev += row.HandRev; handoverPlanNos++;
       }
       const handoverActual = parseDate(row.HandoverActual);
-      if (handoverActual && (!selectedYearPA || handoverActual.getFullYear().toString() === selectedYearPA)) {
+      if (handoverActual && drpInRange(handoverActual, 'PA')) {
         handoverActualRev += row.HandRev; handoverActualNos++;
       }
     });
@@ -6556,9 +6815,9 @@
     let structPlanRev = 0, structActualRev = 0, structPlanNos = 0, structActualNos = 0;
     shellSourceKpi.forEach(row => {
       const planDate = parseDate(row.PlanDate);
-      if (planDate && (!selectedYearPA || planDate.getFullYear().toString() === selectedYearPA)) { structPlanRev += row.DetailAmt; structPlanNos++; }
+      if (planDate && drpInRange(planDate, 'PA')) { structPlanRev += row.DetailAmt; structPlanNos++; }
       const actualDate = parseDate(row.ActualDate);
-      if (actualDate && (!selectedYearPA || actualDate.getFullYear().toString() === selectedYearPA)) { structActualRev += row.DetailAmt; structActualNos++; }
+      if (actualDate && drpInRange(actualDate, 'PA')) { structActualRev += row.DetailAmt; structActualNos++; }
     });
 
     // Totals
@@ -6934,27 +7193,17 @@
       (!ocSelPA.size || ocSelPA.has(r.OC))
     );
     
-    // Filter by year if selected
+    // Filter by date range
     let unitData = filteredData;
-    if (selectedYearPA) {
+    if (_drpFromPA || _drpToPA) {
       unitData = unitData.filter(r => {
-        let planField, actualField;
-        if (revenueField === 'PlasterRev') {
-          planField = 'PlasterPlan';
-          actualField = 'PlasterActual';
-        } else if (revenueField === 'FloorRev') {
-          planField = 'FlooringPlan';
-          actualField = 'FlooringActual';
-        } else {
-          planField = 'HandoverPlan';
-          actualField = 'HandoverActual';
-        }
-        
-        const planDate = parseDate(r[planField]);
+        let planField = revenueField === 'PlasterRev' ? 'PlasterPlan'
+                      : revenueField === 'FloorRev'   ? 'FlooringPlan' : 'HandoverPlan';
+        let actualField = revenueField === 'PlasterRev' ? 'PlasterActual'
+                        : revenueField === 'FloorRev'   ? 'FlooringActual' : 'HandoverActual';
+        const planDate   = parseDate(r[planField]);
         const actualDate = parseDate(r[actualField]);
-        
-        return (planDate && planDate.getFullYear().toString() === selectedYearPA) ||
-               (actualDate && actualDate.getFullYear().toString() === selectedYearPA);
+        return (planDate && drpInRange(planDate, 'PA')) || (actualDate && drpInRange(actualDate, 'PA'));
       });
     }
     
@@ -7291,7 +7540,7 @@
       if (planDate) {
         const year    = planDate.getFullYear().toString();
         const quarter = getQuarter(planDate);
-        if (!selectedYearPA || year === selectedYearPA) {
+        if (drpInRange(planDate, 'PA')) {
           const key = `${year}-Q${quarter}`;
           if (!data[key]) data[key] = { year, quarter, planNos: 0, planAmt: 0, actualNos: 0, actualAmt: 0 };
           data[key].planNos++;
@@ -7305,7 +7554,7 @@
       if (actualDate) {
         const year    = actualDate.getFullYear().toString();
         const quarter = getQuarter(actualDate);
-        if (!selectedYearPA || year === selectedYearPA) {
+        if (drpInRange(actualDate, 'PA')) {
           const key = `${year}-Q${quarter}`;
           if (!data[key]) data[key] = { year, quarter, planNos: 0, planAmt: 0, actualNos: 0, actualAmt: 0 };
           data[key].actualNos++;
@@ -9309,29 +9558,11 @@
 
   let shellSelectedProject = null;
   let shellSelectedTowers  = new Set();   // empty = show all towers for project
-  let shellSelectedYear    = '';          // '' = all years
-  let shellSelectedQuarter = '';          // '' = all quarters, '1'-'4'
+  // shellSelectedYear / shellSelectedQuarter replaced by date range picker
+  let shellSelectedYear    = '';
+  let shellSelectedQuarter = '';
 
   function buildShellTrackerSlicers() {
-    // ── Year dropdown from Shell Master dates ──
-    const years = new Set();
-    rawShell.forEach(r => {
-      [r.PlanDate, r.ActualDate].forEach(d => {
-        const parsed = parseDate(d);
-        if (parsed) years.add(parsed.getFullYear().toString());
-      });
-    });
-    const yEl = document.getElementById('shellYearDropdown');
-    if (yEl) {
-      yEl.innerHTML = '<option value="">All Years</option>';
-      [...years].sort().forEach(y => {
-        const opt = document.createElement('option');
-        opt.value = y; opt.textContent = y;
-        if (y === '2026') { opt.selected = true; shellSelectedYear = y; }
-        yEl.appendChild(opt);
-      });
-    }
-
     // ── Project slicer — ALL + unique Col A values ──
     const projects = [...new Set(rawShell.map(r => r.Project).filter(Boolean))].sort();
     const projEl = document.getElementById('shellProjectSlicer');
@@ -9371,9 +9602,6 @@
 
     // Tower slicer placeholder
     buildShellTowerSlicer(null);
-
-    // Build quarter slicer
-    buildShellQuarterSlicer();
 
     // Initial KPI calc
     updateShellKPIs();
@@ -9480,13 +9708,11 @@
 
     rows.forEach(r => {
       const pd = parseDate(r.PlanDate);
-      if (pd && (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear)
-             && dateInShellQuarter(r.PlanDate)) {
+      if (pd && drpInRange(pd, 'Shell')) {
         planRev += r.DetailAmt; planNos++;
       }
       const ad = parseDate(r.ActualDate);
-      if (ad && (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear)
-             && dateInShellQuarter(r.ActualDate)) {
+      if (ad && drpInRange(ad, 'Shell')) {
         actualRev += r.DetailAmt; actualNos++;
       }
     });
@@ -9503,18 +9729,12 @@
 
     let rows = getShellFilteredRows();
 
-    // Year + Quarter filter for visualization
-    if (shellSelectedYear || shellSelectedQuarter) {
+    // Date range filter for visualization
+    if (_drpFromShell || _drpToShell) {
       rows = rows.filter(r => {
         const pd = parseDate(r.PlanDate);
         const ad = parseDate(r.ActualDate);
-        const pdMatch = pd &&
-          (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear) &&
-          dateInShellQuarter(r.PlanDate);
-        const adMatch = ad &&
-          (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear) &&
-          dateInShellQuarter(r.ActualDate);
-        return pdMatch || adMatch;
+        return (pd && drpInRange(pd, 'Shell')) || (ad && drpInRange(ad, 'Shell'));
       });
     }
 
@@ -9627,17 +9847,11 @@
     // Collect all Shell Master rows matching current filters (project, tower, year, quarter)
     let rows = getShellFilteredRows();
 
-    if (shellSelectedYear || shellSelectedQuarter) {
+    if (_drpFromShell || _drpToShell) {
       rows = rows.filter(r => {
         const pd = parseDate(r.PlanDate);
         const ad = parseDate(r.ActualDate);
-        const pdMatch = pd &&
-          (!shellSelectedYear || pd.getFullYear().toString() === shellSelectedYear) &&
-          dateInShellQuarter(r.PlanDate);
-        const adMatch = ad &&
-          (!shellSelectedYear || ad.getFullYear().toString() === shellSelectedYear) &&
-          dateInShellQuarter(r.ActualDate);
-        return pdMatch || adMatch;
+        return (pd && drpInRange(pd, 'Shell')) || (ad && drpInRange(ad, 'Shell'));
       });
     }
 
@@ -10407,6 +10621,377 @@
   </div>
 </div>
 <!-- ═══ END PA COLUMN CUSTOMISER ═══ -->
+
+<!-- ═══ DATE RANGE PICKER PANEL ═══ -->
+<div class="drp-overlay" id="drpOverlay" style="display:none;" onclick="drpClose()"></div>
+<div class="drp-panel" id="drpPanel">
+  <div class="drp-body">
+    <!-- Quick presets -->
+    <div class="drp-presets">
+      <div class="drp-presets-label">Quick Select</div>
+      <button class="drp-preset-btn" onclick="drpPreset('today')">Today</button>
+      <button class="drp-preset-btn" onclick="drpPreset('yesterday')">Yesterday</button>
+      <button class="drp-preset-btn" onclick="drpPreset('last7')">Last 7 Days</button>
+      <button class="drp-preset-btn" onclick="drpPreset('last30')">Last 30 Days</button>
+      <button class="drp-preset-btn" onclick="drpPreset('thisMonth')">This Month</button>
+      <button class="drp-preset-btn" onclick="drpPreset('lastMonth')">Last Month</button>
+      <button class="drp-preset-btn" onclick="drpPreset('thisQ')">This Quarter</button>
+      <button class="drp-preset-btn" onclick="drpPreset('lastQ')">Last Quarter</button>
+      <button class="drp-preset-btn" onclick="drpPreset('thisYear')">This Year</button>
+      <button class="drp-preset-btn" onclick="drpPreset('lastYear')">Last Year</button>
+      <button class="drp-preset-btn" onclick="drpPreset('next3M')">Next 3 Months</button>
+      <button class="drp-preset-btn" onclick="drpPreset('next6M')">Next 6 Months</button>
+      <button class="drp-preset-btn" onclick="drpPreset('nextYear')">Next 12 Months</button>
+    </div>
+    <!-- Calendar -->
+    <div class="drp-calendars">
+      <div class="drp-cal-header">
+        <button class="drp-cal-nav" onclick="drpNavMonth(-1)"><i class="bi bi-chevron-left"></i></button>
+        <span class="drp-cal-month-label" id="drpMonthLabel"></span>
+        <button class="drp-cal-nav" onclick="drpNavMonth(1)"><i class="bi bi-chevron-right"></i></button>
+      </div>
+      <div class="drp-cal-months" id="drpCalMonths"></div>
+    </div>
+  </div>
+  <div class="drp-footer">
+    <div class="drp-range-display" id="drpRangeDisplay">Select a start date</div>
+    <button class="drp-btn drp-btn-cancel" onclick="drpClose()">Cancel</button>
+    <button class="drp-btn drp-btn-apply" onclick="drpApply()">Apply</button>
+  </div>
+</div>
+<!-- ═══ END DATE RANGE PICKER ═══ -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATE RANGE PICKER ENGINE
+// ═══════════════════════════════════════════════════════════════
+(function () {
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const WD = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+  // State
+  let _context  = null;   // 'PA' | 'Shell'
+  let _start    = null;   // Date
+  let _end      = null;   // Date
+  let _hover    = null;   // Date (for range preview)
+  let _picking  = 0;      // 0=start, 1=end
+  let _viewYear = new Date().getFullYear();
+  let _viewMonth = new Date().getMonth();  // 0-11
+
+  // Applied ranges (per context)
+  const _applied = { PA: { from: null, to: null }, Shell: { from: null, to: null } };
+
+  // ── Public API ──────────────────────────────────────────────
+  window.drpOpen = function(ctx) {
+    _context = ctx;
+    // Seed with currently applied range
+    _start  = _applied[ctx].from ? new Date(_applied[ctx].from) : null;
+    _end    = _applied[ctx].to   ? new Date(_applied[ctx].to)   : null;
+    _hover  = null;
+    _picking = _start ? (_end ? 0 : 1) : 0;
+
+    // View: start at from-month or current month
+    const seed = _start || new Date();
+    _viewYear  = seed.getFullYear();
+    _viewMonth = seed.getMonth();
+    // If viewing the second calendar makes sense, step back one month
+    if (_viewMonth === 11) { _viewMonth = 10; } else if (_viewMonth > 0) { _viewMonth--; }
+
+    // Mark active trigger
+    document.querySelectorAll('.drp-trigger').forEach(b => b.classList.remove('open'));
+    const trig = document.getElementById('drpTrigger' + ctx);
+    if (trig) trig.classList.add('open');
+
+    // Position panel near trigger
+    _positionPanel(trig);
+
+    document.getElementById('drpOverlay').style.display = 'block';
+    requestAnimationFrame(() => document.getElementById('drpPanel').classList.add('open'));
+
+    _render();
+  };
+
+  window.drpClose = function() {
+    document.getElementById('drpPanel').classList.remove('open');
+    document.getElementById('drpOverlay').style.display = 'none';
+    document.querySelectorAll('.drp-trigger').forEach(b => b.classList.remove('open'));
+    setTimeout(() => { _context = null; }, 220);
+  };
+
+  window.drpApply = function() {
+    if (!_start) { drpClose(); return; }
+    const from = _start;
+    const to   = _end || _start;
+    _applied[_context] = { from: _dayStart(from), to: _dayEnd(to) };
+    _updateTriggerLabel(_context);
+    _dispatchChange(_context);
+    drpClose();
+  };
+
+  window.drpPreset = function(key) {
+    const { from, to } = _presetRange(key);
+    _start  = from;
+    _end    = to;
+    _hover  = null;
+    _picking = 0;
+    // Highlight selected preset
+    document.querySelectorAll('.drp-preset-btn').forEach(b => b.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    // Navigate calendar to show from date
+    _viewYear  = from.getFullYear();
+    _viewMonth = from.getMonth() === 11 ? 10 : from.getMonth();
+    _render();
+  };
+
+  window.drpNavMonth = function(dir) {
+    _viewMonth += dir;
+    if (_viewMonth > 11) { _viewMonth = 0;  _viewYear++; }
+    if (_viewMonth < 0)  { _viewMonth = 11; _viewYear--; }
+    _render();
+  };
+
+  // Called by day cells
+  window._drpDayClick = function(y, m, d) {
+    const clicked = new Date(y, m, d);
+    if (_picking === 0) {
+      _start = clicked; _end = null; _hover = null; _picking = 1;
+    } else {
+      if (clicked < _start) { _end = _start; _start = clicked; }
+      else                   { _end = clicked; }
+      _picking = 0;
+      // Clear preset highlights
+      document.querySelectorAll('.drp-preset-btn').forEach(b => b.classList.remove('selected'));
+    }
+    _render();
+  };
+
+  window._drpDayHover = function(y, m, d) {
+    if (_picking === 1) { _hover = new Date(y, m, d); _render(); }
+  };
+
+  // ── Private helpers ──────────────────────────────────────────
+  function _render() {
+    _renderCalendars();
+    _renderFooter();
+  }
+
+  function _renderCalendars() {
+    const label = document.getElementById('drpMonthLabel');
+    const m2year = _viewMonth === 11 ? _viewYear + 1 : _viewYear;
+    const m2month = _viewMonth === 11 ? 0 : _viewMonth + 1;
+    label.textContent = `${MONTHS[_viewMonth]} ${_viewYear}  –  ${MONTHS[m2month]} ${m2year}`;
+
+    const container = document.getElementById('drpCalMonths');
+    container.innerHTML =
+      _buildMonthGrid(_viewYear, _viewMonth) +
+      _buildMonthGrid(m2year, m2month);
+
+    // Wire hover events after DOM insert
+    container.querySelectorAll('.drp-day:not(.drp-day-other):not(.drp-day-disabled)').forEach(el => {
+      el.addEventListener('mouseenter', () => _drpDayHover(+el.dataset.y, +el.dataset.m, +el.dataset.d));
+    });
+  }
+
+  function _buildMonthGrid(year, month) {
+    const today  = new Date(); today.setHours(0,0,0,0);
+    const first  = new Date(year, month, 1);
+    const startWD = first.getDay();           // 0=Sun
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const rangeEnd = _picking === 1 && _hover ? _hover : _end;
+
+    let html = `<div class="drp-cal-grid">
+      <div class="drp-month-name">${MONTHS[month]} ${year}</div>
+      <div class="drp-cal-weekdays">${WD.map(w => `<div class="drp-cal-wd">${w}</div>`).join('')}</div>
+      <div class="drp-cal-days">`;
+
+    // Leading blanks
+    for (let i = 0; i < startWD; i++) html += `<div class="drp-day drp-day-other"></div>`;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(year, month, d);
+      const isToday = date.getTime() === today.getTime();
+      const isStart = _start && _sameDay(date, _start);
+      const isEnd   = rangeEnd && _sameDay(date, rangeEnd);
+      const inRange = _start && rangeEnd && date > (_start < rangeEnd ? _start : rangeEnd) && date < (_start < rangeEnd ? rangeEnd : _start);
+
+      let cls = 'drp-day';
+      if (isToday)  cls += ' drp-day-today';
+      if (isStart)  cls += ' drp-day-start';
+      if (isEnd)    cls += ' drp-day-end';
+      if (inRange)  cls += ' drp-day-in-range';
+
+      html += `<div class="${cls}" data-y="${year}" data-m="${month}" data-d="${d}" onclick="_drpDayClick(${year},${month},${d})">${d}</div>`;
+    }
+    // Trailing blanks to complete grid
+    const total = startWD + daysInMonth;
+    const trailing = total % 7 === 0 ? 0 : 7 - (total % 7);
+    for (let i = 0; i < trailing; i++) html += `<div class="drp-day drp-day-other"></div>`;
+
+    html += `</div></div>`;
+    return html;
+  }
+
+  function _renderFooter() {
+    const disp = document.getElementById('drpRangeDisplay');
+    const rangeEnd = (_picking === 1 && _hover) ? _hover : _end;
+    if (!_start) {
+      disp.innerHTML = 'Click a start date';
+    } else if (_picking === 1) {
+      disp.innerHTML = `<strong>${_fmt(_start)}</strong> → click an end date`;
+    } else if (_end) {
+      disp.innerHTML = `<strong>${_fmt(_start)}</strong> — <strong>${_fmt(_end)}</strong>`;
+    } else {
+      disp.innerHTML = `<strong>${_fmt(_start)}</strong>`;
+    }
+  }
+
+  function _updateTriggerLabel(ctx) {
+    const lbl = document.getElementById('drpLabel' + ctx);
+    const trig = document.getElementById('drpTrigger' + ctx);
+    const { from, to } = _applied[ctx];
+    if (!from && !to) {
+      if (lbl) lbl.textContent = 'All Dates';
+      if (trig) { trig.classList.remove('active'); _removeClearBtn(ctx); }
+    } else {
+      const text = to && !_sameDay(from, to)
+        ? `${_fmtShort(from)} – ${_fmtShort(to)}`
+        : _fmtShort(from);
+      if (lbl) lbl.textContent = text;
+      if (trig) {
+        trig.classList.add('active');
+        _addClearBtn(ctx);
+      }
+    }
+  }
+
+  function _addClearBtn(ctx) {
+    const trig = document.getElementById('drpTrigger' + ctx);
+    if (!trig) return;
+    let btn = trig.querySelector('.drp-clear-btn');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.className = 'drp-clear-btn';
+      btn.innerHTML = '<i class="bi bi-x"></i>';
+      btn.onclick = function(e) { e.stopPropagation(); drpClear(ctx); };
+      trig.appendChild(btn);
+    }
+  }
+  function _removeClearBtn(ctx) {
+    const trig = document.getElementById('drpTrigger' + ctx);
+    if (!trig) return;
+    const btn = trig.querySelector('.drp-clear-btn');
+    if (btn) btn.remove();
+  }
+
+  window.drpClear = function(ctx) {
+    _applied[ctx] = { from: null, to: null };
+    _updateTriggerLabel(ctx);
+    _dispatchChange(ctx);
+  };
+
+  function _dispatchChange(ctx) {
+    const { from, to } = _applied[ctx];
+    if (ctx === 'PA') {
+      drpApplyPA(from, to);
+    } else if (ctx === 'Shell') {
+      drpApplyShell(from, to);
+    }
+  }
+
+  function _positionPanel(trig) {
+    const panel = document.getElementById('drpPanel');
+    if (!trig) return;
+    const rect = trig.getBoundingClientRect();
+    const wrapper = trig.closest('.drp-wrapper');
+    panel.style.left = '0';
+    panel.style.right = 'auto';
+    // Check if panel would overflow right edge
+    setTimeout(() => {
+      const pw = panel.offsetWidth || 560;
+      if (rect.left + pw > window.innerWidth - 16) {
+        panel.style.left = 'auto';
+        panel.style.right = '0';
+      }
+    }, 0);
+  }
+
+  function _presetRange(key) {
+    const now  = new Date(); now.setHours(0,0,0,0);
+    const y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
+    switch (key) {
+      case 'today':     return { from: new Date(y,m,d),   to: new Date(y,m,d) };
+      case 'yesterday': return { from: new Date(y,m,d-1), to: new Date(y,m,d-1) };
+      case 'last7':     return { from: new Date(y,m,d-6), to: new Date(y,m,d) };
+      case 'last30':    return { from: new Date(y,m,d-29),to: new Date(y,m,d) };
+      case 'thisMonth': return { from: new Date(y,m,1),   to: new Date(y,m+1,0) };
+      case 'lastMonth': return { from: new Date(y,m-1,1), to: new Date(y,m,0) };
+      case 'thisQ': {
+        const qs = Math.floor(m/3)*3;
+        return { from: new Date(y,qs,1), to: new Date(y,qs+3,0) };
+      }
+      case 'lastQ': {
+        const qs = Math.floor(m/3)*3 - 3;
+        const qy = qs < 0 ? y-1 : y; const qm = qs < 0 ? qs+12 : qs;
+        return { from: new Date(qy,qm,1), to: new Date(qy,qm+3,0) };
+      }
+      case 'thisYear':  return { from: new Date(y,0,1),   to: new Date(y,11,31) };
+      case 'lastYear':  return { from: new Date(y-1,0,1), to: new Date(y-1,11,31) };
+      case 'next3M':    return { from: new Date(y,m,d),   to: new Date(y,m+3,d) };
+      case 'next6M':    return { from: new Date(y,m,d),   to: new Date(y,m+6,d) };
+      case 'nextYear':  return { from: new Date(y,m,d),   to: new Date(y+1,m,d) };
+      default:          return { from: new Date(y,0,1),   to: new Date(y,11,31) };
+    }
+  }
+
+  function _sameDay(a, b)  { return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+  function _dayStart(d)    { const x=new Date(d); x.setHours(0,0,0,0); return x; }
+  function _dayEnd(d)      { const x=new Date(d); x.setHours(23,59,59,999); return x; }
+  function _fmt(d)         { return d ? `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}` : ''; }
+  function _fmtShort(d)    { return d ? `${d.getDate()}-${MONTHS_SHORT[d.getMonth()]}-${String(d.getFullYear()).slice(2)}` : ''; }
+
+  // ── Integration — PA tab ────────────────────────────────────
+  window.drpApplyPA = function(from, to) {
+    // Convert to a date-match function and re-run generation
+    _drpFromPA = from;
+    _drpToPA   = to;
+    // Reset detail sections when date range changes
+    document.getElementById('structureDetailsSection').classList.remove('visible');
+    document.getElementById('planActualDetailsSection').classList.remove('visible');
+    document.querySelectorAll('.plan-actual-card').forEach(c => c.classList.remove('selected'));
+    generatePlanVsActuals();
+  };
+
+  // ── Integration — Shell tab ─────────────────────────────────
+  window.drpApplyShell = function(from, to) {
+    _drpFromShell = from;
+    _drpToShell   = to;
+    updateShellKPIs();
+    renderShellTracker();
+  };
+
+})();
+
+// Global date range state (accessed by filter functions)
+var _drpFromPA    = null;
+var _drpToPA      = null;
+var _drpFromShell = null;
+var _drpToShell   = null;
+
+// Helper: test if a date falls within the active date range for a given context
+function drpInRange(date, ctx) {
+  const from = ctx === 'PA' ? _drpFromPA : _drpFromShell;
+  const to   = ctx === 'PA' ? _drpToPA   : _drpToShell;
+  if (!from && !to) return true;          // no filter
+  if (!date)        return false;
+  const t = date.getTime();
+  const f = from ? from.getTime() : -Infinity;
+  const e = to   ? to.getTime()   : Infinity;
+  return t >= f && t <= e;
+}
+</script>
+
 
 </body>
 </html>
