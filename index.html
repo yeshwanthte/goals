@@ -5226,7 +5226,8 @@
     SOLD: 30, // Column AE (index 30)
     GFC: 33,
     PLASTER: 36,
-    FLOOR: 39,
+    FLOOR: 39,      // Col AN — Dry Flooring (used in new Floor logic)
+    WET_FLOOR: 40,  // Col AO — Wet Flooring / Dado
     HVAC: 41,
     FALSE: 42,
     FENEST: 44,
@@ -5383,7 +5384,18 @@
       Sold: (r[COL.SOLD] || '').toString().trim().toLowerCase() === 'sold',
       GFC: validDate(r[COL.GFC]),
       Plaster: validDate(r[COL.PLASTER]),
-      Floor: validDate(r[COL.FLOOR]),
+      // Flooring & Dado — completed only when BOTH Col AN and Col AO have dates
+      // Floor = max(AN, AO) when both present, else false
+      DryFloor:  validDate(r[COL.FLOOR]),         // Col AN — Dry Flooring date (individual)
+      WetFloor:  validDate(r[COL.WET_FLOOR]),      // Col AO — Wet Flooring/Dado date (individual)
+      Floor: (() => {
+        const an = validDate(r[COL.FLOOR]);
+        const ao = validDate(r[COL.WET_FLOOR]);
+        if (!an || !ao) return false;              // both must be present
+        const dAN = parseDate(String(an)); const dAO = parseDate(String(ao));
+        if (!dAN || !dAO) return false;
+        return dAN >= dAO ? an : ao;               // return the later date string (truthy)
+      })(),
       HVAC: validDate(r[COL.HVAC]),
       False: validDate(r[COL.FALSE]),
       Fenest: validDate(r[COL.FENEST]),
@@ -5395,7 +5407,14 @@
       PlasterActual: r[COL.PLASTER_ACTUAL] || "",
       FlooringPlan: r[COL.FLOORING_PLAN] || "",
       FlooringProjected: r[COL.FLOORING_PROJECTED] || "",
-      FlooringActual: r[COL.FLOORING_ACTUAL] || "",
+      FlooringActual: (() => {
+        const an = validDate(r[COL.FLOORING_ACTUAL]);
+        const ao = validDate(r[COL.WET_FLOOR_DATE]);
+        if (!an || !ao) return "";                 // both must be present for completion
+        const dAN = parseDate(String(an)); const dAO = parseDate(String(ao));
+        if (!dAN || !dAO) return "";
+        return dAN >= dAO ? String(an) : String(ao); // later date
+      })(),
       HandoverPlan: r[COL.HANDOVER_PLAN] || "",
       HandoverActual: r[COL.HANDOVER_ACTUAL] || "",
       SaleableArea: r[COL.SALEABLE_AREA] || "N/A",
@@ -9823,27 +9842,28 @@
   // COLUMN CUSTOMISER — state & pane logic
   // ═══════════════════════════════════════════════════════
   const OPTIONAL_COLS = [
-    { id: 'IDSADate',   label: 'IDSA',          field: 'IDSADate'   },
-    { id: 'GFC',        label: 'GFC',            field: 'GFC'        },
-    { id: 'Plaster',    label: 'Plaster',        field: 'Plaster'    },
-    { id: 'Floor',      label: 'Flooring',       field: 'Floor'      },
-    { id: 'Fenest',     label: 'Fenestration',   field: 'Fenest'     },
-    { id: 'Masonry',    label: 'Masonry',        field: 'Masonry'    },
-    { id: 'Conduiting', label: 'Conduiting',     field: 'Conduiting' },
-    { id: 'ToiletWP',   label: 'Toilet W/P',     field: 'ToiletWP'   },
-    { id: 'Plumbing',   label: 'Plumbing',       field: 'Plumbing'   },
-    { id: 'HvacOpt',    label: 'HVAC',           field: 'HvacOpt'    },
-    { id: 'FalseCeil',  label: 'False Ceiling',  field: 'FalseCeil'  },
-    { id: 'Furniture',  label: 'Furniture',      field: 'Furniture'  },
-    { id: 'Kitchen',    label: 'Kitchen',        field: 'Kitchen'    },
+    { id: 'IDSADate',   label: 'IDSA',              field: 'IDSADate'   },
+    { id: 'GFC',        label: 'GFC',               field: 'GFC'        },
+    { id: 'Plaster',    label: 'Plaster',           field: 'Plaster'    },
+    { id: 'DryFloor',   label: 'Dry Flooring',      field: 'DryFloor'   },
+    { id: 'WetFloor',   label: 'Wet Flooring & Dado', field: 'WetFloor' },
+    { id: 'Fenest',     label: 'Fenestration',      field: 'Fenest'     },
+    { id: 'Masonry',    label: 'Masonry',           field: 'Masonry'    },
+    { id: 'Conduiting', label: 'Conduiting',        field: 'Conduiting' },
+    { id: 'ToiletWP',   label: 'Toilet W/P',        field: 'ToiletWP'   },
+    { id: 'Plumbing',   label: 'Plumbing',          field: 'Plumbing'   },
+    { id: 'HvacOpt',    label: 'HVAC',              field: 'HvacOpt'    },
+    { id: 'FalseCeil',  label: 'False Ceiling',     field: 'FalseCeil'  },
+    { id: 'Furniture',  label: 'Furniture',         field: 'Furniture'  },
+    { id: 'Kitchen',    label: 'Kitchen',           field: 'Kitchen'    },
   ];
-  const DEFAULT_ACTIVE_COLS = ['IDSADate', 'GFC', 'Plaster', 'Floor', 'Fenest']; // fallback
+  const DEFAULT_ACTIVE_COLS = ['IDSADate', 'GFC', 'Plaster', 'DryFloor', 'WetFloor', 'Fenest']; // fallback
 
   // Per-activity default status columns for Milestone Unit Details
   const ACTIVITY_DEFAULT_COLS = {
     'Plaster':            ['IDSADate', 'GFC', 'Masonry', 'Conduiting'],
-    'Flooring & Dado':    ['IDSADate', 'GFC', 'Plaster', 'ToiletWP', 'Plumbing'],
-    'Ready for Handover': ['IDSADate', 'GFC', 'Plaster', 'Floor', 'ToiletWP', 'Plumbing', 'Fenest'],
+    'Flooring & Dado':    ['IDSADate', 'GFC', 'Plaster', 'ToiletWP', 'Plumbing', 'DryFloor', 'WetFloor'],
+    'Ready for Handover': ['IDSADate', 'GFC', 'Plaster', 'DryFloor', 'WetFloor', 'ToiletWP', 'Plumbing', 'Fenest'],
   };
 
   function _activityStorageKey(activityName) {
@@ -10005,10 +10025,10 @@
   // Shared CTG computation helper — Flooring & Dado (CTG till Plaster + 4 Flooring measures)
   function computeCtgFloorUnit(unit) {
     let c = computeCtgUnit(unit);                  // includes all 4 Plaster CTG measures
-    if (!unit.ToiletWP)    c += unit.CtgBU || 0;  // Toilet Waterproofing (col AL → BU)
-    if (!unit.Plumbing)    c += unit.CtgBT || 0;  // Toilet Plumbing      (col AM → BT)
-    if (!unit.Floor)       c += unit.CtgBV || 0;  // Dry Flooring         (col AN → BV)
-    if (!unit.WetFloorDate)c += unit.CtgBW || 0;  // Wet Flooring         (col AO → BW)
+    if (!unit.ToiletWP)  c += unit.CtgBU || 0;    // Toilet Waterproofing (col AL → BU)
+    if (!unit.Plumbing)  c += unit.CtgBT || 0;    // Toilet Plumbing      (col AM → BT)
+    if (!unit.DryFloor)  c += unit.CtgBV || 0;    // Dry Flooring         (col AN → BV)
+    if (!unit.WetFloor)  c += unit.CtgBW || 0;    // Wet Flooring         (col AO → BW)
     return c;
   }
 
@@ -10052,19 +10072,20 @@
 
   // Status columns (show tick/cross based on truthy field value)
   const PA_STATUS_COLS = [
-    { id: 'pa_IDSADate',   label: 'IDSA',              field: 'IDSADate',    type: 'status' },
-    { id: 'pa_GFC',        label: 'GFC',               field: 'GFC',         type: 'status' },
-    { id: 'pa_Masonry',    label: 'Masonry',            field: 'Masonry',     type: 'status' },
-    { id: 'pa_Conduiting', label: 'Conduiting',         field: 'Conduiting',  type: 'status' },
-    { id: 'pa_Plaster',    label: 'Plaster',            field: 'Plaster',     type: 'status' },
-    { id: 'pa_ToiletWP',   label: 'Toilet W/P',         field: 'ToiletWP',    type: 'status' },
-    { id: 'pa_Plumbing',   label: 'Plumbing',           field: 'Plumbing',    type: 'status' },
-    { id: 'pa_Floor',      label: 'Flooring',           field: 'Floor',       type: 'status' },
-    { id: 'pa_HVAC',       label: 'HVAC',               field: 'HVAC',        type: 'status' },
-    { id: 'pa_False',      label: 'False Ceiling',      field: 'False',       type: 'status' },
-    { id: 'pa_Fenest',     label: 'Fenestration',       field: 'Fenest',      type: 'status' },
-    { id: 'pa_Furniture',  label: 'Furniture',          field: 'Furniture',   type: 'status' },
-    { id: 'pa_Kitchen',    label: 'Kitchen',            field: 'Kitchen',     type: 'status' },
+    { id: 'pa_IDSADate',   label: 'IDSA',                field: 'IDSADate',   type: 'status' },
+    { id: 'pa_GFC',        label: 'GFC',                 field: 'GFC',        type: 'status' },
+    { id: 'pa_Masonry',    label: 'Masonry',             field: 'Masonry',    type: 'status' },
+    { id: 'pa_Conduiting', label: 'Conduiting',          field: 'Conduiting', type: 'status' },
+    { id: 'pa_Plaster',    label: 'Plaster',             field: 'Plaster',    type: 'status' },
+    { id: 'pa_ToiletWP',   label: 'Toilet W/P',          field: 'ToiletWP',   type: 'status' },
+    { id: 'pa_Plumbing',   label: 'Plumbing',            field: 'Plumbing',   type: 'status' },
+    { id: 'pa_DryFloor',   label: 'Dry Flooring',        field: 'DryFloor',   type: 'status' },
+    { id: 'pa_WetFloor',   label: 'Wet Flooring & Dado', field: 'WetFloor',   type: 'status' },
+    { id: 'pa_HVAC',       label: 'HVAC',                field: 'HVAC',       type: 'status' },
+    { id: 'pa_False',      label: 'False Ceiling',       field: 'False',      type: 'status' },
+    { id: 'pa_Fenest',     label: 'Fenestration',        field: 'Fenest',     type: 'status' },
+    { id: 'pa_Furniture',  label: 'Furniture',           field: 'Furniture',  type: 'status' },
+    { id: 'pa_Kitchen',    label: 'Kitchen',             field: 'Kitchen',    type: 'status' },
   ];
 
   // CTG measure columns (show ₹ value in Cr)
@@ -10073,10 +10094,10 @@
     { id: 'ctg_BQ',  label: 'Masonry CTG',                 type: 'ctg', calc: u => u.Masonry    ? 0 : (u.CtgBQ||0) },
     { id: 'ctg_BR',  label: 'Electrical Conduiting CTG',   type: 'ctg', calc: u => u.Conduiting ? 0 : (u.CtgBR||0) },
     { id: 'ctg_BS',  label: 'Plaster CTG',                 type: 'ctg', calc: u => u.Plaster    ? 0 : (u.CtgBS||0) },
-    { id: 'ctg_BV',  label: 'Dry Flooring CTG',            type: 'ctg', calc: u => u.Floor      ? 0 : (u.CtgBV||0) },
+    { id: 'ctg_BV',  label: 'Dry Flooring CTG',            type: 'ctg', calc: u => u.DryFloor    ? 0 : (u.CtgBV||0) },
     { id: 'ctg_BU',  label: 'Toilet Waterproofing CTG',    type: 'ctg', calc: u => u.ToiletWP   ? 0 : (u.CtgBU||0) },
     { id: 'ctg_BT',  label: 'Toilet Plumbing CTG',         type: 'ctg', calc: u => u.Plumbing   ? 0 : (u.CtgBT||0) },
-    { id: 'ctg_BW',  label: 'Wet Flooring CTG',            type: 'ctg', calc: u => u.WetFloorDate ? 0 : (u.CtgBW||0) },
+    { id: 'ctg_BW',  label: 'Wet Flooring CTG',            type: 'ctg', calc: u => u.WetFloor   ? 0 : (u.CtgBW||0) },
     { id: 'ctg_BX',  label: 'HVAC CTG',                    type: 'ctg', calc: u => u.HVAC       ? 0 : (u.CtgBX||0) },
     { id: 'ctg_CB',  label: 'False Ceiling CTG',           type: 'ctg', calc: u => u.False      ? 0 : (u.CtgCB||0) },
     { id: 'ctg_CD',  label: 'Painting 1st Coat CTG',       type: 'ctg', calc: u => u.Paint1Date ? 0 : (u.CtgCD||0) },
