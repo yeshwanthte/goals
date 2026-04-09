@@ -2948,172 +2948,166 @@
     .villa-unit.stage-7 { background: #A9D08E; color: #000; border-color: #87A672; }
     .villa-unit.stage-8 { background: #446A2C; color: #fff; border-color: #2a4119; }
 
-    /* ===== UNIT DETAIL POPUP ===== */
-    /* ================================================================
-       REPORT-STYLE UNIT DETAIL MODAL  — v2
-       ================================================================ */
+    /* =====================================================================
+       UNIT DETAIL MODAL  — v3  (Premium Glassmorphism, Vertical Stack)
+       ===================================================================== */
+
     :root {
-      --report-accent: #C65911;          /* overridden dynamically per project */
-      --report-accent-light: rgba(198,89,17,0.08);
-      --report-font-display: 'DM Serif Display', Georgia, serif;
-      --report-font-body: 'DM Sans', 'Inter', sans-serif;
+      --rpt-accent:       #C65911;
+      --rpt-accent-rgb:   198,89,17;
+      --rpt-radius:       14px;
+      --rpt-font-display: 'DM Serif Display', Georgia, serif;
+      --rpt-font-body:    'DM Sans', 'Inter', sans-serif;
     }
 
     /* ── Overlay ── */
     .unit-detail-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(10, 15, 25, 0.72);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      background: rgba(8, 12, 22, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       z-index: 9999;
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 1rem;
+      padding: 1.25rem;
       overflow-y: auto;
     }
     .unit-detail-overlay.visible {
       display: flex;
-      animation: rptOverlayIn 0.25s ease both;
+      animation: rptOverlayIn 0.22s ease both;
     }
-    @keyframes rptOverlayIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
+    @keyframes rptOverlayIn { from{opacity:0} to{opacity:1} }
 
     /* ── Modal shell ── */
     .unit-detail-card {
-      background: #fff;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
       width: 100%;
-      max-width: 1020px;
-      min-width: 320px;
-      border-radius: 4px;
+      max-width: 740px;
+      min-width: 300px;
+      border-radius: var(--rpt-radius);
+      border: 1px solid rgba(255,255,255,0.55);
       box-shadow:
-        0 2px 4px rgba(0,0,0,0.04),
-        0 8px 24px rgba(0,0,0,0.10),
-        0 32px 64px rgba(0,0,0,0.18);
+        0 0 0 1px rgba(0,0,0,0.04),
+        0 4px 16px rgba(0,0,0,0.08),
+        0 20px 48px rgba(0,0,0,0.14),
+        0 48px 96px rgba(0,0,0,0.10);
       display: flex;
       flex-direction: column;
-      max-height: 92vh;
-      font-family: var(--report-font-body);
-      animation: rptCardIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
-      position: relative;
+      max-height: 90vh;
+      font-family: var(--rpt-font-body);
+      animation: rptCardIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+      overflow: hidden;
     }
     @keyframes rptCardIn {
-      from { opacity: 0; transform: translateY(24px) scale(0.98); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
+      from { opacity:0; transform: translateY(20px) scale(0.97); }
+      to   { opacity:1; transform: translateY(0)    scale(1);    }
     }
 
-    /* ── Sticky Report Header ── */
+    /* ── Header ── */
     .rpt-header {
-      background: var(--report-accent);   /* set dynamically */
-      color: #fff;
-      padding: 0;
-      border-radius: 4px 4px 0 0;
-      position: sticky;
-      top: 0;
-      z-index: 10;
       flex-shrink: 0;
+      border-radius: var(--rpt-radius) var(--rpt-radius) 0 0;
+      overflow: hidden;
     }
-    .rpt-header-inner {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: start;
-      gap: 1.5rem;
-      padding: 1.75rem 2rem 0;
+    .rpt-header-main {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.5rem 1.75rem 1.25rem;
     }
+    .rpt-header-left { flex: 1; min-width: 0; }
     .rpt-project-label {
-      font-family: var(--report-font-body);
-      font-size: 0.6875rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      opacity: 0.72;
-      margin-bottom: 0.5rem;
+      opacity: 0.65;
+      margin-bottom: 0.4rem;
+      color: #fff;
     }
     .rpt-unit-no {
-      font-family: var(--report-font-display);
-      font-size: 2.25rem;
-      line-height: 1;
+      font-family: var(--rpt-font-display);
+      font-size: 1.9rem;
       font-weight: 400;
-      letter-spacing: -0.02em;
-      margin-bottom: 0.35rem;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.3rem;
+      color: #fff;
     }
     .rpt-customer {
-      font-size: 0.9375rem;
+      font-size: 0.875rem;
       font-weight: 400;
-      opacity: 0.88;
+      opacity: 0.85;
+      color: #fff;
     }
-    .rpt-header-right {
+    .rpt-header-actions {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 0.65rem;
-    }
-    .rpt-close-btn {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.28);
-      color: #fff;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 0.8rem;
-      transition: background 0.18s, transform 0.18s;
+      gap: 0.5rem;
       flex-shrink: 0;
     }
+    .rpt-close-btn {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #fff;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: background 0.15s, transform 0.18s;
+    }
     .rpt-close-btn:hover {
-      background: rgba(255,255,255,0.28);
-      transform: scale(1.1);
+      background: rgba(255,255,255,0.32);
+      transform: scale(1.12) rotate(90deg);
     }
     .rpt-status-badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.3rem 0.875rem;
-      border-radius: 2px;
-      font-size: 0.72rem;
+      gap: 0.35rem;
+      padding: 0.28rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.65rem;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      border: 1.5px solid rgba(255,255,255,0.4);
-      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.16);
       color: #fff;
       white-space: nowrap;
     }
-    .rpt-status-badge .rpt-status-dot {
-      width: 6px;
-      height: 6px;
+    .rpt-status-dot {
+      width: 5px; height: 5px;
       border-radius: 50%;
       background: #fff;
+      animation: rptDotPulse 2s ease-in-out infinite;
     }
+    @keyframes rptDotPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
 
-    /* Header meta strip (logo + generated date) */
-    .rpt-header-meta {
+    /* Header bottom strip */
+    .rpt-header-strip {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.75rem 2rem;
-      margin-top: 1rem;
-      border-top: 1px solid rgba(255,255,255,0.2);
-      background: rgba(0,0,0,0.12);
-      font-size: 0.72rem;
-      opacity: 0.85;
+      padding: 0.55rem 1.75rem;
+      background: rgba(0,0,0,0.16);
+      border-top: 1px solid rgba(255,255,255,0.15);
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.72);
+      letter-spacing: 0.03em;
     }
     .rpt-header-logo {
-      height: 28px;
-      max-width: 120px;
+      height: 22px; max-width: 90px;
       object-fit: contain;
-      background: rgba(255,255,255,0.92);
-      padding: 3px 10px;
-      border-radius: 2px;
-    }
-    .rpt-generated-label {
-      letter-spacing: 0.04em;
+      background: rgba(255,255,255,0.9);
+      padding: 2px 7px;
+      border-radius: 3px;
     }
 
     /* ── Scrollable body ── */
@@ -3121,362 +3115,246 @@
       overflow-y: auto;
       overflow-x: hidden;
       flex: 1;
-      padding: 0;
     }
+    .rpt-body::-webkit-scrollbar { width: 4px; }
+    .rpt-body::-webkit-scrollbar-track { background: transparent; }
+    .rpt-body::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
 
-    /* ── Two-column report grid ── */
-    .rpt-grid-2col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-    }
-    @media (max-width: 720px) {
-      .rpt-grid-2col { grid-template-columns: 1fr; }
-    }
-
-    /* ── Section wrapper ── */
+    /* ── Section ── */
     .rpt-section {
-      padding: 1.75rem 2rem;
-      border-bottom: 1px solid #e8eaed;
+      padding: 1.4rem 1.75rem;
+      border-bottom: 1px solid #f0f2f5;
     }
-    .rpt-section:last-child {
-      border-bottom: none;
-    }
-    .rpt-section.rpt-section-right {
-      border-left: 1px solid #e8eaed;
-    }
-    @media (max-width: 720px) {
-      .rpt-section.rpt-section-right { border-left: none; }
-    }
+    .rpt-section:last-child { border-bottom: none; }
 
-    /* ── Section heading ── */
     .rpt-section-heading {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
-      margin-bottom: 1.25rem;
+      gap: 0.5rem;
+      margin-bottom: 0.9rem;
     }
     .rpt-section-heading-bar {
-      width: 3px;
-      height: 1.1em;
+      width: 3px; height: 14px;
       border-radius: 2px;
-      background: var(--report-accent);
+      background: var(--rpt-accent);
       flex-shrink: 0;
     }
     .rpt-section-heading h4 {
-      font-family: var(--report-font-body);
-      font-size: 0.6875rem;
+      font-size: 0.635rem;
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: #374151;
       margin: 0;
+      font-family: var(--rpt-font-body);
     }
     .rpt-section-heading i {
-      font-size: 0.85rem;
-      color: var(--report-accent);
+      font-size: 0.8rem;
+      color: var(--rpt-accent);
     }
 
-    /* ── Label-value rows (no tiles) ── */
-    .rpt-field-rows {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
+    /* ── §1 Unit Details — 2-col pairs ── */
+    .rpt-unit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 2.5rem;
     }
+    @media (max-width: 500px) { .rpt-unit-grid { grid-template-columns: 1fr; } }
+
     .rpt-field-row {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
-      gap: 1rem;
-      padding: 0.55rem 0;
-      border-bottom: 1px dashed #eef0f2;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.48rem 0;
+      border-bottom: 1px solid #f3f4f6;
     }
-    .rpt-field-row:last-child {
-      border-bottom: none;
-    }
+    .rpt-field-row:last-child { border-bottom: none; }
     .rpt-field-label {
-      font-size: 0.76rem;
+      font-size: 0.72rem;
       color: #6b7280;
       font-weight: 500;
-      white-space: nowrap;
       flex-shrink: 0;
-      min-width: 120px;
     }
     .rpt-field-value {
-      font-size: 0.875rem;
+      font-size: 0.8rem;
       font-weight: 600;
       color: #111827;
       text-align: right;
     }
 
-    /* ── Financial rows: right-aligned amounts ── */
-    .rpt-fin-rows {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
+    /* ── §2 Financial Details — table ── */
+    .rpt-fin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
     }
-    .rpt-fin-row {
+    .rpt-fin-table tbody tr { border-bottom: 1px solid #f3f4f6; }
+    .rpt-fin-table tbody tr:last-child { border-bottom: none; }
+    .rpt-fin-table tbody tr:nth-child(even) td { background: #fafafa; }
+    .rpt-fin-table td {
+      padding: 0.55rem 0.4rem;
+      vertical-align: middle;
+    }
+    .rpt-fin-table td:first-child { color: #4b5563; font-weight: 500; padding-left: 0; }
+    .rpt-fin-table td:last-child  { text-align: right; font-weight: 700; padding-right: 0; font-variant-numeric: tabular-nums; }
+    .rpt-fin-total td { background: rgba(var(--rpt-accent-rgb),0.07) !important; }
+    .rpt-fin-total td:first-child { font-weight: 700; color: #1f2937; }
+    .rpt-fin-balance td { border-top: 2px solid #e5e7eb !important; }
+    .rpt-fin-balance td:last-child { font-size: 0.86rem; }
+    .col-positive { color: #059669 !important; }
+    .col-negative { color: #dc2626 !important; }
+    .col-accent   { color: var(--rpt-accent) !important; }
+
+    /* ── §3 Handover Schedule ── */
+    .rpt-dates-list { display: flex; flex-direction: column; }
+    .rpt-date-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.6rem 0.75rem;
-      border-radius: 2px;
+      padding: 0.52rem 0.75rem;
+      border-radius: 5px;
     }
-    .rpt-fin-row:nth-child(odd) {
-      background: #f9fafb;
-    }
-    .rpt-fin-row.rpt-fin-total {
-      background: rgba(var(--report-accent-rgb, 198,89,17), 0.07);
-      border-top: 1.5px solid rgba(var(--report-accent-rgb, 198,89,17), 0.25);
-      margin-top: 0.25rem;
-    }
-    .rpt-fin-row.rpt-fin-balance {
-      border-top: 1.5px solid #e5e7eb;
-      font-weight: 700;
-      margin-top: 0.1rem;
-    }
-    .rpt-fin-label {
-      font-size: 0.775rem;
-      color: #4b5563;
-      font-weight: 500;
-    }
-    .rpt-fin-value {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #111827;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.01em;
-    }
-    .rpt-fin-value.positive { color: #059669; }
-    .rpt-fin-value.negative { color: #dc2626; }
-    .rpt-fin-value.accent   { color: var(--report-accent); }
+    .rpt-date-row:nth-child(odd) { background: #f9fafb; }
+    .rpt-date-row-label { font-size: 0.75rem; color: #4b5563; font-weight: 500; }
+    .rpt-date-row-value { font-size: 0.8rem; font-weight: 600; color: #111827; font-variant-numeric: tabular-nums; }
+    .rpt-date-row-value.na { color: #9ca3af; font-weight: 400; font-style: italic; }
+    .rpt-date-revised .rpt-date-row-label { color: var(--rpt-accent); font-weight: 700; }
+    .rpt-date-revised .rpt-date-row-value { color: var(--rpt-accent); font-weight: 700; }
 
-    /* ── Dates section — 2×2 grid ── */
-    .rpt-dates-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
+    /* ── §4 Construction Activities — proper table ── */
+    .rpt-act-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
     }
-    @media (max-width: 480px) {
-      .rpt-dates-grid { grid-template-columns: 1fr; }
-    }
-    .rpt-date-cell {
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-      border-radius: 3px;
-      padding: 0.75rem 1rem;
-    }
-    .rpt-date-cell-label {
-      font-size: 0.65rem;
+    .rpt-act-table thead tr { border-bottom: 2px solid #e5e7eb; }
+    .rpt-act-table thead th {
+      padding: 0 0.5rem 0.55rem;
+      font-size: 0.6rem;
       font-weight: 700;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.09em;
       text-transform: uppercase;
       color: #9ca3af;
-      margin-bottom: 0.3rem;
+      text-align: left;
     }
-    .rpt-date-cell-value {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #111827;
-      font-variant-numeric: tabular-nums;
+    .rpt-act-table thead th.col-r { text-align: right; }
+    .rpt-act-table tbody tr { border-bottom: 1px solid #f3f4f6; transition: background 0.1s; }
+    .rpt-act-table tbody tr:hover { background: #fafafa; }
+    .rpt-act-table tbody tr:last-child { border-bottom: none; }
+    .rpt-act-table tbody td {
+      padding: 0.6rem 0.5rem;
+      vertical-align: middle;
     }
+    .rpt-act-table tbody td:first-child { padding-left: 0; }
+    .rpt-act-table tbody td:last-child  { padding-right: 0; text-align: right; }
 
-    /* ── Activities — checklist style ── */
-    .rpt-activity-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5rem 1.5rem;
-    }
-    @media (max-width: 560px) {
-      .rpt-activity-grid { grid-template-columns: 1fr; }
-    }
-    .rpt-activity-item {
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-      padding: 0.55rem 0;
-      border-bottom: 1px dashed #eef0f2;
-    }
-    .rpt-activity-item:last-child { border-bottom: none; }
-    .rpt-activity-check {
-      width: 20px;
-      height: 20px;
+    .rpt-act-name { display: flex; align-items: center; gap: 0.5rem; }
+    .rpt-act-icon {
+      width: 20px; height: 20px;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.6rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.55rem;
       flex-shrink: 0;
     }
-    .rpt-activity-check.done {
-      background: #d1fae5;
-      color: #059669;
-    }
-    .rpt-activity-check.pending {
-      background: #f3f4f6;
-      color: #9ca3af;
-      border: 1.5px dashed #d1d5db;
-    }
-    .rpt-activity-body { flex: 1; min-width: 0; }
-    .rpt-activity-name {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #374151;
-    }
-    .rpt-activity-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.35rem;
-      margin-top: 0.2rem;
-    }
-    .rpt-activity-tag {
-      font-size: 0.65rem;
-      font-weight: 600;
-      padding: 1px 7px;
+    .rpt-act-icon.done    { background: #d1fae5; color: #059669; }
+    .rpt-act-icon.pending { background: #f3f4f6; color: #9ca3af; border: 1.5px dashed #d1d5db; }
+    .rpt-act-label { font-weight: 600; color: #1f2937; font-size: 0.8rem; }
+
+    .rpt-act-status {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.2rem 0.6rem;
       border-radius: 50px;
+      font-size: 0.64rem; font-weight: 700; white-space: nowrap;
     }
-    .rpt-activity-tag.date-tag {
-      background: #FCE7DC;
-      color: #C65911;
-    }
-    .rpt-activity-tag.amt-tag {
-      background: #d1fae5;
-      color: #059669;
-    }
-    .rpt-activity-status-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-    .rpt-activity-status-label.done    { color: #059669; }
-    .rpt-activity-status-label.pending { color: #9ca3af; }
+    .rpt-act-status.done    { background: #d1fae5; color: #059669; }
+    .rpt-act-status.pending { background: #f3f4f6; color: #6b7280; }
+
+    .rpt-act-date { font-size: 0.74rem; color: #9ca3af; white-space: nowrap; }
+    .rpt-act-date.has-date { color: var(--rpt-accent); font-weight: 600; }
+    .rpt-act-date.na { color: #d1d5db; }
+
+    .rpt-act-rev { font-variant-numeric: tabular-nums; font-weight: 600; color: #059669; font-size: 0.78rem; white-space: nowrap; }
+    .rpt-act-rev.no-rev { color: #d1d5db; font-weight: 400; }
 
     /* ── OC Badge ── */
     .rpt-oc-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      padding: 0.25rem 0.65rem;
-      border-radius: 50px;
-      font-size: 0.72rem;
-      font-weight: 700;
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.18rem 0.6rem; border-radius: 50px;
+      font-size: 0.66rem; font-weight: 700;
     }
     .rpt-oc-badge.completed { background: #d1fae5; color: #059669; }
     .rpt-oc-badge.pending   { background: #fef3c7; color: #d97706; }
 
     /* ── Footer ── */
     .rpt-footer {
-      padding: 1rem 2rem;
-      background: #f9fafb;
-      border-top: 1px solid #e5e7eb;
-      display: flex;
-      align-items: center;
+      padding: 0.875rem 1.75rem;
+      background: rgba(249,250,251,0.96);
+      border-top: 1px solid #eaecef;
+      display: flex; align-items: center;
       justify-content: space-between;
-      gap: 1rem;
-      border-radius: 0 0 4px 4px;
-      flex-shrink: 0;
+      gap: 1rem; flex-shrink: 0;
+      border-radius: 0 0 var(--rpt-radius) var(--rpt-radius);
     }
-    .rpt-footer-note {
-      font-size: 0.72rem;
-      color: #9ca3af;
-    }
-    .rpt-footer-actions {
-      display: flex;
-      gap: 0.65rem;
-    }
+    .rpt-footer-note { font-size: 0.67rem; color: #9ca3af; }
+    .rpt-footer-actions { display: flex; gap: 0.6rem; }
+
     .rpt-btn {
-      padding: 0.55rem 1.25rem;
-      border-radius: 3px;
-      font-size: 0.8125rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.18s ease;
-      border: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
-      font-family: var(--report-font-body);
+      padding: 0.5rem 1.1rem;
+      border-radius: 8px; font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; transition: all 0.15s; border: none;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: var(--rpt-font-body);
     }
     .rpt-btn-ghost {
-      background: #fff;
-      color: #374151;
-      border: 1.5px solid #d1d5db;
+      background: #fff; color: #4b5563;
+      border: 1.5px solid #e5e7eb;
     }
-    .rpt-btn-ghost:hover {
-      background: #f3f4f6;
-      border-color: #9ca3af;
-    }
+    .rpt-btn-ghost:hover { background: #f9fafb; border-color: #9ca3af; }
     .rpt-btn-pdf {
-      background: var(--report-accent);
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      background: var(--rpt-accent); color: #fff;
+      box-shadow: 0 2px 8px rgba(var(--rpt-accent-rgb),0.28);
     }
-    .rpt-btn-pdf:hover {
-      filter: brightness(1.1);
-      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
-      transform: translateY(-1px);
-    }
-    .rpt-btn-pdf:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-      transform: none;
-    }
+    .rpt-btn-pdf:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(var(--rpt-accent-rgb),0.38); }
+    .rpt-btn-pdf:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-    /* ── Loading spinner for PDF export ── */
     .rpt-pdf-spinner {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
+      display: inline-block; width: 11px; height: 11px;
       border: 2px solid rgba(255,255,255,0.4);
-      border-top-color: #fff;
-      border-radius: 50%;
+      border-top-color: #fff; border-radius: 50%;
       animation: rptSpin 0.7s linear infinite;
     }
-    @keyframes rptSpin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes rptSpin { to { transform: rotate(360deg); } }
 
-    /* ── Section divider rule (full-width) ── */
-    .rpt-divider {
-      height: 1px;
-      background: #e8eaed;
-      margin: 0;
-    }
-
-    /* ─── Backward compat stubs (kept so nothing breaks) ─── */
-    .unit-detail-logo { display: none; }
+    /* ── Backward-compat stubs ── */
+    .unit-detail-logo    { display: none; }
+    .unit-detail-header  { display: none !important; }
+    .unit-detail-section { display: none !important; }
+    .unit-detail-footer  { display: none !important; }
+    .unit-detail-body    { display: none !important; }
 
     /* ── Responsive ── */
-    @media (max-width: 600px) {
-      .rpt-header-inner { grid-template-columns: 1fr; gap: 0.75rem; }
-      .rpt-unit-no { font-size: 1.6rem; }
-      .rpt-section { padding: 1.25rem 1.1rem; }
+    @media (max-width: 560px) {
+      .unit-detail-card { max-width: 100%; border-radius: 10px; }
+      .rpt-section { padding: 1.1rem; }
+      .rpt-unit-no { font-size: 1.5rem; }
       .rpt-footer { flex-direction: column; align-items: flex-end; }
-      .unit-detail-card { border-radius: 0; max-height: 100vh; }
+      .rpt-act-table thead th.col-date,
+      .rpt-act-table tbody td.col-date { display: none; }
     }
 
-    /* ── Keep old overlay animation name alive ── */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to   { opacity: 1; transform: translateY(0); }
+    /* PDF capture mode */
+    .rpt-pdf-mode, .rpt-pdf-mode .rpt-body {
+      max-height: none !important;
+      overflow: visible !important;
     }
 
-    /* Stubs to avoid JS errors if old class refs remain */
-    .unit-detail-header { display: none !important; }
-    .unit-detail-section { display: none !important; }
-    .unit-detail-footer { display: none !important; }
-    .unit-detail-body { display: none !important; }
+    /* Keep legacy animation names */
+    @keyframes fadeIn  { from{opacity:0}to{opacity:1} }
+    @keyframes slideUp { from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)} }
 
-    /* ── Print / PDF capture helpers ── */
-    .rpt-pdf-capture {
-      font-family: var(--report-font-body) !important;
-    }
 
-    /* ===== SEARCH FUNCTIONALITY ===== */
+        /* ===== SEARCH FUNCTIONALITY ===== */
     .search-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -5251,24 +5129,22 @@
   </div>
 
 
-<!-- ═══════════════════════════════════════════════════════════════
-     UNIT DETAIL REPORT MODAL  — redesigned v2
-     ═══════════════════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════════════════════
+     UNIT DETAIL MODAL  — v3  Premium Glassmorphism
+     ══════════════════════════════════════════════════════════ -->
 <div class="unit-detail-overlay" id="unitDetailOverlay">
   <div class="unit-detail-card" id="unitDetailCard">
 
-    <!-- ── Sticky Report Header ── -->
+    <!-- ── Header ── -->
     <div class="rpt-header" id="rptHeader">
-      <div class="rpt-header-inner">
-        <!-- Left: identity -->
+      <div class="rpt-header-main">
         <div class="rpt-header-left">
           <div class="rpt-project-label" id="rptProjectLabel"></div>
           <div class="rpt-unit-no"       id="rptUnitNo"></div>
           <div class="rpt-customer"      id="rptCustomer"></div>
         </div>
-        <!-- Right: close + status -->
-        <div class="rpt-header-right">
-          <button class="rpt-close-btn" onclick="closeUnitDetail()" title="Close">
+        <div class="rpt-header-actions">
+          <button class="rpt-close-btn" onclick="closeUnitDetail()" title="Close (Esc)">
             <i class="bi bi-x-lg"></i>
           </button>
           <span class="rpt-status-badge" id="rptStatusBadge">
@@ -5277,68 +5153,67 @@
           </span>
         </div>
       </div>
-      <!-- Meta strip: logo + timestamp -->
-      <div class="rpt-header-meta">
+      <div class="rpt-header-strip">
         <img class="rpt-header-logo" id="rptHeaderLogo"
-             src="https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg"
-             alt="Logo" onerror="this.style.display='none'">
-        <span class="rpt-generated-label" id="rptGeneratedLabel"></span>
+             src="" alt="Logo" onerror="this.style.display='none'">
+        <span id="rptGeneratedLabel"></span>
       </div>
     </div>
 
     <!-- ── Scrollable Body ── -->
     <div class="rpt-body" id="rptBody">
 
-      <!-- Top row: Unit Details (left) + Financial Details (right) -->
-      <div class="rpt-grid-2col">
-
-        <!-- § Unit Details -->
-        <div class="rpt-section">
-          <div class="rpt-section-heading">
-            <div class="rpt-section-heading-bar"></div>
-            <h4><i class="bi bi-house-door"></i>&nbsp; Unit Details</h4>
-          </div>
-          <div class="rpt-field-rows" id="rptUnitDetailsRows"></div>
-        </div>
-
-        <!-- § Financial Details -->
-        <div class="rpt-section rpt-section-right" id="rptFinancialSection">
-          <div class="rpt-section-heading">
-            <div class="rpt-section-heading-bar"></div>
-            <h4><i class="bi bi-currency-rupee"></i>&nbsp; Financial Details</h4>
-          </div>
-          <div class="rpt-fin-rows" id="rptFinancialRows"></div>
-        </div>
-
-      </div><!-- /grid-2col -->
-
-      <div class="rpt-divider"></div>
-
-      <!-- § Handover Schedule -->
-      <div class="rpt-section" id="rptDatesSection">
-        <div class="rpt-section-heading">
-          <div class="rpt-section-heading-bar"></div>
-          <h4><i class="bi bi-calendar3"></i>&nbsp; Handover Schedule</h4>
-        </div>
-        <div class="rpt-dates-grid" id="rptDatesGrid"></div>
-      </div>
-
-      <div class="rpt-divider"></div>
-
-      <!-- § Construction Activities -->
+      <!-- §1 Unit Details -->
       <div class="rpt-section">
         <div class="rpt-section-heading">
           <div class="rpt-section-heading-bar"></div>
-          <h4><i class="bi bi-tools"></i>&nbsp; Construction Activities</h4>
+          <h4><i class="bi bi-house-door"></i>&nbsp;Unit Details</h4>
         </div>
-        <div class="rpt-activity-grid" id="rptActivityGrid"></div>
+        <div class="rpt-unit-grid" id="rptUnitDetailsRows"></div>
+      </div>
+
+      <!-- §2 Financial Details -->
+      <div class="rpt-section">
+        <div class="rpt-section-heading">
+          <div class="rpt-section-heading-bar"></div>
+          <h4><i class="bi bi-currency-rupee"></i>&nbsp;Financial Details</h4>
+        </div>
+        <table class="rpt-fin-table" id="rptFinancialRows"></table>
+      </div>
+
+      <!-- §3 Handover Schedule -->
+      <div class="rpt-section">
+        <div class="rpt-section-heading">
+          <div class="rpt-section-heading-bar"></div>
+          <h4><i class="bi bi-calendar3"></i>&nbsp;Handover Schedule</h4>
+        </div>
+        <div class="rpt-dates-list" id="rptDatesGrid"></div>
+      </div>
+
+      <!-- §4 Construction Activities -->
+      <div class="rpt-section">
+        <div class="rpt-section-heading">
+          <div class="rpt-section-heading-bar"></div>
+          <h4><i class="bi bi-tools"></i>&nbsp;Construction Activities</h4>
+        </div>
+        <table class="rpt-act-table">
+          <thead>
+            <tr>
+              <th>Activity</th>
+              <th>Status</th>
+              <th class="col-date">Planned / Projected Date</th>
+              <th class="col-r">Revenue</th>
+            </tr>
+          </thead>
+          <tbody id="rptActivityGrid"></tbody>
+        </table>
       </div>
 
     </div><!-- /rpt-body -->
 
     <!-- ── Footer ── -->
     <div class="rpt-footer">
-      <span class="rpt-footer-note" id="rptFooterNote">Confidential — Internal Use Only</span>
+      <span class="rpt-footer-note" id="rptFooterNote">Confidential &mdash; Internal Use Only</span>
       <div class="rpt-footer-actions">
         <button class="rpt-btn rpt-btn-ghost" onclick="closeUnitDetail()">
           <i class="bi bi-x"></i> Close
@@ -8929,178 +8804,196 @@
     return 'linear-gradient(135deg, #1e293b 0%, #334155 100%)';
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  //  REPORT MODAL — showUnitDetail / closeUnitDetail / PDF export
-  // ═══════════════════════════════════════════════════════════════
+  // ══════════════════════════════════════════════════════════════
+  //  UNIT DETAIL MODAL  v3 — showUnitDetail / close / PDF
+  // ══════════════════════════════════════════════════════════════
 
   function showUnitDetail(unit) {
     currentUnitData = unit;
 
-    // ── 1. Determine project colour ──────────────────────────────
-    const gradient = getProjectHeaderGradient(selectedProjectTower);
-    // Extract the "mid" hex so we can tint CSS vars too
+    // ── Theming ──────────────────────────────────────────────────
     const projKey = Object.keys(PROJECT_COLOURS).find(k =>
       (selectedProjectTower || '').toUpperCase().includes(k.split(' ')[0])
     );
-    const midHex  = projKey ? PROJECT_COLOURS[projKey].mid  : '#C65911';
-    const fromHex = projKey ? PROJECT_COLOURS[projKey].from : '#833C0C';
+    const midHex = projKey ? PROJECT_COLOURS[projKey].mid  : '#C65911';
+    const gradient = getProjectHeaderGradient(selectedProjectTower);
 
-    // Set CSS variable so accent bar, badges, buttons, etc. pick it up
     const card = document.getElementById('unitDetailCard');
-    card.style.setProperty('--report-accent', midHex);
-    // rgb decomposition for rgba usage
-    const rgb = _hexToRgbStr(midHex);
-    card.style.setProperty('--report-accent-rgb', rgb);
+    card.style.setProperty('--rpt-accent',     midHex);
+    card.style.setProperty('--rpt-accent-rgb', _hexToRgbStr(midHex));
+    // legacy vars used by rpt-header-bar, buttons, etc.
+    card.style.setProperty('--report-accent',  midHex);
 
-    // ── 2. Header background ─────────────────────────────────────
-    const hdr = document.getElementById('rptHeader');
-    hdr.style.background = gradient;
-
-    // ── 3. Header text ───────────────────────────────────────────
+    // ── Header ───────────────────────────────────────────────────
+    document.getElementById('rptHeader').style.background = gradient;
     document.getElementById('rptProjectLabel').textContent = selectedProjectTower || '';
-    document.getElementById('rptUnitNo').textContent = 'Unit\u00a0' + unit.UnitNo;
-    document.getElementById('rptCustomer').textContent  = unit.Customer || 'N/A';
+    document.getElementById('rptUnitNo').textContent       = 'Unit\u00a0' + unit.UnitNo;
+    document.getElementById('rptCustomer').textContent     = unit.Customer || 'N/A';
 
-    // ── 4. Status badge (derive from handover readiness) ─────────
-    const isHandover = !!unit.Hand;
-    const statusText = isHandover ? 'Ready for Handover' : 'In Progress';
-    document.getElementById('rptStatusText').textContent = statusText;
+    // Status badge
+    const allActivities = [unit.GFC, unit.Plaster, unit.Floor, unit.HVAC,
+                           unit.False, unit.Fenest, unit.Hand];
+    const doneCount = allActivities.filter(Boolean).length;
+    let statusTxt, statusClass;
+    if (unit.Hand)         { statusTxt = 'Handover Done';   }
+    else if (doneCount > 4){ statusTxt = 'Near Completion'; }
+    else if (doneCount > 0){ statusTxt = 'In Progress';     }
+    else                   { statusTxt = 'Not Started';     }
+    document.getElementById('rptStatusText').textContent = statusTxt;
 
-    // ── 5. Logo ──────────────────────────────────────────────────
-    const srcLogo = document.querySelector('#unitDetailCard .rpt-header-logo');
+    // Logo
     try {
-      const domLogo = document.querySelector('.unit-detail-logo') ||
-                      document.querySelector('img[alt="Logo"]');
-      if (domLogo && domLogo.src) srcLogo.src = domLogo.src;
-    } catch(e) { /* ignore */ }
+      const logo = document.querySelector('.rpt-header-logo');
+      if (logo) {
+        const src = document.querySelector('.logo-section img');
+        if (src && src.src) logo.src = src.src; else logo.style.display = 'none';
+      }
+    } catch(e) {}
 
-    // ── 6. Generated timestamp ───────────────────────────────────
-    const now = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+    // Timestamp
+    const now = new Date().toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' });
     document.getElementById('rptGeneratedLabel').textContent = 'Generated: ' + now;
 
-    // ── 7. SECTION 1: Unit Details (label–value rows) ────────────
-    const parsed   = parseUnitNumber(unit.UnitNo);
-    const udFields = [];
+    // ── §1 Unit Details ──────────────────────────────────────────
+    const parsed = parseUnitNumber(unit.UnitNo);
+    const udRows = [];
 
     if (unit.Phase && unit.Phase !== '0')
-      udFields.push(['Phase', unit.Phase]);
+      udRows.push(['Phase', unit.Phase]);
     if (parsed && parsed.tower !== 0)
-      udFields.push(['Tower', String(parsed.tower)]);
+      udRows.push(['Tower', String(parsed.tower)]);
     if (unit.Inventory && unit.Inventory !== 'N/A')
-      udFields.push(['Inventory', unit.Inventory]);
+      udRows.push(['Inventory', unit.Inventory]);
     if (unit.SaleableArea && unit.SaleableArea !== 'N/A')
-      udFields.push(['Saleable Area', unit.SaleableArea + '\u00a0sq.ft.']);
+      udRows.push(['Saleable Area', unit.SaleableArea + '\u00a0sq.ft.']);
     if (unit.Specification && unit.Specification !== 'N/A')
-      udFields.push(['Specification', unit.Specification]);
+      udRows.push(['Specification', unit.Specification]);
     if (unit.ProductType && unit.ProductType !== 'N/A')
-      udFields.push(['Product Type', unit.ProductType]);
-
-    let ocBadge = '';
+      udRows.push(['Product Type', unit.ProductType]);
     if (unit.OC && unit.OC !== 'N/A') {
-      const ocDone = /completed|yes/i.test(unit.OC);
-      ocBadge = `<span class="rpt-oc-badge ${ocDone ? 'completed' : 'pending'}">
-        <i class="bi bi-${ocDone ? 'check-circle-fill' : 'clock'}"></i>
-        ${ocDone ? 'Completed' : unit.OC}
-      </span>`;
-      udFields.push(['OC Status', ocBadge]);
+      const done = /completed|yes/i.test(unit.OC);
+      udRows.push(['OC Status', `<span class="rpt-oc-badge ${done?'completed':'pending'}">
+        <i class="bi bi-${done?'check-circle-fill':'clock'}"></i>
+        ${done ? 'Completed' : unit.OC}</span>`]);
     }
 
     document.getElementById('rptUnitDetailsRows').innerHTML =
-      udFields.map(([lbl, val]) => `
-        <div class="rpt-field-row">
-          <span class="rpt-field-label">${lbl}</span>
-          <span class="rpt-field-value">${val}</span>
-        </div>`).join('') || '<div class="rpt-field-row"><span class="rpt-field-label" style="color:#9ca3af">No data</span></div>';
+      (udRows.length ? udRows : [['—','No unit data available']]).map(([l,v]) =>
+        `<div class="rpt-field-row">
+          <span class="rpt-field-label">${l}</span>
+          <span class="rpt-field-value">${v}</span>
+        </div>`
+      ).join('');
 
-    // ── 8. SECTION 2: Financial Details ──────────────────────────
-    function fmtCr(v) {
-      if (!v || v === 0) return '<span style="color:#9ca3af">—</span>';
-      return '\u20b9\u00a0' + (v / 1e7).toFixed(2) + '\u00a0Cr';
-    }
-    const agr  = unit.AgreementValue || 0;
-    const intr = unit.InteriorValue  || 0;
-    const totR = agr + intr;
-    const recvd = unit.TotalReceived || 0;
+    // ── §2 Financial Details ─────────────────────────────────────
+    const _cr = v => (!v || v===0)
+      ? '<span style="color:#d1d5db">—</span>'
+      : '\u20b9\u00a0' + (v/1e7).toFixed(2) + '\u00a0Cr';
+    const agr   = unit.AgreementValue || 0;
+    const intr  = unit.InteriorValue  || 0;
+    const totR  = agr + intr;
+    const recvd = unit.TotalReceived  || 0;
     const bal   = totR - recvd;
 
     document.getElementById('rptFinancialRows').innerHTML = `
-      <div class="rpt-fin-row">
-        <span class="rpt-fin-label">Agreement Value</span>
-        <span class="rpt-fin-value">${fmtCr(agr)}</span>
-      </div>
-      <div class="rpt-fin-row">
-        <span class="rpt-fin-label">Interior Design Value</span>
-        <span class="rpt-fin-value">${fmtCr(intr)}</span>
-      </div>
-      <div class="rpt-fin-row rpt-fin-total">
-        <span class="rpt-fin-label"><strong>Total Receivables</strong></span>
-        <span class="rpt-fin-value accent">${fmtCr(totR)}</span>
-      </div>
-      <div class="rpt-fin-row">
-        <span class="rpt-fin-label">Total Received</span>
-        <span class="rpt-fin-value positive">${fmtCr(recvd)}</span>
-      </div>
-      <div class="rpt-fin-row rpt-fin-balance">
-        <span class="rpt-fin-label">Balance Receivables</span>
-        <span class="rpt-fin-value ${bal > 0 ? 'negative' : 'positive'}">${fmtCr(bal)}</span>
-      </div>`;
+      <tbody>
+        <tr>
+          <td>Agreement Value</td>
+          <td>${_cr(agr)}</td>
+        </tr>
+        <tr>
+          <td>Interior Design Value</td>
+          <td>${_cr(intr)}</td>
+        </tr>
+        <tr class="rpt-fin-total">
+          <td><strong>Total Receivables</strong></td>
+          <td class="col-accent">${_cr(totR)}</td>
+        </tr>
+        <tr>
+          <td>Total Received</td>
+          <td class="col-positive">${_cr(recvd)}</td>
+        </tr>
+        <tr class="rpt-fin-balance">
+          <td><strong>Balance Receivables</strong></td>
+          <td class="${bal>0?'col-negative':'col-positive'}">${_cr(bal)}</td>
+        </tr>
+      </tbody>`;
 
-    // ── 9. SECTION 3: Handover Dates ─────────────────────────────
-    const dateFields = [
-      ['AFS Date',       unit.AFSDate],
-      ['H/O per AFS',    unit.HOasPerAFS],
-      ['IDSA Date',      unit.IDSADate],
-      ['H/O per IDSA',   unit.HOasPerIDSA],
-    ];
-    document.getElementById('rptDatesGrid').innerHTML = dateFields.map(([lbl, raw]) => {
-      const pd  = parseDate(raw);
-      const val = (pd ? formatDateDDMMMYY(pd) : formatRawDate(raw)) || '<span style="color:#9ca3af">N/A</span>';
-      return `<div class="rpt-date-cell">
-        <div class="rpt-date-cell-label">${lbl}</div>
-        <div class="rpt-date-cell-value">${val}</div>
-      </div>`;
-    }).join('');
+    // ── §3 Handover Schedule  (includes Revised HO Date = Col AA = HandoverPlan) ──
+    const _fmtDate = raw => {
+      const pd = parseDate(raw);
+      const s  = pd ? formatDateDDMMMYY(pd) : formatRawDate(raw);
+      return s && s !== 'N/A' ? s : null;
+    };
 
-    // ── 10. SECTION 4: Construction Activities ───────────────────
-    const activities = [
-      { name: 'GFC Released',       completed: !!unit.GFC,    projected: null,                  amt: null },
-      { name: 'Plaster',            completed: !!unit.Plaster, projected: unit.PlasterPlan,      amt: unit.PlasterRev },
-      { name: 'Flooring & Dado',    completed: !!unit.Floor,   projected: unit.FlooringProjected,amt: unit.FloorRev },
-      { name: 'HVAC Installed',     completed: !!unit.HVAC,   projected: null,                  amt: null },
-      { name: 'False Ceiling',      completed: !!unit.False,  projected: null,                  amt: null },
-      { name: 'Fenestration',       completed: !!unit.Fenest, projected: null,                  amt: null },
-      { name: 'Ready for Handover', completed: !!unit.Hand,   projected: unit.HandoverPlan,     amt: unit.HandRev },
+    const dateRows = [
+      { label: 'AFS Date',           val: _fmtDate(unit.AFSDate),     revised: false },
+      { label: 'H/O as per AFS',     val: _fmtDate(unit.HOasPerAFS),  revised: false },
+      { label: 'IDSA Date',          val: _fmtDate(unit.IDSADate),    revised: false },
+      { label: 'H/O as per IDSA',    val: _fmtDate(unit.HOasPerIDSA), revised: false },
+      { label: 'Revised H/O Date',   val: _fmtDate(unit.HandoverPlan),revised: true  },
     ];
 
-    document.getElementById('rptActivityGrid').innerHTML = activities.map(a => {
-      const checkClass = a.completed ? 'done' : 'pending';
-      const checkIcon  = a.completed ? 'bi-check-lg' : 'bi-dash';
+    document.getElementById('rptDatesGrid').innerHTML = dateRows.map(r => `
+      <div class="rpt-date-row${r.revised ? ' rpt-date-revised' : ''}">
+        <span class="rpt-date-row-label">${r.revised ? '<i class="bi bi-calendar-check" style="margin-right:4px"></i>' : ''}${r.label}</span>
+        <span class="rpt-date-row-value${r.val ? '' : ' na'}">${r.val || 'N/A'}</span>
+      </div>`).join('');
 
-      let tags = '';
-      if (!a.completed && a.projected) {
-        const pd = parseDate(a.projected);
-        const ps = pd ? formatDateDDMMMYY(pd) : formatRawDate(a.projected);
-        if (ps && ps !== 'N/A')
-          tags += `<span class="rpt-activity-tag date-tag"><i class="bi bi-calendar-event"></i> ${ps}</span>`;
+    // ── §4 Construction Activities  (proper table) ──────────────
+    const acts = [
+      { name:'GFC Released',       done: !!unit.GFC,    planDate: null,                    amt: null         },
+      { name:'Plaster',            done: !!unit.Plaster, planDate: unit.PlasterPlan,        amt: unit.PlasterRev },
+      { name:'Flooring & Dado',    done: !!unit.Floor,   planDate: unit.FlooringProjected,  amt: unit.FloorRev   },
+      { name:'HVAC Installed',     done: !!unit.HVAC,   planDate: null,                    amt: null         },
+      { name:'False Ceiling',      done: !!unit.False,  planDate: null,                    amt: null         },
+      { name:'Fenestration',       done: !!unit.Fenest, planDate: null,                    amt: null         },
+      { name:'Ready for Handover', done: !!unit.Hand,   planDate: unit.HandoverPlan,       amt: unit.HandRev },
+    ];
+
+    document.getElementById('rptActivityGrid').innerHTML = acts.map(a => {
+      const cls     = a.done ? 'done' : 'pending';
+      const icon    = a.done ? 'bi-check-lg' : 'bi-dash';
+
+      // planned date — only show for pending items
+      let dateStr = null;
+      if (!a.done && a.planDate) {
+        const pd = parseDate(a.planDate);
+        const s  = pd ? formatDateDDMMMYY(pd) : formatRawDate(a.planDate);
+        if (s && s !== 'N/A') dateStr = s;
       }
-      if (a.amt && a.amt > 0)
-        tags += `<span class="rpt-activity-tag amt-tag">\u20b9${(a.amt/1e7).toFixed(2)}\u00a0Cr</span>`;
 
-      return `<div class="rpt-activity-item">
-        <div class="rpt-activity-check ${checkClass}"><i class="bi ${checkIcon}"></i></div>
-        <div class="rpt-activity-body">
-          <div class="rpt-activity-name">${a.name}</div>
-          ${tags ? `<div class="rpt-activity-meta">${tags}</div>` : ''}
-        </div>
-        <span class="rpt-activity-status-label ${checkClass}">${a.completed ? 'Done' : 'Pending'}</span>
-      </div>`;
+      const revStr = (a.amt && a.amt > 0)
+        ? '\u20b9\u00a0' + (a.amt/1e7).toFixed(2) + '\u00a0Cr'
+        : null;
+
+      return `<tr>
+        <td>
+          <div class="rpt-act-name">
+            <div class="rpt-act-icon ${cls}"><i class="bi ${icon}"></i></div>
+            <span class="rpt-act-label">${a.name}</span>
+          </div>
+        </td>
+        <td>
+          <span class="rpt-act-status ${cls}">
+            <i class="bi ${a.done?'bi-check-circle-fill':'bi-clock'}"></i>
+            ${a.done ? 'Completed' : 'Pending'}
+          </span>
+        </td>
+        <td class="col-date">
+          <span class="rpt-act-date ${dateStr?'has-date':'na'}">${dateStr||'—'}</span>
+        </td>
+        <td>
+          <span class="rpt-act-rev ${revStr?'':'no-rev'}">${revStr||'—'}</span>
+        </td>
+      </tr>`;
     }).join('');
 
-    // ── 11. Footer note ──────────────────────────────────────────
+    // ── Footer ───────────────────────────────────────────────────
     document.getElementById('rptFooterNote').textContent =
-      `${selectedProjectTower || 'Unit'} \u2022 Confidential \u2022 Internal Use Only`;
+      `${selectedProjectTower||'Unit'} \u2022 Confidential \u2022 Internal Use Only`;
 
-    // ── 12. Show overlay ─────────────────────────────────────────
+    // ── Open ─────────────────────────────────────────────────────
     document.getElementById('unitDetailOverlay').classList.add('visible');
     document.body.style.overflow = 'hidden';
   }
@@ -9111,131 +9004,121 @@
     currentUnitData = null;
   }
 
-  // Close on ESC
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeUnitDetail();
-  });
-  // Close on overlay click
+  // ESC to close
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeUnitDetail(); });
+  // Click outside
   document.getElementById('unitDetailOverlay').addEventListener('click', function(e) {
     if (e.target === this) closeUnitDetail();
   });
 
-  // ── Helper: hex → "r,g,b" string ────────────────────────────
+  // ── hex → "r,g,b" ────────────────────────────────────────────
   function _hexToRgbStr(hex) {
-    const r = parseInt(hex.slice(1,3),16);
-    const g = parseInt(hex.slice(3,5),16);
-    const b = parseInt(hex.slice(5,7),16);
-    return `${r},${g},${b}`;
+    return [1,3,5].map(i => parseInt(hex.slice(i,i+2),16)).join(',');
   }
 
   // ══════════════════════════════════════════════════════════════
-  //  PDF EXPORT  —  html2canvas + jsPDF  (A4, multi-page safe)
+  //  PDF EXPORT  — html2canvas → jsPDF  (A4, paginated, complete)
   // ══════════════════════════════════════════════════════════════
   async function downloadUnitDetailPDF() {
     if (!currentUnitData) return;
-
     const btn = document.getElementById('rptPdfBtn');
     if (!btn) return;
 
-    // Show loading state
     btn.disabled = true;
     btn.innerHTML = '<span class="rpt-pdf-spinner"></span> Generating…';
 
-    const reportEl = document.getElementById('unitDetailCard');
+    const card = document.getElementById('unitDetailCard');
+    const body = document.getElementById('rptBody');
 
     try {
       const { jsPDF } = window.jspdf;
 
-      // ── Temporarily style the card for capture ───────────────
-      const origMaxH  = reportEl.style.maxHeight;
-      const origOvY   = reportEl.style.overflowY;
-      const body      = document.getElementById('rptBody');
-      const origBodyOv = body ? body.style.overflowY : '';
+      // ── Expand to full height for capture ───────────────────
+      const savedCardMaxH = card.style.maxHeight;
+      const savedCardOvY  = card.style.overflowY;
+      const savedBodyOvY  = body ? body.style.overflowY : '';
+      const savedBodyMaxH = body ? body.style.maxHeight  : '';
 
-      reportEl.style.maxHeight = 'none';
-      reportEl.style.overflowY = 'visible';
-      if (body) body.style.overflowY = 'visible';
+      card.classList.add('rpt-pdf-mode');
+      card.style.maxHeight  = 'none';
+      card.style.overflowY  = 'visible';
+      if (body) { body.style.overflowY = 'visible'; body.style.maxHeight = 'none'; }
 
-      // Short paint settle
-      await new Promise(r => setTimeout(r, 80));
+      // One frame for repaint
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+      await new Promise(r => setTimeout(r, 60));
 
-      // ── Capture with html2canvas ─────────────────────────────
-      const canvas = await html2canvas(reportEl, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
+      // ── html2canvas capture ──────────────────────────────────
+      const canvas = await html2canvas(card, {
+        scale:           2,
+        useCORS:         true,
+        allowTaint:      true,
         backgroundColor: '#ffffff',
-        logging: false,
-        removeContainer: true,
+        logging:         false,
+        removeContainer: false,
+        ignoreElements:  el => el.id === 'rptPdfBtn',  // hide the button in PDF
       });
 
-      // ── Restore scroll state ─────────────────────────────────
-      reportEl.style.maxHeight = origMaxH;
-      reportEl.style.overflowY = origOvY;
-      if (body) body.style.overflowY = origBodyOv;
+      // ── Restore ──────────────────────────────────────────────
+      card.classList.remove('rpt-pdf-mode');
+      card.style.maxHeight = savedCardMaxH;
+      card.style.overflowY = savedCardOvY;
+      if (body) { body.style.overflowY = savedBodyOvY; body.style.maxHeight = savedBodyMaxH; }
 
-      // ── Build PDF  (A4 = 210 × 297 mm) ───────────────────────
-      const A4_W = 210;
-      const A4_H = 297;
-      const MARGIN = 10; // mm
-
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      // ── Build A4 PDF ─────────────────────────────────────────
+      const A4W = 210, A4H = 297, MG = 10;
+      const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
 
       const imgW  = canvas.width;
       const imgH  = canvas.height;
+      const pxPerMm = imgW / (A4W - MG*2);
+      const contentMmH = imgH / pxPerMm;
+      const sliceMmH   = A4H - MG*2;
+      const pages      = Math.ceil(contentMmH / sliceMmH);
 
-      const printW   = A4_W - MARGIN * 2;                     // usable width in mm
-      const mmPerPx  = printW / imgW;                          // mm per pixel
-      const printH   = imgH * mmPerPx;                         // full content height in mm
-      const pageH    = A4_H - MARGIN * 2;                      // usable height per page
-
-      const totalPages = Math.ceil(printH / pageH);
-
-      for (let p = 0; p < totalPages; p++) {
+      for (let p = 0; p < pages; p++) {
         if (p > 0) pdf.addPage();
 
-        // Slice: which part of the canvas to paint this page
-        const sliceY    = Math.round((p * pageH) / mmPerPx);   // px from top
-        const sliceH_px = Math.round(pageH / mmPerPx);         // how many px tall
-        const actualH_px = Math.min(sliceH_px, imgH - sliceY); // clamp at bottom
-        if (actualH_px <= 0) break;
+        const slicePxY  = Math.round(p * sliceMmH * pxPerMm);
+        const slicePxH  = Math.min(Math.round(sliceMmH * pxPerMm), imgH - slicePxY);
+        if (slicePxH <= 0) break;
 
-        // Create a slice canvas
         const sliceCanvas = document.createElement('canvas');
         sliceCanvas.width  = imgW;
-        sliceCanvas.height = actualH_px;
-        const ctx = sliceCanvas.getContext('2d');
-        ctx.drawImage(canvas, 0, sliceY, imgW, actualH_px, 0, 0, imgW, actualH_px);
+        sliceCanvas.height = slicePxH;
+        sliceCanvas.getContext('2d').drawImage(
+          canvas, 0, slicePxY, imgW, slicePxH, 0, 0, imgW, slicePxH
+        );
 
-        const sliceDataUrl = sliceCanvas.toDataURL('image/jpeg', 0.93);
-        const sliceMmH     = actualH_px * mmPerPx;
-
-        pdf.addImage(sliceDataUrl, 'JPEG', MARGIN, MARGIN, printW, sliceMmH);
+        const mmH = slicePxH / pxPerMm;
+        pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.94),
+          'JPEG', MG, MG, A4W - MG*2, mmH);
       }
 
-      // ── Footer on every page ─────────────────────────────────
-      const pageCount = pdf.internal.getNumberOfPages();
-      for (let p = 1; p <= pageCount; p++) {
+      // ── Page footers ─────────────────────────────────────────
+      const totalPages = pdf.internal.getNumberOfPages();
+      const ts = new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+      for (let p = 1; p <= totalPages; p++) {
         pdf.setPage(p);
-        pdf.setFontSize(7);
-        pdf.setTextColor(160, 160, 160);
-        const ts = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
-        pdf.text(`Unit ${currentUnitData.UnitNo} — Generated ${ts}`, MARGIN, A4_H - 5);
-        pdf.text(`Page ${p} / ${pageCount}`, A4_W - MARGIN, A4_H - 5, { align: 'right' });
+        pdf.setFontSize(6.5);
+        pdf.setTextColor(170, 170, 170);
+        pdf.text(`Unit ${currentUnitData.UnitNo}  |  ${selectedProjectTower||''}  |  Generated: ${ts}`,
+          MG, A4H - 5);
+        pdf.text(`${p} / ${totalPages}`, A4W - MG, A4H - 5, { align:'right' });
       }
 
       pdf.save(`Unit_${currentUnitData.UnitNo}_Report.pdf`);
 
-    } catch (err) {
-      console.error('PDF export failed:', err);
-      alert('PDF export failed. Please try again.');
+    } catch(err) {
+      console.error('PDF error:', err);
+      alert('PDF export failed — ' + err.message);
     } finally {
       btn.disabled = false;
       btn.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Download PDF';
     }
   }
 
-  // ===== SEARCH FUNCTIONALITY =====
+    // ===== SEARCH FUNCTIONALITY =====
   
   let searchData = [];
   let currentSearchSelection = -1;
