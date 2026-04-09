@@ -11,6 +11,8 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -2946,384 +2948,413 @@
     .villa-unit.stage-7 { background: #A9D08E; color: #000; border-color: #87A672; }
     .villa-unit.stage-8 { background: #446A2C; color: #fff; border-color: #2a4119; }
 
-    /* ===== UNIT DETAIL POPUP ===== */
+    /* =====================================================================
+       UNIT DETAIL MODAL  — v3  (Premium Glassmorphism, Vertical Stack)
+       ===================================================================== */
+
+    :root {
+      --rpt-accent:       #C65911;
+      --rpt-accent-rgb:   198,89,17;
+      --rpt-radius:       14px;
+      --rpt-font-display: 'DM Serif Display', Georgia, serif;
+      --rpt-font-body:    'DM Sans', 'Inter', sans-serif;
+    }
+
+    /* ── Overlay ── */
     .unit-detail-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
+      inset: 0;
+      background: rgba(8, 12, 22, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       z-index: 9999;
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 1rem;
+      padding: 1.25rem;
+      overflow-y: auto;
     }
-    
     .unit-detail-overlay.visible {
       display: flex;
-      animation: fadeIn 0.2s ease;
+      animation: rptOverlayIn 0.22s ease both;
     }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    
+    @keyframes rptOverlayIn { from{opacity:0} to{opacity:1} }
+
+    /* ── Modal shell ── */
     .unit-detail-card {
-      background: white;
-      border-radius: var(--radius-lg);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
       width: 100%;
-      max-width: 600px;
+      max-width: 740px;
+      min-width: 300px;
+      border-radius: var(--rpt-radius);
+      border: 1px solid rgba(255,255,255,0.55);
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.04),
+        0 4px 16px rgba(0,0,0,0.08),
+        0 20px 48px rgba(0,0,0,0.14),
+        0 48px 96px rgba(0,0,0,0.10);
+      display: flex;
+      flex-direction: column;
       max-height: 90vh;
-      overflow-y: auto;
-      animation: slideUp 0.3s ease;
+      font-family: var(--rpt-font-body);
+      animation: rptCardIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+      overflow: hidden;
     }
-    
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    /* ===== PREMIUM UNIT DETAIL POPUP ===== */
-    .unit-detail-header {
-      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-      color: white;
-      padding: 2rem 2.5rem;
-      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 2rem;
-    }
-    
-    .unit-detail-header-content {
-      flex: 1;
-    }
-    
-    .unit-detail-project-name {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      opacity: 0.75;
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
-    
-    .unit-detail-main-info {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    
-    .unit-detail-unit-no {
-      font-size: 2.25rem;
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -0.5px;
-    }
-    
-    .unit-detail-customer {
-      font-size: 1.1rem;
-      opacity: 0.9;
-      font-weight: 500;
-    }
-    
-    .unit-detail-logo {
-      width: 110px;
-      height: auto;
-      background: white;
-      padding: 8px 12px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    
-    /* Sections */
-    .unit-detail-section {
-      padding: 1.75rem 2.5rem;
-      border-bottom: 1px solid var(--gray-200);
-    }
-    
-    .unit-section-title {
-      font-size: 0.85rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--gray-700);
-      margin-bottom: 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 2px solid var(--gray-200);
-    }
-    
-    .unit-section-title i {
-      color: var(--primary);
-      font-size: 1rem;
-    }
-    
-    /* Unit Details Grid */
-    .unit-info-grid-premium {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1rem;
-    }
-    
-    .unit-info-item-premium {
-      background: var(--gray-50);
-      padding: 1rem;
-      border-radius: var(--radius-md);
-      border-left: 3px solid var(--primary);
-      transition: all 0.2s ease;
-    }
-    
-    .unit-info-item-premium:hover {
-      background: #FCE7DC;
-      transform: translateX(2px);
-    }
-    
-    .unit-info-label-premium {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: var(--gray-500);
-      margin-bottom: 0.4rem;
-    }
-    
-    .unit-info-value-premium {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--gray-900);
-      line-height: 1.3;
-    }
-    
-    .unit-info-value-premium.badge-oc {
-      display: inline-block;
-      padding: 0.3rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 700;
-    }
-    
-    .badge-oc.completed {
-      background: rgba(16, 185, 129, 0.15);
-      color: #059669;
-    }
-    
-    .badge-oc.pending {
-      background: rgba(245, 158, 11, 0.15);
-      color: #d97706;
-    }
-    
-    /* Financial Grid */
-    .unit-financial-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.25rem;
-    }
-    
-    .financial-item {
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 150, 105, 0.05) 100%);
-      padding: 1.25rem;
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(16, 185, 129, 0.2);
-    }
-    
-    .financial-item.total {
-      background: linear-gradient(135deg, rgba(198, 89, 17, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
-      border-color: rgba(198, 89, 17, 0.3);
-    }
-    
-    .financial-item.balance {
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.08) 100%);
-      border-color: rgba(245, 158, 11, 0.3);
-    }
-    
-    .financial-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: var(--gray-600);
-      margin-bottom: 0.5rem;
-    }
-    
-    .financial-value {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--gray-900);
-      line-height: 1;
-    }
-    
-    .financial-value.positive {
-      color: #059669;
-    }
-    
-    .financial-value.negative {
-      color: #dc2626;
-    }
-    
-    /* Dates Grid */
-    .unit-dates-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1rem;
-    }
-    
-    .date-item {
-      background: var(--gray-50);
-      padding: 1rem 1.25rem;
-      border-radius: var(--radius-md);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 1px solid var(--gray-200);
-    }
-    
-    .date-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--gray-600);
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-    }
-    
-    .date-value {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--gray-900);
-      font-family: 'Courier New', monospace;
-    }
-    
-    /* Activities */
-    .unit-activity-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 0.75rem;
-    }
-    }
-    
-    .unit-info-value.badge.oc-completed {
-      background: rgba(16, 185, 129, 0.15);
-      color: #059669;
-    }
-    
-    .unit-info-value.badge.oc-pending {
-      background: rgba(245, 158, 11, 0.15);
-      color: #d97706;
-    }
-    
-    .unit-detail-body {
-      padding: 1.5rem;
-    }
-    
-    .unit-detail-section-title {
-      font-size: 0.85rem;
-      color: var(--gray-600);
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px solid var(--gray-200);
-    }
-    
-    .unit-activity-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    
-    .unit-activity-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      background: var(--gray-50);
-      border-radius: var(--radius-md);
-      border-left: 4px solid var(--gray-300);
-      transition: var(--transition);
-    }
-    
-    .unit-activity-item:hover {
-      background: var(--gray-100);
-    }
-    
-    .unit-activity-item.completed {
-      background: rgba(16, 185, 129, 0.08);
-      border-left-color: var(--success);
-    }
-    
-    .unit-activity-name {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--gray-700);
-    }
-    
-    .unit-activity-status {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-    
-    .unit-activity-status.completed {
-      color: var(--success);
-    }
-    
-    .unit-activity-status.pending {
-      color: var(--gray-400);
-    }
-    
-    .unit-detail-footer {
-      padding: 1rem 1.5rem;
-      background: var(--gray-50);
-      border-top: 1px solid var(--gray-200);
-      display: flex;
-      gap: 0.75rem;
-      justify-content: flex-end;
-    }
-    
-    .unit-detail-btn {
-      padding: 0.65rem 1.25rem;
-      border-radius: var(--radius-md);
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      border: none;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    
-    .unit-detail-btn-close {
-      background: var(--gray-200);
-      color: var(--gray-700);
-    }
-    
-    .unit-detail-btn-close:hover {
-      background: var(--gray-300);
-    }
-    
-    .unit-detail-btn-download {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      color: white;
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-    }
-    
-    .unit-detail-btn-download:hover {
-      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
-      transform: translateY(-2px);
+    @keyframes rptCardIn {
+      from { opacity:0; transform: translateY(20px) scale(0.97); }
+      to   { opacity:1; transform: translateY(0)    scale(1);    }
     }
 
-    /* ===== SEARCH FUNCTIONALITY ===== */
+    /* ── Header ── */
+    .rpt-header {
+      flex-shrink: 0;
+      border-radius: var(--rpt-radius) var(--rpt-radius) 0 0;
+      overflow: hidden;
+    }
+    .rpt-header-main {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.5rem 1.75rem 1.25rem;
+    }
+    .rpt-header-left { flex: 1; min-width: 0; }
+    .rpt-project-label {
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      opacity: 0.65;
+      margin-bottom: 0.4rem;
+      color: #fff;
+    }
+    .rpt-unit-no {
+      font-family: var(--rpt-font-display);
+      font-size: 1.9rem;
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.3rem;
+      color: #fff;
+    }
+    .rpt-customer {
+      font-size: 0.875rem;
+      font-weight: 400;
+      opacity: 0.85;
+      color: #fff;
+    }
+    .rpt-header-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+    .rpt-close-btn {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #fff;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: background 0.15s, transform 0.18s;
+    }
+    .rpt-close-btn:hover {
+      background: rgba(255,255,255,0.32);
+      transform: scale(1.12) rotate(90deg);
+    }
+    .rpt-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.28rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1.5px solid rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.16);
+      color: #fff;
+      white-space: nowrap;
+    }
+    .rpt-status-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #fff;
+      animation: rptDotPulse 2s ease-in-out infinite;
+    }
+    @keyframes rptDotPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+    /* Header bottom strip */
+    .rpt-header-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.55rem 1.75rem;
+      background: rgba(0,0,0,0.16);
+      border-top: 1px solid rgba(255,255,255,0.15);
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.72);
+      letter-spacing: 0.03em;
+    }
+    .rpt-header-logo {
+      height: 22px; max-width: 90px;
+      object-fit: contain;
+      background: rgba(255,255,255,0.9);
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+
+    /* ── Scrollable body ── */
+    .rpt-body {
+      overflow-y: auto;
+      overflow-x: hidden;
+      flex: 1;
+    }
+    .rpt-body::-webkit-scrollbar { width: 4px; }
+    .rpt-body::-webkit-scrollbar-track { background: transparent; }
+    .rpt-body::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
+
+    /* ── Section ── */
+    .rpt-section {
+      padding: 1.4rem 1.75rem;
+      border-bottom: 1px solid #f0f2f5;
+    }
+    .rpt-section:last-child { border-bottom: none; }
+
+    .rpt-section-heading {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.9rem;
+    }
+    .rpt-section-heading-bar {
+      width: 3px; height: 14px;
+      border-radius: 2px;
+      background: var(--rpt-accent);
+      flex-shrink: 0;
+    }
+    .rpt-section-heading h4 {
+      font-size: 0.635rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #374151;
+      margin: 0;
+      font-family: var(--rpt-font-body);
+    }
+    .rpt-section-heading i {
+      font-size: 0.8rem;
+      color: var(--rpt-accent);
+    }
+
+    /* ── §1 Unit Details — 2-col pairs ── */
+    .rpt-unit-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 2.5rem;
+    }
+    @media (max-width: 500px) { .rpt-unit-grid { grid-template-columns: 1fr; } }
+
+    .rpt-field-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.48rem 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .rpt-field-row:last-child { border-bottom: none; }
+    .rpt-field-label {
+      font-size: 0.72rem;
+      color: #6b7280;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+    .rpt-field-value {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #111827;
+      text-align: right;
+    }
+
+    /* ── §2 Financial Details — table ── */
+    .rpt-fin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    .rpt-fin-table tbody tr { border-bottom: 1px solid #f3f4f6; }
+    .rpt-fin-table tbody tr:last-child { border-bottom: none; }
+    .rpt-fin-table tbody tr:nth-child(even) td { background: #fafafa; }
+    .rpt-fin-table td {
+      padding: 0.55rem 0.4rem;
+      vertical-align: middle;
+    }
+    .rpt-fin-table td:first-child { color: #4b5563; font-weight: 500; padding-left: 0; }
+    .rpt-fin-table td:last-child  { text-align: right; font-weight: 700; padding-right: 0; font-variant-numeric: tabular-nums; }
+    .rpt-fin-total td { background: rgba(var(--rpt-accent-rgb),0.07) !important; }
+    .rpt-fin-total td:first-child { font-weight: 700; color: #1f2937; }
+    .rpt-fin-balance td { border-top: 2px solid #e5e7eb !important; }
+    .rpt-fin-balance td:last-child { font-size: 0.86rem; }
+    .col-positive { color: #059669 !important; }
+    .col-negative { color: #dc2626 !important; }
+    .col-accent   { color: var(--rpt-accent) !important; }
+
+    /* ── §3 Handover Schedule ── */
+    .rpt-dates-list { display: flex; flex-direction: column; }
+    .rpt-date-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.52rem 0.75rem;
+      border-radius: 5px;
+    }
+    .rpt-date-row:nth-child(odd) { background: #f9fafb; }
+    .rpt-date-row-label { font-size: 0.75rem; color: #4b5563; font-weight: 500; }
+    .rpt-date-row-value { font-size: 0.8rem; font-weight: 600; color: #111827; font-variant-numeric: tabular-nums; }
+    .rpt-date-row-value.na { color: #9ca3af; font-weight: 400; font-style: italic; }
+    .rpt-date-revised .rpt-date-row-label { color: var(--rpt-accent); font-weight: 700; }
+    .rpt-date-revised .rpt-date-row-value { color: var(--rpt-accent); font-weight: 700; }
+
+    /* ── §4 Construction Activities — proper table ── */
+    .rpt-act-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    .rpt-act-table thead tr { border-bottom: 2px solid #e5e7eb; }
+    .rpt-act-table thead th {
+      padding: 0 0.5rem 0.55rem;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      text-align: left;
+    }
+    .rpt-act-table thead th.col-r { text-align: right; }
+    .rpt-act-table tbody tr { border-bottom: 1px solid #f3f4f6; transition: background 0.1s; }
+    .rpt-act-table tbody tr:hover { background: #fafafa; }
+    .rpt-act-table tbody tr:last-child { border-bottom: none; }
+    .rpt-act-table tbody td {
+      padding: 0.6rem 0.5rem;
+      vertical-align: middle;
+    }
+    .rpt-act-table tbody td:first-child { padding-left: 0; }
+    .rpt-act-table tbody td:last-child  { padding-right: 0; text-align: right; }
+
+    .rpt-act-name { display: flex; align-items: center; gap: 0.5rem; }
+    .rpt-act-icon {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.55rem;
+      flex-shrink: 0;
+    }
+    .rpt-act-icon.done    { background: #d1fae5; color: #059669; }
+    .rpt-act-icon.pending { background: #f3f4f6; color: #9ca3af; border: 1.5px dashed #d1d5db; }
+    .rpt-act-label { font-weight: 600; color: #1f2937; font-size: 0.8rem; }
+
+    .rpt-act-status {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 50px;
+      font-size: 0.64rem; font-weight: 700; white-space: nowrap;
+    }
+    .rpt-act-status.done    { background: #d1fae5; color: #059669; }
+    .rpt-act-status.pending { background: #f3f4f6; color: #6b7280; }
+
+    .rpt-act-date { font-size: 0.74rem; color: #9ca3af; white-space: nowrap; }
+    .rpt-act-date.has-date { color: var(--rpt-accent); font-weight: 600; }
+    .rpt-act-date.na { color: #d1d5db; }
+
+    .rpt-act-rev { font-variant-numeric: tabular-nums; font-weight: 600; color: #059669; font-size: 0.78rem; white-space: nowrap; }
+    .rpt-act-rev.no-rev { color: #d1d5db; font-weight: 400; }
+
+    /* ── OC Badge ── */
+    .rpt-oc-badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.18rem 0.6rem; border-radius: 50px;
+      font-size: 0.66rem; font-weight: 700;
+    }
+    .rpt-oc-badge.completed { background: #d1fae5; color: #059669; }
+    .rpt-oc-badge.pending   { background: #fef3c7; color: #d97706; }
+
+    /* ── Footer ── */
+    .rpt-footer {
+      padding: 0.875rem 1.75rem;
+      background: rgba(249,250,251,0.96);
+      border-top: 1px solid #eaecef;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      gap: 1rem; flex-shrink: 0;
+      border-radius: 0 0 var(--rpt-radius) var(--rpt-radius);
+    }
+    .rpt-footer-note { font-size: 0.67rem; color: #9ca3af; }
+    .rpt-footer-actions { display: flex; gap: 0.6rem; }
+
+    .rpt-btn {
+      padding: 0.5rem 1.1rem;
+      border-radius: 8px; font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; transition: all 0.15s; border: none;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-family: var(--rpt-font-body);
+    }
+    .rpt-btn-ghost {
+      background: #fff; color: #4b5563;
+      border: 1.5px solid #e5e7eb;
+    }
+    .rpt-btn-ghost:hover { background: #f9fafb; border-color: #9ca3af; }
+    .rpt-btn-pdf {
+      background: var(--rpt-accent); color: #fff;
+      box-shadow: 0 2px 8px rgba(var(--rpt-accent-rgb),0.28);
+    }
+    .rpt-btn-pdf:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(var(--rpt-accent-rgb),0.38); }
+    .rpt-btn-pdf:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .rpt-pdf-spinner {
+      display: inline-block; width: 11px; height: 11px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff; border-radius: 50%;
+      animation: rptSpin 0.7s linear infinite;
+    }
+    @keyframes rptSpin { to { transform: rotate(360deg); } }
+
+    /* ── Backward-compat stubs ── */
+    .unit-detail-logo    { display: none; }
+    .unit-detail-header  { display: none !important; }
+    .unit-detail-section { display: none !important; }
+    .unit-detail-footer  { display: none !important; }
+    .unit-detail-body    { display: none !important; }
+
+    /* ── Responsive ── */
+    @media (max-width: 560px) {
+      .unit-detail-card { max-width: 100%; border-radius: 10px; }
+      .rpt-section { padding: 1.1rem; }
+      .rpt-unit-no { font-size: 1.5rem; }
+      .rpt-footer { flex-direction: column; align-items: flex-end; }
+      .rpt-act-table thead th.col-date,
+      .rpt-act-table tbody td.col-date { display: none; }
+    }
+
+    /* PDF capture mode */
+    .rpt-pdf-mode, .rpt-pdf-mode .rpt-body {
+      max-height: none !important;
+      overflow: visible !important;
+    }
+
+    /* Keep legacy animation names */
+    @keyframes fadeIn  { from{opacity:0}to{opacity:1} }
+    @keyframes slideUp { from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)} }
+
+
+        /* ===== SEARCH FUNCTIONALITY ===== */
     .search-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -3781,203 +3812,301 @@
     }
 
     /* ═══════════════════════════════════════════════════════
-       DATE RANGE PICKER — Premium Enterprise Style (v2)
+       DATE RANGE PICKER — Premium Enterprise Style
        ═══════════════════════════════════════════════════════ */
+
+    .drp-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
 
     /* Trigger button */
     .drp-trigger {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.42rem 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.48rem 0.85rem;
       background: white;
       border: 1.5px solid #e2e8f0;
       border-radius: 10px;
       cursor: pointer;
-      font-size: 0.8rem; font-weight: 600; color: #334155;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #1e293b;
       white-space: nowrap;
-      transition: all 0.18s;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      transition: all 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
       user-select: none;
-      position: relative;
     }
     .drp-trigger:hover {
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(198,89,17,0.1);
       color: var(--primary);
     }
-    .drp-trigger.drp-active {
+    .drp-trigger.active {
       border-color: var(--primary);
       background: rgba(198,89,17,0.05);
       color: var(--primary);
     }
+    .drp-trigger .drp-icon {
+      font-size: 0.9rem;
+      opacity: 0.75;
+    }
     .drp-trigger .drp-caret {
-      font-size: 0.6rem; opacity: 0.5; margin-left: 1px;
-      transition: transform 0.18s;
+      font-size: 0.65rem;
+      opacity: 0.5;
+      margin-left: 2px;
+      transition: transform 0.2s;
     }
-    .drp-trigger.drp-open .drp-caret { transform: rotate(180deg); }
-    .drp-x-btn {
-      background: none; border: none;
-      color: var(--primary); cursor: pointer;
-      font-size: 0.72rem; padding: 0 2px;
-      display: inline-flex; align-items: center;
-      border-radius: 3px; transition: background 0.15s;
-      line-height: 1;
+    .drp-trigger.open .drp-caret { transform: rotate(180deg); }
+    .drp-clear-btn {
+      margin-left: 2px;
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 0.75rem;
+      padding: 0 2px;
+      border-radius: 3px;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
     }
-    .drp-x-btn:hover { background: rgba(198,89,17,0.12); }
+    .drp-clear-btn:hover { background: rgba(198,89,17,0.1); }
 
-    /* Panel — fixed positioning calculated by JS */
+    /* Dropdown panel */
     .drp-panel {
-      position: fixed;
-      z-index: 99999;
-      background: rgba(255,255,255,0.97);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 9500;
+      background: white;
       border-radius: 16px;
-      border: 1px solid rgba(226,232,240,0.8);
       box-shadow:
-        0 0 0 1px rgba(198,89,17,0.06),
-        0 8px 24px rgba(0,0,0,0.1),
-        0 32px 64px rgba(0,0,0,0.12);
+        0 24px 60px rgba(0,0,0,0.14),
+        0 6px 20px rgba(0,0,0,0.08),
+        0 0 0 1px rgba(0,0,0,0.06);
       min-width: 560px;
-      max-width: 95vw;
-      max-height: 90vh;
-      overflow: auto;
-      display: none;
-      flex-direction: column;
+      overflow: hidden;
       opacity: 0;
-      transform: translateY(-6px) scale(0.98);
-      transition: opacity 0.18s ease, transform 0.18s ease;
+      transform: translateY(-8px) scale(0.98);
+      pointer-events: none;
+      transition: opacity 0.2s cubic-bezier(0.4,0,0.2,1), transform 0.2s cubic-bezier(0.4,0,0.2,1);
     }
-    .drp-panel.drp-open {
+    .drp-panel.open {
       opacity: 1;
       transform: translateY(0) scale(1);
+      pointer-events: auto;
     }
-    @media (max-width: 600px) {
-      .drp-panel { min-width: calc(100vw - 24px) !important; }
+    /* Mobile: position right-aligned */
+    @media (max-width: 768px) {
+      .drp-panel {
+        min-width: calc(100vw - 2rem);
+        left: 50%;
+        transform: translateX(-50%) translateY(-8px) scale(0.98);
+      }
+      .drp-panel.open { transform: translateX(-50%) translateY(0) scale(1); }
     }
 
-    /* Backdrop */
-    .drp-backdrop {
-      position: fixed; inset: 0; z-index: 99998;
-      background: rgba(15,23,42,0.15);
-      backdrop-filter: blur(2px);
-      display: none;
+    /* Quick presets sidebar */
+    .drp-body {
+      display: flex;
     }
-
-    /* Layout */
-    .drp-body { display: flex; }
-
-    /* Presets sidebar */
     .drp-presets {
-      width: 152px; flex-shrink: 0;
+      width: 148px;
+      flex-shrink: 0;
       background: #f8fafc;
       border-right: 1px solid #f1f5f9;
       padding: 0.6rem 0.5rem;
-      display: flex; flex-direction: column; gap: 2px;
-      border-radius: 16px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
     .drp-presets-label {
-      font-size: 0.58rem; font-weight: 800;
-      text-transform: uppercase; letter-spacing: 0.7px;
-      color: #94a3b8; padding: 0.3rem 0.5rem 0.25rem;
+      font-size: 0.6rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: #94a3b8;
+      padding: 0.35rem 0.5rem 0.2rem;
     }
     .drp-preset-btn {
-      background: none; border: none; border-radius: 7px;
-      padding: 0.38rem 0.6rem;
-      text-align: left; font-size: 0.76rem; font-weight: 500;
-      color: #475569; cursor: pointer;
-      transition: all 0.12s; white-space: nowrap;
+      background: none;
+      border: none;
+      border-radius: 8px;
+      padding: 0.42rem 0.6rem;
+      text-align: left;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
     }
     .drp-preset-btn:hover { background: #e9f0fb; color: var(--primary); font-weight: 600; }
-    .drp-preset-btn.drp-preset-active {
-      background: rgba(198,89,17,0.1); color: var(--primary); font-weight: 700;
-    }
+    .drp-preset-btn.selected { background: rgba(198,89,17,0.1); color: var(--primary); font-weight: 700; }
 
     /* Calendar area */
-    .drp-calendars { flex: 1; padding: 1rem 1rem 0.6rem; min-width: 0; }
+    .drp-calendars {
+      flex: 1;
+      padding: 1rem 1rem 0.75rem;
+    }
     .drp-cal-header {
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       margin-bottom: 0.7rem;
     }
     .drp-cal-nav {
-      background: none; border: 1.5px solid #e2e8f0; border-radius: 7px;
-      width: 28px; height: 28px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 0.75rem; color: #64748b;
-      transition: all 0.12s;
+      background: none;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: #64748b;
+      transition: all 0.15s;
     }
-    .drp-cal-nav:hover { border-color: var(--primary); color: var(--primary); }
-    .drp-cal-month-label { font-size: 0.85rem; font-weight: 700; color: #1e293b; }
-    .drp-cal-months {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem;
+    .drp-cal-nav:hover { border-color: var(--primary); color: var(--primary); background: rgba(198,89,17,0.06); }
+    .drp-cal-month-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #1e293b;
+      cursor: pointer;
     }
-    @media (max-width: 560px) { .drp-cal-months { grid-template-columns: 1fr; } }
 
-    .drp-month-name {
-      font-size: 0.75rem; font-weight: 700; color: #334155;
-      margin-bottom: 5px; padding-bottom: 4px;
-      border-bottom: 1px solid #f1f5f9;
+    .drp-cal-months {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    @media (max-width: 580px) {
+      .drp-cal-months { grid-template-columns: 1fr; }
+    }
+
+    .drp-cal-grid {
+      width: 100%;
     }
     .drp-cal-weekdays {
-      display: grid; grid-template-columns: repeat(7, 1fr);
-      margin-bottom: 3px;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      margin-bottom: 4px;
     }
     .drp-cal-wd {
-      text-align: center; font-size: 0.6rem; font-weight: 700;
-      color: #94a3b8; padding: 2px 0;
-      text-transform: uppercase; letter-spacing: 0.3px;
+      text-align: center;
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: #94a3b8;
+      padding: 3px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
     }
-    .drp-cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
+    .drp-cal-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+    }
     .drp-day {
       aspect-ratio: 1;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.72rem; font-weight: 500; color: #334155;
-      border-radius: 6px; cursor: pointer;
-      transition: all 0.1s; position: relative; user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.74rem;
+      font-weight: 500;
+      color: #334155;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.12s;
+      position: relative;
+      user-select: none;
     }
-    .drp-day:hover:not(.drp-day-other) {
-      background: rgba(198,89,17,0.13); color: var(--primary); font-weight: 700;
+    .drp-day:hover:not(.drp-day-other):not(.drp-day-disabled) {
+      background: rgba(198,89,17,0.12);
+      color: var(--primary);
+      font-weight: 700;
     }
     .drp-day-other { color: #d1d5db; pointer-events: none; }
+    .drp-day-disabled { color: #e5e7eb; pointer-events: none; }
     .drp-day-today::after {
-      content: ''; position: absolute; bottom: 2px; left: 50%;
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      left: 50%;
       transform: translateX(-50%);
-      width: 3px; height: 3px; border-radius: 50%;
+      width: 4px; height: 4px;
+      border-radius: 50%;
       background: var(--primary);
     }
     .drp-day-start, .drp-day-end {
       background: var(--primary) !important;
-      color: white !important; font-weight: 700 !important;
-      border-radius: 6px !important;
+      color: white !important;
+      font-weight: 700 !important;
+      border-radius: 7px !important;
     }
     .drp-day-in-range {
       background: rgba(198,89,17,0.1);
-      color: #9a3d08; font-weight: 600;
+      color: var(--primary);
+      font-weight: 600;
       border-radius: 0;
     }
-    .drp-day-start.drp-day-in-range { border-radius: 6px 0 0 6px !important; }
-    .drp-day-end.drp-day-in-range   { border-radius: 0 6px 6px 0 !important; }
-    .drp-day-start.drp-day-end      { border-radius: 6px !important; }
+    .drp-day-start.drp-day-in-range { border-radius: 7px 0 0 7px !important; }
+    .drp-day-end.drp-day-in-range   { border-radius: 0 7px 7px 0 !important; }
+    .drp-day-start.drp-day-end      { border-radius: 7px !important; }
+
+    /* Month name label */
+    .drp-month-name {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #f1f5f9;
+    }
 
     /* Footer */
     .drp-footer {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0.6rem 1rem 0.75rem; border-top: 1px solid #f1f5f9;
-      gap: 0.5rem; flex-wrap: wrap;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1rem 0.75rem;
+      border-top: 1px solid #f1f5f9;
+      gap: 0.5rem;
     }
-    .drp-range-info { font-size: 0.76rem; color: #64748b; flex: 1; min-width: 120px; }
-    .drp-range-info strong { color: #1e293b; }
+    .drp-range-display {
+      font-size: 0.78rem;
+      color: #64748b;
+      font-weight: 500;
+      flex: 1;
+    }
+    .drp-range-display strong { color: #1e293b; }
     .drp-btn {
-      padding: 0.42rem 1rem; border-radius: 8px;
-      font-size: 0.79rem; font-weight: 700;
-      cursor: pointer; border: none; transition: all 0.15s;
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
     }
     .drp-btn-apply {
       background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white; box-shadow: 0 2px 8px rgba(198,89,17,0.3);
+      color: white;
+      box-shadow: 0 2px 8px rgba(198,89,17,0.3);
     }
     .drp-btn-apply:hover { opacity: 0.88; }
-    .drp-btn-cancel { background: #f1f5f9; color: #64748b; }
+    .drp-btn-cancel {
+      background: #f1f5f9;
+      color: #64748b;
+    }
     .drp-btn-cancel:hover { background: #e2e8f0; }
+
+    /* Overlay to close when clicking outside */
+    .drp-overlay { position: fixed; inset: 0; z-index: 9499; }
 
   </style>
 </head>
@@ -5000,78 +5129,112 @@
   </div>
 
 
-<!-- Unit Detail Popup Modal -->
-<div class="unit-detail-overlay" id="unitDetailOverlay" onclick="if(event.target===this) closeUnitDetail()">
+<!-- ══════════════════════════════════════════════════════════
+     UNIT DETAIL MODAL  — v3  Premium Glassmorphism
+     ══════════════════════════════════════════════════════════ -->
+<div class="unit-detail-overlay" id="unitDetailOverlay">
   <div class="unit-detail-card" id="unitDetailCard">
-    <!-- Premium Header -->
-    <div class="unit-detail-header">
-      <div class="unit-detail-header-content">
-        <div class="unit-detail-project-name" id="popupProject"></div>
-        <div class="unit-detail-main-info">
-          <div class="unit-detail-unit-no" id="popupUnitNo"></div>
-          <div class="unit-detail-customer" id="popupCustomer"></div>
+
+    <!-- ── Header ── -->
+    <div class="rpt-header" id="rptHeader">
+      <div class="rpt-header-main">
+        <div class="rpt-header-left">
+          <div class="rpt-project-label" id="rptProjectLabel"></div>
+          <div class="rpt-unit-no"       id="rptUnitNo"></div>
+          <div class="rpt-customer"      id="rptCustomer"></div>
+        </div>
+        <div class="rpt-header-actions">
+          <button class="rpt-close-btn" onclick="closeUnitDetail()" title="Close (Esc)">
+            <i class="bi bi-x-lg"></i>
+          </button>
+          <span class="rpt-status-badge" id="rptStatusBadge">
+            <span class="rpt-status-dot"></span>
+            <span id="rptStatusText">Active</span>
+          </span>
         </div>
       </div>
-      <img class="unit-detail-logo" 
-           src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCADcApUDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3iiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiuc8fSSw+ANekgd0mWxlKNGSGB2nkEd6AOjor4j/tzxH/0FdV/8CJP8aDrviIDJ1XVAB3+0Sf40AfbmaM18QDxHrxOBrWo8/8AT0/+NP8A7c8R/wDQU1X/AMCJP8aAPtulr4rsdb8RHULYNqmqFTKuQbiT1HvX2oOlABRRRQAUUVh+IvF+heE1t31u/FotwWEWY2bcVxn7oPqKANyisHw74y0HxYbgaJfi7+zbfNxGy7d2cfeA9D+Vb1ABRRRQAUUUUAFFFfFOo+ItcXVLpV1nUAomcAC6fj5j70Afa1Gaq6YxbSbNmJLGBCST1+UV84+MF17XfjffeH9N1q5tPtEyrH/pDrGmIgx4U+xoA+mM0ZrwP/hTPj7/AKHJf/Aqf/Cj/hTPj7/ocl/8Cp/8KAPfKK8D/wCFM+Pf+hyX/wACp/8ACvcdNt5bTS7S2nk8yaGFI3fJO5goBPPqaALdFFFABRRRQAUUUUAFFFFABRQa8c+GFh4ptviNr82sQ6mmnuk32drov5ZPmgjbnjp6dqAPY6KKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAoorIv/E2iaXqUOm3+p2tteThTFBLIFdwxKjA9yCKANeiiigAooooAKKKKACi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WuE+FN7awfFbxpLLcwxxvLLtd5AA3789D3r2efxBo1tE0s+rWEUY6s9yigfiTQBo14z8evEhbTrHwjYFpL7UJUeaJOTsB+RSPVnwR/u+9XvGXxz0LR7eS30B11TUMYV1B8hD6k/xfQfnXmvhHxD4f0rWJvGfi/UH1TW5CXtrOBN5Rjxvc8KCBwFz8vpkDAB9CeF9Jh8J+DdP02SSNEsrYedKThd2Mu2T2ySa8X1W5l+NPxNtdPslk/4RzTMmSXoCmfmb2LkBVHXAz64LnVfHHxnuPsen2p0rw5uHmSMTsYA/xNxvP+yOOmfWvZfCHg/TPBmiLpumpnJ3TTsPnmf+8f6DoKAN6KNIYljjUJGihVVRgADoBT6KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigDy/xP8E9J8UeI7zWrjVb2Ga6ZWaOMJtGFC8ZHtWT/AMM56F/0G9R/75T/AAr2aigDxn/hnPQv+g3qP/fKf4Uf8M56F/0G9R/75T/CvZqKAPG4/wBnXw8sgMusam6d1Xy1J/Haa6jRPg94L0R1lXS/tkynIkvXMv8A47939K7yigBscaRRrHGioijCqowAPQCnUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB//9k=" 
-           alt="Logo" 
-           onerror="this.style.display='none'">
-    </div>
-    
-    <!-- Section 1: Unit Details -->
-    <div class="unit-detail-section">
-      <div class="unit-section-title">
-        <i class="bi bi-info-circle"></i>
-        Unit Details
-      </div>
-      <div class="unit-info-grid-premium" id="popupUnitDetailsGrid">
-        <!-- Phase, Tower, Inventory, Saleable Area, Specification, Product Type, OC Status -->
+      <div class="rpt-header-strip">
+        <img class="rpt-header-logo" id="rptHeaderLogo"
+             src="" alt="Logo" onerror="this.style.display='none'">
+        <span id="rptGeneratedLabel"></span>
       </div>
     </div>
-    
-    <!-- Section 2: Financial Details -->
-    <div class="unit-detail-section" id="popupFinancialSection">
-      <div class="unit-section-title">
-        <i class="bi bi-currency-rupee"></i>
-        Financial Details
+
+    <!-- ── Scrollable Body ── -->
+    <div class="rpt-body" id="rptBody">
+
+      <!-- §1 Unit Details -->
+      <div class="rpt-section">
+        <div class="rpt-section-heading">
+          <div class="rpt-section-heading-bar"></div>
+          <h4><i class="bi bi-house-door"></i>&nbsp;Unit Details</h4>
+        </div>
+        <div class="rpt-unit-grid" id="rptUnitDetailsRows"></div>
       </div>
-      <div class="unit-financial-grid" id="popupFinancialGrid">
-        <!-- Agreement Value, Interior Design Value, Total Receivables, Total Received, Balance Receivables -->
+
+      <!-- §2 Financial Details -->
+      <div class="rpt-section">
+        <div class="rpt-section-heading">
+          <div class="rpt-section-heading-bar"></div>
+          <h4><i class="bi bi-currency-rupee"></i>&nbsp;Financial Details</h4>
+        </div>
+        <table class="rpt-fin-table" id="rptFinancialRows"></table>
+      </div>
+
+      <!-- §3 Handover Schedule -->
+      <div class="rpt-section">
+        <div class="rpt-section-heading">
+          <div class="rpt-section-heading-bar"></div>
+          <h4><i class="bi bi-calendar3"></i>&nbsp;Handover Schedule</h4>
+        </div>
+        <div class="rpt-dates-list" id="rptDatesGrid"></div>
+      </div>
+
+      <!-- §4 Construction Activities -->
+      <div class="rpt-section">
+        <div class="rpt-section-heading">
+          <div class="rpt-section-heading-bar"></div>
+          <h4><i class="bi bi-tools"></i>&nbsp;Construction Activities</h4>
+        </div>
+        <table class="rpt-act-table">
+          <thead>
+            <tr>
+              <th>Activity</th>
+              <th>Status</th>
+              <th class="col-date">Planned / Projected Date</th>
+              <th class="col-r">Revenue</th>
+            </tr>
+          </thead>
+          <tbody id="rptActivityGrid"></tbody>
+        </table>
+      </div>
+
+    </div><!-- /rpt-body -->
+
+    <!-- ── Footer ── -->
+    <div class="rpt-footer">
+      <span class="rpt-footer-note" id="rptFooterNote">Confidential &mdash; Internal Use Only</span>
+      <div class="rpt-footer-actions">
+        <button class="rpt-btn rpt-btn-ghost" onclick="closeUnitDetail()">
+          <i class="bi bi-x"></i> Close
+        </button>
+        <button class="rpt-btn rpt-btn-pdf" id="rptPdfBtn" onclick="downloadUnitDetailPDF()">
+          <i class="bi bi-file-earmark-pdf"></i> Download PDF
+        </button>
       </div>
     </div>
-    
-    <!-- Section 3: Dates & Handover -->
-    <div class="unit-detail-section" id="popupDatesSection">
-      <div class="unit-section-title">
-        <i class="bi bi-calendar-event"></i>
-        Handover Schedule
-      </div>
-      <div class="unit-dates-grid" id="popupDatesGrid">
-        <!-- AFS Date, HO as per AFS, IDSA Date, HO as per IDSA -->
-      </div>
-    </div>
-    
-    <!-- Section 4: Construction Activities -->
-    <div class="unit-detail-section">
-      <div class="unit-section-title">
-        <i class="bi bi-tools"></i>
-        Construction Activities
-      </div>
-      <div class="unit-activity-list" id="popupActivityList">
-        <!-- Activities will be inserted here -->
-      </div>
-    </div>
-    
-    <div class="unit-detail-footer">
-      <button class="unit-detail-btn unit-detail-btn-close" onclick="closeUnitDetail()">
-        <i class="bi bi-x-lg"></i> Close
-      </button>
-      <button class="unit-detail-btn unit-detail-btn-download" onclick="downloadUnitDetailPDF()">
-        <i class="bi bi-file-pdf"></i> Download PDF
-      </button>
-    </div>
-  </div>
-</div>
+
+  </div><!-- /unit-detail-card -->
+</div><!-- /unit-detail-overlay -->
+
+<!-- hidden legacy stubs so existing JS attr-refs don't throw -->
+<div id="popupProject"    style="display:none"></div>
+<div id="popupUnitNo"     style="display:none"></div>
+<div id="popupCustomer"   style="display:none"></div>
+<div id="popupUnitDetailsGrid" style="display:none"></div>
+<div id="popupFinancialGrid"   style="display:none"></div>
+<div id="popupDatesGrid"       style="display:none"></div>
+<div id="popupActivityList"    style="display:none"></div>
 <!-- Excel-style column filter dropdown moved to body level — see bottom of page -->
 
 </main>
@@ -5442,6 +5605,7 @@
     AGREEMENT_VALUE: 56, // Column BE (index 56)
     INTERIOR_VALUE: 57, // Column BF (index 57)
     TOTAL_RECEIVED: 59, // Column BH (index 59)
+    DUE_NOW: 60,        // Column BI (index 60)
     AFS_DATE: 61, // Column BJ (index 61)
     HO_AFS: 62, // Column BK (index 62)
     IDSA_DATE: 63, // Column BL (index 63)
@@ -5617,6 +5781,7 @@
       AgreementValue: +r[COL.AGREEMENT_VALUE] || 0,
       InteriorValue: +r[COL.INTERIOR_VALUE] || 0,
       TotalReceived: +r[COL.TOTAL_RECEIVED] || 0,
+      DueNow: +r[COL.DUE_NOW] || 0,
       AFSDate: r[COL.AFS_DATE] || "",
       HOasPerAFS: r[COL.HO_AFS] || "",
       IDSADate: r[COL.IDSA_DATE] || "",
@@ -6024,7 +6189,7 @@
   }
 
   function render() {
-    let d = raw.filter(r =>
+    const d = raw.filter(r =>
       (!projectSel.size || projectSel.has(r.Project)) &&
       (!towerSel.size || towerSel.has(r.Tower)) &&
       (!phaseSel.size || phaseSel.has(r.Phase)) &&
@@ -6033,8 +6198,6 @@
       (!gfcSel.size || gfcSel.has(r.GFC ? "Yes" : "No")) &&
       (!ocSel.size || ocSel.has(r.OC))
     );
-
-    // Milestone date range filter removed (not used in this tab)
 
     currentFilteredData = d;
 
@@ -8643,526 +8806,326 @@
     return 'linear-gradient(135deg, #1e293b 0%, #334155 100%)';
   }
 
+  // ══════════════════════════════════════════════════════════════
+  //  UNIT DETAIL MODAL  v3 — showUnitDetail / close / PDF
+  // ══════════════════════════════════════════════════════════════
+
   function showUnitDetail(unit) {
     currentUnitData = unit;
-    
-    // === HEADER — project-specific colour ===
-    const headerEl = document.querySelector('#unitDetailCard .unit-detail-header');
-    if (headerEl) {
-      headerEl.style.background = getProjectHeaderGradient(selectedProjectTower);
-    }
-    document.getElementById('popupProject').textContent = selectedProjectTower;
-    document.getElementById('popupUnitNo').textContent = 'Unit ' + unit.UnitNo;
-    document.getElementById('popupCustomer').textContent = unit.Customer || 'N/A';
-    
-    // === SECTION 1: UNIT DETAILS ===
-    const unitDetailsHTML = [];
-    
-    // Phase (if available and not 0)
-    if (unit.Phase && unit.Phase !== '0') {
-      unitDetailsHTML.push(`
-        <div class="unit-info-item-premium">
-          <div class="unit-info-label-premium">Phase</div>
-          <div class="unit-info-value-premium">${unit.Phase}</div>
-        </div>
-      `);
-    }
-    
-    // Tower (if available and not 0)
-    const parsed = parseUnitNumber(unit.UnitNo);
-    if (parsed && parsed.tower !== 0) {
-      unitDetailsHTML.push(`
-        <div class="unit-info-item-premium">
-          <div class="unit-info-label-premium">Tower</div>
-          <div class="unit-info-value-premium">${parsed.tower}</div>
-        </div>
-      `);
-    }
-    
-    // Inventory
-    if (unit.Inventory && unit.Inventory !== 'N/A') {
-      unitDetailsHTML.push(`
-        <div class="unit-info-item-premium">
-          <div class="unit-info-label-premium">Inventory</div>
-          <div class="unit-info-value-premium">${unit.Inventory}</div>
-        </div>
-      `);
-    }
-    
-    // Saleable Area
-    if (unit.SaleableArea && unit.SaleableArea !== 'N/A') {
-      unitDetailsHTML.push(`
-        <div class="unit-info-item-premium">
-          <div class="unit-info-label-premium">Saleable Area</div>
-          <div class="unit-info-value-premium">${unit.SaleableArea} sq.ft.</div>
-        </div>
-      `);
-    }
-    
-    // Specification
-    if (unit.Specification && unit.Specification !== 'N/A') {
-      unitDetailsHTML.push(`
-        <div class="unit-info-item-premium">
-          <div class="unit-info-label-premium">Specification</div>
-          <div class="unit-info-value-premium">${unit.Specification}</div>
-        </div>
-      `);
-    }
-    
-    // Product Type
-    if (unit.ProductType && unit.ProductType !== 'N/A') {
-      unitDetailsHTML.push(`
-        <div class="unit-info-item-premium">
-          <div class="unit-info-label-premium">Product Type</div>
-          <div class="unit-info-value-premium">${unit.ProductType}</div>
-        </div>
-      `);
-    }
-    
-    // OC Status
-    if (unit.OC && unit.OC !== 'N/A') {
-      const ocCompleted = (unit.OC || '').toLowerCase().includes('completed') || 
-                          (unit.OC || '').toLowerCase().includes('yes');
-      const badgeClass = ocCompleted ? 'completed' : 'pending';
-      const badgeText = ocCompleted ? 'Completed' : unit.OC;
-      
-      unitDetailsHTML.push(`
-        <div class="unit-info-item-premium">
-          <div class="unit-info-label-premium">OC Status</div>
-          <div class="unit-info-value-premium badge-oc ${badgeClass}">${badgeText}</div>
-        </div>
-      `);
-    }
-    
-    document.getElementById('popupUnitDetailsGrid').innerHTML = unitDetailsHTML.join('');
-    
-    // === SECTION 2: FINANCIAL DETAILS ===
-    const agreementValue = unit.AgreementValue || 0;
-    const interiorValue = unit.InteriorValue || 0;
-    const totalReceivables = agreementValue + interiorValue;
-    const totalReceived = unit.TotalReceived || 0;
-    const balanceReceivables = totalReceivables - totalReceived;
-    
-    // Helper function to format currency always in Crores
-    function formatCurrency(value) {
-      if (!value || value === 0) return '₹0.00 Cr';
-      const crores = value / 10000000;
-      return `₹${crores.toFixed(2)} Cr`;
-    }
-    
-    const financialHTML = `
-      <div class="financial-item">
-        <div class="financial-label">Agreement Value</div>
-        <div class="financial-value">${formatCurrency(agreementValue)}</div>
-      </div>
-      <div class="financial-item">
-        <div class="financial-label">Interior Design Value</div>
-        <div class="financial-value">${formatCurrency(interiorValue)}</div>
-      </div>
-      <div class="financial-item total">
-        <div class="financial-label">Total Receivables</div>
-        <div class="financial-value">${formatCurrency(totalReceivables)}</div>
-      </div>
-      <div class="financial-item">
-        <div class="financial-label">Total Received</div>
-        <div class="financial-value positive">${formatCurrency(totalReceived)}</div>
-      </div>
-      <div class="financial-item balance">
-        <div class="financial-label">Balance Receivables</div>
-        <div class="financial-value ${balanceReceivables > 0 ? 'negative' : 'positive'}">${formatCurrency(balanceReceivables)}</div>
-      </div>
-    `;
-    
-    document.getElementById('popupFinancialGrid').innerHTML = financialHTML;
-    
-    // === SECTION 3: HANDOVER SCHEDULE ===
-    const datesHTML = `
-      <div class="date-item">
-        <div class="date-label">AFS Date</div>
-        <div class="date-value">${formatRawDate(unit.AFSDate)}</div>
-      </div>
-      <div class="date-item">
-        <div class="date-label">HO as per AFS</div>
-        <div class="date-value">${formatRawDate(unit.HOasPerAFS)}</div>
-      </div>
-      <div class="date-item">
-        <div class="date-label">IDSA Date</div>
-        <div class="date-value">${formatRawDate(unit.IDSADate)}</div>
-      </div>
-      <div class="date-item">
-        <div class="date-label">HO as per IDSA</div>
-        <div class="date-value">${formatRawDate(unit.HOasPerIDSA)}</div>
-      </div>
-    `;
-    
-    document.getElementById('popupDatesGrid').innerHTML = datesHTML;
-    
-    // === SECTION 4: CONSTRUCTION ACTIVITIES ===
-    const activities = [
-      { name: 'GFC Released',     completed: !!unit.GFC,     projected: null,                   amt: null },
-      { name: 'Plaster',          completed: !!unit.Plaster,  projected: unit.PlasterPlan,        amt: unit.PlasterRev },
-      { name: 'Flooring & Dado',  completed: !!unit.Floor,    projected: unit.FlooringProjected,  amt: unit.FloorRev },
-      { name: 'HVAC Installed',   completed: !!unit.HVAC,    projected: null,                   amt: null },
-      { name: 'False Ceiling',    completed: !!unit.False,   projected: null,                   amt: null },
-      { name: 'Fenestration',     completed: !!unit.Fenest,  projected: null,                   amt: null },
-      { name: 'Ready for Handover', completed: !!unit.Hand,  projected: unit.HandoverPlan,       amt: unit.HandRev }
-    ];
 
-    const activityHTML = activities.map(a => {
-      // Projected date badge — only for pending items with a date
-      let projectedTag = '';
-      if (!a.completed && a.projected) {
-        const pd = parseDate(a.projected);
-        const projStr = pd ? formatDateDDMMMYY(pd) : formatRawDate(a.projected);
-        if (projStr && projStr !== 'N/A') {
-          projectedTag = `<span style="font-size:0.68rem;color:#C65911;font-weight:600;background:#FCE7DC;padding:2px 8px;border-radius:50px;margin-left:0.5rem;white-space:nowrap;">
-            <i class="bi bi-calendar-event" style="margin-right:3px;"></i>${projStr}
-          </span>`;
-        }
-      }
-      // Milestone amount badge
-      let amtTag = '';
-      if (a.amt && a.amt > 0) {
-        const amtCr = (a.amt / 10000000).toFixed(2);
-        amtTag = `<span style="font-size:0.68rem;color:#059669;font-weight:700;background:#d1fae5;padding:2px 8px;border-radius:50px;margin-left:0.4rem;white-space:nowrap;">
-          ₹${amtCr} Cr
-        </span>`;
-      }
-      return `
-      <div class="unit-activity-item ${a.completed ? 'completed' : ''}">
-        <span class="unit-activity-name">${a.name}${projectedTag}${amtTag}</span>
-        <span class="unit-activity-status ${a.completed ? 'completed' : 'pending'}">
-          <i class="bi bi-${a.completed ? 'check-circle-fill' : 'circle'}"></i>
-          ${a.completed ? 'Completed' : 'Pending'}
-        </span>
-      </div>`;
-    }).join('');
-
-    document.getElementById('popupActivityList').innerHTML = activityHTML;
-    
-    // Show overlay
-    document.getElementById('unitDetailOverlay').classList.add('visible');
-  }
-  
-  function closeUnitDetail() {
-    document.getElementById('unitDetailOverlay').classList.remove('visible');
-    currentUnitData = null;
-  }
-  
-  function downloadUnitDetailPDF() {
-    if (!currentUnitData) return;
-    
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const unit = currentUnitData;
-    
-    // Helper function to format currency (ASCII-safe for jsPDF)
-    function formatCurrency(value) {
-      if (!value || value === 0) return 'Rs. 0.00 Cr';
-      const crores = value / 10000000;
-      return `Rs. ${crores.toFixed(2)} Cr`;
-    }
-
-    // ── Project-specific header colour ──────────────────────────────────────
-    // Parse hex colour from PROJECT_COLOURS map (mid colour)
-    function hexToRgb(hex) {
-      const r = parseInt(hex.slice(1,3), 16);
-      const g = parseInt(hex.slice(3,5), 16);
-      const b = parseInt(hex.slice(5,7), 16);
-      return [r, g, b];
-    }
-    function darkenHex(hex, factor) {
-      const [r,g,b] = hexToRgb(hex);
-      return [Math.round(r*factor), Math.round(g*factor), Math.round(b*factor)];
-    }
-
+    // ── Theming ──────────────────────────────────────────────────
     const projKey = Object.keys(PROJECT_COLOURS).find(k =>
       (selectedProjectTower || '').toUpperCase().includes(k.split(' ')[0])
     );
-    const projMid = projKey ? PROJECT_COLOURS[projKey].mid : '#833C0C';
-    const [hr, hg, hb] = hexToRgb(projMid);
-    const [dr, dg, db] = darkenHex(projMid, 0.45);  // darker shade for gradient feel
+    const midHex = projKey ? PROJECT_COLOURS[projKey].mid  : '#C65911';
+    const gradient = getProjectHeaderGradient(selectedProjectTower);
 
-    // Header background — clean two-tone gradient (left=darker, right=project colour)
-    doc.setFillColor(dr, dg, db);
-    doc.rect(0, 0, 210, 45, 'F');
-    // Smooth gradient feel: overlay lighter colour on right half with slight transparency trick
-    doc.setFillColor(hr, hg, hb);
-    doc.rect(70, 0, 140, 45, 'F');
-    // Thin accent line at bottom of header
-    doc.setDrawColor(255, 255, 255);
-    doc.setLineWidth(0.4);
-    doc.line(0, 45, 210, 45);
+    const card = document.getElementById('unitDetailCard');
+    card.style.setProperty('--rpt-accent',     midHex);
+    card.style.setProperty('--rpt-accent-rgb', _hexToRgbStr(midHex));
+    // legacy vars used by rpt-header-bar, buttons, etc.
+    card.style.setProperty('--report-accent',  midHex);
 
-    // ── Logo image (top-right) ───────────────────────────────────────────────
+    // ── Header ───────────────────────────────────────────────────
+    document.getElementById('rptHeader').style.background = gradient;
+    document.getElementById('rptProjectLabel').textContent = selectedProjectTower || '';
+    document.getElementById('rptUnitNo').textContent       = 'Unit\u00a0' + unit.UnitNo;
+    document.getElementById('rptCustomer').textContent     = unit.Customer || 'N/A';
+
+    // Status badge
+    const allActivities = [unit.GFC, unit.Plaster, unit.Floor, unit.HVAC,
+                           unit.False, unit.Fenest, unit.Hand];
+    const doneCount = allActivities.filter(Boolean).length;
+    let statusTxt, statusClass;
+    if (unit.Hand)         { statusTxt = 'Handover Done';   }
+    else if (doneCount > 4){ statusTxt = 'Near Completion'; }
+    else if (doneCount > 0){ statusTxt = 'In Progress';     }
+    else                   { statusTxt = 'Not Started';     }
+    document.getElementById('rptStatusText').textContent = statusTxt;
+
+    // Logo
     try {
-      const logoImg = document.querySelector('#unitDetailCard .unit-detail-logo');
-      if (logoImg && logoImg.src && logoImg.src.startsWith('data:')) {
-        doc.addImage(logoImg.src, 'JPEG', 148, 6, 52, 14);
+      const logo = document.querySelector('.rpt-header-logo');
+      if (logo) {
+        const src = document.querySelector('.logo-section img');
+        if (src && src.src) logo.src = src.src; else logo.style.display = 'none';
       }
-    } catch(e) { /* logo unavailable — skip */ }
+    } catch(e) {}
 
-    // Project name (top-left)
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(7.5);
-    doc.setFont(undefined, 'normal');
-    doc.text((selectedProjectTower || '').toUpperCase(), 15, 11);
+    // Timestamp
+    const now = new Date().toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' });
+    document.getElementById('rptGeneratedLabel').textContent = 'Generated: ' + now;
 
-    // Unit Number
-    doc.setFontSize(22);
-    doc.setFont(undefined, 'bold');
-    doc.text('Unit ' + unit.UnitNo, 15, 26);
-
-    // Customer Name
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(255, 255, 255);
-    doc.text(unit.Customer || 'N/A', 15, 37);
-
-    let yPos = 55;
-
-    // Section accent colour = project mid colour
-    const [ar, ag, ab] = [hr, hg, hb];
-
-    // === SECTION 1: UNIT DETAILS ===
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'bold');
-    doc.text('UNIT DETAILS', 15, yPos);
-    yPos += 2;
-    doc.setDrawColor(ar, ag, ab);
-    doc.setLineWidth(0.8);
-    doc.line(15, yPos, 45, yPos);
-    yPos += 8;
-    
-    doc.setFontSize(9);
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(100, 100, 100);
-    
+    // ── §1 Unit Details ──────────────────────────────────────────
     const parsed = parseUnitNumber(unit.UnitNo);
-    
-    // Phase
-    if (unit.Phase && unit.Phase !== '0') {
-      doc.text('Phase:', 15, yPos);
-      doc.setTextColor(0);
-      doc.text(unit.Phase, 50, yPos);
-      doc.setTextColor(100);
-      yPos += 6;
-    }
-    
-    // Tower
-    if (parsed && parsed.tower !== 0) {
-      doc.text('Tower:', 15, yPos);
-      doc.setTextColor(0);
-      doc.text(String(parsed.tower), 50, yPos);
-      doc.setTextColor(100);
-      yPos += 6;
-    }
-    
-    // Inventory
-    if (unit.Inventory && unit.Inventory !== 'N/A') {
-      doc.text('Inventory:', 15, yPos);
-      doc.setTextColor(0);
-      doc.text(unit.Inventory, 50, yPos);
-      doc.setTextColor(100);
-      yPos += 6;
-    }
-    
-    // Saleable Area
-    if (unit.SaleableArea && unit.SaleableArea !== 'N/A') {
-      doc.text('Saleable Area:', 15, yPos);
-      doc.setTextColor(0);
-      doc.text(unit.SaleableArea + ' sq.ft.', 50, yPos);
-      doc.setTextColor(100);
-      yPos += 6;
-    }
-    
-    // Specification
-    if (unit.Specification && unit.Specification !== 'N/A') {
-      doc.text('Specification:', 15, yPos);
-      doc.setTextColor(0);
-      doc.text(unit.Specification, 50, yPos);
-      doc.setTextColor(100);
-      yPos += 6;
-    }
-    
-    // Product Type
-    if (unit.ProductType && unit.ProductType !== 'N/A') {
-      doc.text('Product Type:', 15, yPos);
-      doc.setTextColor(0);
-      doc.text(unit.ProductType, 50, yPos);
-      doc.setTextColor(100);
-      yPos += 6;
-    }
-    
-    // OC Status
+    const udRows = [];
+
+    if (unit.Phase && unit.Phase !== '0')
+      udRows.push(['Phase', unit.Phase]);
+    if (parsed && parsed.tower !== 0)
+      udRows.push(['Tower', String(parsed.tower)]);
+    if (unit.Inventory && unit.Inventory !== 'N/A')
+      udRows.push(['Inventory', unit.Inventory]);
+    if (unit.SaleableArea && unit.SaleableArea !== 'N/A')
+      udRows.push(['Saleable Area', unit.SaleableArea + '\u00a0sq.ft.']);
+    if (unit.Specification && unit.Specification !== 'N/A')
+      udRows.push(['Specification', unit.Specification]);
+    if (unit.ProductType && unit.ProductType !== 'N/A')
+      udRows.push(['Product Type', unit.ProductType]);
     if (unit.OC && unit.OC !== 'N/A') {
-      doc.text('OC Status:', 15, yPos);
-      doc.setTextColor(0);
-      doc.text(unit.OC, 50, yPos);
-      doc.setTextColor(100);
-      yPos += 6;
+      const done = /completed|yes/i.test(unit.OC);
+      udRows.push(['OC Status', `<span class="rpt-oc-badge ${done?'completed':'pending'}">
+        <i class="bi bi-${done?'check-circle-fill':'clock'}"></i>
+        ${done ? 'Completed' : unit.OC}</span>`]);
     }
-    
-    // === SECTION 2: FINANCIAL DETAILS ===
-    yPos += 8;
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'bold');
-    doc.text('FINANCIAL DETAILS', 15, yPos);
-    yPos += 2;
-    
-    doc.setDrawColor(ar, ag, ab);
-    doc.setLineWidth(0.8);
-    doc.line(15, yPos, 55, yPos);
-    yPos += 8;
-    
-    doc.setFontSize(9);
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(100);
-    
-    const agreementValue = unit.AgreementValue || 0;
-    const interiorValue = unit.InteriorValue || 0;
-    const totalReceivables = agreementValue + interiorValue;
-    const totalReceived = unit.TotalReceived || 0;
-    const balanceReceivables = totalReceivables - totalReceived;
-    
-    doc.text('Agreement Value:', 15, yPos);
-    doc.setTextColor(0);
-    doc.text(formatCurrency(agreementValue), 60, yPos);
-    doc.setTextColor(100);
-    yPos += 6;
-    
-    doc.text('Interior Design Value:', 15, yPos);
-    doc.setTextColor(0);
-    doc.text(formatCurrency(interiorValue), 60, yPos);
-    doc.setTextColor(100);
-    yPos += 6;
-    
-    doc.text('Total Receivables:', 15, yPos);
-    doc.setTextColor(0);
-    doc.setFont(undefined, 'bold');
-    doc.text(formatCurrency(totalReceivables), 60, yPos);
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(100);
-    yPos += 6;
-    
-    doc.text('Total Received:', 15, yPos);
-    doc.setTextColor(5, 150, 105);
-    doc.text(formatCurrency(totalReceived), 60, yPos);
-    doc.setTextColor(100);
-    yPos += 6;
-    
-    doc.text('Balance Receivables:', 15, yPos);
-    doc.setTextColor(balanceReceivables > 0 ? 220 : 5, balanceReceivables > 0 ? 38 : 150, balanceReceivables > 0 ? 38 : 105);
-    doc.setFont(undefined, 'bold');
-    doc.text(formatCurrency(balanceReceivables), 60, yPos);
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(100);
-    yPos += 6;
-    
-    // === SECTION 3: HANDOVER SCHEDULE ===
-    yPos += 8;
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'bold');
-    doc.text('HANDOVER SCHEDULE', 15, yPos);
-    yPos += 2;
-    
-    doc.setDrawColor(ar, ag, ab);
-    doc.setLineWidth(0.8);
-    doc.line(15, yPos, 58, yPos);
-    yPos += 8;
-    
-    doc.setFontSize(9);
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(100);
-    
-    doc.text('AFS Date:', 15, yPos);
-    doc.setTextColor(0);
-    doc.text(formatDateDDMMMYY(parseDate(unit.AFSDate)) || unit.AFSDate || 'N/A', 50, yPos);
-    doc.setTextColor(100);
-    yPos += 6;
-    
-    doc.text('HO as per AFS:', 15, yPos);
-    doc.setTextColor(0);
-    doc.text(formatDateDDMMMYY(parseDate(unit.HOasPerAFS)) || unit.HOasPerAFS || 'N/A', 50, yPos);
-    doc.setTextColor(100);
-    yPos += 6;
-    
-    doc.text('IDSA Date:', 15, yPos);
-    doc.setTextColor(0);
-    doc.text(formatDateDDMMMYY(parseDate(unit.IDSADate)) || unit.IDSADate || 'N/A', 50, yPos);
-    doc.setTextColor(100);
-    yPos += 6;
-    
-    doc.text('HO as per IDSA:', 15, yPos);
-    doc.setTextColor(0);
-    doc.text(formatDateDDMMMYY(parseDate(unit.HOasPerIDSA)) || unit.HOasPerIDSA || 'N/A', 50, yPos);
-    doc.setTextColor(100);
-    yPos += 6;
-    
-    // === SECTION 4: CONSTRUCTION ACTIVITIES ===
-    yPos += 8;
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'bold');
-    doc.text('CONSTRUCTION ACTIVITIES', 15, yPos);
-    yPos += 2;
-    
-    doc.setDrawColor(ar, ag, ab);
-    doc.setLineWidth(0.8);
-    doc.line(15, yPos, 70, yPos);
-    yPos += 8;
-    
-    const activities = [
-      { name: 'GFC Released', completed: !!unit.GFC },
-      { name: 'Plaster', completed: !!unit.Plaster },
-      { name: 'Flooring & Dado', completed: !!unit.Floor },
-      { name: 'HVAC Installed', completed: !!unit.HVAC },
-      { name: 'False Ceiling', completed: !!unit.False },
-      { name: 'Fenestration', completed: !!unit.Fenest },
-      { name: 'Ready for Handover', completed: !!unit.Hand }
+
+    document.getElementById('rptUnitDetailsRows').innerHTML =
+      (udRows.length ? udRows : [['—','No unit data available']]).map(([l,v]) =>
+        `<div class="rpt-field-row">
+          <span class="rpt-field-label">${l}</span>
+          <span class="rpt-field-value">${v}</span>
+        </div>`
+      ).join('');
+
+    // ── §2 Financial Details ─────────────────────────────────────
+    const _cr = v => (!v || v===0)
+      ? '<span style="color:#d1d5db">—</span>'
+      : '\u20b9\u00a0' + (v/1e7).toFixed(2) + '\u00a0Cr';
+    const agr    = unit.AgreementValue || 0;
+    const intr   = unit.InteriorValue  || 0;
+    const totR   = agr + intr;
+    const recvd  = unit.TotalReceived  || 0;
+    const dueNow = unit.DueNow         || 0;
+    const bal    = totR - recvd;
+
+    document.getElementById('rptFinancialRows').innerHTML = `
+      <tbody>
+        <tr>
+          <td>Agreement Value</td>
+          <td>${_cr(agr)}</td>
+        </tr>
+        <tr>
+          <td>Interior Design Value</td>
+          <td>${_cr(intr)}</td>
+        </tr>
+        <tr class="rpt-fin-total">
+          <td><strong>Total Receivables</strong></td>
+          <td class="col-accent">${_cr(totR)}</td>
+        </tr>
+        <tr>
+          <td>Total Received</td>
+          <td class="col-positive">${_cr(recvd)}</td>
+        </tr>
+        <tr>
+          <td>Due Now</td>
+          <td class="${dueNow>0?'col-negative':'col-positive'}">${_cr(dueNow)}</td>
+        </tr>
+        <tr class="rpt-fin-balance">
+          <td><strong>Balance Receivables</strong></td>
+          <td class="${bal>0?'col-negative':'col-positive'}">${_cr(bal)}</td>
+        </tr>
+      </tbody>`;
+
+    // ── §3 Handover Schedule  (includes Revised HO Date = Col AA = HandoverPlan) ──
+    const _fmtDate = raw => {
+      const pd = parseDate(raw);
+      const s  = pd ? formatDateDDMMMYY(pd) : formatRawDate(raw);
+      return s && s !== 'N/A' ? s : null;
+    };
+
+    const dateRows = [
+      { label: 'AFS Date',           val: _fmtDate(unit.AFSDate),     revised: false },
+      { label: 'H/O as per AFS',     val: _fmtDate(unit.HOasPerAFS),  revised: false },
+      { label: 'IDSA Date',          val: _fmtDate(unit.IDSADate),    revised: false },
+      { label: 'H/O as per IDSA',    val: _fmtDate(unit.HOasPerIDSA), revised: false },
+      { label: 'Revised H/O Date',   val: _fmtDate(unit.HandoverPlan),revised: true  },
     ];
-    
-    doc.setFontSize(9);
-    activities.forEach(a => {
-      // Bullet (ASCII dash - avoids Unicode rendering issues in jsPDF)
-      doc.setTextColor(a.completed ? 16 : 150, a.completed ? 185 : 150, a.completed ? 129 : 150);
-      doc.text('-', 17, yPos);
-      
-      // Activity name
-      doc.setTextColor(0);
-      doc.text(a.name, 23, yPos);
-      
-      // Status
-      if (a.completed) {
-        doc.setTextColor(5, 150, 105);
-        doc.setFont(undefined, 'bold');
-      } else {
-        doc.setTextColor(156, 163, 175);
-        doc.setFont(undefined, 'normal');
+
+    document.getElementById('rptDatesGrid').innerHTML = dateRows.map(r => `
+      <div class="rpt-date-row${r.revised ? ' rpt-date-revised' : ''}">
+        <span class="rpt-date-row-label">${r.revised ? '<i class="bi bi-calendar-check" style="margin-right:4px"></i>' : ''}${r.label}</span>
+        <span class="rpt-date-row-value${r.val ? '' : ' na'}">${r.val || 'N/A'}</span>
+      </div>`).join('');
+
+    // ── §4 Construction Activities  (proper table) ──────────────
+    const acts = [
+      { name:'GFC Released',       done: !!unit.GFC,    planDate: null,                    amt: null         },
+      { name:'Plaster',            done: !!unit.Plaster, planDate: unit.PlasterPlan,        amt: unit.PlasterRev },
+      { name:'Flooring & Dado',    done: !!unit.Floor,   planDate: unit.FlooringProjected,  amt: unit.FloorRev   },
+      { name:'HVAC Installed',     done: !!unit.HVAC,   planDate: null,                    amt: null         },
+      { name:'False Ceiling',      done: !!unit.False,  planDate: null,                    amt: null         },
+      { name:'Fenestration',       done: !!unit.Fenest, planDate: null,                    amt: null         },
+      { name:'Ready for Handover', done: !!unit.Hand,   planDate: unit.HandoverPlan,       amt: unit.HandRev },
+    ];
+
+    document.getElementById('rptActivityGrid').innerHTML = acts.map(a => {
+      const cls     = a.done ? 'done' : 'pending';
+      const icon    = a.done ? 'bi-check-lg' : 'bi-dash';
+
+      // planned date — only show for pending items
+      let dateStr = null;
+      if (!a.done && a.planDate) {
+        const pd = parseDate(a.planDate);
+        const s  = pd ? formatDateDDMMMYY(pd) : formatRawDate(a.planDate);
+        if (s && s !== 'N/A') dateStr = s;
       }
-      doc.text(a.completed ? 'Completed' : 'Pending', 100, yPos);
-      doc.setFont(undefined, 'normal');
-      yPos += 6;
-    });
-    
-    // Footer
-    doc.setFontSize(7);
-    doc.setTextColor(150);
-    const now = new Date().toLocaleString('en-IN', { 
-      dateStyle: 'medium', 
-      timeStyle: 'short' 
-    });
-    doc.text('Generated on ' + now, 15, 285);
-    doc.text('TotalEnvironment Realty Pvt. Ltd.', 145, 285);
-    
-    // Save
-    doc.save(`Unit_${unit.UnitNo}_Details.pdf`);
+
+      const revStr = (a.amt && a.amt > 0)
+        ? '\u20b9\u00a0' + (a.amt/1e7).toFixed(2) + '\u00a0Cr'
+        : null;
+
+      return `<tr>
+        <td>
+          <div class="rpt-act-name">
+            <div class="rpt-act-icon ${cls}"><i class="bi ${icon}"></i></div>
+            <span class="rpt-act-label">${a.name}</span>
+          </div>
+        </td>
+        <td>
+          <span class="rpt-act-status ${cls}">
+            <i class="bi ${a.done?'bi-check-circle-fill':'bi-clock'}"></i>
+            ${a.done ? 'Completed' : 'Pending'}
+          </span>
+        </td>
+        <td class="col-date">
+          <span class="rpt-act-date ${dateStr?'has-date':'na'}">${dateStr||'—'}</span>
+        </td>
+        <td>
+          <span class="rpt-act-rev ${revStr?'':'no-rev'}">${revStr||'—'}</span>
+        </td>
+      </tr>`;
+    }).join('');
+
+    // ── Footer ───────────────────────────────────────────────────
+    document.getElementById('rptFooterNote').textContent =
+      `${selectedProjectTower||'Unit'} \u2022 Confidential \u2022 Internal Use Only`;
+
+    // ── Open ─────────────────────────────────────────────────────
+    document.getElementById('unitDetailOverlay').classList.add('visible');
+    document.body.style.overflow = 'hidden';
   }
 
-  // ===== SEARCH FUNCTIONALITY =====
+  function closeUnitDetail() {
+    document.getElementById('unitDetailOverlay').classList.remove('visible');
+    document.body.style.overflow = '';
+    currentUnitData = null;
+  }
+
+  // ESC to close
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeUnitDetail(); });
+  // Click outside
+  document.getElementById('unitDetailOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeUnitDetail();
+  });
+
+  // ── hex → "r,g,b" ────────────────────────────────────────────
+  function _hexToRgbStr(hex) {
+    return [1,3,5].map(i => parseInt(hex.slice(i,i+2),16)).join(',');
+  }
+
+  // ══════════════════════════════════════════════════════════════
+  //  PDF EXPORT  — html2canvas → jsPDF  (A4, paginated, complete)
+  // ══════════════════════════════════════════════════════════════
+  async function downloadUnitDetailPDF() {
+    if (!currentUnitData) return;
+    const btn = document.getElementById('rptPdfBtn');
+    if (!btn) return;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="rpt-pdf-spinner"></span> Generating…';
+
+    const card = document.getElementById('unitDetailCard');
+    const body = document.getElementById('rptBody');
+
+    try {
+      const { jsPDF } = window.jspdf;
+
+      // ── Expand to full height for capture ───────────────────
+      const savedCardMaxH = card.style.maxHeight;
+      const savedCardOvY  = card.style.overflowY;
+      const savedBodyOvY  = body ? body.style.overflowY : '';
+      const savedBodyMaxH = body ? body.style.maxHeight  : '';
+
+      card.classList.add('rpt-pdf-mode');
+      card.style.maxHeight  = 'none';
+      card.style.overflowY  = 'visible';
+      if (body) { body.style.overflowY = 'visible'; body.style.maxHeight = 'none'; }
+
+      // One frame for repaint
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+      await new Promise(r => setTimeout(r, 60));
+
+      // ── html2canvas capture ──────────────────────────────────
+      const canvas = await html2canvas(card, {
+        scale:           2,
+        useCORS:         true,
+        allowTaint:      true,
+        backgroundColor: '#ffffff',
+        logging:         false,
+        removeContainer: false,
+        ignoreElements:  el => el.id === 'rptPdfBtn',  // hide the button in PDF
+      });
+
+      // ── Restore ──────────────────────────────────────────────
+      card.classList.remove('rpt-pdf-mode');
+      card.style.maxHeight = savedCardMaxH;
+      card.style.overflowY = savedCardOvY;
+      if (body) { body.style.overflowY = savedBodyOvY; body.style.maxHeight = savedBodyMaxH; }
+
+      // ── Build A4 PDF ─────────────────────────────────────────
+      const A4W = 210, A4H = 297, MG = 10;
+      const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+
+      const imgW  = canvas.width;
+      const imgH  = canvas.height;
+      const pxPerMm = imgW / (A4W - MG*2);
+      const contentMmH = imgH / pxPerMm;
+      const sliceMmH   = A4H - MG*2;
+      const pages      = Math.ceil(contentMmH / sliceMmH);
+
+      for (let p = 0; p < pages; p++) {
+        if (p > 0) pdf.addPage();
+
+        const slicePxY  = Math.round(p * sliceMmH * pxPerMm);
+        const slicePxH  = Math.min(Math.round(sliceMmH * pxPerMm), imgH - slicePxY);
+        if (slicePxH <= 0) break;
+
+        const sliceCanvas = document.createElement('canvas');
+        sliceCanvas.width  = imgW;
+        sliceCanvas.height = slicePxH;
+        sliceCanvas.getContext('2d').drawImage(
+          canvas, 0, slicePxY, imgW, slicePxH, 0, 0, imgW, slicePxH
+        );
+
+        const mmH = slicePxH / pxPerMm;
+        pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.94),
+          'JPEG', MG, MG, A4W - MG*2, mmH);
+      }
+
+      // ── Page footers ─────────────────────────────────────────
+      const totalPages = pdf.internal.getNumberOfPages();
+      const ts = new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+      for (let p = 1; p <= totalPages; p++) {
+        pdf.setPage(p);
+        pdf.setFontSize(6.5);
+        pdf.setTextColor(170, 170, 170);
+        pdf.text(`Unit ${currentUnitData.UnitNo}  |  ${selectedProjectTower||''}  |  Generated: ${ts}`,
+          MG, A4H - 5);
+        pdf.text(`${p} / ${totalPages}`, A4W - MG, A4H - 5, { align:'right' });
+      }
+
+      pdf.save(`Unit_${currentUnitData.UnitNo}_Report.pdf`);
+
+    } catch(err) {
+      console.error('PDF error:', err);
+      alert('PDF export failed — ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Download PDF';
+    }
+  }
+
+    // ===== SEARCH FUNCTIONALITY =====
   
   let searchData = [];
   let currentSearchSelection = -1;
@@ -10526,26 +10489,26 @@
 </div>
 <!-- ═══ END PA COLUMN CUSTOMISER ═══ -->
 
-<!-- ═══ DATE RANGE PICKER v3 ═══ -->
-<div class="drp-backdrop" id="drpBackdrop" onclick="drpClose()"></div>
+<!-- ═══ DATE RANGE PICKER PANEL ═══ -->
+<div class="drp-overlay" id="drpOverlay" style="display:none;" onclick="drpClose()"></div>
 <div class="drp-panel" id="drpPanel">
   <div class="drp-body">
     <!-- Quick presets -->
     <div class="drp-presets">
       <div class="drp-presets-label">Quick Select</div>
-      <button class="drp-preset-btn" onclick="drpPreset(this,'today')">Today</button>
-      <button class="drp-preset-btn" onclick="drpPreset(this,'yesterday')">Yesterday</button>
-      <button class="drp-preset-btn" onclick="drpPreset(this,'last7')">Last 7 Days</button>
-      <button class="drp-preset-btn" onclick="drpPreset(this,'last30')">Last 30 Days</button>
-      <button class="drp-preset-btn" onclick="drpPreset(this,'thisMonth')">This Month</button>
-      <button class="drp-preset-btn" onclick="drpPreset(this,'lastMonth')">Last Month</button>
-      <button class="drp-preset-btn" onclick="drpPreset(this,'thisQ')">This Quarter</button>
-      <button class="drp-preset-btn" onclick="drpPreset(this,'lastQ')">Last Quarter</button>
-      <button class="drp-preset-btn" onclick="drpPreset(this,'thisYear')">This Year</button>
-      <button class="drp-preset-btn" onclick="drpPreset(this,'lastYear')">Last Year</button>
-      <button class="drp-preset-btn" onclick="drpPreset(this,'next3M')">Next 3 Months</button>
-      <button class="drp-preset-btn" onclick="drpPreset(this,'next6M')">Next 6 Months</button>
-      <button class="drp-preset-btn" onclick="drpPreset(this,'nextYear')">Next 12 Months</button>
+      <button class="drp-preset-btn" onclick="drpPreset('today')">Today</button>
+      <button class="drp-preset-btn" onclick="drpPreset('yesterday')">Yesterday</button>
+      <button class="drp-preset-btn" onclick="drpPreset('last7')">Last 7 Days</button>
+      <button class="drp-preset-btn" onclick="drpPreset('last30')">Last 30 Days</button>
+      <button class="drp-preset-btn" onclick="drpPreset('thisMonth')">This Month</button>
+      <button class="drp-preset-btn" onclick="drpPreset('lastMonth')">Last Month</button>
+      <button class="drp-preset-btn" onclick="drpPreset('thisQ')">This Quarter</button>
+      <button class="drp-preset-btn" onclick="drpPreset('lastQ')">Last Quarter</button>
+      <button class="drp-preset-btn" onclick="drpPreset('thisYear')">This Year</button>
+      <button class="drp-preset-btn" onclick="drpPreset('lastYear')">Last Year</button>
+      <button class="drp-preset-btn" onclick="drpPreset('next3M')">Next 3 Months</button>
+      <button class="drp-preset-btn" onclick="drpPreset('next6M')">Next 6 Months</button>
+      <button class="drp-preset-btn" onclick="drpPreset('nextYear')">Next 12 Months</button>
     </div>
     <!-- Calendar -->
     <div class="drp-calendars">
@@ -10558,409 +10521,344 @@
     </div>
   </div>
   <div class="drp-footer">
-    <div class="drp-range-info" id="drpRangeInfo">Click a start date</div>
+    <div class="drp-range-display" id="drpRangeDisplay">Select a start date</div>
     <button class="drp-btn drp-btn-cancel" onclick="drpClose()">Cancel</button>
-    <button class="drp-btn drp-btn-apply" id="drpApplyBtn" onclick="drpApply()" disabled style="opacity:0.5;cursor:not-allowed;">Apply</button>
+    <button class="drp-btn drp-btn-apply" onclick="drpApply()">Apply</button>
   </div>
 </div>
 <!-- ═══ END DATE RANGE PICKER ═══ -->
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-//  DATE RANGE PICKER  v3  — bulletproof date-part comparison
+// DATE RANGE PICKER ENGINE
 // ═══════════════════════════════════════════════════════════════
 (function () {
-  'use strict';
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const WD = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 
-  var MN  = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  var MS  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var WD  = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  // State
+  let _context  = null;   // 'PA' | 'Shell'
+  let _start    = null;   // Date
+  let _end      = null;   // Date
+  let _hover    = null;   // Date (for range preview)
+  let _picking  = 0;      // 0=start, 1=end
+  let _viewYear = new Date().getFullYear();
+  let _viewMonth = new Date().getMonth();  // 0-11
 
-  // Applied state: store as {y,m,d} objects — no timestamp ambiguity
-  var _applied = {
-    PA:    { from: null, to: null },  // {y,m,d} or null
-    Shell: { from: null, to: null }
-  };
+  // Applied ranges (per context)
+  const _applied = { PA: { from: null, to: null }, Shell: { from: null, to: null } };
 
-  // Working state
-  var _ctx   = null;
-  var _from  = null;   // {y,m,d} start
-  var _to    = null;   // {y,m,d} end
-  var _hover = null;   // {y,m,d} hover
-  var _step  = 1;      // 1 = picking start, 2 = picking end
-  var _vY    = new Date().getFullYear();
-  var _vM    = new Date().getMonth();  // 0-11
-
-  // ── Date part helpers ────────────────────────────────────────
-  function _today()       { var n=new Date(); return {y:n.getFullYear(),m:n.getMonth(),d:n.getDate()}; }
-  function _daysInMonth(y,m){ return new Date(y,m+1,0).getDate(); }
-  function _cmp(a,b)      { /* <0 a before b, 0 same, >0 a after b */
-    if (!a||!b) return 0;
-    var ay=a.y*10000+a.m*100+a.d, by=b.y*10000+b.m*100+b.d;
-    return ay-by;
-  }
-  function _fmtLong(o)    { return o ? o.d+' '+MS[o.m]+' '+o.y : ''; }
-  function _fmtShort(o)   { return o ? o.d+'-'+MS[o.m]+'-'+String(o.y).slice(2) : ''; }
-
-  // Parse a JS Date object to {y,m,d} safely (local time)
-  function _dateToObj(dt) {
-    if (!dt || isNaN(dt.getTime())) return null;
-    return { y: dt.getFullYear(), m: dt.getMonth(), d: dt.getDate() };
-  }
-
-  // Convert {y,m,d} to Date objects for midnight and end-of-day
-  function _objToMidnight(o) { return o ? new Date(o.y, o.m, o.d, 0,0,0,0) : null; }
-  function _objToEOD(o)      { return o ? new Date(o.y, o.m, o.d,23,59,59,999) : null; }
-
-  // ── Preset ranges ─────────────────────────────────────────────
-  function _preset(key) {
-    var t=_today(), y=t.y, m=t.m, d=t.d;
-    var from, to;
-    function ymd(yr,mo,dy){
-      var dt=new Date(yr,mo,dy); return {y:dt.getFullYear(),m:dt.getMonth(),d:dt.getDate()};
-    }
-    switch(key){
-      case 'today':     from=ymd(y,m,d);   to=ymd(y,m,d);   break;
-      case 'yesterday': from=ymd(y,m,d-1); to=ymd(y,m,d-1); break;
-      case 'last7':     from=ymd(y,m,d-6); to=ymd(y,m,d);   break;
-      case 'last30':    from=ymd(y,m,d-29);to=ymd(y,m,d);   break;
-      case 'thisMonth': from={y:y,m:m,d:1}; to=ymd(y,m+1,0); break;
-      case 'lastMonth': from={y:y,m:m-1<0?11:m-1,d:1}; to=ymd(y,m,0); break;
-      case 'thisQ':  {var qs=Math.floor(m/3)*3; from={y:y,m:qs,d:1}; to=ymd(y,qs+3,0); break;}
-      case 'lastQ':  {var qs2=Math.floor(m/3)*3-3; var qy=qs2<0?y-1:y; var qm=qs2<0?qs2+12:qs2; from={y:qy,m:qm,d:1}; to=ymd(qy,qm+3,0); break;}
-      case 'thisYear':  from={y:y,m:0,d:1}; to={y:y,m:11,d:31}; break;
-      case 'lastYear':  from={y:y-1,m:0,d:1}; to={y:y-1,m:11,d:31}; break;
-      case 'next3M':    from=ymd(y,m,d); to=ymd(y,m+3,d); break;
-      case 'next6M':    from=ymd(y,m,d); to=ymd(y,m+6,d); break;
-      case 'nextYear':  from=ymd(y,m,d); to=ymd(y+1,m,d); break;
-      default:          from={y:y,m:0,d:1}; to={y:y,m:11,d:31};
-    }
-    return {from:from, to:to};
-  }
-
-  // ── Public API ────────────────────────────────────────────────
+  // ── Public API ──────────────────────────────────────────────
   window.drpOpen = function(ctx) {
-    _ctx  = ctx;
-    var ap = _applied[ctx];
-    _from  = ap.from ? {y:ap.from.y,m:ap.from.m,d:ap.from.d} : null;
-    _to    = ap.to   ? {y:ap.to.y,  m:ap.to.m,  d:ap.to.d  } : null;
-    _hover = null;
-    _step  = _from ? 2 : 1;  // if from already set, let user pick a new range from step 1
+    _context = ctx;
+    // Seed with currently applied range
+    _start  = _applied[ctx].from ? new Date(_applied[ctx].from) : null;
+    _end    = _applied[ctx].to   ? new Date(_applied[ctx].to)   : null;
+    _hover  = null;
+    _picking = _start ? (_end ? 0 : 1) : 0;
 
-    // Reset step to 1 so user always starts fresh with a new "from" click
-    _step = 1;
-    _from = null; _to = null;
+    // View: start at from-month or current month
+    const seed = _start || new Date();
+    _viewYear  = seed.getFullYear();
+    _viewMonth = seed.getMonth();
+    // If viewing the second calendar makes sense, step back one month
+    if (_viewMonth === 11) { _viewMonth = 10; } else if (_viewMonth > 0) { _viewMonth--; }
 
-    // View: show month of applied from, or current month
-    var seed = ap.from || _today();
-    _vY = seed.y; _vM = seed.m;
-    if (_vM > 0) _vM--; else { /* keep as Jan */ }
+    // Mark active trigger
+    document.querySelectorAll('.drp-trigger').forEach(b => b.classList.remove('open'));
+    const trig = document.getElementById('drpTrigger' + ctx);
+    if (trig) trig.classList.add('open');
 
-    // Update trigger styling
-    document.querySelectorAll('.drp-trigger').forEach(function(b){b.classList.remove('drp-open');});
-    var trig = document.getElementById('drpTrigger'+ctx);
-    if (trig) trig.classList.add('drp-open');
+    // Position panel near trigger
+    _positionPanel(trig);
 
-    // Render, show, position
+    document.getElementById('drpOverlay').style.display = 'block';
+    requestAnimationFrame(() => document.getElementById('drpPanel').classList.add('open'));
+
     _render();
-    var panel = document.getElementById('drpPanel');
-    panel.style.display = 'flex';
-    document.getElementById('drpBackdrop').style.display = 'block';
-
-    // Position AFTER display:flex so offsetWidth is real
-    setTimeout(function(){ _positionPanel(trig); }, 0);
-
-    // Animate open
-    setTimeout(function(){ panel.classList.add('drp-open'); }, 10);
   };
 
   window.drpClose = function() {
-    var panel = document.getElementById('drpPanel');
-    panel.classList.remove('drp-open');
-    document.getElementById('drpBackdrop').style.display = 'none';
-    document.querySelectorAll('.drp-trigger').forEach(function(b){b.classList.remove('drp-open');});
-    setTimeout(function(){ panel.style.display = 'none'; _ctx=null; }, 200);
+    document.getElementById('drpPanel').classList.remove('open');
+    document.getElementById('drpOverlay').style.display = 'none';
+    document.querySelectorAll('.drp-trigger').forEach(b => b.classList.remove('open'));
+    setTimeout(() => { _context = null; }, 220);
   };
 
   window.drpApply = function() {
-    if (!_from) { drpClose(); return; }
-    var finalTo = _to || _from;  // single day if no end selected
-    // Ensure correct order
-    if (_cmp(_from, finalTo) > 0) { var tmp=_from; _from=finalTo; finalTo=tmp; }
-    _applied[_ctx] = { from: {y:_from.y,m:_from.m,d:_from.d}, to: {y:finalTo.y,m:finalTo.m,d:finalTo.d} };
-    _updateLabel(_ctx);
-    _dispatch(_ctx);
+    if (!_start) { drpClose(); return; }
+    const from = _start;
+    const to   = _end || _start;
+    _applied[_context] = { from: _dayStart(from), to: _dayEnd(to) };
+    _updateTriggerLabel(_context);
+    _dispatchChange(_context);
     drpClose();
   };
 
-  window.drpClear = function(ctx, e) {
-    if (e) { e.stopPropagation(); e.preventDefault(); }
-    _applied[ctx] = { from: null, to: null };
-    _updateLabel(ctx);
-    _dispatch(ctx);
-  };
-
-  window.drpPreset = function(btn, key) {
-    var r = _preset(key);
-    _from  = r.from;
-    _to    = r.to;
-    _hover = null;
-    _step  = 1;  // reset so next manual click restarts selection
-    document.querySelectorAll('.drp-preset-btn').forEach(function(b){b.classList.remove('drp-preset-active');});
-    btn.classList.add('drp-preset-active');
-    _vY = _from.y; _vM = _from.m > 0 ? _from.m - 1 : 0;
+  window.drpPreset = function(key) {
+    const { from, to } = _presetRange(key);
+    _start  = from;
+    _end    = to;
+    _hover  = null;
+    _picking = 0;
+    // Highlight selected preset
+    document.querySelectorAll('.drp-preset-btn').forEach(b => b.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    // Navigate calendar to show from date
+    _viewYear  = from.getFullYear();
+    _viewMonth = from.getMonth() === 11 ? 10 : from.getMonth();
     _render();
   };
 
   window.drpNavMonth = function(dir) {
-    _vM += dir;
-    if (_vM > 11) { _vM=0; _vY++; }
-    if (_vM < 0)  { _vM=11; _vY--; }
+    _viewMonth += dir;
+    if (_viewMonth > 11) { _viewMonth = 0;  _viewYear++; }
+    if (_viewMonth < 0)  { _viewMonth = 11; _viewYear--; }
     _render();
   };
 
-  // Called by day cells (y, m, d are plain integers)
-  window._drpClick = function(y, m, d) {
-    var clicked = {y:y, m:m, d:d};
-    if (_step === 1) {
-      _from  = clicked;
-      _to    = null;
-      _hover = null;
-      _step  = 2;
+  // Called by day cells
+  window._drpDayClick = function(y, m, d) {
+    const clicked = new Date(y, m, d);
+    if (_picking === 0) {
+      _start = clicked; _end = null; _hover = null; _picking = 1;
+    } else {
+      if (clicked < _start) { _end = _start; _start = clicked; }
+      else                   { _end = clicked; }
+      _picking = 0;
       // Clear preset highlights
-      document.querySelectorAll('.drp-preset-btn').forEach(function(b){b.classList.remove('drp-preset-active');});
-    } else {
-      if (_cmp(clicked, _from) < 0) {
-        // Clicked before start — swap: new start = clicked, new end = old start
-        _to   = _from;
-        _from = clicked;
-      } else {
-        _to = clicked;
-      }
-      _step = 1;  // ready for new selection next time
+      document.querySelectorAll('.drp-preset-btn').forEach(b => b.classList.remove('selected'));
     }
-    _hover = null;
     _render();
   };
 
-  window._drpHover = function(y, m, d) {
-    if (_step === 2) { _hover = {y:y,m:m,d:d}; _render(); }
+  window._drpDayHover = function(y, m, d) {
+    if (_picking === 1) { _hover = new Date(y, m, d); _render(); }
   };
 
-  // ── Positioning ────────────────────────────────────────────────
-  function _positionPanel(trig) {
-    var panel = document.getElementById('drpPanel');
-    if (!trig) {
-      panel.style.top  = '80px';
-      panel.style.left = '50%';
-      panel.style.transform = 'translateX(-50%)';
-      return;
-    }
-    panel.style.transform = '';
-    var rect = trig.getBoundingClientRect();
-    var pw   = panel.offsetWidth  || 570;
-    var ph   = panel.offsetHeight || 390;
-    var spaceBelow = window.innerHeight - rect.bottom - 10;
-    var spaceAbove = rect.top - 10;
-
-    var top, left;
-
-    // Prefer below; flip up only if not enough space below AND enough above
-    if (spaceBelow >= ph || spaceBelow >= spaceAbove) {
-      top = rect.bottom + 6;
-    } else {
-      top = rect.top - ph - 6;
-    }
-
-    // Clamp to viewport
-    if (top < 8) top = 8;
-    if (top + ph > window.innerHeight - 8) top = window.innerHeight - ph - 8;
-
-    left = rect.left;
-    if (left + pw > window.innerWidth - 12) left = Math.max(12, window.innerWidth - pw - 12);
-
-    panel.style.top    = top  + 'px';
-    panel.style.left   = left + 'px';
-    panel.style.width  = Math.min(pw, window.innerWidth - 24) + 'px';
-    panel.style.maxHeight = (window.innerHeight - top - 12) + 'px';
-  }
-
-  // ── Rendering ──────────────────────────────────────────────────
+  // ── Private helpers ──────────────────────────────────────────
   function _render() {
-    // Second calendar month
-    var m2y = _vM === 11 ? _vY+1 : _vY;
-    var m2m = _vM === 11 ? 0 : _vM+1;
-
-    document.getElementById('drpMonthLabel').textContent =
-      MN[_vM]+' '+_vY+'  –  '+MN[m2m]+' '+m2y;
-
-    document.getElementById('drpCalMonths').innerHTML =
-      _buildMonth(_vY, _vM) + _buildMonth(m2y, m2m);
-
+    _renderCalendars();
     _renderFooter();
-    _updateApplyBtn();
   }
 
-  function _buildMonth(Y, M) {
-    var t      = _today();
-    var first  = new Date(Y, M, 1).getDay();  // 0=Sun
-    var total  = _daysInMonth(Y, M);
-    var dispEnd = _step===2 && _hover ? _hover : _to;
+  function _renderCalendars() {
+    const label = document.getElementById('drpMonthLabel');
+    const m2year = _viewMonth === 11 ? _viewYear + 1 : _viewYear;
+    const m2month = _viewMonth === 11 ? 0 : _viewMonth + 1;
+    label.textContent = `${MONTHS[_viewMonth]} ${_viewYear}  –  ${MONTHS[m2month]} ${m2year}`;
 
-    // Determine lo/hi for range shading
-    var lo = null, hi = null;
-    if (_from && dispEnd) {
-      lo = _cmp(_from,dispEnd)<=0 ? _from : dispEnd;
-      hi = _cmp(_from,dispEnd)<=0 ? dispEnd : _from;
-    }
+    const container = document.getElementById('drpCalMonths');
+    container.innerHTML =
+      _buildMonthGrid(_viewYear, _viewMonth) +
+      _buildMonthGrid(m2year, m2month);
 
-    var html = '<div><div class="drp-month-name">'+MN[M]+' '+Y+'</div>'
-      + '<div class="drp-cal-weekdays">'
-      + WD.map(function(w){return '<div class="drp-cal-wd">'+w+'</div>';}).join('')
-      + '</div><div class="drp-cal-days">';
+    // Wire hover events after DOM insert
+    container.querySelectorAll('.drp-day:not(.drp-day-other):not(.drp-day-disabled)').forEach(el => {
+      el.addEventListener('mouseenter', () => _drpDayHover(+el.dataset.y, +el.dataset.m, +el.dataset.d));
+    });
+  }
+
+  function _buildMonthGrid(year, month) {
+    const today  = new Date(); today.setHours(0,0,0,0);
+    const first  = new Date(year, month, 1);
+    const startWD = first.getDay();           // 0=Sun
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const rangeEnd = _picking === 1 && _hover ? _hover : _end;
+
+    let html = `<div class="drp-cal-grid">
+      <div class="drp-month-name">${MONTHS[month]} ${year}</div>
+      <div class="drp-cal-weekdays">${WD.map(w => `<div class="drp-cal-wd">${w}</div>`).join('')}</div>
+      <div class="drp-cal-days">`;
 
     // Leading blanks
-    for (var i=0; i<first; i++) html += '<div class="drp-day drp-day-other"></div>';
+    for (let i = 0; i < startWD; i++) html += `<div class="drp-day drp-day-other"></div>`;
 
-    for (var d=1; d<=total; d++) {
-      var cur = {y:Y, m:M, d:d};
-      var isToday   = Y===t.y && M===t.m && d===t.d;
-      var isStart   = _from  && _cmp(cur,_from)===0;
-      var isEnd     = dispEnd && _cmp(cur,dispEnd)===0;
-      var inRange   = lo && hi && _cmp(cur,lo)>0 && _cmp(cur,hi)<0;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(year, month, d);
+      const isToday = date.getTime() === today.getTime();
+      const isStart = _start && _sameDay(date, _start);
+      const isEnd   = rangeEnd && _sameDay(date, rangeEnd);
+      const inRange = _start && rangeEnd && date > (_start < rangeEnd ? _start : rangeEnd) && date < (_start < rangeEnd ? rangeEnd : _start);
 
-      var cls = 'drp-day';
-      if (isToday) cls += ' drp-day-today';
-      if (isStart) cls += ' drp-day-start';
-      if (isEnd)   cls += ' drp-day-end';
-      if (inRange) cls += ' drp-day-in-range';
+      let cls = 'drp-day';
+      if (isToday)  cls += ' drp-day-today';
+      if (isStart)  cls += ' drp-day-start';
+      if (isEnd)    cls += ' drp-day-end';
+      if (inRange)  cls += ' drp-day-in-range';
 
-      html += '<div class="'+cls+'" '
-        + 'onclick="_drpClick('+Y+','+M+','+d+')" '
-        + 'onmouseenter="_drpHover('+Y+','+M+','+d+')">'
-        + d+'</div>';
+      html += `<div class="${cls}" data-y="${year}" data-m="${month}" data-d="${d}" onclick="_drpDayClick(${year},${month},${d})">${d}</div>`;
     }
+    // Trailing blanks to complete grid
+    const total = startWD + daysInMonth;
+    const trailing = total % 7 === 0 ? 0 : 7 - (total % 7);
+    for (let i = 0; i < trailing; i++) html += `<div class="drp-day drp-day-other"></div>`;
 
-    // Trailing blanks
-    var used = first + total;
-    for (var j=0; j < (7 - used%7)%7; j++) html += '<div class="drp-day drp-day-other"></div>';
-
-    html += '</div></div>';
+    html += `</div></div>`;
     return html;
   }
 
   function _renderFooter() {
-    var el  = document.getElementById('drpRangeInfo');
-    var end = (_step===2 && _hover) ? _hover : _to;
-    if (!_from) {
-      el.innerHTML = 'Click a <strong>start date</strong>';
-    } else if (_step === 2) {
-      el.innerHTML = '<strong>'+_fmtLong(_from)+'</strong> → click an <strong>end date</strong>';
+    const disp = document.getElementById('drpRangeDisplay');
+    const rangeEnd = (_picking === 1 && _hover) ? _hover : _end;
+    if (!_start) {
+      disp.innerHTML = 'Click a start date';
+    } else if (_picking === 1) {
+      disp.innerHTML = `<strong>${_fmt(_start)}</strong> → click an end date`;
+    } else if (_end) {
+      disp.innerHTML = `<strong>${_fmt(_start)}</strong> — <strong>${_fmt(_end)}</strong>`;
     } else {
-      var lo = _cmp(_from, end||_from)<=0 ? _from : (end||_from);
-      var hi = _cmp(_from, end||_from)<=0 ? (end||_from) : _from;
-      el.innerHTML = '<strong>'+_fmtLong(lo)+'</strong> – <strong>'+_fmtLong(hi)+'</strong>';
+      disp.innerHTML = `<strong>${_fmt(_start)}</strong>`;
     }
   }
 
-  function _updateApplyBtn() {
-    var btn = document.getElementById('drpApplyBtn');
-    if (!btn) return;
-    var ready = !!_from;
-    btn.disabled = !ready;
-    btn.style.opacity = ready ? '1' : '0.5';
-    btn.style.cursor  = ready ? 'pointer' : 'not-allowed';
-  }
-
-  function _updateLabel(ctx) {
-    var lbl  = document.getElementById('drpLabel'+ctx);
-    var trig = document.getElementById('drpTrigger'+ctx);
-    var ap   = _applied[ctx];
-
-    // Remove existing clear button
-    if (trig) { var x=trig.querySelector('.drp-x-btn'); if(x) x.remove(); }
-
-    if (!ap.from && !ap.to) {
-      if (lbl)  lbl.textContent = 'All Dates';
-      if (trig) trig.classList.remove('drp-active');
+  function _updateTriggerLabel(ctx) {
+    const lbl = document.getElementById('drpLabel' + ctx);
+    const trig = document.getElementById('drpTrigger' + ctx);
+    const { from, to } = _applied[ctx];
+    if (!from && !to) {
+      if (lbl) lbl.textContent = 'All Dates';
+      if (trig) { trig.classList.remove('active'); _removeClearBtn(ctx); }
     } else {
-      var same = ap.from && ap.to && _cmp(ap.from,ap.to)===0;
-      var text = same ? _fmtShort(ap.from) : _fmtShort(ap.from)+' – '+_fmtShort(ap.to);
-      if (lbl)  lbl.textContent = text;
+      const text = to && !_sameDay(from, to)
+        ? `${_fmtShort(from)} – ${_fmtShort(to)}`
+        : _fmtShort(from);
+      if (lbl) lbl.textContent = text;
       if (trig) {
-        trig.classList.add('drp-active');
-        var xBtn = document.createElement('button');
-        xBtn.className = 'drp-x-btn';
-        xBtn.title = 'Clear';
-        xBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
-        xBtn.onclick = function(e){ drpClear(ctx, e); };
-        trig.appendChild(xBtn);
+        trig.classList.add('active');
+        _addClearBtn(ctx);
       }
     }
   }
 
-  function _dispatch(ctx) {
-    var ap = _applied[ctx];
-    if (ctx === 'PA')    drpApplyPA(ap.from, ap.to);
-    if (ctx === 'Shell') drpApplyShell(ap.from, ap.to);
+  function _addClearBtn(ctx) {
+    const trig = document.getElementById('drpTrigger' + ctx);
+    if (!trig) return;
+    let btn = trig.querySelector('.drp-clear-btn');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.className = 'drp-clear-btn';
+      btn.innerHTML = '<i class="bi bi-x"></i>';
+      btn.onclick = function(e) { e.stopPropagation(); drpClear(ctx); };
+      trig.appendChild(btn);
+    }
   }
+  function _removeClearBtn(ctx) {
+    const trig = document.getElementById('drpTrigger' + ctx);
+    if (!trig) return;
+    const btn = trig.querySelector('.drp-clear-btn');
+    if (btn) btn.remove();
+  }
+
+  window.drpClear = function(ctx) {
+    _applied[ctx] = { from: null, to: null };
+    _updateTriggerLabel(ctx);
+    _dispatchChange(ctx);
+  };
+
+  function _dispatchChange(ctx) {
+    const { from, to } = _applied[ctx];
+    if (ctx === 'PA') {
+      drpApplyPA(from, to);
+    } else if (ctx === 'Shell') {
+      drpApplyShell(from, to);
+    }
+  }
+
+  function _positionPanel(trig) {
+    const panel = document.getElementById('drpPanel');
+    if (!trig) return;
+    const rect = trig.getBoundingClientRect();
+    const wrapper = trig.closest('.drp-wrapper');
+    panel.style.left = '0';
+    panel.style.right = 'auto';
+    // Check if panel would overflow right edge
+    setTimeout(() => {
+      const pw = panel.offsetWidth || 560;
+      if (rect.left + pw > window.innerWidth - 16) {
+        panel.style.left = 'auto';
+        panel.style.right = '0';
+      }
+    }, 0);
+  }
+
+  function _presetRange(key) {
+    const now  = new Date(); now.setHours(0,0,0,0);
+    const y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
+    switch (key) {
+      case 'today':     return { from: new Date(y,m,d),   to: new Date(y,m,d) };
+      case 'yesterday': return { from: new Date(y,m,d-1), to: new Date(y,m,d-1) };
+      case 'last7':     return { from: new Date(y,m,d-6), to: new Date(y,m,d) };
+      case 'last30':    return { from: new Date(y,m,d-29),to: new Date(y,m,d) };
+      case 'thisMonth': return { from: new Date(y,m,1),   to: new Date(y,m+1,0) };
+      case 'lastMonth': return { from: new Date(y,m-1,1), to: new Date(y,m,0) };
+      case 'thisQ': {
+        const qs = Math.floor(m/3)*3;
+        return { from: new Date(y,qs,1), to: new Date(y,qs+3,0) };
+      }
+      case 'lastQ': {
+        const qs = Math.floor(m/3)*3 - 3;
+        const qy = qs < 0 ? y-1 : y; const qm = qs < 0 ? qs+12 : qs;
+        return { from: new Date(qy,qm,1), to: new Date(qy,qm+3,0) };
+      }
+      case 'thisYear':  return { from: new Date(y,0,1),   to: new Date(y,11,31) };
+      case 'lastYear':  return { from: new Date(y-1,0,1), to: new Date(y-1,11,31) };
+      case 'next3M':    return { from: new Date(y,m,d),   to: new Date(y,m+3,d) };
+      case 'next6M':    return { from: new Date(y,m,d),   to: new Date(y,m+6,d) };
+      case 'nextYear':  return { from: new Date(y,m,d),   to: new Date(y+1,m,d) };
+      default:          return { from: new Date(y,0,1),   to: new Date(y,11,31) };
+    }
+  }
+
+  function _sameDay(a, b)  { return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+  function _dayStart(d)    { const x=new Date(d); x.setHours(0,0,0,0); return x; }
+  function _dayEnd(d)      { const x=new Date(d); x.setHours(23,59,59,999); return x; }
+  function _fmt(d)         { return d ? `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}` : ''; }
+  function _fmtShort(d)    { return d ? `${d.getDate()}-${MONTHS_SHORT[d.getMonth()]}-${String(d.getFullYear()).slice(2)}` : ''; }
+
+  // ── Integration — PA tab ────────────────────────────────────
+  window.drpApplyPA = function(from, to) {
+    // Convert to a date-match function and re-run generation
+    _drpFromPA = from;
+    _drpToPA   = to;
+    // Reset detail sections when date range changes
+    document.getElementById('structureDetailsSection').classList.remove('visible');
+    document.getElementById('planActualDetailsSection').classList.remove('visible');
+    document.querySelectorAll('.plan-actual-card').forEach(c => c.classList.remove('selected'));
+    generatePlanVsActuals();
+  };
+
+  // ── Integration — Shell tab ─────────────────────────────────
+  window.drpApplyShell = function(from, to) {
+    _drpFromShell = from;
+    _drpToShell   = to;
+    updateShellKPIs();
+    renderShellTracker();
+  };
 
 })();
 
-// ══════════════════════════════════════════════════════════════
-//  GLOBAL STATE — {y,m,d} objects
-// ══════════════════════════════════════════════════════════════
-var _drpFromPA    = null;  // {y,m,d}
-var _drpToPA      = null;  // {y,m,d}
+// Global date range state (accessed by filter functions)
+var _drpFromPA    = null;
+var _drpToPA      = null;
 var _drpFromShell = null;
 var _drpToShell   = null;
 
-/**
- * drpInRange — compares at DATE-PART level (year/month/day), NOT timestamps.
- * This is 100% timezone-safe: no DST, no UTC-offset issues.
- * @param {Date} dateObj  — a JS Date from parseDate()
- * @param {string} ctx    — 'PA' | 'Shell'
- */
-function drpInRange(dateObj, ctx) {
-  var from, to;
-  if      (ctx === 'PA')    { from = _drpFromPA;    to = _drpToPA;    }
-  else if (ctx === 'Shell') { from = _drpFromShell; to = _drpToShell; }
-  else return true;
-
-  if (!from && !to) return true;
-  if (!dateObj || isNaN(dateObj.getTime())) return false;
-
-  // Extract LOCAL year/month/day from the data date
-  var dy = dateObj.getFullYear();
-  var dm = dateObj.getMonth();
-  var dd = dateObj.getDate();
-
-  // Convert to a comparable integer YYYYMMDD
-  var dNum = dy*10000 + dm*100 + dd;
-
-  var fNum = from ? from.y*10000 + from.m*100 + from.d : -Infinity;
-  var eNum = to   ? to.y*10000   + to.m*100   + to.d   : Infinity;
-
-  return dNum >= fNum && dNum <= eNum;
-}
-
-// ── Tab integrations ───────────────────────────────────────────
-function drpApplyPA(fromObj, toObj) {
-  _drpFromPA = fromObj;
-  _drpToPA   = toObj;
-  document.getElementById('structureDetailsSection').classList.remove('visible');
-  document.getElementById('planActualDetailsSection').classList.remove('visible');
-  document.querySelectorAll('.plan-actual-card').forEach(function(c){c.classList.remove('selected');});
-  generatePlanVsActuals();
-}
-
-function drpApplyShell(fromObj, toObj) {
-  _drpFromShell = fromObj;
-  _drpToShell   = toObj;
-  updateShellKPIs();
-  renderShellTracker();
+// Helper: test if a date falls within the active date range for a given context
+function drpInRange(date, ctx) {
+  const from = ctx === 'PA' ? _drpFromPA : _drpFromShell;
+  const to   = ctx === 'PA' ? _drpToPA   : _drpToShell;
+  if (!from && !to) return true;          // no filter
+  if (!date)        return false;
+  const t = date.getTime();
+  const f = from ? from.getTime() : -Infinity;
+  const e = to   ? to.getTime()   : Infinity;
+  return t >= f && t <= e;
 }
 </script>
+
 
 </body>
 </html>
