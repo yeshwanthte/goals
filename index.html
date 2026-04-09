@@ -6439,32 +6439,86 @@
     renderDetailsTable();
   }
 
+  // ═══════════════════════════════════════════════════════════════
+  // SHARED EXCEL FORMAT HELPER
+  // Applies cell-level number formats to a SheetJS worksheet.
+  //   ws        — SheetJS worksheet object
+  //   schema    — array of column types: 'd'=date, 'n'=number, 't'=text
+  //   startRow  — 0-based first data row to format (skip header = 1)
+  //
+  // Date format  : dd-mmm-yy  →  "05-Jan-26"   (Excel recognises as real date)
+  // Number format: #,##0.00   →  "1,234.56"
+  // Text         : no numFmt  →  plain string
+  // ═══════════════════════════════════════════════════════════════
+  function xlsxApplyFormats(ws, schema, startRow) {
+    const DATE_FMT = 'dd-mmm-yy';
+    const NUM_FMT  = '#,##0.00';
+    const range    = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+
+    for (let R = startRow; R <= range.e.r; R++) {
+      for (let C = 0; C < schema.length && C <= range.e.c; C++) {
+        const addr = XLSX.utils.encode_cell({ r: R, c: C });
+        if (!ws[addr]) continue;
+        const cell = ws[addr];
+        const type = schema[C];
+
+        if (type === 'd') {
+          // Only format if the cell contains a real date value
+          if (cell.v instanceof Date || (cell.t === 'n' && cell.v > 0)) {
+            cell.t = 'n';  // SheetJS stores dates as numbers internally
+            if (cell.v instanceof Date) {
+              // Convert Date → Excel serial (local time, not UTC)
+              const d = cell.v;
+              const base = new Date(1899, 11, 30);
+              cell.v = Math.round((d - base) / 86400000 * 10000) / 10000;
+            }
+            cell.z = DATE_FMT;
+          }
+          // If null / empty — leave as-is (blank cell)
+        } else if (type === 'n') {
+          if (cell.v !== null && cell.v !== '' && !isNaN(cell.v)) {
+            cell.t = 'n';
+            cell.v = typeof cell.v === 'string' ? parseFloat(cell.v) : cell.v;
+            cell.z = NUM_FMT;
+          }
+        } else {
+          // text — ensure type is string
+          if (cell.v !== null && cell.v !== undefined) {
+            cell.t = 's';
+            cell.v = String(cell.v);
+          }
+        }
+      }
+    }
+  }
+
   function downloadExcel() {
     if (currentDetailsData.length === 0) { alert('No data to download'); return; }
 
     const optLabels = activeColIds.map(id => (OPTIONAL_COLS.find(c => c.id === id) || {label: id}).label);
     const headers = ['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', ...optLabels];
-    const excelData = [headers];
 
+    // schema: 't'=text, 'n'=number, 'd'=date, 's'=status-text
+    const schema = ['t','t','t','t','t','n', ...activeColIds.map(() => 't')];
+
+    const excelData = [headers];
     const totalRevenue = currentDetailsData.reduce((s, u) => s + (u[currentRevenueField] || 0), 0) / 10000000;
-    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue.toFixed(2),
-      ...activeColIds.map(() => '')]);
+    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue, ...activeColIds.map(() => '')]);
 
     currentDetailsData.forEach(unit => {
-      const revenue = ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
+      const revenue = (unit[currentRevenueField] || 0) / 10000000;
       const optVals = activeColIds.map(id => {
         const col = OPTIONAL_COLS.find(c => c.id === id);
         return col ? (unit[col.field] ? 'Done' : 'Pending') : '';
       });
-      excelData.push([
-        unit.Project || 'N/A', unit.Phase || 'N/A', unit.Tower || 'N/A',
-        unit.UnitNo, unit.Customer, revenue, ...optVals
-      ]);
+      excelData.push([unit.Project||'N/A', unit.Phase||'N/A', unit.Tower||'N/A',
+        unit.UnitNo, unit.Customer, revenue, ...optVals]);
     });
 
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(excelData);
     ws['!cols'] = headers.map((_, i) => ({ wch: i===0?20 : i===4?25 : i===5?15 : 14 }));
+    xlsxApplyFormats(ws, schema, 1);  // startRow=1 (0-indexed, skip header row 0)
     XLSX.utils.book_append_sheet(wb, ws, currentActivityName);
     const ts = new Date().toISOString().slice(0, 10);
     XLSX.writeFile(wb, `${currentActivityName.replace(/\s+/g, '_')}_${ts}.xlsx`);
@@ -7716,32 +7770,35 @@
   function downloadStructureExcel() {
     if (currentStructureData.length === 0) { alert('No data to download'); return; }
 
+    // schema: t=text, d=date, n=number
+    const schema = ['t','t','t','d','n','d','n'];
     const excelData = [
       ['Project', 'Villa / Tower', 'Milestone Name', 'Plan Date', 'Plan Amt (₹ Cr)', 'Actual Date', 'Actual Amt (₹ Cr)']
     ];
 
     const totalPlanAmt   = currentStructureData.reduce((s,r) => parseDate(r.PlanDate)   ? s + r.DetailAmt : s, 0) / 10000000;
     const totalActualAmt = currentStructureData.reduce((s,r) => parseDate(r.ActualDate) ? s + r.DetailAmt : s, 0) / 10000000;
-    excelData.push(['TOTAL', `${currentStructureData.length} Slabs`, '', '', totalPlanAmt.toFixed(2), '', totalActualAmt.toFixed(2)]);
+    excelData.push(['TOTAL', `${currentStructureData.length} Slabs`, '', null, totalPlanAmt, null, totalActualAmt]);
 
     currentStructureData.forEach(row => {
-      const villaTower   = row.Tower ? row.Tower : row.Villa;
-      const planDate     = parseDate(row.PlanDate);
-      const actualDate   = parseDate(row.ActualDate);
+      const villaTower = row.Tower ? row.Tower : row.Villa;
+      const planDate   = parseDate(row.PlanDate);
+      const actualDate = parseDate(row.ActualDate);
       excelData.push([
         row.Project || 'N/A',
         villaTower  || 'N/A',
         row.MilestoneName || row.Category || 'N/A',
-        planDate   ? formatDateDDMMMYY(planDate)   : '-',
-        planDate   ? (row.DetailAmt / 10000000).toFixed(2) : '-',
-        actualDate ? formatDateDDMMMYY(actualDate) : '-',
-        actualDate ? (row.DetailAmt / 10000000).toFixed(2) : '-'
+        planDate   || null,
+        planDate   ? (row.DetailAmt / 10000000) : null,
+        actualDate || null,
+        actualDate ? (row.DetailAmt / 10000000) : null
       ]);
     });
 
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(excelData);
-    ws['!cols'] = [{ wch:22 },{ wch:18 },{ wch:20 },{ wch:14 },{ wch:18 },{ wch:14 },{ wch:18 }];
+    const ws = XLSX.utils.aoa_to_sheet(excelData, { cellDates: true });
+    ws['!cols'] = [{wch:22},{wch:18},{wch:20},{wch:14},{wch:18},{wch:14},{wch:18}];
+    xlsxApplyFormats(ws, schema, 1);
     XLSX.utils.book_append_sheet(wb, ws, 'Structures');
     XLSX.writeFile(wb, `Structures_Plan_Actual_${new Date().toISOString().slice(0,10)}.xlsx`);
   }
@@ -7749,17 +7806,13 @@
 
 
   function downloadPlanActualExcel() {
-    if (currentPlanActualData.length === 0) {
-      alert('No data to download');
-      return;
-    }
+    if (currentPlanActualData.length === 0) { alert('No data to download'); return; }
     
     const isPlaster  = currentPlanActualRevField === 'PlasterRev';
     const isFlooring = currentPlanActualRevField === 'FloorRev';
     const isHandover = currentPlanActualRevField === 'HandRev';
     const includeCtg = ctgVisible && (isPlaster || isFlooring || isHandover);
 
-    // Helper: compute CTG for the current activity
     function _ctgVal(unit) {
       if (isPlaster)  return computeCtgUnit(unit)         / 10000000;
       if (isFlooring) return computeCtgFloorUnit(unit)    / 10000000;
@@ -7771,18 +7824,10 @@
       : isHandover ? 'CTG Till Ready for Handover (₹ Cr)'
       : 'CTG Till Plaster (₹ Cr)';
 
-    // Get plan and actual field names
     let planField, actualField;
-    if (currentPlanActualRevField === 'PlasterRev') {
-      planField = 'PlasterPlan';
-      actualField = 'PlasterActual';
-    } else if (currentPlanActualRevField === 'FloorRev') {
-      planField = 'FlooringPlan';
-      actualField = 'FlooringActual';
-    } else {
-      planField = 'HandoverPlan';
-      actualField = 'HandoverActual';
-    }
+    if (isPlaster)       { planField='PlasterPlan';  actualField='PlasterActual';  }
+    else if (isFlooring) { planField='FlooringPlan'; actualField='FlooringActual'; }
+    else                 { planField='HandoverPlan'; actualField='HandoverActual'; }
 
     const headers = [
       'Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name',
@@ -7794,85 +7839,60 @@
     const optCols = paActiveColIds.map(id => _getPAColDef(id)).filter(Boolean);
     if (optCols.length) optCols.forEach(col => headers.push(col.label));
 
+    // Build column schema: t=text, d=date, n=number
+    const schema = ['t','t','t','t','t','d','n','d','n'];
+    if (includeCtg) schema.push('n');
+    optCols.forEach(col => schema.push(col.type === 'ctg' ? 'n' : 't'));
+
     const excelData = [headers];
-    
-    // Calculate totals
-    const totalPlanAmt = currentPlanActualData.reduce((sum, unit) => {
-      const planDate = parseDate(unit[planField]);
-      return planDate ? sum + (unit[currentPlanActualRevField] || 0) : sum;
-    }, 0) / 10000000;
-    
-    const totalActualAmt = currentPlanActualData.reduce((sum, unit) => {
-      const actualDate = parseDate(unit[actualField]);
-      return actualDate ? sum + (unit[currentPlanActualRevField] || 0) : sum;
-    }, 0) / 10000000;
 
-    const totalCtgAmt = includeCtg
-      ? currentPlanActualData.reduce((s, u) => s + _ctgVal(u), 0)
-      : null;
+    // Totals row
+    const totalPlanAmt = currentPlanActualData.reduce((sum,unit) => {
+      return parseDate(unit[planField]) ? sum+(unit[currentPlanActualRevField]||0) : sum;
+    }, 0) / 10000000;
+    const totalActualAmt = currentPlanActualData.reduce((sum,unit) => {
+      return parseDate(unit[actualField]) ? sum+(unit[currentPlanActualRevField]||0) : sum;
+    }, 0) / 10000000;
+    const totalCtgAmt = includeCtg ? currentPlanActualData.reduce((s,u)=>s+_ctgVal(u),0) : null;
 
-    const totalRow = [
-      'TOTAL', '', '', `${currentPlanActualData.length} Units`, '',
-      '', totalPlanAmt.toFixed(2),
-      '', totalActualAmt.toFixed(2)
-    ];
-    if (includeCtg) totalRow.push(totalCtgAmt.toFixed(2));
+    const totalRow = ['TOTAL','','',`${currentPlanActualData.length} Units`,'',null,totalPlanAmt,null,totalActualAmt];
+    if (includeCtg) totalRow.push(totalCtgAmt);
     optCols.forEach(() => totalRow.push(''));
     excelData.push(totalRow);
-    
+
     currentPlanActualData.forEach(unit => {
       const planDate   = parseDate(unit[planField]);
       const actualDate = parseDate(unit[actualField]);
-      
-      const planDateText   = formatDateDDMMMYY(planDate);
-      const actualDateText = formatDateDDMMMYY(actualDate);
-      
-      const planAmt   = planDate   ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
-      const actualAmt = actualDate ? ((unit[currentPlanActualRevField] || 0) / 10000000).toFixed(2) : '-';
-      
+      const planAmt    = planDate   ? (unit[currentPlanActualRevField]||0)/10000000 : null;
+      const actualAmt  = actualDate ? (unit[currentPlanActualRevField]||0)/10000000 : null;
+
       const row = [
-        unit.Project  || 'N/A',
-        unit.Phase    || 'N/A',
-        unit.Tower    || 'N/A',
-        unit.UnitNo,
-        unit.Customer,
-        planDateText,
-        planAmt,
-        actualDateText,
-        actualAmt
+        unit.Project||'N/A', unit.Phase||'N/A', unit.Tower||'N/A',
+        unit.UnitNo, unit.Customer,
+        planDate||null, planAmt,
+        actualDate||null, actualAmt
       ];
-      if (includeCtg) row.push(_ctgVal(unit).toFixed(2));
+      if (includeCtg) row.push(_ctgVal(unit));
       optCols.forEach(col => {
-        if (col.type === 'status') row.push(unit[col.field] ? 'Done' : 'Pending');
-        else if (col.type === 'ctg') row.push((col.calc(unit) / 10000000).toFixed(2));
+        if (col.type==='status') row.push(unit[col.field]?'Done':'Pending');
+        else if (col.type==='ctg') row.push(col.calc(unit)/10000000);
         else row.push('');
       });
       excelData.push(row);
     });
-    
+
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(excelData);
-    
+    const ws = XLSX.utils.aoa_to_sheet(excelData, { cellDates: true });
     ws['!cols'] = [
-      { wch: 20 },  // Project
-      { wch: 15 },  // Phase
-      { wch: 15 },  // Tower
-      { wch: 15 },  // Unit No
-      { wch: 25 },  // Customer Name
-      { wch: 12 },  // Plan Date
-      { wch: 18 },  // Plan Amt
-      { wch: 12 },  // Actual Date
-      { wch: 18 },  // Actual Amt
-      ...(includeCtg ? [{ wch: 28 }] : []),
-      ...optCols.map(col => ({ wch: col.type === 'ctg' ? 26 : 14 }))
+      {wch:20},{wch:15},{wch:15},{wch:15},{wch:25},
+      {wch:14},{wch:18},{wch:14},{wch:18},
+      ...(includeCtg?[{wch:28}]:[]),
+      ...optCols.map(col=>({wch:col.type==='ctg'?26:14}))
     ];
-    
+    xlsxApplyFormats(ws, schema, 1);
     XLSX.utils.book_append_sheet(wb, ws, currentPlanActualActivity);
-    
-    const timestamp = new Date().toISOString().slice(0, 10);
-    const filename = `${currentPlanActualActivity.replace(/\s+/g, '_')}_Plan_Actual_${timestamp}.xlsx`;
-    
-    XLSX.writeFile(wb, filename);
+    const timestamp = new Date().toISOString().slice(0,10);
+    XLSX.writeFile(wb, `${currentPlanActualActivity.replace(/\s+/g,'_')}_Plan_Actual_${timestamp}.xlsx`);
   }
 
   // ===== LOGIN / LOGOUT LOGIC =====
@@ -9597,7 +9617,6 @@
   }
 
   function downloadShellTrackerExcel() {
-    // Collect all Shell Master rows matching current filters (project, tower, year, quarter)
     let rows = getShellFilteredRows();
 
     if (_drpFromShell || _drpToShell) {
@@ -9608,82 +9627,45 @@
       });
     }
 
-    if (rows.length === 0) {
-      alert('No data to download with the current filters.');
-      return;
-    }
+    if (rows.length === 0) { alert('No data to download with the current filters.'); return; }
 
-    // ── Build Excel data ────────────────────────────────────────────────────
-    const header = [
-      'Project',
-      'Tower',
-      'Milestone Name',
-      'Baseline Plan',
-      'Actual / Projected',
-      'Status',
-      'Milestone Amount (₹ Cr)'
-    ];
+    // schema: t=text, d=date, n=number
+    const schema = ['t','t','t','d','d','t','n'];
+    const header = ['Project','Tower','Milestone Name','Baseline Plan','Actual / Projected','Status','Milestone Amount (₹ Cr)'];
 
     const dataRows = rows.map(r => {
       const ad   = parseDate(r.ActualDate);
       const proj = parseDate(r.ProjectedDate);
       const base = parseDate(r.BaselinePlan);
-      const amt  = r.DetailAmt > 0 ? (r.DetailAmt / 10000000).toFixed(2) : '';
-
-      let dateDisplay, status;
-      if (ad) {
-        dateDisplay = formatDateDDMMMYY(ad);
-        status = 'Completed';
-      } else if (proj) {
-        dateDisplay = formatDateDDMMMYY(proj) + ' (Projected)';
-        status = 'Pending';
-      } else {
-        dateDisplay = '';
-        status = 'Pending';
-      }
-
+      const amt  = r.DetailAmt > 0 ? r.DetailAmt / 10000000 : null;
+      const dateDisplay = ad ? ad : (proj ? proj : null);
+      const status = ad ? 'Completed' : 'Pending';
       return [
-        r.Project        || '',
-        r.Tower          || '',
-        r.MilestoneName  || r.Category || '',
-        base ? formatDateDDMMMYY(base) : '',
-        dateDisplay,
+        r.Project       || '',
+        r.Tower         || '',
+        r.MilestoneName || r.Category || '',
+        base         || null,
+        dateDisplay  || null,
         status,
         amt
       ];
     });
 
-    // Group rows by Project then Tower for visual separation
     dataRows.sort((a, b) => {
-      const projCmp = a[0].localeCompare(b[0]);
-      if (projCmp !== 0) return projCmp;
+      const pc = a[0].localeCompare(b[0]);
+      if (pc !== 0) return pc;
       return a[1].localeCompare(b[1], undefined, { numeric: true });
     });
 
     const excelData = [header, ...dataRows];
 
-    // ── Create workbook with styling via SheetJS ────────────────────────────
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(excelData);
-
-    // Column widths
-    ws['!cols'] = [
-      { wch: 22 },  // Project
-      { wch: 18 },  // Tower
-      { wch: 35 },  // Milestone Name
-      { wch: 16 },  // Baseline Plan
-      { wch: 22 },  // Actual / Projected
-      { wch: 12 },  // Status
-      { wch: 20 }   // Milestone Amount
-    ];
-
-    // Freeze top header row
+    const ws = XLSX.utils.aoa_to_sheet(excelData, { cellDates: true });
+    ws['!cols'] = [{wch:22},{wch:18},{wch:35},{wch:16},{wch:22},{wch:12},{wch:20}];
     ws['!freeze'] = { xSplit: 0, ySplit: 1 };
-
+    xlsxApplyFormats(ws, schema, 1);
     XLSX.utils.book_append_sheet(wb, ws, 'Shell Tracker');
-
-    const timestamp = new Date().toISOString().slice(0, 10);
-    XLSX.writeFile(wb, `Shell_Tracker_${timestamp}.xlsx`);
+    XLSX.writeFile(wb, `Shell_Tracker_${new Date().toISOString().slice(0,10)}.xlsx`);
   }
 
 
