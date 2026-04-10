@@ -579,6 +579,99 @@
     .kpi-trend.up { background: var(--success-light); color: var(--success); }
     .kpi-trend.down { background: var(--danger-light); color: var(--danger); }
 
+    /* ── Milestone tab date range card ── */
+    .milestone-drp-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(198,89,17,0.12);
+      border-radius: var(--radius-md);
+      padding: 0.6rem 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 16px rgba(198,89,17,0.07), 0 1px 4px rgba(0,0,0,0.04);
+      flex-wrap: wrap;
+    }
+    .milestone-drp-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+    }
+    .milestone-drp-label i { color: var(--primary); font-size: 0.9rem; }
+    .milestone-drp-sep {
+      width: 1px;
+      height: 22px;
+      background: var(--gray-200);
+      flex-shrink: 0;
+    }
+    .milestone-drp-info {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      font-style: italic;
+      flex: 1;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    /* ── Shell date-basis toggle ── */
+    .shell-basis-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px) saturate(1.5);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: 12px;
+      padding: 0.45rem 0.7rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08), 0 0 0 1px rgba(198,89,17,0.07);
+    }
+    .shell-basis-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .shell-basis-toggle {
+      display: flex;
+      background: rgba(241,245,249,0.9);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .shell-basis-btn {
+      padding: 0.3rem 0.75rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #64748b;
+      background: transparent;
+      transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .shell-basis-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: 0 2px 8px rgba(198,89,17,0.3);
+    }
+    .shell-basis-btn:hover:not(.active) {
+      background: rgba(198,89,17,0.08);
+      color: var(--primary);
+    }
+
     /* Filter Section */
     .filter-section {
       margin-bottom: 1rem;
@@ -4149,6 +4242,20 @@
   <!-- Data Sections (Hidden until data loads) -->
   <div class="data-section" id="dataSection">
 
+    <!-- Date Range Filter Bar -->
+    <div class="milestone-drp-bar">
+      <span class="milestone-drp-label"><i class="bi bi-calendar2-range"></i> Date Filter</span>
+      <div class="milestone-drp-sep"></div>
+      <div class="drp-wrapper" id="drpWrapperMilestone">
+        <button class="drp-trigger" id="drpTriggerMilestone" onclick="drpOpen('Milestone')">
+          <i class="bi bi-calendar2-range drp-icon"></i>
+          <span id="drpLabelMilestone">All Dates</span>
+          <i class="bi bi-chevron-down drp-caret"></i>
+        </button>
+      </div>
+      <span class="milestone-drp-info" id="milestoneDrpInfo">Filtering across all activity dates</span>
+    </div>
+
     <!-- KPI Cards -->
     <section class="kpi-grid" id="kpiSection">
       <div class="kpi-card primary">
@@ -4960,17 +5067,29 @@
             </div>
           </div>
           <!-- Date Range Picker for Shell Tracker -->
-          <div class="pa-multi-card" style="max-width:260px;">
+          <div class="pa-multi-card" style="max-width:320px; flex-direction:column; gap:0.5rem;">
             <div class="pa-multi-header" style="background:linear-gradient(135deg,#475569,#334155);">
-              <i class="bi bi-calendar2-range"></i><span>Date Range</span>
+              <i class="bi bi-calendar2-range"></i><span>Date Range Filter</span>
             </div>
-            <div class="pa-multi-body" style="padding:0.5rem 0.7rem;align-items:center;">
-              <div class="drp-wrapper" id="drpWrapperShell">
+            <div class="pa-multi-body" style="padding:0.5rem 0.7rem; flex-direction:column; align-items:stretch; gap:0.5rem;">
+              <div class="drp-wrapper" id="drpWrapperShell" style="width:100%;">
                 <button class="drp-trigger" id="drpTriggerShell" onclick="drpOpen('Shell')" style="width:100%;">
                   <i class="bi bi-calendar2-range drp-icon"></i>
                   <span id="drpLabelShell">All Dates</span>
                   <i class="bi bi-chevron-down drp-caret"></i>
                 </button>
+              </div>
+              <!-- Date Basis Toggle -->
+              <div class="shell-basis-wrapper">
+                <span class="shell-basis-label"><i class="bi bi-sliders" style="margin-right:3px;"></i>Filter by</span>
+                <div class="shell-basis-toggle">
+                  <button class="shell-basis-btn active" id="shellBasisBaseline" onclick="setShellDateBasis('baseline')">
+                    <i class="bi bi-calendar-check"></i> Baseline Plan
+                  </button>
+                  <button class="shell-basis-btn" id="shellBasisActual" onclick="setShellDateBasis('actual')">
+                    <i class="bi bi-calendar2-event"></i> Actual / Projected
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -5498,7 +5617,6 @@
     AGREEMENT_VALUE: 56, // Column BE (index 56)
     INTERIOR_VALUE: 57, // Column BF (index 57)
     TOTAL_RECEIVED: 59, // Column BH (index 59)
-    DUE_NOW: 60,        // Column BI (index 60)
     AFS_DATE: 61, // Column BJ (index 61)
     HO_AFS: 62, // Column BK (index 62)
     IDSA_DATE: 63, // Column BL (index 63)
@@ -5674,7 +5792,6 @@
       AgreementValue: +r[COL.AGREEMENT_VALUE] || 0,
       InteriorValue: +r[COL.INTERIOR_VALUE] || 0,
       TotalReceived: +r[COL.TOTAL_RECEIVED] || 0,
-      DueNow: +r[COL.DUE_NOW] || 0,
       AFSDate: r[COL.AFS_DATE] || "",
       HOasPerAFS: r[COL.HO_AFS] || "",
       IDSADate: r[COL.IDSA_DATE] || "",
@@ -5754,37 +5871,35 @@
     document.getElementById("planActualDataSection").classList.add("visible");
 
     buildAllSlicers();
+
+    // ── Apply "This Year" as the default date range for all contexts ──
+    (function _seedThisYear() {
+      const now = new Date(); now.setHours(0,0,0,0);
+      const y = now.getFullYear();
+      function _ds(d) { const x = new Date(d); x.setHours(0,0,0,0);       return x; }
+      function _de(d) { const x = new Date(d); x.setHours(23,59,59,999);   return x; }
+      const from = new Date(y, 0, 1);
+      const to   = new Date(y, 11, 31);
+      _drpFromPA        = _ds(from); _drpToPA        = _de(to);
+      _drpFromShell     = _ds(from); _drpToShell     = _de(to);
+      _drpFromMilestone = _ds(from); _drpToMilestone = _de(to);
+      // Update trigger labels
+      const shortFmt = d => `${d.getDate()}-${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]}-${String(d.getFullYear()).slice(2)}`;
+      const label = shortFmt(from) + ' – ' + shortFmt(to);
+      ['PA','Shell','Milestone'].forEach(function(ctx) {
+        const lbl  = document.getElementById('drpLabel'  + ctx);
+        const trig = document.getElementById('drpTrigger' + ctx);
+        if (lbl)  lbl.textContent = label;
+        if (trig) trig.classList.add('active');
+      });
+      const info = document.getElementById('milestoneDrpInfo');
+      const fmtLong = d => `${d.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]} ${d.getFullYear()}`;
+      if (info) info.textContent = `${fmtLong(from)} — ${fmtLong(to)}`;
+    })();
+
     render();
     buildPlanActualSlicers();
     
-    // ── Apply "This Year" as default date range for both contexts ──
-    (function _applyThisYearDefault() {
-      const now = new Date(); now.setHours(0,0,0,0);
-      const y = now.getFullYear();
-      const from = new Date(y, 0, 1);
-      const to   = new Date(y, 11, 31);
-      function _ds(d) { const x=new Date(d); x.setHours(0,0,0,0);       return x; }
-      function _de(d) { const x=new Date(d); x.setHours(23,59,59,999);   return x; }
-      // Stamp into global vars directly (the IIFE hasn't run yet, so use globals)
-      _drpFromPA    = _ds(from);
-      _drpToPA      = _de(to);
-      _drpFromShell = _ds(from);
-      _drpToShell   = _de(to);
-      // Also seed _applied so reopening the picker shows the applied range
-      if (window._drpAppliedDefault) return;
-      window._drpAppliedDefault = true;
-      setTimeout(function() {
-        // Update trigger labels for both contexts
-        ['PA','Shell'].forEach(function(ctx) {
-          var lbl  = document.getElementById('drpLabel'  + ctx);
-          var trig = document.getElementById('drpTrigger'+ ctx);
-          if (lbl)  lbl.textContent = y + ' (Full Year)';
-          if (trig) trig.classList.add('active');
-          // Highlight "This Year" preset button (will only apply when panel opens)
-        });
-      }, 0);
-    })();
-
     generatePlanVsActuals();
     
     // Build tower visualization
@@ -6117,7 +6232,8 @@
       (!inventorySel.size || inventorySel.has(r.Inventory)) &&
       (!idsaSel.size || idsaSel.has(r.IDSADate ? "Yes" : "No")) &&
       (!gfcSel.size || gfcSel.has(r.GFC ? "Yes" : "No")) &&
-      (!ocSel.size || ocSel.has(r.OC))
+      (!ocSel.size || ocSel.has(r.OC)) &&
+      drpInRangeMilestone(r)
     );
 
     currentFilteredData = d;
@@ -8832,12 +8948,11 @@
     const _cr = v => (!v || v===0)
       ? '<span style="color:#d1d5db">—</span>'
       : '\u20b9\u00a0' + (v/1e7).toFixed(2) + '\u00a0Cr';
-    const agr    = unit.AgreementValue || 0;
-    const intr   = unit.InteriorValue  || 0;
-    const totR   = agr + intr;
-    const recvd  = unit.TotalReceived  || 0;
-    const dueNow = unit.DueNow         || 0;
-    const bal    = totR - recvd;
+    const agr   = unit.AgreementValue || 0;
+    const intr  = unit.InteriorValue  || 0;
+    const totR  = agr + intr;
+    const recvd = unit.TotalReceived  || 0;
+    const bal   = totR - recvd;
 
     document.getElementById('rptFinancialRows').innerHTML = `
       <tbody>
@@ -8856,10 +8971,6 @@
         <tr>
           <td>Total Received</td>
           <td class="col-positive">${_cr(recvd)}</td>
-        </tr>
-        <tr>
-          <td>Due Now</td>
-          <td class="${dueNow > 0 ? 'col-negative' : 'col-positive'}">${_cr(dueNow)}</td>
         </tr>
         <tr class="rpt-fin-balance">
           <td><strong>Balance Receivables</strong></td>
@@ -9537,13 +9648,9 @@
 
     let rows = getShellFilteredRows();
 
-    // Date range filter for visualization
+    // Date range filter — respects the basis toggle
     if (_drpFromShell || _drpToShell) {
-      rows = rows.filter(r => {
-        const pd = parseDate(r.PlanDate);
-        const ad = parseDate(r.ActualDate);
-        return (pd && drpInRange(pd, 'Shell')) || (ad && drpInRange(ad, 'Shell'));
-      });
+      rows = rows.filter(r => drpInRangeShell(r));
     }
 
     if (rows.length === 0) {
@@ -9655,11 +9762,7 @@
     let rows = getShellFilteredRows();
 
     if (_drpFromShell || _drpToShell) {
-      rows = rows.filter(r => {
-        const pd = parseDate(r.PlanDate);
-        const ad = parseDate(r.ActualDate);
-        return (pd && drpInRange(pd, 'Shell')) || (ad && drpInRange(ad, 'Shell'));
-      });
+      rows = rows.filter(r => drpInRangeShell(r));
     }
 
     if (rows.length === 0) { alert('No data to download with the current filters.'); return; }
@@ -10433,7 +10536,7 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// DATE RANGE PICKER ENGINE  — v3 (event-delegation, no hover re-render)
+// DATE RANGE PICKER ENGINE  — v2 (single-month, fixed-position)
 // ═══════════════════════════════════════════════════════════════
 (function () {
   const MONTHS       = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -10441,35 +10544,37 @@
   const WD           = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 
   // ── State ────────────────────────────────────────────────────
-  let _context   = null;
-  let _start     = null;   // Date | null
-  let _end       = null;   // Date | null
-  let _hoverDate = null;   // Date | null (CSS-only hover tracking)
-  let _picking   = 0;      // 0 = need start, 1 = need end
-  let _viewYear  = new Date().getFullYear();
-  let _viewMonth = new Date().getMonth();
+  let _context  = null;   // 'PA' | 'Shell'
+  let _start    = null;   // Date | null
+  let _end      = null;   // Date | null
+  let _hover    = null;   // Date | null  (range preview while picking end)
+  let _picking  = 0;      // 0 = waiting for start, 1 = waiting for end
+  let _viewYear = new Date().getFullYear();
+  let _viewMonth = new Date().getMonth();   // 0-11
 
-  // Applied ranges (per context) — seeded from globals on open
-  const _applied = { PA: { from: null, to: null }, Shell: { from: null, to: null } };
+  // Applied ranges survive close/reopen (per context)
+  const _applied = { PA: { from: null, to: null }, Shell: { from: null, to: null }, Milestone: { from: null, to: null } };
 
   // ── Public API ───────────────────────────────────────────────
 
   window.drpOpen = function(ctx) {
     _context = ctx;
 
-    // Sync _applied from globals (in case "This Year" default was set)
-    _applied.PA.from    = _drpFromPA    || null;
-    _applied.PA.to      = _drpToPA      || null;
-    _applied.Shell.from = _drpFromShell || null;
-    _applied.Shell.to   = _drpToShell   || null;
+    // Sync _applied from globals (in case default range was applied externally)
+    _applied.PA.from        = _drpFromPA         || null;
+    _applied.PA.to          = _drpToPA           || null;
+    _applied.Shell.from     = _drpFromShell      || null;
+    _applied.Shell.to       = _drpToShell        || null;
+    _applied.Milestone.from = _drpFromMilestone  || null;
+    _applied.Milestone.to   = _drpToMilestone    || null;
 
-    // Restore previously applied range
-    _start     = _applied[ctx].from ? new Date(_applied[ctx].from) : null;
-    _end       = _applied[ctx].to   ? new Date(_applied[ctx].to)   : null;
-    _hoverDate = null;
-    _picking   = 0; // always start fresh — clicking will set start first
+    // Restore previously applied range into picker state
+    _start   = _applied[ctx].from ? new Date(_applied[ctx].from) : null;
+    _end     = _applied[ctx].to   ? new Date(_applied[ctx].to)   : null;
+    _hover   = null;
+    _picking = 0;
 
-    // Navigate to from-month (or current month)
+    // Navigate to the month of the from-date (or current month)
     const seed = _start || new Date();
     _viewYear  = seed.getFullYear();
     _viewMonth = seed.getMonth();
@@ -10479,30 +10584,34 @@
     const trig = document.getElementById('drpTrigger' + ctx);
     if (trig) trig.classList.add('open');
 
+    // Position panel fixed, just below the trigger button
     _positionPanel(trig);
 
+    // Show overlay + animate in
     document.getElementById('drpOverlay').style.display = 'block';
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      document.getElementById('drpPanel').classList.add('open');
-    }));
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.getElementById('drpPanel').classList.add('open');
+      });
+    });
 
-    _renderCalendar();
-    _renderFooter();
-    _syncPresetHighlight();
+    _render();
   };
 
   window.drpClose = function() {
-    document.getElementById('drpPanel').classList.remove('open');
+    const panel = document.getElementById('drpPanel');
+    panel.classList.remove('open');
     document.getElementById('drpOverlay').style.display = 'none';
     document.querySelectorAll('.drp-trigger').forEach(b => b.classList.remove('open'));
-    _hoverDate = null;
     setTimeout(() => { _context = null; }, 240);
   };
 
   window.drpApply = function() {
     if (!_start) { drpClose(); return; }
+    // End date defaults to start date if user only picked one day
     const from = new Date(_start);
     const to   = _end ? new Date(_end) : new Date(_start);
+    // Ensure correct order
     const [f, t] = from <= to ? [from, to] : [to, from];
     _applied[_context] = { from: _dayStart(f), to: _dayEnd(t) };
     _updateTriggerLabel(_context);
@@ -10512,140 +10621,120 @@
 
   window.drpPreset = function(key) {
     const { from, to } = _presetRange(key);
-    _start     = from;
-    _end       = to;
-    _hoverDate = null;
-    _picking   = 0;
+    _start   = from;
+    _end     = to;
+    _hover   = null;
+    _picking = 0;
     document.querySelectorAll('.drp-preset-btn').forEach(b => b.classList.remove('selected'));
     if (event && event.currentTarget) event.currentTarget.classList.add('selected');
+    // Navigate to from-month
     _viewYear  = from.getFullYear();
     _viewMonth = from.getMonth();
-    _renderCalendar();
-    _renderFooter();
+    _render();
   };
 
   window.drpNavMonth = function(dir) {
     _viewMonth += dir;
     if (_viewMonth > 11) { _viewMonth = 0;  _viewYear++; }
     if (_viewMonth < 0)  { _viewMonth = 11; _viewYear--; }
-    _hoverDate = null;
-    _renderCalendar();
-    _renderFooter();
+    _render();
   };
 
-  // ── Day click via event delegation on the grid ───────────────
-  // (avoids inline-onclick issues and is immune to innerHTML re-renders)
-  function _onGridClick(e) {
-    const el = e.target.closest('.drp-day');
-    if (!el || el.classList.contains('drp-day-other') || el.classList.contains('drp-day-disabled')) return;
-    const y = +el.dataset.y, m = +el.dataset.m, d = +el.dataset.d;
+  // ── Day click — fixed two-click start→end selection ──────────
+  window._drpDayClick = function(y, m, d) {
     const clicked = new Date(y, m, d);
     clicked.setHours(0, 0, 0, 0);
 
     if (_picking === 0) {
-      // First click: set start, clear end, wait for end click
-      _start     = clicked;
-      _end       = null;
-      _hoverDate = null;
-      _picking   = 1;
+      // First click → set start, clear end, wait for end
+      _start   = clicked;
+      _end     = null;
+      _hover   = null;
+      _picking = 1;
     } else {
-      // Second click: set end, done
-      if (clicked < _start) { _end = new Date(_start); _start = clicked; }
-      else                   { _end = clicked; }
-      _hoverDate = null;
-      _picking   = 0;
+      // Second click → set end (swap if needed), done picking
+      if (clicked < _start) {
+        _end   = new Date(_start);
+        _start = clicked;
+      } else {
+        _end = clicked;
+      }
+      _hover   = null;
+      _picking = 0;
+      // Clear any preset highlight since user manually selected
       document.querySelectorAll('.drp-preset-btn').forEach(b => b.classList.remove('selected'));
     }
-    _updateDayCells();
+    _render();
+  };
+
+  window._drpDayHover = function(y, m, d) {
+    if (_picking === 1) {
+      _hover = new Date(y, m, d);
+      _hover.setHours(0, 0, 0, 0);
+      _render();
+    }
+  };
+
+  // ── Private helpers ──────────────────────────────────────────
+
+  function _render() {
+    _renderCalendar();
     _renderFooter();
   }
 
-  // ── Hover via event delegation — update CSS classes, NO re-render ──
-  function _onGridMove(e) {
-    if (_picking !== 1) return;
-    const el = e.target.closest('.drp-day');
-    if (!el || el.classList.contains('drp-day-other')) return;
-    const y = +el.dataset.y, m = +el.dataset.m, d = +el.dataset.d;
-    const hov = new Date(y, m, d); hov.setHours(0, 0, 0, 0);
-    if (_hoverDate && _sameDay(hov, _hoverDate)) return; // no change
-    _hoverDate = hov;
-    _updateDayCells();
-    _renderFooter();
-  }
-
-  function _onGridLeave() {
-    if (_picking !== 1 || !_hoverDate) return;
-    _hoverDate = null;
-    _updateDayCells();
-    _renderFooter();
-  }
-
-  // ── Wire delegation once per container ──────────────────────
-  let _gridListenerAttached = false;
-  function _attachGridListeners() {
-    const container = document.getElementById('drpCalMonths');
-    if (!container || _gridListenerAttached) return;
-    container.addEventListener('click',      _onGridClick);
-    container.addEventListener('mousemove',  _onGridMove);
-    container.addEventListener('mouseleave', _onGridLeave);
-    _gridListenerAttached = true;
-  }
-
-  // ── Render calendar HTML (only on open / month nav) ─────────
+  // Single-month calendar render
   function _renderCalendar() {
     const label = document.getElementById('drpMonthLabel');
-    if (label) label.textContent = `${MONTHS[_viewMonth]} ${_viewYear}`;
+    label.textContent = `${MONTHS[_viewMonth]} ${_viewYear}`;
 
     const container = document.getElementById('drpCalMonths');
-    if (!container) return;
     container.innerHTML = _buildMonthGrid(_viewYear, _viewMonth);
-    _attachGridListeners();
-    _updateDayCells(); // apply selection classes after fresh render
-  }
 
-  // ── Update only CSS classes on existing day cells ────────────
-  function _updateDayCells() {
-    const container = document.getElementById('drpCalMonths');
-    if (!container) return;
-
-    const rangeEnd = (_picking === 1 && _hoverDate) ? _hoverDate : _end;
-    const lo = (_start && rangeEnd) ? (_start <= rangeEnd ? _start : rangeEnd) : null;
-    const hi = (_start && rangeEnd) ? (_start <= rangeEnd ? rangeEnd : _start) : null;
-
+    // Wire hover events after DOM insertion (mouseover on the grid is simpler + reliable)
     container.querySelectorAll('.drp-day:not(.drp-day-other):not(.drp-day-disabled)').forEach(el => {
-      const y = +el.dataset.y, m = +el.dataset.m, d = +el.dataset.d;
-      const date = new Date(y, m, d);
-
-      const isStart = _start   && _sameDay(date, _start);
-      const isEnd   = rangeEnd && _sameDay(date, rangeEnd);
-      const inRange = lo && hi && date > lo && date < hi;
-
-      el.classList.toggle('drp-day-start',    !!isStart);
-      el.classList.toggle('drp-day-end',      !!isEnd);
-      el.classList.toggle('drp-day-in-range', !!inRange);
+      el.addEventListener('mouseenter', () => _drpDayHover(+el.dataset.y, +el.dataset.m, +el.dataset.d));
     });
   }
 
-  // ── Build static month HTML (no selection classes — added by _updateDayCells) ──
   function _buildMonthGrid(year, month) {
     const today       = new Date(); today.setHours(0,0,0,0);
     const first       = new Date(year, month, 1);
     const startWD     = first.getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
+    // When picking end date, show hover preview; otherwise show committed end
+    const rangeEnd = (_picking === 1 && _hover) ? _hover : _end;
+
+    // Normalise start/end for range comparison (always have lo ≤ hi)
+    const lo = (_start && rangeEnd) ? (_start <= rangeEnd ? _start : rangeEnd) : _start;
+    const hi = (_start && rangeEnd) ? (_start <= rangeEnd ? rangeEnd : _start) : null;
+
     let html = `<div class="drp-cal-grid">
       <div class="drp-cal-weekdays">${WD.map(w => `<div class="drp-cal-wd">${w}</div>`).join('')}</div>
       <div class="drp-cal-days">`;
 
+    // Leading blank cells
     for (let i = 0; i < startWD; i++) html += `<div class="drp-day drp-day-other"></div>`;
 
     for (let d = 1; d <= daysInMonth; d++) {
       const date    = new Date(year, month, d);
       const isToday = _sameDay(date, today);
-      html += `<div class="drp-day${isToday ? ' drp-day-today' : ''}"
-        data-y="${year}" data-m="${month}" data-d="${d}">${d}</div>`;
+      const isStart = _start    && _sameDay(date, _start);
+      const isEnd   = rangeEnd  && _sameDay(date, rangeEnd);
+      // inRange = strictly between lo and hi
+      const inRange = lo && hi && date > lo && date < hi;
+
+      let cls = 'drp-day';
+      if (isToday)  cls += ' drp-day-today';
+      if (isStart)  cls += ' drp-day-start';
+      if (isEnd)    cls += ' drp-day-end';
+      if (inRange)  cls += ' drp-day-in-range';
+
+      html += `<div class="${cls}" data-y="${year}" data-m="${month}" data-d="${d}"
+        onclick="_drpDayClick(${year},${month},${d})">${d}</div>`;
     }
 
+    // Trailing blanks
     const total    = startWD + daysInMonth;
     const trailing = total % 7 === 0 ? 0 : 7 - (total % 7);
     for (let i = 0; i < trailing; i++) html += `<div class="drp-day drp-day-other"></div>`;
@@ -10654,44 +10743,17 @@
     return html;
   }
 
-  // ── Footer display ───────────────────────────────────────────
   function _renderFooter() {
     const disp = document.getElementById('drpRangeDisplay');
-    if (!disp) return;
     if (!_start) {
       disp.innerHTML = '<span style="opacity:.6">Click a start date</span>';
     } else if (_picking === 1) {
-      const hStr = _hoverDate
-        ? ` → <strong>${_fmt(_hoverDate)}</strong>`
-        : ' → <em style="opacity:.55">click an end date</em>';
-      disp.innerHTML = `<strong>${_fmt(_start)}</strong>${hStr}`;
+      const hoverStr = _hover ? ` → <strong>${_fmt(_hover)}</strong>` : ' → <em style="opacity:.55">click an end date</em>';
+      disp.innerHTML = `<strong>${_fmt(_start)}</strong>${hoverStr}`;
     } else if (_end) {
       disp.innerHTML = `<strong>${_fmt(_start)}</strong> &mdash; <strong>${_fmt(_end)}</strong>`;
     } else {
       disp.innerHTML = `<strong>${_fmt(_start)}</strong>`;
-    }
-  }
-
-  // ── Highlight the correct preset button when picker opens ────
-  function _syncPresetHighlight() {
-    document.querySelectorAll('.drp-preset-btn').forEach(b => b.classList.remove('selected'));
-    if (!_start || !_end) return;
-    const now = new Date(); now.setHours(0,0,0,0);
-    const y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
-    const presets = {
-      today:     { from: new Date(y,m,d),   to: new Date(y,m,d) },
-      yesterday: { from: new Date(y,m,d-1), to: new Date(y,m,d-1) },
-      thisMonth: { from: new Date(y,m,1),   to: new Date(y,m+1,0) },
-      lastMonth: { from: new Date(y,m-1,1), to: new Date(y,m,0) },
-      thisYear:  { from: new Date(y,0,1),   to: new Date(y,11,31) },
-      lastYear:  { from: new Date(y-1,0,1), to: new Date(y-1,11,31) },
-    };
-    for (const [key, {from, to}] of Object.entries(presets)) {
-      if (_sameDay(_start, from) && _sameDay(_end, to)) {
-        const btn = document.querySelector(`.drp-preset-btn[onclick*="${key}"]`);
-        if (btn) btn.classList.add('selected');
-        break;
-      }
     }
   }
 
@@ -10713,7 +10775,8 @@
 
   function _addClearBtn(ctx) {
     const trig = document.getElementById('drpTrigger' + ctx);
-    if (!trig || trig.querySelector('.drp-clear-btn')) return;
+    if (!trig) return;
+    if (trig.querySelector('.drp-clear-btn')) return;
     const btn = document.createElement('button');
     btn.className = 'drp-clear-btn';
     btn.innerHTML = '<i class="bi bi-x"></i>';
@@ -10737,22 +10800,39 @@
     const { from, to } = _applied[ctx];
     if (ctx === 'PA')         drpApplyPA(from, to);
     else if (ctx === 'Shell') drpApplyShell(from, to);
+    else if (ctx === 'Milestone') drpApplyMilestone(from, to);
   }
 
-  // ── Fixed positioning anchored to trigger ───────────────────
+  // ── Panel positioning — fixed to viewport, anchored below trigger ──
   function _positionPanel(trig) {
     const panel = document.getElementById('drpPanel');
-    if (!trig || !panel) return;
-    const rect   = trig.getBoundingClientRect();
-    const panelW = 380, panelH = 430, gap = 8;
-    let left = rect.left;
-    let top  = rect.bottom + gap;
-    if (left + panelW > window.innerWidth  - 12) left = rect.right - panelW;
-    if (left < 8) left = 8;
-    if (top  + panelH > window.innerHeight - 12) top  = rect.top - panelH - gap;
-    if (top  < 8) top  = 8;
-    panel.style.top  = top  + 'px';
-    panel.style.left = left + 'px';
+    if (!trig) return;
+
+    const rect      = trig.getBoundingClientRect();
+    const panelW    = 380;
+    const gap       = 8;
+    const topPos    = rect.bottom + gap;
+
+    // Default: align left edge with trigger
+    let leftPos = rect.left;
+
+    // Flip left if panel would overflow right edge
+    if (leftPos + panelW > window.innerWidth - 12) {
+      leftPos = rect.right - panelW;
+    }
+    // Never go off the left edge
+    if (leftPos < 8) leftPos = 8;
+
+    // If panel would go below viewport, flip above the trigger
+    const panelH = 420; // estimated height
+    let finalTop = topPos;
+    if (topPos + panelH > window.innerHeight - 12) {
+      finalTop = rect.top - panelH - gap;
+      if (finalTop < 8) finalTop = 8;
+    }
+
+    panel.style.top  = finalTop + 'px';
+    panel.style.left = leftPos + 'px';
   }
 
   // ── Preset ranges ────────────────────────────────────────────
@@ -10772,7 +10852,7 @@
       }
       case 'lastQ': {
         const qs = Math.floor(m/3)*3 - 3;
-        const qy = qs < 0 ? y-1 : y, qm = qs < 0 ? qs+12 : qs;
+        const qy = qs < 0 ? y-1 : y; const qm = qs < 0 ? qs+12 : qs;
         return { from: new Date(qy,qm,1), to: new Date(qy,qm+3,0) };
       }
       case 'thisYear':  return { from: new Date(y,0,1),   to: new Date(y,11,31) };
@@ -10784,30 +10864,28 @@
     }
   }
 
-  // ── Helpers ──────────────────────────────────────────────────
-  function _sameDay(a, b) {
-    return a && b &&
-      a.getFullYear()===b.getFullYear() &&
-      a.getMonth()===b.getMonth()       &&
-      a.getDate()===b.getDate();
+  // ── Tiny helpers ─────────────────────────────────────────────
+  function _sameDay(a, b)  {
+    return a.getFullYear()===b.getFullYear() &&
+           a.getMonth()===b.getMonth()       &&
+           a.getDate()===b.getDate();
   }
-  function _dayStart(d) { const x=new Date(d); x.setHours(0,0,0,0);       return x; }
-  function _dayEnd(d)   { const x=new Date(d); x.setHours(23,59,59,999);   return x; }
-  function _fmt(d)      { return d ? `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}` : ''; }
-  function _fmtShort(d) { return d ? `${d.getDate()}-${MONTHS_SHORT[d.getMonth()]}-${String(d.getFullYear()).slice(2)}` : ''; }
+  function _dayStart(d)  { const x=new Date(d); x.setHours(0,0,0,0);       return x; }
+  function _dayEnd(d)    { const x=new Date(d); x.setHours(23,59,59,999);   return x; }
+  function _fmt(d)       { return d ? `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}` : ''; }
+  function _fmtShort(d)  { return d ? `${d.getDate()}-${MONTHS_SHORT[d.getMonth()]}-${String(d.getFullYear()).slice(2)}` : ''; }
 
-  // ── Integration ──────────────────────────────────────────────
+  // ── Integration — PA tab ──────────────────────────────────────
   window.drpApplyPA = function(from, to) {
     _drpFromPA = from;
     _drpToPA   = to;
-    const s = document.getElementById('structureDetailsSection');
-    const p = document.getElementById('planActualDetailsSection');
-    if (s) s.classList.remove('visible');
-    if (p) p.classList.remove('visible');
+    document.getElementById('structureDetailsSection').classList.remove('visible');
+    document.getElementById('planActualDetailsSection').classList.remove('visible');
     document.querySelectorAll('.plan-actual-card').forEach(c => c.classList.remove('selected'));
     generatePlanVsActuals();
   };
 
+  // ── Integration — Shell tab ───────────────────────────────────
   window.drpApplyShell = function(from, to) {
     _drpFromShell = from;
     _drpToShell   = to;
@@ -10815,24 +10893,85 @@
     renderShellTracker();
   };
 
+  // ── Integration — Milestone tab ───────────────────────────────
+  window.drpApplyMilestone = function(from, to) {
+    _drpFromMilestone = from;
+    _drpToMilestone   = to;
+    // Update info text
+    const info = document.getElementById('milestoneDrpInfo');
+    if (info) {
+      if (!from && !to) {
+        info.textContent = 'Filtering across all activity dates';
+      } else {
+        const fmt = d => d ? `${d.getDate()} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()]} ${d.getFullYear()}` : '';
+        info.textContent = to ? `${fmt(from)} — ${fmt(to)}` : fmt(from);
+      }
+    }
+    if (typeof render === 'function') render();
+  };
+
 })();
 
 // ── Global date range state ───────────────────────────────────
-var _drpFromPA    = null;
-var _drpToPA      = null;
-var _drpFromShell = null;
-var _drpToShell   = null;
+var _drpFromPA        = null;
+var _drpToPA          = null;
+var _drpFromShell     = null;
+var _drpToShell       = null;
+var _drpFromMilestone = null;
+var _drpToMilestone   = null;
 
-// Helper: inclusive range check (end date fully included via 23:59:59)
+// ── Shell date-basis: 'baseline' | 'actual' ──────────────────
+var _shellDateBasis = 'baseline';
+
+window.setShellDateBasis = function(basis) {
+  _shellDateBasis = basis;
+  document.getElementById('shellBasisBaseline').classList.toggle('active', basis === 'baseline');
+  document.getElementById('shellBasisActual').classList.toggle('active',   basis === 'actual');
+  updateShellKPIs();
+  renderShellTracker();
+};
+
+// ── Shared range-check helper ─────────────────────────────────
+// ctx = 'PA' | 'Shell' | 'Milestone'
+// For Shell, uses _shellDateBasis to pick which date column to test
 function drpInRange(date, ctx) {
-  const from = ctx === 'PA' ? _drpFromPA : _drpFromShell;
-  const to   = ctx === 'PA' ? _drpToPA   : _drpToShell;
+  let from, to;
+  if (ctx === 'PA')         { from = _drpFromPA;        to = _drpToPA;          }
+  else if (ctx === 'Shell') { from = _drpFromShell;     to = _drpToShell;       }
+  else                      { from = _drpFromMilestone; to = _drpToMilestone;   }
   if (!from && !to) return true;
   if (!date)        return false;
   const t = date instanceof Date ? date.getTime() : new Date(date).getTime();
   const f = from ? from.getTime() : -Infinity;
-  const e = to   ? to.getTime()   : Infinity;
+  const e = to   ? to.getTime()   :  Infinity;
   return t >= f && t <= e;
+}
+
+// Shell-specific range check that respects the basis toggle
+function drpInRangeShell(row) {
+  if (!_drpFromShell && !_drpToShell) return true;
+  if (_shellDateBasis === 'baseline') {
+    const d = (typeof parseDate !== 'undefined') ? parseDate(row.BaselinePlan || row.PlanDate) : null;
+    return d ? drpInRange(d, 'Shell') : false;
+  } else {
+    // actual/projected: actual takes priority, fall back to projected
+    const ad = (typeof parseDate !== 'undefined') ? parseDate(row.ActualDate)    : null;
+    const pd = (typeof parseDate !== 'undefined') ? parseDate(row.ProjectedDate) : null;
+    const d  = ad || pd;
+    return d ? drpInRange(d, 'Shell') : false;
+  }
+}
+
+// Milestone date-range check across all relevant activity date fields
+function drpInRangeMilestone(row) {
+  if (!_drpFromMilestone && !_drpToMilestone) return true;
+  const fields = ['PlasterPlan','PlasterActual','FlooringPlan','FlooringActual','HandoverPlan','HandoverActual'];
+  return fields.some(f => {
+    const v = row[f];
+    if (!v) return false;
+    const d = (typeof parseDate !== 'undefined') ? parseDate(v) : null;
+    return d ? drpInRange(d, 'Milestone') : false;
+  });
 }
 </script>
 
