@@ -9626,10 +9626,12 @@
     let planRev = 0, actualRev = 0, planNos = 0, actualNos = 0;
 
     rows.forEach(r => {
+      // Plan KPIs always use BaselinePlan/PlanDate regardless of basis toggle
       const pd = parseDate(r.PlanDate);
       if (pd && drpInRange(pd, 'Shell')) {
         planRev += r.DetailAmt; planNos++;
       }
+      // Actual KPIs always use ActualDate regardless of basis toggle
       const ad = parseDate(r.ActualDate);
       if (ad && drpInRange(ad, 'Shell')) {
         actualRev += r.DetailAmt; actualNos++;
