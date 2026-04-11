@@ -9569,21 +9569,42 @@
     let planRev = 0, actualRev = 0, planNos = 0, actualNos = 0;
 
     rows.forEach(r => {
-      // ── Plan KPI — always counts against BaselinePlan date ──
-      const pd = parseDate(r.PlanDate || r.BaselinePlan);
-      const pdInRange = pd && (_shellDateBasis === 'baseline'
-        ? drpInRange(pd, 'Shell')          // filter by baseline when basis = baseline
-        : true);                            // show all plan rows when basis = actual
-      if (pd && pdInRange) { planRev += r.DetailAmt; planNos++; }
+      const baseline   = parseDate(r.BaselinePlan || r.PlanDate);
+      const actual     = parseDate(r.ActualDate);
+      const projected  = parseDate(r.ProjectedDate);
+      const isComplete = !!actual;                      // green = has ActualDate
 
-      // ── Actual KPI — counts against ActualDate (or ProjectedDate fallback) ──
-      const ad   = parseDate(r.ActualDate);
-      const proj = parseDate(r.ProjectedDate);
-      const adDate = ad || proj;
-      const adInRange = adDate && (_shellDateBasis === 'actual'
-        ? drpInRange(adDate, 'Shell')      // filter by actual/proj when basis = actual
-        : true);                            // show all actual rows when basis = baseline
-      if (adDate && adInRange) { actualRev += r.DetailAmt; actualNos++; }
+      if (_shellDateBasis === 'baseline') {
+        // ── BASELINE mode ──────────────────────────────────────────
+        // Qualify row: BaselinePlan date must fall within the selected range
+        const baseInRange = baseline && drpInRange(baseline, 'Shell');
+        if (baseInRange) {
+          // Plan = all milestone values whose baseline is in range
+          planRev += r.DetailAmt;
+          planNos++;
+          // Actual = only completed (green) milestones adjacent to those baseline dates
+          if (isComplete) {
+            actualRev += r.DetailAmt;
+            actualNos++;
+          }
+        }
+      } else {
+        // ── ACTUAL/PROJ mode ───────────────────────────────────────
+        // Qualify row: ActualDate OR ProjectedDate must fall within the selected range
+        const actProjDate  = actual || projected;
+        const actProjInRange = actProjDate && drpInRange(actProjDate, 'Shell');
+        if (actProjInRange) {
+          // Plan = all milestone values whose Actual/Proj date is in range
+          planRev += r.DetailAmt;
+          planNos++;
+          // Actual = only completed (green) milestones — ActualDate specifically in range
+          const actualInRange = actual && drpInRange(actual, 'Shell');
+          if (actualInRange) {
+            actualRev += r.DetailAmt;
+            actualNos++;
+          }
+        }
+      }
     });
 
     const fmt = v => '₹' + (v / 10000000).toFixed(1);
