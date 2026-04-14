@@ -2888,6 +2888,34 @@
       justify-content: center;
       padding: 1rem;
     }
+
+    /* Project section wrapper used in All-projects view */
+    .proj-section {
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .proj-section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.55rem 1rem;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      border-radius: var(--radius-md);
+      color: white;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      box-shadow: 0 3px 10px rgba(198,89,17,0.25);
+    }
+    .proj-section-header i { opacity: 0.85; font-size: 1rem; }
+    .proj-section-body {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: flex-start;
+      padding: 0 0.25rem;
+    }
     
     .villa-block {
       background: rgba(255, 255, 255, 0.98);
@@ -8287,70 +8315,86 @@
   }
   
   function renderTowerVisualization() {
-    // When selectedProjectTower is null → All projects selected
     const projectData = raw.filter(r => {
       if (selectedProjectTower && r.Project !== selectedProjectTower) return false;
       if (selectedTowerViz.size > 0 && !selectedTowerViz.has(r.Tower)) return false;
       if (selectedPhaseViz.size > 0 && !selectedPhaseViz.has(r.Phase)) return false;
       return true;
     });
-    
+
     if (projectData.length === 0) {
       document.getElementById('towerVizContainer').innerHTML = `
-        <div style="text-align: center; padding: 3rem; color: var(--gray-400); width: 100%;">
-          <i class="bi bi-building" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
+        <div style="text-align:center;padding:3rem;color:var(--gray-400);width:100%;">
+          <i class="bi bi-building" style="font-size:3rem;margin-bottom:1rem;display:block;"></i>
           <p>No units found for ${selectedProjectTower ? `project "${selectedProjectTower}"` : 'the selected filters'}</p>
         </div>`;
       document.getElementById('stageKpiGrid').innerHTML = '';
       return;
     }
-    
+
     // Show KPI bar
     const kpiGrid = document.getElementById('stageKpiGrid');
-    const parentBar = kpiGrid.parentElement;
-    if (parentBar && parentBar.classList.contains('stage-kpi-bar')) {
-      parentBar.style.display = 'block';
-    }
-    
-    // Render Stage KPIs
+    const parentBar = kpiGrid ? kpiGrid.parentElement : null;
+    if (parentBar && parentBar.classList.contains('stage-kpi-bar')) parentBar.style.display = 'block';
     renderStageKPIs(projectData);
-    
-    // Initialize search
     initializeSearch();
-    
-    // Parse all units and organize by tower/floor/flat
-    const parsed = projectData.map(u => ({
+
+    const container = document.getElementById('towerVizContainer');
+    container.innerHTML = '';
+    container.classList.remove('tower-villa-layout');
+
+    // ── Single project selected → existing behaviour ──────────
+    if (selectedProjectTower) {
+      _renderProjectUnits(container, projectData, selectedProjectTower);
+      return;
+    }
+
+    // ── All projects → render each project in its own section ─
+    // Group by project, preserving the order they first appear in raw
+    const projectOrder = [];
+    const projectGroups = {};
+    projectData.forEach(r => {
+      if (!projectGroups[r.Project]) {
+        projectOrder.push(r.Project);
+        projectGroups[r.Project] = [];
+      }
+      projectGroups[r.Project].push(r);
+    });
+
+    projectOrder.forEach(projName => {
+      const units = projectGroups[projName];
+
+      // Create a section wrapper
+      const section = document.createElement('div');
+      section.className = 'proj-section';
+      section.innerHTML = `
+        <div class="proj-section-header">
+          <i class="bi bi-folder2-open"></i>${projName}
+          <span style="margin-left:auto;font-size:0.75rem;opacity:0.85;font-weight:500;">${units.length} unit${units.length !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="proj-section-body" id="proj-body-${projName.replace(/\s+/g,'_')}"></div>`;
+      container.appendChild(section);
+
+      const body = section.querySelector('.proj-section-body');
+      _renderProjectUnits(body, units, projName);
+    });
+  }
+
+  // ── Internal: render one project's units into a container ───
+  function _renderProjectUnits(container, units, projName) {
+    const parsed = units.map(u => ({
       ...u,
       parsed: parseUnitNumber(u.UnitNo),
       stage: getUnitStage(u)
     })).filter(u => u.parsed !== null);
-    
-    // Group by tower
-    const towerMap = {};
-    parsed.forEach(u => {
-      const t = u.parsed.tower;
-      if (!towerMap[t]) towerMap[t] = [];
-      towerMap[t].push(u);
-    });
-    
-    // Sort tower numbers
-    const towerNumbers = Object.keys(towerMap).map(Number).sort((a, b) => a - b);
-    
-    // Render each tower
-    const container = document.getElementById('towerVizContainer');
-    container.innerHTML = '';
-    
-    // Check if villa project — render villa (tower=0) units, then still render any tower units
-    if (isVillaProject(selectedProjectTower)) {
-      const villaUnits  = parsed.filter(u => u.parsed.tower === 0);
+
+    if (isVillaProject(projName)) {
+      const villaUnits    = parsed.filter(u => u.parsed.tower === 0);
       const towerOnlyUnits = parsed.filter(u => u.parsed.tower !== 0);
 
-      // Render villa blocks first
       if (villaUnits.length > 0) {
-        renderVillaLayout(container, villaUnits, selectedProjectTower);
+        renderVillaLayout(container, villaUnits, projName);
       }
-
-      // Then render remaining towers (non-zero tower number)
       if (towerOnlyUnits.length > 0) {
         const towerOnlyMap = {};
         towerOnlyUnits.forEach(u => {
@@ -8358,15 +8402,19 @@
           if (!towerOnlyMap[t]) towerOnlyMap[t] = [];
           towerOnlyMap[t].push(u);
         });
-        const towerNums = Object.keys(towerOnlyMap).map(Number).sort((a, b) => a - b);
-        towerNums.forEach(tNum => renderSingleTower(container, tNum, towerOnlyMap[tNum]));
+        Object.keys(towerOnlyMap).map(Number).sort((a, b) => a - b)
+          .forEach(tNum => renderSingleTower(container, tNum, towerOnlyMap[tNum]));
       }
-      return;
+    } else {
+      const towerMap = {};
+      parsed.forEach(u => {
+        const t = u.parsed.tower;
+        if (!towerMap[t]) towerMap[t] = [];
+        towerMap[t].push(u);
+      });
+      Object.keys(towerMap).map(Number).sort((a, b) => a - b)
+        .forEach(tNum => renderSingleTower(container, tNum, towerMap[tNum]));
     }
-    
-    towerNumbers.forEach(towerNum => {
-      renderSingleTower(container, towerNum, towerMap[towerNum]);
-    });
   }
 
   function renderSingleTower(container, towerNum, towerUnits) {
@@ -8757,7 +8805,7 @@
 
   function renderBlockLayout(container, units, blocks) {
     container.classList.add('tower-villa-layout');
-    container.innerHTML = '';
+    // Append to container (don't wipe — may already have content from other projects)
     
     // Build unit map - strip alphabetic suffixes so "47a" → 47
     const unitMap = {};
@@ -8780,10 +8828,9 @@
         const unit = unitMap[unitNo];
         if (unit) {
           const stageClass = `stage-${unit.stage}`;
-          const soldClass   = ''; // Sold is now stage-1, no separate class needed
           const unitJson = JSON.stringify(unit).replace(/'/g, "&apos;");
           blockHTML += `
-            <div class="villa-unit ${stageClass} ${soldClass}" 
+            <div class="villa-unit ${stageClass}" 
                  data-unit="${unit.UnitNo}"
                  onclick='showUnitDetail(${unitJson})'
                  title="${unit.UnitNo}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}">
@@ -8795,7 +8842,7 @@
       blockHTML += `</div></div>`;
       rows.push(blockHTML);
     });
-    container.innerHTML = rows.join('');
+    container.innerHTML += rows.join('');
   }
 
   // ===== UNIT DETAIL POPUP =====
