@@ -10700,80 +10700,59 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// DATE RANGE PICKER ENGINE  — v2 (single-month, fixed-position)
+// DATE RANGE PICKER — v4 (no DOM rebuild on hover; click-safe)
+// Root-cause fix: hover NEVER replaces innerHTML; only CSS toggled.
 // ═══════════════════════════════════════════════════════════════
 (function () {
   const MONTHS       = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const WD           = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 
-  // ── State ────────────────────────────────────────────────────
-  let _context  = null;   // 'PA' | 'Shell'
-  let _start    = null;   // Date | null
-  let _end      = null;   // Date | null
-  let _hover    = null;   // Date | null  (range preview while picking end)
-  let _picking  = 0;      // 0 = waiting for start, 1 = waiting for end
-  let _viewYear = new Date().getFullYear();
-  let _viewMonth = new Date().getMonth();   // 0-11
+  let _context = null, _start = null, _end = null, _hover = null;
+  let _picking = 0, _viewYear = new Date().getFullYear(), _viewMonth = new Date().getMonth();
 
-  // Applied ranges survive close/reopen (per context)
   const _applied = { PA: { from: null, to: null }, Shell: { from: null, to: null } };
 
-  // ── Public API ───────────────────────────────────────────────
-
+  // ── Open ─────────────────────────────────────────────────────
   window.drpOpen = function(ctx) {
     _context = ctx;
-
-    // Sync _applied from globals (captures any externally-set default)
     _applied.PA.from    = _drpFromPA    || null;
     _applied.PA.to      = _drpToPA      || null;
     _applied.Shell.from = _drpFromShell || null;
     _applied.Shell.to   = _drpToShell   || null;
 
-    // Restore previously applied range into picker state
-    _start   = _applied[ctx].from ? new Date(_applied[ctx].from) : null;
-    _end     = _applied[ctx].to   ? new Date(_applied[ctx].to)   : null;
-    _hover   = null;
-    _picking = 0;
+    _start = _applied[ctx].from ? new Date(_applied[ctx].from) : null;
+    _end   = _applied[ctx].to   ? new Date(_applied[ctx].to)   : null;
+    _hover = null; _picking = 0;
 
-    // Navigate to the month of the from-date (or current month)
     const seed = _start || new Date();
-    _viewYear  = seed.getFullYear();
-    _viewMonth = seed.getMonth();
+    _viewYear = seed.getFullYear(); _viewMonth = seed.getMonth();
 
-    // Mark open state on trigger
     document.querySelectorAll('.drp-trigger').forEach(b => b.classList.remove('open'));
     const trig = document.getElementById('drpTrigger' + ctx);
     if (trig) trig.classList.add('open');
-
-    // Position panel fixed, just below the trigger button
     _positionPanel(trig);
 
-    // Show overlay + animate in
     document.getElementById('drpOverlay').style.display = 'block';
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.getElementById('drpPanel').classList.add('open');
-      });
-    });
-
-    _render();
+    requestAnimationFrame(() => requestAnimationFrame(() =>
+      document.getElementById('drpPanel').classList.add('open')
+    ));
+    _buildCalendar(); _paintDays(); _paintFooter();
   };
 
+  // ── Close / Apply ─────────────────────────────────────────────
   window.drpClose = function() {
-    const panel = document.getElementById('drpPanel');
-    panel.classList.remove('open');
+    document.getElementById('drpPanel').classList.remove('open');
     document.getElementById('drpOverlay').style.display = 'none';
     document.querySelectorAll('.drp-trigger').forEach(b => b.classList.remove('open'));
+    _hover = null;
     setTimeout(() => { _context = null; }, 240);
   };
 
   window.drpApply = function() {
     if (!_start) { drpClose(); return; }
-    // End date defaults to start date if user only picked one day
     const from = new Date(_start);
     const to   = _end ? new Date(_end) : new Date(_start);
-    // Ensure correct order
     const [f, t] = from <= to ? [from, to] : [to, from];
     _applied[_context] = { from: _dayStart(f), to: _dayEnd(t) };
     _updateTriggerLabel(_context);
@@ -10781,146 +10760,134 @@
     drpClose();
   };
 
+  // ── Presets ───────────────────────────────────────────────────
   window.drpPreset = function(key) {
     const { from, to } = _presetRange(key);
-    _start   = from;
-    _end     = to;
-    _hover   = null;
-    _picking = 0;
+    _start = from; _end = to; _hover = null; _picking = 0;
     document.querySelectorAll('.drp-preset-btn').forEach(b => b.classList.remove('selected'));
     if (event && event.currentTarget) event.currentTarget.classList.add('selected');
-    // Navigate to from-month
-    _viewYear  = from.getFullYear();
-    _viewMonth = from.getMonth();
-    _render();
+    _viewYear = from.getFullYear(); _viewMonth = from.getMonth();
+    _buildCalendar(); _paintDays(); _paintFooter();
   };
 
   window.drpNavMonth = function(dir) {
     _viewMonth += dir;
-    if (_viewMonth > 11) { _viewMonth = 0;  _viewYear++; }
+    if (_viewMonth > 11) { _viewMonth = 0; _viewYear++; }
     if (_viewMonth < 0)  { _viewMonth = 11; _viewYear--; }
-    _render();
+    _hover = null;
+    _buildCalendar(); _paintDays(); _paintFooter();
   };
 
-  // ── Day click — fixed two-click start→end selection ──────────
-  window._drpDayClick = function(y, m, d) {
-    const clicked = new Date(y, m, d);
-    clicked.setHours(0, 0, 0, 0);
-
-    if (_picking === 0) {
-      // First click → set start, clear end, wait for end
-      _start   = clicked;
-      _end     = null;
-      _hover   = null;
-      _picking = 1;
-    } else {
-      // Second click → set end (swap if needed), done picking
-      if (clicked < _start) {
-        _end   = new Date(_start);
-        _start = clicked;
-      } else {
-        _end = clicked;
-      }
-      _hover   = null;
-      _picking = 0;
-      // Clear any preset highlight since user manually selected
-      document.querySelectorAll('.drp-preset-btn').forEach(b => b.classList.remove('selected'));
-    }
-    _render();
-  };
-
-  window._drpDayHover = function(y, m, d) {
-    if (_picking === 1) {
-      _hover = new Date(y, m, d);
-      _hover.setHours(0, 0, 0, 0);
-      _render();
-    }
-  };
-
-  // ── Private helpers ──────────────────────────────────────────
-
-  function _render() {
-    _renderCalendar();
-    _renderFooter();
-  }
-
-  // Single-month calendar render
-  function _renderCalendar() {
+  // ── Build calendar HTML — called ONLY on open / month nav ─────
+  // Hover and click NEVER rebuild HTML. Stable elements = reliable clicks.
+  function _buildCalendar() {
     const label = document.getElementById('drpMonthLabel');
-    label.textContent = `${MONTHS[_viewMonth]} ${_viewYear}`;
+    if (label) label.textContent = MONTHS[_viewMonth] + ' ' + _viewYear;
+
+    const today       = new Date(); today.setHours(0,0,0,0);
+    const first       = new Date(_viewYear, _viewMonth, 1);
+    const startWD     = first.getDay();
+    const daysInMonth = new Date(_viewYear, _viewMonth + 1, 0).getDate();
+
+    let html = '<div class="drp-cal-grid"><div class="drp-cal-weekdays">'
+      + WD.map(w => '<div class="drp-cal-wd">' + w + '</div>').join('')
+      + '</div><div class="drp-cal-days" id="drpDaysGrid">';
+
+    for (let i = 0; i < startWD; i++)
+      html += '<div class="drp-day drp-day-other"></div>';
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const isToday = _sameDay(new Date(_viewYear, _viewMonth, d), today);
+      html += '<div class="drp-day' + (isToday ? ' drp-day-today' : '') + '" data-y="'
+        + _viewYear + '" data-m="' + _viewMonth + '" data-d="' + d + '">' + d + '</div>';
+    }
+
+    const total = startWD + daysInMonth;
+    const trailing = total % 7 === 0 ? 0 : 7 - (total % 7);
+    for (let i = 0; i < trailing; i++)
+      html += '<div class="drp-day drp-day-other"></div>';
+
+    html += '</div></div>';
 
     const container = document.getElementById('drpCalMonths');
-    container.innerHTML = _buildMonthGrid(_viewYear, _viewMonth);
+    container.innerHTML = html;
 
-    // Wire hover events after DOM insertion (mouseover on the grid is simpler + reliable)
-    container.querySelectorAll('.drp-day:not(.drp-day-other):not(.drp-day-disabled)').forEach(el => {
-      el.addEventListener('mouseenter', () => _drpDayHover(+el.dataset.y, +el.dataset.m, +el.dataset.d));
+    // ── Single delegated listener per grid rebuild ─────────────
+    const grid = document.getElementById('drpDaysGrid');
+
+    // CLICK — fires on stable elements; no hover-rebuild race possible
+    grid.addEventListener('click', function(e) {
+      const el = e.target.closest('[data-d]');
+      if (!el || el.classList.contains('drp-day-other')) return;
+      const clicked = new Date(+el.dataset.y, +el.dataset.m, +el.dataset.d);
+      clicked.setHours(0,0,0,0);
+
+      if (_picking === 0) {
+        // First click — set start, await end
+        _start = clicked; _end = null; _hover = null; _picking = 1;
+      } else {
+        // Second click — commit end date (swap if backwards)
+        if (clicked < _start) { _end = new Date(_start); _start = clicked; }
+        else                   { _end = clicked; }
+        _hover = null; _picking = 0;
+        document.querySelectorAll('.drp-preset-btn').forEach(b => b.classList.remove('selected'));
+      }
+      _paintDays(); _paintFooter();   // CSS-only update, no innerHTML change
+    });
+
+    // MOUSEMOVE — only paints CSS classes; never touches innerHTML
+    grid.addEventListener('mousemove', function(e) {
+      if (_picking !== 1) return;
+      const el = e.target.closest('[data-d]');
+      if (!el || el.classList.contains('drp-day-other')) return;
+      const hov = new Date(+el.dataset.y, +el.dataset.m, +el.dataset.d);
+      hov.setHours(0,0,0,0);
+      if (_hover && _sameDay(hov, _hover)) return;
+      _hover = hov; _paintDays(); _paintFooter();
+    });
+
+    grid.addEventListener('mouseleave', function() {
+      if (_picking !== 1 || !_hover) return;
+      _hover = null; _paintDays(); _paintFooter();
     });
   }
 
-  function _buildMonthGrid(year, month) {
-    const today       = new Date(); today.setHours(0,0,0,0);
-    const first       = new Date(year, month, 1);
-    const startWD     = first.getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    // When picking end date, show hover preview; otherwise show committed end
+  // ── Paint CSS classes on existing day elements (no innerHTML) ─
+  function _paintDays() {
+    const grid = document.getElementById('drpDaysGrid');
+    if (!grid) return;
     const rangeEnd = (_picking === 1 && _hover) ? _hover : _end;
-
-    // Normalise start/end for range comparison (always have lo ≤ hi)
-    const lo = (_start && rangeEnd) ? (_start <= rangeEnd ? _start : rangeEnd) : _start;
+    const lo = (_start && rangeEnd) ? (_start <= rangeEnd ? _start : rangeEnd) : null;
     const hi = (_start && rangeEnd) ? (_start <= rangeEnd ? rangeEnd : _start) : null;
-
-    let html = `<div class="drp-cal-grid">
-      <div class="drp-cal-weekdays">${WD.map(w => `<div class="drp-cal-wd">${w}</div>`).join('')}</div>
-      <div class="drp-cal-days">`;
-
-    // Leading blank cells
-    for (let i = 0; i < startWD; i++) html += `<div class="drp-day drp-day-other"></div>`;
-
-    for (let d = 1; d <= daysInMonth; d++) {
-      const date    = new Date(year, month, d);
-      const isToday = _sameDay(date, today);
-      const isStart = _start    && _sameDay(date, _start);
-      const isEnd   = rangeEnd  && _sameDay(date, rangeEnd);
-      // inRange = strictly between lo and hi
-      const inRange = lo && hi && date > lo && date < hi;
-
-      let cls = 'drp-day';
-      if (isToday)  cls += ' drp-day-today';
-      if (isStart)  cls += ' drp-day-start';
-      if (isEnd)    cls += ' drp-day-end';
-      if (inRange)  cls += ' drp-day-in-range';
-
-      html += `<div class="${cls}" data-y="${year}" data-m="${month}" data-d="${d}"
-        onclick="_drpDayClick(${year},${month},${d})">${d}</div>`;
-    }
-
-    // Trailing blanks
-    const total    = startWD + daysInMonth;
-    const trailing = total % 7 === 0 ? 0 : 7 - (total % 7);
-    for (let i = 0; i < trailing; i++) html += `<div class="drp-day drp-day-other"></div>`;
-
-    html += `</div></div>`;
-    return html;
+    grid.querySelectorAll('[data-d]').forEach(function(el) {
+      if (el.classList.contains('drp-day-other')) return;
+      const date = new Date(+el.dataset.y, +el.dataset.m, +el.dataset.d);
+      el.classList.toggle('drp-day-start',    !!(_start   && _sameDay(date, _start)));
+      el.classList.toggle('drp-day-end',      !!(rangeEnd && _sameDay(date, rangeEnd)));
+      el.classList.toggle('drp-day-in-range', !!(lo && hi && date > lo && date < hi));
+    });
   }
 
-  function _renderFooter() {
+  // ── Footer display ────────────────────────────────────────────
+  function _paintFooter() {
     const disp = document.getElementById('drpRangeDisplay');
+    if (!disp) return;
     if (!_start) {
       disp.innerHTML = '<span style="opacity:.6">Click a start date</span>';
     } else if (_picking === 1) {
-      const hoverStr = _hover ? ` → <strong>${_fmt(_hover)}</strong>` : ' → <em style="opacity:.55">click an end date</em>';
-      disp.innerHTML = `<strong>${_fmt(_start)}</strong>${hoverStr}`;
+      disp.innerHTML = '<strong>' + _fmt(_start) + '</strong>'
+        + (_hover ? ' → <strong>' + _fmt(_hover) + '</strong>'
+                  : ' → <em style="opacity:.55">click an end date</em>');
     } else if (_end) {
-      disp.innerHTML = `<strong>${_fmt(_start)}</strong> &mdash; <strong>${_fmt(_end)}</strong>`;
+      disp.innerHTML = '<strong>' + _fmt(_start) + '</strong> &mdash; <strong>' + _fmt(_end) + '</strong>';
     } else {
-      disp.innerHTML = `<strong>${_fmt(_start)}</strong>`;
+      disp.innerHTML = '<strong>' + _fmt(_start) + '</strong>';
     }
   }
 
+  // ── Trigger labels / clear btn ────────────────────────────────
   function _updateTriggerLabel(ctx) {
-    const lbl  = document.getElementById('drpLabel' + ctx);
+    const lbl  = document.getElementById('drpLabel'   + ctx);
     const trig = document.getElementById('drpTrigger' + ctx);
     const { from, to } = _applied[ctx];
     if (!from && !to) {
@@ -10928,17 +10895,14 @@
       if (trig) { trig.classList.remove('active'); _removeClearBtn(ctx); }
     } else {
       const text = (to && !_sameDay(from, to))
-        ? `${_fmtShort(from)} – ${_fmtShort(to)}`
-        : _fmtShort(from);
+        ? _fmtShort(from) + ' – ' + _fmtShort(to) : _fmtShort(from);
       if (lbl)  lbl.textContent = text;
       if (trig) { trig.classList.add('active'); _addClearBtn(ctx); }
     }
   }
-
   function _addClearBtn(ctx) {
     const trig = document.getElementById('drpTrigger' + ctx);
-    if (!trig) return;
-    if (trig.querySelector('.drp-clear-btn')) return;
+    if (!trig || trig.querySelector('.drp-clear-btn')) return;
     const btn = document.createElement('button');
     btn.className = 'drp-clear-btn';
     btn.innerHTML = '<i class="bi bi-x"></i>';
@@ -10951,52 +10915,30 @@
     const btn = trig.querySelector('.drp-clear-btn');
     if (btn) btn.remove();
   }
-
   window.drpClear = function(ctx) {
     _applied[ctx] = { from: null, to: null };
-    _updateTriggerLabel(ctx);
-    _dispatchChange(ctx);
+    _updateTriggerLabel(ctx); _dispatchChange(ctx);
   };
-
   function _dispatchChange(ctx) {
     const { from, to } = _applied[ctx];
-    if (ctx === 'PA')    drpApplyPA(from, to);
+    if (ctx === 'PA')         drpApplyPA(from, to);
     else if (ctx === 'Shell') drpApplyShell(from, to);
   }
 
-  // ── Panel positioning — fixed to viewport, anchored below trigger ──
+  // ── Panel position ────────────────────────────────────────────
   function _positionPanel(trig) {
     const panel = document.getElementById('drpPanel');
-    if (!trig) return;
-
-    const rect      = trig.getBoundingClientRect();
-    const panelW    = 380;
-    const gap       = 8;
-    const topPos    = rect.bottom + gap;
-
-    // Default: align left edge with trigger
-    let leftPos = rect.left;
-
-    // Flip left if panel would overflow right edge
-    if (leftPos + panelW > window.innerWidth - 12) {
-      leftPos = rect.right - panelW;
-    }
-    // Never go off the left edge
-    if (leftPos < 8) leftPos = 8;
-
-    // If panel would go below viewport, flip above the trigger
-    const panelH = 420; // estimated height
-    let finalTop = topPos;
-    if (topPos + panelH > window.innerHeight - 12) {
-      finalTop = rect.top - panelH - gap;
-      if (finalTop < 8) finalTop = 8;
-    }
-
-    panel.style.top  = finalTop + 'px';
-    panel.style.left = leftPos + 'px';
+    if (!trig || !panel) return;
+    const rect = trig.getBoundingClientRect();
+    let left = rect.left, top = rect.bottom + 8;
+    if (left + 380 > window.innerWidth  - 12) left = rect.right - 380;
+    if (left < 8) left = 8;
+    if (top  + 430 > window.innerHeight - 12) top  = rect.top - 430 - 8;
+    if (top  < 8)  top  = 8;
+    panel.style.top = top + 'px'; panel.style.left = left + 'px';
   }
 
-  // ── Preset ranges ────────────────────────────────────────────
+  // ── Preset ranges ─────────────────────────────────────────────
   function _presetRange(key) {
     const now = new Date(); now.setHours(0,0,0,0);
     const y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
@@ -11007,15 +10949,8 @@
       case 'last30':    return { from: new Date(y,m,d-29), to: new Date(y,m,d) };
       case 'thisMonth': return { from: new Date(y,m,1),    to: new Date(y,m+1,0) };
       case 'lastMonth': return { from: new Date(y,m-1,1),  to: new Date(y,m,0) };
-      case 'thisQ': {
-        const qs = Math.floor(m/3)*3;
-        return { from: new Date(y,qs,1), to: new Date(y,qs+3,0) };
-      }
-      case 'lastQ': {
-        const qs = Math.floor(m/3)*3 - 3;
-        const qy = qs < 0 ? y-1 : y; const qm = qs < 0 ? qs+12 : qs;
-        return { from: new Date(qy,qm,1), to: new Date(qy,qm+3,0) };
-      }
+      case 'thisQ': { const qs=Math.floor(m/3)*3; return {from:new Date(y,qs,1),to:new Date(y,qs+3,0)}; }
+      case 'lastQ': { const qs=Math.floor(m/3)*3-3, qy=qs<0?y-1:y, qm=qs<0?qs+12:qs; return {from:new Date(qy,qm,1),to:new Date(qy,qm+3,0)}; }
       case 'thisYear':  return { from: new Date(y,0,1),   to: new Date(y,11,31) };
       case 'lastYear':  return { from: new Date(y-1,0,1), to: new Date(y-1,11,31) };
       case 'next3M':    return { from: new Date(y,m,d),   to: new Date(y,m+3,d) };
@@ -11025,33 +10960,26 @@
     }
   }
 
-  // ── Tiny helpers ─────────────────────────────────────────────
-  function _sameDay(a, b)  {
-    return a.getFullYear()===b.getFullYear() &&
-           a.getMonth()===b.getMonth()       &&
-           a.getDate()===b.getDate();
-  }
-  function _dayStart(d)  { const x=new Date(d); x.setHours(0,0,0,0);       return x; }
-  function _dayEnd(d)    { const x=new Date(d); x.setHours(23,59,59,999);   return x; }
-  function _fmt(d)       { return d ? `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}` : ''; }
-  function _fmtShort(d)  { return d ? `${d.getDate()}-${MONTHS_SHORT[d.getMonth()]}-${String(d.getFullYear()).slice(2)}` : ''; }
+  // ── Helpers ───────────────────────────────────────────────────
+  function _sameDay(a,b) { return a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate(); }
+  function _dayStart(d) { const x=new Date(d); x.setHours(0,0,0,0); return x; }
+  function _dayEnd(d)   { const x=new Date(d); x.setHours(23,59,59,999); return x; }
+  function _fmt(d)      { return d ? d.getDate()+' '+MONTHS_SHORT[d.getMonth()]+' '+d.getFullYear() : ''; }
+  function _fmtShort(d) { return d ? d.getDate()+'-'+MONTHS_SHORT[d.getMonth()]+'-'+String(d.getFullYear()).slice(2) : ''; }
 
-  // ── Integration — PA tab ──────────────────────────────────────
+  // ── Integrations ──────────────────────────────────────────────
   window.drpApplyPA = function(from, to) {
-    _drpFromPA = from;
-    _drpToPA   = to;
-    document.getElementById('structureDetailsSection').classList.remove('visible');
-    document.getElementById('planActualDetailsSection').classList.remove('visible');
+    _drpFromPA = from; _drpToPA = to;
+    const s = document.getElementById('structureDetailsSection');
+    const p = document.getElementById('planActualDetailsSection');
+    if (s) s.classList.remove('visible');
+    if (p) p.classList.remove('visible');
     document.querySelectorAll('.plan-actual-card').forEach(c => c.classList.remove('selected'));
     generatePlanVsActuals();
   };
-
-  // ── Integration — Shell tab ───────────────────────────────────
   window.drpApplyShell = function(from, to) {
-    _drpFromShell = from;
-    _drpToShell   = to;
-    updateShellKPIs();
-    renderShellTracker();
+    _drpFromShell = from; _drpToShell = to;
+    updateShellKPIs(); renderShellTracker();
   };
 
 })();
