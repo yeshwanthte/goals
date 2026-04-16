@@ -5000,7 +5000,7 @@
         <div class="work-front-content">
           <i class="bi bi-funnel-fill"></i>
           <div class="work-front-info">
-            <div class="work-front-label">Work Front for next activity</div>
+            <div class="work-front-label">Work Front</div>
             <div class="work-front-value">
               <span id="workFrontValue">0</span>
               <span class="work-front-subtitle">units</span>
@@ -6475,10 +6475,12 @@
     const displayData = applyMilestoneColumnFilters(currentDetailsData);
     const totalRevenue = displayData.reduce((s, u) => s + (u[currentRevenueField] || 0), 0) / 10000000;
 
-    // Compute done-count per active status column
+    // Compute totals per active column (count Done for status, sum for CTG)
     const statusTotals = activeColIds.map(id => {
       const col = OPTIONAL_COLS.find(c => c.id === id);
-      return col ? displayData.filter(u => !!u[col.field]).length : null;
+      if (!col) return null;
+      if (col.type === 'ctg') return { ctg: true, val: displayData.reduce((s, u) => s + col.calc(u), 0) / 10000000 };
+      return col.field ? displayData.filter(u => !!u[col.field]).length : null;
     });
 
     const rows = [`
@@ -6492,17 +6494,23 @@
         <td class="revenue-cell" style="font-size:1.1rem;">
           <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
         </td>
-        ${statusTotals.map(t => t !== null
-          ? `<td style="text-align:center;font-weight:700;color:#446A2C;">${t} <span style="font-size:0.7rem;font-weight:500;color:var(--gray-500);">Done</span></td>`
-          : '<td></td>'
-        ).join('')}
+        ${statusTotals.map(t => {
+          if (t === null) return '<td></td>';
+          if (typeof t === 'object' && t.ctg) return `<td style="text-align:right;font-weight:700;color:#C65911;">₹${t.val.toFixed(2)}</td>`;
+          return `<td style="text-align:center;font-weight:700;color:#446A2C;">${t} <span style="font-size:0.7rem;font-weight:500;color:var(--gray-500);">Done</span></td>`;
+        }).join('')}
       </tr>`];
 
     displayData.forEach(unit => {
       const revenue = ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
       const optCells = activeColIds.map(id => {
         const col = OPTIONAL_COLS.find(c => c.id === id);
-        return col ? statusCell(!!unit[col.field]) : '<td></td>';
+        if (!col) return '<td></td>';
+        if (col.type === 'ctg') {
+          const v = (col.calc(unit) / 10000000).toFixed(2);
+          return `<td style="text-align:right;font-size:0.78rem;color:#C65911;font-weight:600;">₹${v}</td>`;
+        }
+        return statusCell(!!unit[col.field]);
       }).join('');
       rows.push(`
         <tr>
@@ -6538,8 +6546,8 @@
         case 5: valA = a[currentRevenueField] || 0; valB = b[currentRevenueField] || 0; break;
         default: {
           const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 6]);
-          valA = col && a[col.field] ? 1 : 0;
-          valB = col && b[col.field] ? 1 : 0;
+          if (col && col.type === 'ctg') { valA = col.calc(a); valB = col.calc(b); }
+          else { valA = col && a[col.field] ? 1 : 0; valB = col && b[col.field] ? 1 : 0; }
           break;
         }
       }
@@ -6611,7 +6619,10 @@
     const headers = ['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', ...optLabels];
 
     // schema: 't'=text, 'n'=number, 'd'=date, 's'=status-text
-    const schema = ['t','t','t','t','t','n', ...activeColIds.map(() => 't')];
+    const schema = ['t','t','t','t','t','n', ...activeColIds.map(id => {
+      const col = OPTIONAL_COLS.find(c => c.id === id);
+      return (col && col.type === 'ctg') ? 'n' : 't';
+    })];
 
     const excelData = [headers];
     const totalRevenue = currentDetailsData.reduce((s, u) => s + (u[currentRevenueField] || 0), 0) / 10000000;
@@ -6621,7 +6632,9 @@
       const revenue = (unit[currentRevenueField] || 0) / 10000000;
       const optVals = activeColIds.map(id => {
         const col = OPTIONAL_COLS.find(c => c.id === id);
-        return col ? (unit[col.field] ? 'Done' : 'Pending') : '';
+        if (!col) return '';
+        if (col.type === 'ctg') return col.calc(unit) / 10000000;
+        return unit[col.field] ? 'Done' : 'Pending';
       });
       excelData.push([unit.Project||'N/A', unit.Phase||'N/A', unit.Tower||'N/A',
         unit.UnitNo, unit.Customer, revenue, ...optVals]);
@@ -6983,16 +6996,33 @@
 
   // Returns all unique cell values for a given column + table from FULL (unfiltered) master data
   function getCFDAllValues(tableType, colIdx) {
-    const source = tableType === 'pa'     ? currentPlanActualData
-                 : tableType === 'struct' ? currentStructureData
-                 :                          currentDetailsData;   // 'milestone'
-    const getter = tableType === 'pa'     ? getPACellText
-                 : tableType === 'struct' ? getStructCellText
-                 :                          getMilestoneCellText;
+    // ── Excel-style cascading filter ──────────────────────────
+    // Show only values that exist in rows still visible after all OTHER active filters.
+    const fullSource = tableType === 'pa'     ? currentPlanActualData
+                     : tableType === 'struct' ? currentStructureData
+                     :                          currentDetailsData;
+
+    const allFilters  = tableType === 'pa'     ? paColumnFilters
+                      : tableType === 'struct' ? structColumnFilters
+                      :                          milestoneColumnFilters;
+
+    const getter      = tableType === 'pa'     ? getPACellText
+                      : tableType === 'struct' ? getStructCellText
+                      :                          getMilestoneCellText;
+
+    // Apply every active filter EXCEPT the one for the column being opened
+    const otherEntries = Object.entries(allFilters).filter(([c]) => +c !== colIdx);
+    const source = fullSource.filter(row =>
+      otherEntries.every(([c, valSet]) => {
+        if (!valSet || valSet.size === 0) return true;
+        return valSet.has(getter(row, +c));
+      })
+    );
+
     const vals = new Set();
     source.forEach(row => {
       const v = getter(row, colIdx);
-      if (v && v !== 'N/A' && v !== '-') vals.add(v);
+      if (v !== undefined && v !== null && v !== '' && v !== 'N/A' && v !== '-') vals.add(v);
     });
     return [...vals].sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
   }
@@ -7015,7 +7045,9 @@
     // Date columns in PA table (5=Plan Date, 7=Actual Date) get a hierarchy filter
     const isDateHierarchy = tableType === 'pa' && (colIdx === 5 || colIdx === 7);
 
-    const activeFilters = tableType === 'pa' ? paColumnFilters : structColumnFilters;
+    const activeFilters = tableType === 'pa'     ? paColumnFilters
+                        : tableType === 'struct' ? structColumnFilters
+                        :                          milestoneColumnFilters;
     const existingFilter = activeFilters[colIdx];
 
     const allVals = getCFDAllValues(tableType, colIdx);
@@ -7239,7 +7271,9 @@
       case 5: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
       default: {
         const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - 6]);
-        return col ? (unit[col.field] ? 'Done' : 'Pending') : '';
+        if (!col) return '';
+        if (col.type === 'ctg') return (col.calc(unit) / 10000000).toFixed(2);
+        return col.field ? (unit[col.field] ? 'Done' : 'Pending') : '';
       }
     }
   }
@@ -9993,20 +10027,34 @@
   // COLUMN CUSTOMISER — state & pane logic
   // ═══════════════════════════════════════════════════════
   const OPTIONAL_COLS = [
-    { id: 'IDSADate',   label: 'IDSA',              field: 'IDSADate'   },
-    { id: 'GFC',        label: 'GFC',               field: 'GFC'        },
-    { id: 'Plaster',    label: 'Plaster',           field: 'Plaster'    },
-    { id: 'DryFloor',   label: 'Dry Flooring',      field: 'DryFloor'   },
-    { id: 'WetFloor',   label: 'Wet Flooring & Dado', field: 'WetFloor' },
-    { id: 'Fenest',     label: 'Fenestration',      field: 'Fenest'     },
-    { id: 'Masonry',    label: 'Masonry',           field: 'Masonry'    },
-    { id: 'Conduiting', label: 'Conduiting',        field: 'Conduiting' },
-    { id: 'ToiletWP',   label: 'Toilet W/P',        field: 'ToiletWP'   },
-    { id: 'Plumbing',   label: 'Plumbing',          field: 'Plumbing'   },
-    { id: 'HvacOpt',    label: 'HVAC',              field: 'HvacOpt'    },
-    { id: 'FalseCeil',  label: 'False Ceiling',     field: 'FalseCeil'  },
-    { id: 'Furniture',  label: 'Furniture',         field: 'Furniture'  },
-    { id: 'Kitchen',    label: 'Kitchen',           field: 'Kitchen'    },
+    { id: 'IDSADate',   label: 'IDSA',                field: 'IDSADate',   type: 'status' },
+    { id: 'GFC',        label: 'GFC',                 field: 'GFC',        type: 'status' },
+    { id: 'Plaster',    label: 'Plaster',             field: 'Plaster',    type: 'status' },
+    { id: 'DryFloor',   label: 'Dry Flooring',        field: 'DryFloor',   type: 'status' },
+    { id: 'WetFloor',   label: 'Wet Flooring & Dado', field: 'WetFloor',   type: 'status' },
+    { id: 'Fenest',     label: 'Fenestration',        field: 'Fenest',     type: 'status' },
+    { id: 'Masonry',    label: 'Masonry',             field: 'Masonry',    type: 'status' },
+    { id: 'Conduiting', label: 'Conduiting',          field: 'Conduiting', type: 'status' },
+    { id: 'ToiletWP',   label: 'Toilet W/P',          field: 'ToiletWP',   type: 'status' },
+    { id: 'Plumbing',   label: 'Plumbing',            field: 'Plumbing',   type: 'status' },
+    { id: 'HvacOpt',    label: 'HVAC',                field: 'HvacOpt',    type: 'status' },
+    { id: 'FalseCeil',  label: 'False Ceiling',       field: 'FalseCeil',  type: 'status' },
+    { id: 'Furniture',  label: 'Furniture',           field: 'Furniture',  type: 'status' },
+    { id: 'Kitchen',    label: 'Kitchen',             field: 'Kitchen',    type: 'status' },
+    // ── CTG measure columns (shown in pane only when CTG toggle is ON) ──
+    { id: 'ctg_ms_BP',  label: 'Misc Works CTG (₹Cr)',       type: 'ctg', calc: u => u.Masonry    ? 0 : (u.CtgBP||0) },
+    { id: 'ctg_ms_BQ',  label: 'Masonry CTG (₹Cr)',          type: 'ctg', calc: u => u.Masonry    ? 0 : (u.CtgBQ||0) },
+    { id: 'ctg_ms_BR',  label: 'Conduiting CTG (₹Cr)',       type: 'ctg', calc: u => u.Conduiting ? 0 : (u.CtgBR||0) },
+    { id: 'ctg_ms_BS',  label: 'Plaster CTG (₹Cr)',          type: 'ctg', calc: u => u.Plaster    ? 0 : (u.CtgBS||0) },
+    { id: 'ctg_ms_BU',  label: 'Toilet W/P CTG (₹Cr)',       type: 'ctg', calc: u => u.ToiletWP   ? 0 : (u.CtgBU||0) },
+    { id: 'ctg_ms_BT',  label: 'Toilet Plumbing CTG (₹Cr)', type: 'ctg', calc: u => u.Plumbing   ? 0 : (u.CtgBT||0) },
+    { id: 'ctg_ms_BV',  label: 'Dry Flooring CTG (₹Cr)',    type: 'ctg', calc: u => u.DryFloor   ? 0 : (u.CtgBV||0) },
+    { id: 'ctg_ms_BW',  label: 'Wet Flooring CTG (₹Cr)',    type: 'ctg', calc: u => u.WetFloor   ? 0 : (u.CtgBW||0) },
+    { id: 'ctg_ms_BX',  label: 'HVAC CTG (₹Cr)',            type: 'ctg', calc: u => u.HVAC       ? 0 : (u.CtgBX||0) },
+    { id: 'ctg_ms_CB',  label: 'False Ceiling CTG (₹Cr)',   type: 'ctg', calc: u => u.False      ? 0 : (u.CtgCB||0) },
+    { id: 'ctg_ms_CE',  label: 'Fenestration CTG (₹Cr)',    type: 'ctg', calc: u => u.Fenest     ? 0 : (u.CtgCE||0) },
+    { id: 'ctg_ms_CI',  label: 'Furniture CTG (₹Cr)',       type: 'ctg', calc: u => u.Furniture  ? 0 : (u.CtgCI||0) },
+    { id: 'ctg_ms_CJ',  label: 'Kitchen CTG (₹Cr)',         type: 'ctg', calc: u => u.Kitchen    ? 0 : (u.CtgCJ||0) },
   ];
   const DEFAULT_ACTIVE_COLS = ['IDSADate', 'GFC', 'Plaster', 'DryFloor', 'WetFloor', 'Fenest']; // fallback
 
@@ -10077,23 +10125,55 @@
         activeEl.appendChild(el);
       });
     }
+
     const availEl = document.getElementById('colAvailableList');
     availEl.innerHTML = '';
-    const inactive = OPTIONAL_COLS.filter(c => !_paneWork.includes(c.id));
-    if (inactive.length === 0) {
+
+    // Status cols always available; CTG cols only when CTG toggle is on
+    const statusInactive = OPTIONAL_COLS.filter(c => c.type !== 'ctg' && !_paneWork.includes(c.id));
+    const ctgInactive    = ctgVisible
+      ? OPTIONAL_COLS.filter(c => c.type === 'ctg' && !_paneWork.includes(c.id))
+      : [];
+
+    const allInactive = [...statusInactive, ...ctgInactive];
+
+    if (allInactive.length === 0) {
       availEl.innerHTML = '<div style="font-size:0.78rem;color:var(--gray-400);padding:0.45rem 0.7rem;">All columns are active</div>';
     } else {
-      inactive.forEach(col => {
-        const el = document.createElement('div');
-        el.className = 'col-available-item';
-        el.innerHTML = `<span>${col.label}</span>
-          <button class="add-col-btn" data-id="${col.id}" title="Add"><i class="bi bi-plus-lg"></i></button>`;
-        el.querySelector('.add-col-btn').addEventListener('click', function() {
-          _paneWork.push(this.dataset.id); _renderPaneContent();
-        });
-        availEl.appendChild(el);
-      });
+      // Status columns section
+      if (statusInactive.length > 0) {
+        const hdr = document.createElement('div');
+        hdr.style.cssText = 'font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;padding:0.3rem 0.7rem 0.15rem;';
+        hdr.textContent = 'Status Columns';
+        availEl.appendChild(hdr);
+        statusInactive.forEach(col => _appendAvailItem(availEl, col));
+      }
+      // CTG columns section (only when CTG toggle is ON)
+      if (ctgInactive.length > 0) {
+        const hdr = document.createElement('div');
+        hdr.style.cssText = 'font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:#C65911;padding:0.3rem 0.7rem 0.15rem;margin-top:0.4rem;';
+        hdr.innerHTML = '<i class="bi bi-sigma" style="margin-right:3px;"></i>CTG Columns';
+        availEl.appendChild(hdr);
+        ctgInactive.forEach(col => _appendAvailItem(availEl, col));
+      }
+      if (!ctgVisible) {
+        const note = document.createElement('div');
+        note.style.cssText = 'font-size:0.72rem;color:#94a3b8;padding:0.35rem 0.7rem;font-style:italic;';
+        note.textContent = 'Enable CTG toggle to add CTG columns';
+        availEl.appendChild(note);
+      }
     }
+  }
+
+  function _appendAvailItem(availEl, col) {
+    const el = document.createElement('div');
+    el.className = 'col-available-item';
+    el.innerHTML = `<span>${col.label}</span>
+      <button class="add-col-btn" data-id="${col.id}" title="Add"><i class="bi bi-plus-lg"></i></button>`;
+    el.querySelector('.add-col-btn').addEventListener('click', function() {
+      _paneWork.push(this.dataset.id); _renderPaneContent();
+    });
+    availEl.appendChild(el);
   }
   function _pDragStart(e) { _paneDragSrc = e.currentTarget; e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
   function _pDragOver(e) {
@@ -10210,11 +10290,31 @@
     const hThumb = document.getElementById('ctgToggleThumb');
     if (hTrack) hTrack.style.background = ctgVisible ? '#C65911' : 'rgba(255,255,255,0.2)';
     if (hThumb) hThumb.style.left = ctgVisible ? '19px' : '3px';
+
     // Re-render PA details table if currently open (Plaster, Flooring or Handover)
     const isAnyCtgActivity = ['PlasterRev','FloorRev','HandRev'].includes(currentPlanActualRevField);
     if (isAnyCtgActivity &&
         document.getElementById('planActualDetailsSection').classList.contains('visible')) {
       renderPlanActualDetailsTable();
+    }
+
+    // If Milestone col pane is open, refresh it so CTG cols appear/disappear live
+    if (document.getElementById('colPane').classList.contains('open')) {
+      _renderPaneContent();
+    }
+
+    // If CTG toggle is turned OFF, strip any active CTG cols from activeColIds
+    // so they don't render broken columns in the table
+    if (!ctgVisible) {
+      const hadCtg = activeColIds.some(id => id.startsWith('ctg_ms_'));
+      if (hadCtg) {
+        activeColIds = activeColIds.filter(id => !id.startsWith('ctg_ms_'));
+        _saveActiveCols(activeColIds, currentActivityName);
+        if (document.getElementById('detailsSection').classList.contains('visible')) {
+          rebuildMilestoneTableHeader();
+          renderDetailsTable();
+        }
+      }
     }
   }
   // ===== END CTG HELPERS =====
