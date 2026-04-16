@@ -10055,6 +10055,10 @@
     { id: 'ctg_ms_CE',  label: 'Fenestration CTG (₹Cr)',    type: 'ctg', calc: u => u.Fenest     ? 0 : (u.CtgCE||0) },
     { id: 'ctg_ms_CI',  label: 'Furniture CTG (₹Cr)',       type: 'ctg', calc: u => u.Furniture  ? 0 : (u.CtgCI||0) },
     { id: 'ctg_ms_CJ',  label: 'Kitchen CTG (₹Cr)',         type: 'ctg', calc: u => u.Kitchen    ? 0 : (u.CtgCJ||0) },
+    // ── Aggregate CTG totals — one per activity, injected automatically when CTG is ON ──
+    { id: 'ctg_ms_PLASTER_TOTAL',  label: 'CTG till Plaster (₹Cr)',          type: 'ctg', calc: u => computeCtgUnit(u) },
+    { id: 'ctg_ms_FLOOR_TOTAL',    label: 'CTG till Flooring & Dado (₹Cr)',  type: 'ctg', calc: u => computeCtgFloorUnit(u) },
+    { id: 'ctg_ms_HAND_TOTAL',     label: 'CTG till Handover (₹Cr)',         type: 'ctg', calc: u => computeCtgHandoverUnit(u) },
   ];
   const DEFAULT_ACTIVE_COLS = ['IDSADate', 'GFC', 'Plaster', 'DryFloor', 'WetFloor', 'Fenest']; // fallback
 
@@ -10069,14 +10073,31 @@
     return 'milestoneActiveCols_' + (activityName || 'default').replace(/\s+/g, '_');
   }
 
+  // Map activity → which aggregate CTG column to auto-inject when CTG toggle is ON
+  const ACTIVITY_CTG_COL = {
+    'Plaster':            'ctg_ms_PLASTER_TOTAL',
+    'Flooring & Dado':    'ctg_ms_FLOOR_TOTAL',
+    'Ready for Handover': 'ctg_ms_HAND_TOTAL',
+  };
+
   function _loadActiveCols(activityName) {
+    let cols;
     try {
       const key = _activityStorageKey(activityName);
       const s = sessionStorage.getItem(key);
-      if (s) return JSON.parse(s);
-    } catch(e) {}
-    // Fall back to per-activity default, or global default
-    return [...(ACTIVITY_DEFAULT_COLS[activityName] || DEFAULT_ACTIVE_COLS)];
+      cols = s ? JSON.parse(s) : null;
+    } catch(e) { cols = null; }
+    if (!cols) cols = [...(ACTIVITY_DEFAULT_COLS[activityName] || DEFAULT_ACTIVE_COLS)];
+
+    // Strip any aggregate CTG cols that no longer apply (stale from previous session)
+    cols = cols.filter(id => !id.startsWith('ctg_ms_') || id === ACTIVITY_CTG_COL[activityName]);
+
+    // Inject the correct aggregate CTG col at end when CTG toggle is ON
+    const ctgCol = ACTIVITY_CTG_COL[activityName];
+    if (ctgVisible && ctgCol && !cols.includes(ctgCol)) {
+      cols.push(ctgCol);
+    }
+    return cols;
   }
 
   function _saveActiveCols(ids, activityName) {
@@ -10285,36 +10306,29 @@
 
   function toggleCTGColumn() {
     ctgVisible = !ctgVisible;
-    // Sync header toggle (small track in top bar)
     const hTrack = document.getElementById('ctgToggleTrack');
     const hThumb = document.getElementById('ctgToggleThumb');
     if (hTrack) hTrack.style.background = ctgVisible ? '#C65911' : 'rgba(255,255,255,0.2)';
     if (hThumb) hThumb.style.left = ctgVisible ? '19px' : '3px';
 
-    // Re-render PA details table if currently open (Plaster, Flooring or Handover)
+    // Re-render PA details table if open
     const isAnyCtgActivity = ['PlasterRev','FloorRev','HandRev'].includes(currentPlanActualRevField);
     if (isAnyCtgActivity &&
         document.getElementById('planActualDetailsSection').classList.contains('visible')) {
       renderPlanActualDetailsTable();
     }
 
-    // If Milestone col pane is open, refresh it so CTG cols appear/disappear live
+    // Refresh col pane if open
     if (document.getElementById('colPane').classList.contains('open')) {
       _renderPaneContent();
     }
 
-    // If CTG toggle is turned OFF, strip any active CTG cols from activeColIds
-    // so they don't render broken columns in the table
-    if (!ctgVisible) {
-      const hadCtg = activeColIds.some(id => id.startsWith('ctg_ms_'));
-      if (hadCtg) {
-        activeColIds = activeColIds.filter(id => !id.startsWith('ctg_ms_'));
-        _saveActiveCols(activeColIds, currentActivityName);
-        if (document.getElementById('detailsSection').classList.contains('visible')) {
-          rebuildMilestoneTableHeader();
-          renderDetailsTable();
-        }
-      }
+    // Refresh Milestone unit details if visible — re-load cols so CTG aggregate appears/disappears
+    if (document.getElementById('detailsSection').classList.contains('visible') && currentActivityName) {
+      activeColIds = _loadActiveCols(currentActivityName);
+      _saveActiveCols(activeColIds, currentActivityName);
+      rebuildMilestoneTableHeader();
+      renderDetailsTable();
     }
   }
   // ===== END CTG HELPERS =====
