@@ -4869,7 +4869,7 @@
                     <th class="sortable" onclick="sortPlanActualTable(6)">Plan Amt (₹ Cr)<button class="col-filter-btn" data-table="pa" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                     <th class="sortable" onclick="sortPlanActualTable(7)">Actual Date<button class="col-filter-btn" data-table="pa" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                     <th class="sortable" onclick="sortPlanActualTable(8)">Actual Amt (₹ Cr)<button class="col-filter-btn" data-table="pa" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                    <th class="sortable ctg-col-header" id="ctgColHeader" onclick="sortPlanActualTable(9)" style="display:none;"><i class="bi bi-sigma"></i> <span id="ctgColHeaderLabel">CTG (₹ Cr)</span></th>
+                    <th class="sortable ctg-col-header" id="ctgColHeader" onclick="sortPlanActualTable(9)" style="display:none;"><i class="bi bi-sigma"></i> <span id="ctgColHeaderLabel">CTG (₹ Cr)</span><button class="col-filter-btn" data-table="pa" data-col="9" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   </tr>
                 </thead>
                 <tbody id="planActualDetailsTableBody"></tbody>
@@ -7555,6 +7555,9 @@
     if (ctgLabel)  ctgLabel.textContent = isFlooring ? 'CTG Till Flooring & Dado (₹ Cr)'
       : isHandover ? 'CTG Till Ready for Handover (₹ Cr)'
       : 'CTG Till Plaster (₹ Cr)';
+    // Restore active filter state on CTG filter button
+    const ctgFilterBtn = ctgHeader ? ctgHeader.querySelector('.col-filter-btn') : null;
+    if (ctgFilterBtn) ctgFilterBtn.classList.toggle('active', !!paColumnFilters[9]);
 
     // Remove any previously injected optional th elements
     document.querySelectorAll('#planActualDetailsTable thead th.pa-opt-col').forEach(el => el.remove());
