@@ -2145,6 +2145,21 @@
     .settings-table th { background: #f1f5f9; padding: 0.6rem 0.9rem; text-align: left; font-weight: 700; color: #475569; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.4px; }
     .settings-table td { padding: 0.7rem 0.9rem; border-top: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
     .settings-table tr:hover td { background: #fef9f6; }
+    /* Tab-access checkboxes */
+    .tab-access-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.75rem; }
+    .tab-access-chip { display: flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.7rem; border: 1.5px solid #e2e8f0; border-radius: 20px; font-size: 0.73rem; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.18s; user-select: none; background: #f8fafc; }
+    .tab-access-chip input[type=checkbox] { accent-color: #C65911; width: 13px; height: 13px; cursor: pointer; }
+    .tab-access-chip:has(input:checked) { border-color: #C65911; background: rgba(198,89,17,0.08); color: #C65911; }
+    /* Inline edit row */
+    .user-edit-row td { background: #fef9f6 !important; padding: 0.9rem !important; }
+    .user-edit-row .edit-section { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; }
+    .user-edit-section-title { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 0.35rem; }
+    .btn-reset-pin { background: none; border: 1.5px solid #93c5fd; color: #2563eb; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-reset-pin:hover { background: #2563eb; color: #fff; }
+    .btn-edit-user { background: none; border: 1.5px solid #86efac; color: #16a34a; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-right: 4px; }
+    .btn-edit-user:hover { background: #16a34a; color: #fff; }
+    .btn-save-user { background: #C65911; border: none; color: #fff; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .btn-save-user:hover { background: #833C0C; }
     .btn-del-user { background: none; border: 1.5px solid #fca5a5; color: #ef4444; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
     .btn-del-user:hover { background: #ef4444; color: #fff; }
     /* Activity log */
@@ -8110,6 +8125,9 @@
         const settingsBtn = document.getElementById('adminSettingsBtn');
         if (settingsBtn) settingsBtn.style.display = result.isAdmin ? 'flex' : 'none';
 
+        // Apply tab-level access control for non-admin users
+        applyTabAccess(result);
+
         overlay.style.opacity = '0';
         overlay.style.transition = 'opacity 0.4s ease';
         setTimeout(function() { overlay.style.display = 'none'; }, 400);
@@ -8160,8 +8178,55 @@
     document.getElementById('dataSection').classList.remove('visible');
     document.getElementById('planActualDataSection').classList.remove('visible');
 
+    // Restore all tab buttons (clean state for next login)
+    document.querySelectorAll('#tabNavigation .tab-button').forEach(btn => btn.style.display = '');
+
     // focus username on next tick so it's ready
     setTimeout(function() { document.getElementById('loginUsername').focus(); }, 450);
+  }
+
+  // ── Tab-level access control ───────────────────────────────────
+  // Called right after login. Hides tab buttons and content for tabs
+  // not in the user's allowed list. Admin always gets all tabs.
+  function applyTabAccess(user) {
+    const tabMap = {
+      milestone:    { btn: 'switchTab(\'milestone\')',    content: 'milestoneTab' },
+      planactual:   { btn: 'switchTab(\'planactual\')',   content: 'planActualTab' },
+      tower:        { btn: 'switchTab(\'tower\')',         content: 'towerTab' },
+      shelltracker: { btn: 'switchTab(\'shelltracker\')', content: 'shellTrackerTab' },
+    };
+
+    // Admin: always show all
+    if (user.isAdmin) {
+      document.querySelectorAll('#tabNavigation .tab-button').forEach(btn => btn.style.display = '');
+      return;
+    }
+
+    // Find user record to get their tabs list
+    const users = getUsers();
+    const record = users.find(u => u.username === user.username);
+    const allowed = (record && record.tabs && record.tabs.length > 0) ? record.tabs : ['milestone','planactual','tower','shelltracker'];
+
+    // Show/hide each tab button
+    document.querySelectorAll('#tabNavigation .tab-button').forEach(btn => {
+      // Match button by its onclick text
+      const onclick = btn.getAttribute('onclick') || '';
+      const tabKey = Object.keys(tabMap).find(k => onclick.includes(k));
+      if (tabKey) {
+        const visible = allowed.includes(tabKey);
+        btn.style.display = visible ? '' : 'none';
+      }
+    });
+
+    // If currently active tab is not allowed, switch to first allowed tab
+    const activeTab = document.querySelector('#tabNavigation .tab-button.active');
+    const activeOnclick = activeTab ? (activeTab.getAttribute('onclick') || '') : '';
+    const activeKey = Object.keys(tabMap).find(k => activeOnclick.includes(k));
+    if (activeKey && !allowed.includes(activeKey)) {
+      const firstAllowed = allowed[0];
+      const firstBtn = document.querySelector(`#tabNavigation .tab-button[onclick*="${firstAllowed}"]`);
+      if (firstBtn) firstBtn.click();
+    }
   }
 
   // ===== TOWER VISUALIZATION MODULE =====
@@ -9929,6 +9994,15 @@
     if (tab === 'users') renderUsersTable();
   }
 
+  // All 4 tabs available — same keys used in tab navigation onclick attrs
+  const ALL_TABS = ['milestone','planactual','tower','shelltracker'];
+  const TAB_LABELS = {
+    milestone:    'Project Milestone',
+    planactual:   'Plan Vs Actuals',
+    tower:        'Graphical Representation',
+    shelltracker: 'Shell Tracker'
+  };
+
   async function createUser() {
     const name = document.getElementById('newUserName').value.trim();
     const pin  = document.getElementById('newUserPin').value.trim();
@@ -9949,16 +10023,23 @@
     if (users.find(u => u.username.toLowerCase() === name.toLowerCase()))
       return showMsg('This username already exists.', false);
 
+    // Collect tab access from chips
+    const tabs = [...document.querySelectorAll('#newUserTabGrid input[type=checkbox]')]
+      .filter(cb => cb.checked).map(cb => cb.value);
+    if (tabs.length === 0) return showMsg('Grant at least one tab.', false);
+
     const hash = await sha256(name.toLowerCase() + ':' + pin);
-    users.push({ username: name, hash, createdAt: new Date().toISOString() });
+    users.push({ username: name, hash, tabs, createdAt: new Date().toISOString() });
     saveUsers(users);
     renderUsersTable();
     showMsg(`Saving user "${name}" to GitHub...`, true);
     await persistGitHubDB();
-    showMsg(`User "${name}" created successfully. Works in any browser!`, true);
+    showMsg(`User "${name}" created. Works in any browser!`, true);
 
     document.getElementById('newUserName').value = '';
     document.getElementById('newUserPin').value  = '';
+    // Reset checkboxes to all-checked
+    document.querySelectorAll('#newUserTabGrid input[type=checkbox]').forEach(cb => cb.checked = true);
   }
 
   async function deleteUser(username) {
@@ -9969,13 +10050,113 @@
     await persistGitHubDB();
   }
 
+  // Toggle inline edit row for a user
+  function toggleEditRow(username) {
+    const existingRow = document.getElementById('editrow-' + CSS.escape(username));
+    if (existingRow) { existingRow.remove(); return; }
+
+    const users = getUsers();
+    const u = users.find(x => x.username === username);
+    if (!u) return;
+
+    const tabs = u.tabs || ALL_TABS;  // default: all tabs if not set
+    const tabChips = ALL_TABS.map(t => `
+      <label class="tab-access-chip">
+        <input type="checkbox" value="${t}" ${tabs.includes(t) ? 'checked' : ''}>
+        ${TAB_LABELS[t]}
+      </label>`).join('');
+
+    const tr = document.getElementById('userrow-' + CSS.escape(username));
+    if (!tr) return;
+    const editRow = document.createElement('tr');
+    editRow.id = 'editrow-' + username;
+    editRow.className = 'user-edit-row';
+    editRow.innerHTML = `
+      <td colspan="6">
+        <div class="user-edit-section-title" style="margin-bottom:0.6rem;"><i class="bi bi-pencil-square" style="margin-right:4px;"></i>Editing: <strong>${username}</strong></div>
+        <div class="user-edit-section" style="display:flex;flex-wrap:wrap;gap:1.5rem;align-items:flex-start;">
+          <div>
+            <div class="user-edit-section-title">Reset PIN</div>
+            <div style="display:flex;gap:0.5rem;align-items:center;margin-top:4px;">
+              <input type="password" id="resetPin-${username}" placeholder="New 4-digit PIN" maxlength="4" inputmode="numeric"
+                style="padding:0.4rem 0.7rem;border:1.5px solid #e2e8f0;border-radius:7px;font-size:0.82rem;width:140px;outline:none;">
+              <button class="btn-save-user" onclick="saveResetPin('${username}')"><i class="bi bi-key"></i> Save PIN</button>
+            </div>
+            <div id="pinMsg-${username}" style="font-size:0.75rem;font-weight:600;margin-top:4px;display:none;"></div>
+          </div>
+          <div style="flex:1;min-width:260px;">
+            <div class="user-edit-section-title">Tab Access</div>
+            <div class="tab-access-grid" id="tabgrid-${username}" style="margin-top:4px;">${tabChips}</div>
+            <button class="btn-save-user" style="margin-top:0.6rem;" onclick="saveTabAccess('${username}')">
+              <i class="bi bi-shield-check"></i> Save Access
+            </button>
+            <span id="accessMsg-${username}" style="font-size:0.75rem;font-weight:600;margin-left:0.5rem;display:none;"></span>
+          </div>
+        </div>
+      </td>`;
+    tr.insertAdjacentElement('afterend', editRow);
+  }
+
+  async function saveResetPin(username) {
+    const input = document.getElementById('resetPin-' + username);
+    const msgEl = document.getElementById('pinMsg-' + username);
+    const pin = (input.value || '').trim();
+
+    function showPinMsg(text, ok) {
+      msgEl.style.display = 'inline';
+      msgEl.style.color = ok ? '#059669' : '#dc2626';
+      msgEl.textContent = text;
+      setTimeout(() => { msgEl.style.display = 'none'; }, 3500);
+    }
+
+    if (!/^\d{4}$/.test(pin)) return showPinMsg('PIN must be exactly 4 digits.', false);
+
+    const users = getUsers();
+    const u = users.find(x => x.username === username);
+    if (!u) return showPinMsg('User not found.', false);
+
+    u.hash = await sha256(username.toLowerCase() + ':' + pin);
+    saveUsers(users);
+    showPinMsg('PIN updated! Syncing...', true);
+    await persistGitHubDB();
+    showPinMsg('PIN saved successfully.', true);
+    input.value = '';
+  }
+
+  async function saveTabAccess(username) {
+    const msgEl = document.getElementById('accessMsg-' + username);
+    const grid  = document.getElementById('tabgrid-' + username);
+
+    function showAccessMsg(text, ok) {
+      msgEl.style.display = 'inline';
+      msgEl.style.color = ok ? '#059669' : '#dc2626';
+      msgEl.textContent = text;
+      setTimeout(() => { msgEl.style.display = 'none'; }, 3500);
+    }
+
+    const tabs = [...grid.querySelectorAll('input[type=checkbox]')]
+      .filter(cb => cb.checked).map(cb => cb.value);
+    if (tabs.length === 0) return showAccessMsg('Grant at least one tab.', false);
+
+    const users = getUsers();
+    const u = users.find(x => x.username === username);
+    if (!u) return;
+
+    u.tabs = tabs;
+    saveUsers(users);
+    renderUsersTable();  // refresh table to show updated access badges
+    showAccessMsg('Access saved! Syncing...', true);
+    await persistGitHubDB();
+    showAccessMsg('Access saved successfully.', true);
+  }
+
   function renderUsersTable() {
     const users = getUsers();
     const log   = getLog();
     const tbody = document.getElementById('usersTableBody');
 
     if (users.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">No users created yet</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:1.5rem;">No users created yet</td></tr>';
       return;
     }
 
@@ -9985,12 +10166,20 @@
         ? new Date(lastLogin.ts).toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
         : '—';
       const created = new Date(u.createdAt).toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
-      return `<tr>
+      const tabs = u.tabs || ALL_TABS;
+      const tabBadges = tabs.map(t =>
+        `<span style="display:inline-block;padding:1px 6px;border-radius:10px;font-size:0.65rem;font-weight:700;background:rgba(198,89,17,0.1);color:#C65911;margin:1px;">${TAB_LABELS[t] || t}</span>`
+      ).join('');
+      return `<tr id="userrow-${u.username}">
         <td style="color:#94a3b8;font-weight:700;">${i + 1}</td>
         <td><i class="bi bi-person-circle" style="color:#C65911;margin-right:6px;"></i><strong>${u.username}</strong></td>
         <td>${created}</td>
         <td>${lastLoginStr}</td>
-        <td><button class="btn-del-user" onclick="deleteUser('${u.username}')"><i class="bi bi-trash3"></i> Delete</button></td>
+        <td>${tabBadges}</td>
+        <td style="white-space:nowrap;">
+          <button class="btn-edit-user" onclick="toggleEditRow('${u.username}')"><i class="bi bi-pencil"></i> Edit</button>
+          <button class="btn-del-user" onclick="deleteUser('${u.username}')"><i class="bi bi-trash3"></i> Delete</button>
+        </td>
       </tr>`;
     }).join('');
   }
@@ -10579,6 +10768,16 @@
             </div>
             <button class="btn-create-user" onclick="createUser()"><i class="bi bi-person-plus-fill"></i> Create</button>
           </div>
+          <!-- Tab access chips for new user -->
+          <div style="margin-top:0.9rem;">
+            <div class="user-edit-section-title"><i class="bi bi-shield-check" style="margin-right:3px;"></i>Tab Access (all granted by default)</div>
+            <div class="tab-access-grid" id="newUserTabGrid">
+              <label class="tab-access-chip"><input type="checkbox" value="milestone" checked> <i class="bi bi-buildings"></i> Project Milestone</label>
+              <label class="tab-access-chip"><input type="checkbox" value="planactual" checked> <i class="bi bi-graph-up-arrow"></i> Plan Vs Actuals</label>
+              <label class="tab-access-chip"><input type="checkbox" value="tower" checked> <i class="bi bi-building"></i> Graphical Representation</label>
+              <label class="tab-access-chip"><input type="checkbox" value="shelltracker" checked> <i class="bi bi-building-fill-gear"></i> Shell Tracker</label>
+            </div>
+          </div>
           <div id="createUserMsg" style="margin-top:0.75rem;font-size:0.82rem;font-weight:600;display:none;"></div>
         </div>
 
@@ -10593,11 +10792,12 @@
                 <th>Username</th>
                 <th>Created On</th>
                 <th>Last Login</th>
-                <th>Action</th>
+                <th>Tab Access</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="usersTableBody">
-              <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">No users created yet</td></tr>
+              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:1.5rem;">No users created yet</td></tr>
             </tbody>
           </table>
         </div>
