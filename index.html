@@ -1896,6 +1896,7 @@
     /* Fixed column widths — used identically in header + every data row */
     :root {
       --shell-col-name:     1fr;      /* Milestone Name — grows to fill */
+      --shell-col-duration: 62px;     /* Duration (days) */
       --shell-col-baseline: 82px;     /* Baseline Plan */
       --shell-col-date:     100px;    /* Actual / Projected */
       --shell-col-amt:      58px;     /* Value */
@@ -1909,11 +1910,24 @@
       grid-template-columns:
         var(--shell-accent)
         var(--shell-col-name)
+        var(--shell-col-duration)
         var(--shell-col-baseline)
         var(--shell-col-date)
         var(--shell-col-amt);
       align-items: stretch;
       width: 100%;
+    }
+
+    /* Duration cell */
+    .shell-slab-duration {
+      width: var(--shell-col-duration);
+      padding: 0.5rem 0.3rem;
+      font-size: 0.7rem;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-left: 1px solid #f1f5f9;
     }
 
     /* ── Data rows ── */
@@ -2145,21 +2159,6 @@
     .settings-table th { background: #f1f5f9; padding: 0.6rem 0.9rem; text-align: left; font-weight: 700; color: #475569; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.4px; }
     .settings-table td { padding: 0.7rem 0.9rem; border-top: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
     .settings-table tr:hover td { background: #fef9f6; }
-    /* Tab-access checkboxes */
-    .tab-access-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.75rem; }
-    .tab-access-chip { display: flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.7rem; border: 1.5px solid #e2e8f0; border-radius: 20px; font-size: 0.73rem; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.18s; user-select: none; background: #f8fafc; }
-    .tab-access-chip input[type=checkbox] { accent-color: #C65911; width: 13px; height: 13px; cursor: pointer; }
-    .tab-access-chip:has(input:checked) { border-color: #C65911; background: rgba(198,89,17,0.08); color: #C65911; }
-    /* Inline edit row */
-    .user-edit-row td { background: #fef9f6 !important; padding: 0.9rem !important; }
-    .user-edit-row .edit-section { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; }
-    .user-edit-section-title { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 0.35rem; }
-    .btn-reset-pin { background: none; border: 1.5px solid #93c5fd; color: #2563eb; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-    .btn-reset-pin:hover { background: #2563eb; color: #fff; }
-    .btn-edit-user { background: none; border: 1.5px solid #86efac; color: #16a34a; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-right: 4px; }
-    .btn-edit-user:hover { background: #16a34a; color: #fff; }
-    .btn-save-user { background: #C65911; border: none; color: #fff; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-    .btn-save-user:hover { background: #833C0C; }
     .btn-del-user { background: none; border: 1.5px solid #fca5a5; color: #ef4444; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
     .btn-del-user:hover { background: #ef4444; color: #fff; }
     /* Activity log */
@@ -2902,34 +2901,6 @@
       gap: 1rem;
       justify-content: center;
       padding: 1rem;
-    }
-
-    /* Project section wrapper used in All-projects view */
-    .proj-section {
-      width: 100%;
-      margin-bottom: 1.5rem;
-    }
-    .proj-section-header {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.55rem 1rem;
-      margin-bottom: 0.75rem;
-      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-      border-radius: var(--radius-md);
-      color: white;
-      font-size: 0.88rem;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-      box-shadow: 0 3px 10px rgba(198,89,17,0.25);
-    }
-    .proj-section-header i { opacity: 0.85; font-size: 1rem; }
-    .proj-section-body {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      justify-content: flex-start;
-      padding: 0 0.25rem;
     }
     
     .villa-block {
@@ -4044,74 +4015,6 @@
     /* ── Backdrop overlay ── */
     .drp-overlay { position: fixed; inset: 0; z-index: 9499; background: transparent; }
 
-    /* ── Shell date-basis toggle — embedded inside Date Range card ── */
-    .shell-date-card {
-      max-width: 300px;
-      flex-direction: column !important;
-    }
-    .shell-date-card .pa-multi-body {
-      flex-direction: column;
-      gap: 0;
-      align-items: stretch;
-      padding: 0;
-    }
-    .shell-drp-row {
-      padding: 0.5rem 0.7rem;
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-    }
-    .shell-drp-row .drp-trigger { width: 100%; }
-    .shell-basis-row {
-      padding: 0.45rem 0.65rem 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .shell-basis-lbl {
-      font-size: 0.62rem;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      color: #94a3b8;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .shell-basis-pills {
-      display: flex;
-      background: #f1f5f9;
-      border-radius: 8px;
-      padding: 3px;
-      gap: 3px;
-      flex: 1;
-    }
-    .shell-basis-pill {
-      flex: 1;
-      padding: 0.28rem 0.5rem;
-      border: none;
-      border-radius: 6px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      cursor: pointer;
-      color: #64748b;
-      background: transparent;
-      transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
-      white-space: nowrap;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.25rem;
-      line-height: 1.2;
-    }
-    .shell-basis-pill.active {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-      box-shadow: 0 2px 6px rgba(198,89,17,0.32);
-    }
-    .shell-basis-pill:hover:not(.active) {
-      background: rgba(198,89,17,0.09);
-      color: var(--primary);
-    }
-    .shell-basis-pill i { font-size: 0.68rem; flex-shrink: 0; }
-
   </style>
 </head>
 
@@ -4485,6 +4388,7 @@
                   <th class="sortable" onclick="sortTable(3)">Unit No.<button class="col-filter-btn" data-table="milestone" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(4)">Customer Name<button class="col-filter-btn" data-table="milestone" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(5)">Revenue (₹ Cr)<button class="col-filter-btn" data-table="milestone" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(6)">Inventory<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(6)" style="text-align:center;">IDSA<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(7)" style="text-align:center;">GFC<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(8)" style="text-align:center;">Plaster<button class="col-filter-btn" data-table="milestone" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
@@ -4884,7 +4788,7 @@
                     <th class="sortable" onclick="sortPlanActualTable(6)">Plan Amt (₹ Cr)<button class="col-filter-btn" data-table="pa" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                     <th class="sortable" onclick="sortPlanActualTable(7)">Actual Date<button class="col-filter-btn" data-table="pa" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                     <th class="sortable" onclick="sortPlanActualTable(8)">Actual Amt (₹ Cr)<button class="col-filter-btn" data-table="pa" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                    <th class="sortable ctg-col-header" id="ctgColHeader" onclick="sortPlanActualTable(9)" style="display:none;"><i class="bi bi-sigma"></i> <span id="ctgColHeaderLabel">CTG (₹ Cr)</span><button class="col-filter-btn" data-table="pa" data-col="9" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                    <th class="sortable ctg-col-header" id="ctgColHeader" onclick="sortPlanActualTable(9)" style="display:none;"><i class="bi bi-sigma"></i> <span id="ctgColHeaderLabel">CTG (₹ Cr)</span></th>
                   </tr>
                 </thead>
                 <tbody id="planActualDetailsTableBody"></tbody>
@@ -5070,31 +4974,18 @@
               </div>
             </div>
           </div>
-          <!-- Date Range + Basis Toggle for Shell Tracker -->
-          <div class="pa-multi-card shell-date-card">
+          <!-- Date Range Picker for Shell Tracker -->
+          <div class="pa-multi-card" style="max-width:260px;">
             <div class="pa-multi-header" style="background:linear-gradient(135deg,#475569,#334155);">
-              <i class="bi bi-calendar2-range"></i><span>Date Range Filter</span>
+              <i class="bi bi-calendar2-range"></i><span>Date Range</span>
             </div>
-            <div class="pa-multi-body">
-              <div class="shell-drp-row">
-                <div class="drp-wrapper" id="drpWrapperShell">
-                  <button class="drp-trigger" id="drpTriggerShell" onclick="drpOpen('Shell')">
-                    <i class="bi bi-calendar2-range drp-icon"></i>
-                    <span id="drpLabelShell">All Dates</span>
-                    <i class="bi bi-chevron-down drp-caret"></i>
-                  </button>
-                </div>
-              </div>
-              <div class="shell-basis-row">
-                <span class="shell-basis-lbl">Filter by</span>
-                <div class="shell-basis-pills">
-                  <button class="shell-basis-pill active" id="shellBasisBaseline" onclick="setShellDateBasis('baseline')">
-                    <i class="bi bi-calendar-check"></i> Baseline
-                  </button>
-                  <button class="shell-basis-pill" id="shellBasisActual" onclick="setShellDateBasis('actual')">
-                    <i class="bi bi-calendar2-event"></i> Actual/Proj
-                  </button>
-                </div>
+            <div class="pa-multi-body" style="padding:0.5rem 0.7rem;align-items:center;">
+              <div class="drp-wrapper" id="drpWrapperShell">
+                <button class="drp-trigger" id="drpTriggerShell" onclick="drpOpen('Shell')" style="width:100%;">
+                  <i class="bi bi-calendar2-range drp-icon"></i>
+                  <span id="drpLabelShell">All Dates</span>
+                  <i class="bi bi-chevron-down drp-caret"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -5103,6 +4994,12 @@
 
       <!-- Filters Row -->
       <section class="filter-section" style="margin-bottom:1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <span style="font-size:0.78rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;"><i class="bi bi-funnel-fill" style="margin-right:4px;color:#C65911;"></i>Filters</span>
+          <button onclick="clearAllShellFilters()" style="display:flex;align-items:center;gap:0.35rem;padding:0.3rem 0.75rem;background:rgba(198,89,17,0.08);border:1.5px solid rgba(198,89,17,0.25);border-radius:7px;font-size:0.74rem;font-weight:700;color:#C65911;cursor:pointer;transition:all 0.18s;" onmouseover="this.style.background='rgba(198,89,17,0.18)'" onmouseout="this.style.background='rgba(198,89,17,0.08)'">
+            <i class="bi bi-x-circle"></i> Clear All
+          </button>
+        </div>
         <div class="filter-grid" style="grid-template-columns: repeat(2, 1fr);">
           <div class="filter-card">
             <div class="filter-card-header"><i class="bi bi-folder"></i> Project<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
@@ -5622,7 +5519,6 @@
     AGREEMENT_VALUE: 56, // Column BE (index 56)
     INTERIOR_VALUE: 57, // Column BF (index 57)
     TOTAL_RECEIVED: 59, // Column BH (index 59)
-    DUE_NOW: 60,        // Column BI (index 60)
     AFS_DATE: 61, // Column BJ (index 61)
     HO_AFS: 62, // Column BK (index 62)
     IDSA_DATE: 63, // Column BL (index 63)
@@ -5798,7 +5694,6 @@
       AgreementValue: +r[COL.AGREEMENT_VALUE] || 0,
       InteriorValue: +r[COL.INTERIOR_VALUE] || 0,
       TotalReceived: +r[COL.TOTAL_RECEIVED] || 0,
-      DueNow: +r[COL.DUE_NOW] || 0,
       AFSDate: r[COL.AFS_DATE] || "",
       HOasPerAFS: r[COL.HO_AFS] || "",
       IDSADate: r[COL.IDSA_DATE] || "",
@@ -5878,7 +5773,6 @@
     document.getElementById("planActualDataSection").classList.add("visible");
 
     buildAllSlicers();
-    _applyThisYearDefault();
     render();
     buildPlanActualSlicers();
     
@@ -6468,7 +6362,7 @@
 
   function renderDetailsTable() {
     const tbody = document.getElementById("detailsTableBody");
-    const totalCols = 6 + activeColIds.length;
+    const totalCols = 7 + activeColIds.length;
 
     if (currentDetailsData.length === 0) {
       tbody.innerHTML = `
@@ -6490,12 +6384,10 @@
     const displayData = applyMilestoneColumnFilters(currentDetailsData);
     const totalRevenue = displayData.reduce((s, u) => s + (u[currentRevenueField] || 0), 0) / 10000000;
 
-    // Compute totals per active column (count Done for status, sum for CTG)
+    // Compute done-count per active status column
     const statusTotals = activeColIds.map(id => {
       const col = OPTIONAL_COLS.find(c => c.id === id);
-      if (!col) return null;
-      if (col.type === 'ctg') return { ctg: true, val: displayData.reduce((s, u) => s + col.calc(u), 0) / 10000000 };
-      return col.field ? displayData.filter(u => !!u[col.field]).length : null;
+      return col ? displayData.filter(u => !!u[col.field]).length : null;
     });
 
     const rows = [`
@@ -6509,6 +6401,7 @@
         <td class="revenue-cell" style="font-size:1.1rem;">
           <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
         </td>
+        <td></td>
         ${statusTotals.map(t => {
           if (t === null) return '<td></td>';
           if (typeof t === 'object' && t.ctg) return `<td style="text-align:right;font-weight:700;color:#C65911;">₹${t.val.toFixed(2)}</td>`;
@@ -6535,6 +6428,7 @@
           <td class="unit-number">${unit.UnitNo}</td>
           <td class="customer-name">${unit.Customer}</td>
           <td class="revenue-cell">₹${revenue}</td>
+          <td style="font-size:0.78rem;color:#475569;">${unit.Inventory || '—'}</td>
           ${optCells}
         </tr>`);
     });
@@ -6553,20 +6447,23 @@
     currentDetailsData.sort((a, b) => {
       let valA, valB;
       switch (columnIndex) {
-        case 0: valA = a.Project  || ''; valB = b.Project  || ''; break;
-        case 1: valA = a.Phase    || ''; valB = b.Phase    || ''; break;
-        case 2: valA = a.Tower    || ''; valB = b.Tower    || ''; break;
-        case 3: valA = a.UnitNo   || ''; valB = b.UnitNo   || ''; break;
-        case 4: valA = a.Customer || ''; valB = b.Customer || ''; break;
+        case 0: valA = a.Project   || ''; valB = b.Project   || ''; break;
+        case 1: valA = a.Phase     || ''; valB = b.Phase     || ''; break;
+        case 2: valA = a.Tower     || ''; valB = b.Tower     || ''; break;
+        case 3: valA = a.UnitNo    || ''; valB = b.UnitNo    || ''; break;
+        case 4: valA = a.Customer  || ''; valB = b.Customer  || ''; break;
         case 5: valA = a[currentRevenueField] || 0; valB = b[currentRevenueField] || 0; break;
+        case 6: valA = a.Inventory || ''; valB = b.Inventory || ''; break;
         default: {
-          const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 6]);
+          const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 7]);
           if (col && col.type === 'ctg') { valA = col.calc(a); valB = col.calc(b); }
           else { valA = col && a[col.field] ? 1 : 0; valB = col && b[col.field] ? 1 : 0; }
           break;
         }
       }
-      if (columnIndex >= 5) return sortAscending ? valA - valB : valB - valA;
+      if (columnIndex === 5 || (columnIndex >= 7 && OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 7] && c.type === 'ctg')))
+        return sortAscending ? valA - valB : valB - valA;
+      if (columnIndex === 5) return sortAscending ? valA - valB : valB - valA;
       if (valA < valB) return sortAscending ? -1 : 1;
       if (valA > valB) return sortAscending ? 1 : -1;
       return 0;
@@ -6631,17 +6528,17 @@
     if (currentDetailsData.length === 0) { alert('No data to download'); return; }
 
     const optLabels = activeColIds.map(id => (OPTIONAL_COLS.find(c => c.id === id) || {label: id}).label);
-    const headers = ['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', ...optLabels];
+    const headers = ['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', 'Inventory', ...optLabels];
 
-    // schema: 't'=text, 'n'=number, 'd'=date, 's'=status-text
-    const schema = ['t','t','t','t','t','n', ...activeColIds.map(id => {
+    // schema: 't'=text, 'n'=number
+    const schema = ['t','t','t','t','t','n','t', ...activeColIds.map(id => {
       const col = OPTIONAL_COLS.find(c => c.id === id);
       return (col && col.type === 'ctg') ? 'n' : 't';
     })];
 
     const excelData = [headers];
     const totalRevenue = currentDetailsData.reduce((s, u) => s + (u[currentRevenueField] || 0), 0) / 10000000;
-    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue, ...activeColIds.map(() => '')]);
+    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue, '', ...activeColIds.map(() => '')]);
 
     currentDetailsData.forEach(unit => {
       const revenue = (unit[currentRevenueField] || 0) / 10000000;
@@ -6652,7 +6549,7 @@
         return unit[col.field] ? 'Done' : 'Pending';
       });
       excelData.push([unit.Project||'N/A', unit.Phase||'N/A', unit.Tower||'N/A',
-        unit.UnitNo, unit.Customer, revenue, ...optVals]);
+        unit.UnitNo, unit.Customer, revenue, unit.Inventory||'', ...optVals]);
     });
 
     const wb = XLSX.utils.book_new();
@@ -7011,33 +6908,16 @@
 
   // Returns all unique cell values for a given column + table from FULL (unfiltered) master data
   function getCFDAllValues(tableType, colIdx) {
-    // ── Excel-style cascading filter ──────────────────────────
-    // Show only values that exist in rows still visible after all OTHER active filters.
-    const fullSource = tableType === 'pa'     ? currentPlanActualData
-                     : tableType === 'struct' ? currentStructureData
-                     :                          currentDetailsData;
-
-    const allFilters  = tableType === 'pa'     ? paColumnFilters
-                      : tableType === 'struct' ? structColumnFilters
-                      :                          milestoneColumnFilters;
-
-    const getter      = tableType === 'pa'     ? getPACellText
-                      : tableType === 'struct' ? getStructCellText
-                      :                          getMilestoneCellText;
-
-    // Apply every active filter EXCEPT the one for the column being opened
-    const otherEntries = Object.entries(allFilters).filter(([c]) => +c !== colIdx);
-    const source = fullSource.filter(row =>
-      otherEntries.every(([c, valSet]) => {
-        if (!valSet || valSet.size === 0) return true;
-        return valSet.has(getter(row, +c));
-      })
-    );
-
+    const source = tableType === 'pa'     ? currentPlanActualData
+                 : tableType === 'struct' ? currentStructureData
+                 :                          currentDetailsData;   // 'milestone'
+    const getter = tableType === 'pa'     ? getPACellText
+                 : tableType === 'struct' ? getStructCellText
+                 :                          getMilestoneCellText;
     const vals = new Set();
     source.forEach(row => {
       const v = getter(row, colIdx);
-      if (v !== undefined && v !== null && v !== '' && v !== 'N/A' && v !== '-') vals.add(v);
+      if (v && v !== 'N/A' && v !== '-') vals.add(v);
     });
     return [...vals].sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
   }
@@ -7060,9 +6940,7 @@
     // Date columns in PA table (5=Plan Date, 7=Actual Date) get a hierarchy filter
     const isDateHierarchy = tableType === 'pa' && (colIdx === 5 || colIdx === 7);
 
-    const activeFilters = tableType === 'pa'     ? paColumnFilters
-                        : tableType === 'struct' ? structColumnFilters
-                        :                          milestoneColumnFilters;
+    const activeFilters = tableType === 'pa' ? paColumnFilters : structColumnFilters;
     const existingFilter = activeFilters[colIdx];
 
     const allVals = getCFDAllValues(tableType, colIdx);
@@ -7284,8 +7162,9 @@
       case 3: return (unit.UnitNo   || '').toString();
       case 4: return (unit.Customer || '').toString();
       case 5: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
+      case 6: return (unit.Inventory || '').toString();
       default: {
-        const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - 6]);
+        const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - 7]);
         if (!col) return '';
         if (col.type === 'ctg') return (col.calc(unit) / 10000000).toFixed(2);
         return col.field ? (unit[col.field] ? 'Done' : 'Pending') : '';
@@ -7570,9 +7449,6 @@
     if (ctgLabel)  ctgLabel.textContent = isFlooring ? 'CTG Till Flooring & Dado (₹ Cr)'
       : isHandover ? 'CTG Till Ready for Handover (₹ Cr)'
       : 'CTG Till Plaster (₹ Cr)';
-    // Restore active filter state on CTG filter button
-    const ctgFilterBtn = ctgHeader ? ctgHeader.querySelector('.col-filter-btn') : null;
-    if (ctgFilterBtn) ctgFilterBtn.classList.toggle('active', !!paColumnFilters[9]);
 
     // Remove any previously injected optional th elements
     document.querySelectorAll('#planActualDetailsTable thead th.pa-opt-col').forEach(el => el.remove());
@@ -8125,9 +8001,6 @@
         const settingsBtn = document.getElementById('adminSettingsBtn');
         if (settingsBtn) settingsBtn.style.display = result.isAdmin ? 'flex' : 'none';
 
-        // Apply tab-level access control for non-admin users
-        applyTabAccess(result);
-
         overlay.style.opacity = '0';
         overlay.style.transition = 'opacity 0.4s ease';
         setTimeout(function() { overlay.style.display = 'none'; }, 400);
@@ -8178,55 +8051,8 @@
     document.getElementById('dataSection').classList.remove('visible');
     document.getElementById('planActualDataSection').classList.remove('visible');
 
-    // Restore all tab buttons (clean state for next login)
-    document.querySelectorAll('#tabNavigation .tab-button').forEach(btn => btn.style.display = '');
-
     // focus username on next tick so it's ready
     setTimeout(function() { document.getElementById('loginUsername').focus(); }, 450);
-  }
-
-  // ── Tab-level access control ───────────────────────────────────
-  // Called right after login. Hides tab buttons and content for tabs
-  // not in the user's allowed list. Admin always gets all tabs.
-  function applyTabAccess(user) {
-    const tabMap = {
-      milestone:    { btn: 'switchTab(\'milestone\')',    content: 'milestoneTab' },
-      planactual:   { btn: 'switchTab(\'planactual\')',   content: 'planActualTab' },
-      tower:        { btn: 'switchTab(\'tower\')',         content: 'towerTab' },
-      shelltracker: { btn: 'switchTab(\'shelltracker\')', content: 'shellTrackerTab' },
-    };
-
-    // Admin: always show all
-    if (user.isAdmin) {
-      document.querySelectorAll('#tabNavigation .tab-button').forEach(btn => btn.style.display = '');
-      return;
-    }
-
-    // Find user record to get their tabs list
-    const users = getUsers();
-    const record = users.find(u => u.username === user.username);
-    const allowed = (record && record.tabs && record.tabs.length > 0) ? record.tabs : ['milestone','planactual','tower','shelltracker'];
-
-    // Show/hide each tab button
-    document.querySelectorAll('#tabNavigation .tab-button').forEach(btn => {
-      // Match button by its onclick text
-      const onclick = btn.getAttribute('onclick') || '';
-      const tabKey = Object.keys(tabMap).find(k => onclick.includes(k));
-      if (tabKey) {
-        const visible = allowed.includes(tabKey);
-        btn.style.display = visible ? '' : 'none';
-      }
-    });
-
-    // If currently active tab is not allowed, switch to first allowed tab
-    const activeTab = document.querySelector('#tabNavigation .tab-button.active');
-    const activeOnclick = activeTab ? (activeTab.getAttribute('onclick') || '') : '';
-    const activeKey = Object.keys(tabMap).find(k => activeOnclick.includes(k));
-    if (activeKey && !allowed.includes(activeKey)) {
-      const firstAllowed = allowed[0];
-      const firstBtn = document.querySelector(`#tabNavigation .tab-button[onclick*="${firstAllowed}"]`);
-      if (firstBtn) firstBtn.click();
-    }
   }
 
   // ===== TOWER VISUALIZATION MODULE =====
@@ -8417,86 +8243,70 @@
   }
   
   function renderTowerVisualization() {
+    // When selectedProjectTower is null → All projects selected
     const projectData = raw.filter(r => {
       if (selectedProjectTower && r.Project !== selectedProjectTower) return false;
       if (selectedTowerViz.size > 0 && !selectedTowerViz.has(r.Tower)) return false;
       if (selectedPhaseViz.size > 0 && !selectedPhaseViz.has(r.Phase)) return false;
       return true;
     });
-
+    
     if (projectData.length === 0) {
       document.getElementById('towerVizContainer').innerHTML = `
-        <div style="text-align:center;padding:3rem;color:var(--gray-400);width:100%;">
-          <i class="bi bi-building" style="font-size:3rem;margin-bottom:1rem;display:block;"></i>
+        <div style="text-align: center; padding: 3rem; color: var(--gray-400); width: 100%;">
+          <i class="bi bi-building" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
           <p>No units found for ${selectedProjectTower ? `project "${selectedProjectTower}"` : 'the selected filters'}</p>
         </div>`;
       document.getElementById('stageKpiGrid').innerHTML = '';
       return;
     }
-
+    
     // Show KPI bar
     const kpiGrid = document.getElementById('stageKpiGrid');
-    const parentBar = kpiGrid ? kpiGrid.parentElement : null;
-    if (parentBar && parentBar.classList.contains('stage-kpi-bar')) parentBar.style.display = 'block';
-    renderStageKPIs(projectData);
-    initializeSearch();
-
-    const container = document.getElementById('towerVizContainer');
-    container.innerHTML = '';
-    container.classList.remove('tower-villa-layout');
-
-    // ── Single project selected → existing behaviour ──────────
-    if (selectedProjectTower) {
-      _renderProjectUnits(container, projectData, selectedProjectTower);
-      return;
+    const parentBar = kpiGrid.parentElement;
+    if (parentBar && parentBar.classList.contains('stage-kpi-bar')) {
+      parentBar.style.display = 'block';
     }
-
-    // ── All projects → render each project in its own section ─
-    // Group by project, preserving the order they first appear in raw
-    const projectOrder = [];
-    const projectGroups = {};
-    projectData.forEach(r => {
-      if (!projectGroups[r.Project]) {
-        projectOrder.push(r.Project);
-        projectGroups[r.Project] = [];
-      }
-      projectGroups[r.Project].push(r);
-    });
-
-    projectOrder.forEach(projName => {
-      const units = projectGroups[projName];
-
-      // Create a section wrapper
-      const section = document.createElement('div');
-      section.className = 'proj-section';
-      section.innerHTML = `
-        <div class="proj-section-header">
-          <i class="bi bi-folder2-open"></i>${projName}
-          <span style="margin-left:auto;font-size:0.75rem;opacity:0.85;font-weight:500;">${units.length} unit${units.length !== 1 ? 's' : ''}</span>
-        </div>
-        <div class="proj-section-body" id="proj-body-${projName.replace(/\s+/g,'_')}"></div>`;
-      container.appendChild(section);
-
-      const body = section.querySelector('.proj-section-body');
-      _renderProjectUnits(body, units, projName);
-    });
-  }
-
-  // ── Internal: render one project's units into a container ───
-  function _renderProjectUnits(container, units, projName) {
-    const parsed = units.map(u => ({
+    
+    // Render Stage KPIs
+    renderStageKPIs(projectData);
+    
+    // Initialize search
+    initializeSearch();
+    
+    // Parse all units and organize by tower/floor/flat
+    const parsed = projectData.map(u => ({
       ...u,
       parsed: parseUnitNumber(u.UnitNo),
       stage: getUnitStage(u)
     })).filter(u => u.parsed !== null);
-
-    if (isVillaProject(projName)) {
-      const villaUnits    = parsed.filter(u => u.parsed.tower === 0);
+    
+    // Group by tower
+    const towerMap = {};
+    parsed.forEach(u => {
+      const t = u.parsed.tower;
+      if (!towerMap[t]) towerMap[t] = [];
+      towerMap[t].push(u);
+    });
+    
+    // Sort tower numbers
+    const towerNumbers = Object.keys(towerMap).map(Number).sort((a, b) => a - b);
+    
+    // Render each tower
+    const container = document.getElementById('towerVizContainer');
+    container.innerHTML = '';
+    
+    // Check if villa project — render villa (tower=0) units, then still render any tower units
+    if (isVillaProject(selectedProjectTower)) {
+      const villaUnits  = parsed.filter(u => u.parsed.tower === 0);
       const towerOnlyUnits = parsed.filter(u => u.parsed.tower !== 0);
 
+      // Render villa blocks first
       if (villaUnits.length > 0) {
-        renderVillaLayout(container, villaUnits, projName);
+        renderVillaLayout(container, villaUnits, selectedProjectTower);
       }
+
+      // Then render remaining towers (non-zero tower number)
       if (towerOnlyUnits.length > 0) {
         const towerOnlyMap = {};
         towerOnlyUnits.forEach(u => {
@@ -8504,19 +8314,15 @@
           if (!towerOnlyMap[t]) towerOnlyMap[t] = [];
           towerOnlyMap[t].push(u);
         });
-        Object.keys(towerOnlyMap).map(Number).sort((a, b) => a - b)
-          .forEach(tNum => renderSingleTower(container, tNum, towerOnlyMap[tNum]));
+        const towerNums = Object.keys(towerOnlyMap).map(Number).sort((a, b) => a - b);
+        towerNums.forEach(tNum => renderSingleTower(container, tNum, towerOnlyMap[tNum]));
       }
-    } else {
-      const towerMap = {};
-      parsed.forEach(u => {
-        const t = u.parsed.tower;
-        if (!towerMap[t]) towerMap[t] = [];
-        towerMap[t].push(u);
-      });
-      Object.keys(towerMap).map(Number).sort((a, b) => a - b)
-        .forEach(tNum => renderSingleTower(container, tNum, towerMap[tNum]));
+      return;
     }
+    
+    towerNumbers.forEach(towerNum => {
+      renderSingleTower(container, towerNum, towerMap[towerNum]);
+    });
   }
 
   function renderSingleTower(container, towerNum, towerUnits) {
@@ -8831,33 +8637,7 @@
 
       // Block 28 — 2 Cols x 2 Rows
       { name: 'Block 28', cols: 2,
-        units: [228,221, 230,223] },
-
-      // ── Phase 3 ──────────────────────────────────────────────
-
-      // Block 29 — 9 Cols x 1 Row
-      { name: 'Block 29', cols: 9,
-        units: [269,267,265,263,261,259,257,255,253] },
-
-      // Block 30 — 9 Cols x 1 Row
-      { name: 'Block 30', cols: 9,
-        units: [270,268,266,264,262,260,258,256,254] },
-
-      // Block 31 — 2 Cols x 1 Row
-      { name: 'Block 31', cols: 2,
-        units: [274,276] },
-
-      // Block 32 — 2 Cols x 2 Rows
-      { name: 'Block 32', cols: 2,
-        units: [273,275, 271,272] },
-
-      // Block 33 — 6 Cols x 1 Row
-      { name: 'Block 33', cols: 6,
-        units: [277,278,279,280,281,282] },
-
-      // Block 34 — 6 Cols x 1 Row
-      { name: 'Block 34', cols: 6,
-        units: [247,248,249,250,251,252] }
+        units: [228,221, 230,223] }
     ];
 
     // Build lookup from unit numbers present in the loaded data.
@@ -8907,7 +8687,7 @@
 
   function renderBlockLayout(container, units, blocks) {
     container.classList.add('tower-villa-layout');
-    // Append to container (don't wipe — may already have content from other projects)
+    container.innerHTML = '';
     
     // Build unit map - strip alphabetic suffixes so "47a" → 47
     const unitMap = {};
@@ -8930,9 +8710,10 @@
         const unit = unitMap[unitNo];
         if (unit) {
           const stageClass = `stage-${unit.stage}`;
+          const soldClass   = ''; // Sold is now stage-1, no separate class needed
           const unitJson = JSON.stringify(unit).replace(/'/g, "&apos;");
           blockHTML += `
-            <div class="villa-unit ${stageClass}" 
+            <div class="villa-unit ${stageClass} ${soldClass}" 
                  data-unit="${unit.UnitNo}"
                  onclick='showUnitDetail(${unitJson})'
                  title="${unit.UnitNo}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}">
@@ -8944,7 +8725,7 @@
       blockHTML += `</div></div>`;
       rows.push(blockHTML);
     });
-    container.innerHTML += rows.join('');
+    container.innerHTML = rows.join('');
   }
 
   // ===== UNIT DETAIL POPUP =====
@@ -9061,12 +8842,11 @@
     const _cr = v => (!v || v===0)
       ? '<span style="color:#d1d5db">—</span>'
       : '\u20b9\u00a0' + (v/1e7).toFixed(2) + '\u00a0Cr';
-    const agr    = unit.AgreementValue || 0;
-    const intr   = unit.InteriorValue  || 0;
-    const totR   = agr + intr;
-    const recvd  = unit.TotalReceived  || 0;
-    const dueNow = unit.DueNow         || 0;
-    const bal    = totR - recvd;
+    const agr   = unit.AgreementValue || 0;
+    const intr  = unit.InteriorValue  || 0;
+    const totR  = agr + intr;
+    const recvd = unit.TotalReceived  || 0;
+    const bal   = totR - recvd;
 
     document.getElementById('rptFinancialRows').innerHTML = `
       <tbody>
@@ -9085,10 +8865,6 @@
         <tr>
           <td>Total Received</td>
           <td class="col-positive">${_cr(recvd)}</td>
-        </tr>
-        <tr>
-          <td>Due Now</td>
-          <td class="${dueNow > 0 ? 'col-negative' : 'col-positive'}">${_cr(dueNow)}</td>
         </tr>
         <tr class="rpt-fin-balance">
           <td><strong>Balance Receivables</strong></td>
@@ -9644,6 +9420,28 @@
     updateShellKPIs();
   }
 
+  function clearAllShellFilters() {
+    // Reset project → All
+    shellSelectedProject = null;
+    const projEl = document.getElementById('shellProjectSlicer');
+    if (projEl) {
+      projEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      const allBtn = projEl.querySelector('button');
+      if (allBtn) allBtn.classList.add('active');
+    }
+    // Reset tower slicer
+    shellSelectedTowers.clear();
+    buildShellTowerSlicer(null);
+    // Reset date range (use drpClear which updates label + globals)
+    _drpFromShell = null; _drpToShell = null;
+    if (typeof drpClear === 'function') drpClear('Shell');
+    // Reset basis toggle to baseline
+    if (typeof setShellDateBasis === 'function') setShellDateBasis('baseline');
+    // Re-render
+    updateShellKPIs();
+    renderShellTracker();
+  }
+
   function buildShellQuarterSlicer() {
     const el = document.getElementById('shellQuarterSlicer');
     if (!el) return;
@@ -9744,41 +9542,13 @@
     let planRev = 0, actualRev = 0, planNos = 0, actualNos = 0;
 
     rows.forEach(r => {
-      const baseline   = parseDate(r.BaselinePlan || r.PlanDate);
-      const actual     = parseDate(r.ActualDate);
-      const projected  = parseDate(r.ProjectedDate);
-      const isComplete = !!actual;                      // green = has ActualDate
-
-      if (_shellDateBasis === 'baseline') {
-        // ── BASELINE mode ──────────────────────────────────────────
-        // Qualify row: BaselinePlan date must fall within the selected range
-        const baseInRange = baseline && drpInRange(baseline, 'Shell');
-        if (baseInRange) {
-          // Plan = all milestone values whose baseline is in range
-          planRev += r.DetailAmt;
-          planNos++;
-          // Actual = only completed (green) milestones adjacent to those baseline dates
-          if (isComplete) {
-            actualRev += r.DetailAmt;
-            actualNos++;
-          }
-        }
-      } else {
-        // ── ACTUAL/PROJ mode ───────────────────────────────────────
-        // Qualify row: ActualDate OR ProjectedDate must fall within the selected range
-        const actProjDate  = actual || projected;
-        const actProjInRange = actProjDate && drpInRange(actProjDate, 'Shell');
-        if (actProjInRange) {
-          // Plan = all milestone values whose Actual/Proj date is in range
-          planRev += r.DetailAmt;
-          planNos++;
-          // Actual = only completed (green) milestones — ActualDate specifically in range
-          const actualInRange = actual && drpInRange(actual, 'Shell');
-          if (actualInRange) {
-            actualRev += r.DetailAmt;
-            actualNos++;
-          }
-        }
+      const pd = parseDate(r.PlanDate);
+      if (pd && drpInRange(pd, 'Shell')) {
+        planRev += r.DetailAmt; planNos++;
+      }
+      const ad = parseDate(r.ActualDate);
+      if (ad && drpInRange(ad, 'Shell')) {
+        actualRev += r.DetailAmt; actualNos++;
       }
     });
 
@@ -9794,18 +9564,12 @@
 
     let rows = getShellFilteredRows();
 
-    // Date range filter — respects the basis toggle
+    // Date range filter for visualization
     if (_drpFromShell || _drpToShell) {
       rows = rows.filter(r => {
-        if (_shellDateBasis === 'baseline') {
-          const pd = parseDate(r.PlanDate || r.BaselinePlan);
-          return pd && drpInRange(pd, 'Shell');
-        } else {
-          const ad   = parseDate(r.ActualDate);
-          const proj = parseDate(r.ProjectedDate);
-          const d    = ad || proj;
-          return d && drpInRange(d, 'Shell');
-        }
+        const pd = parseDate(r.PlanDate);
+        const ad = parseDate(r.ActualDate);
+        return (pd && drpInRange(pd, 'Shell')) || (ad && drpInRange(ad, 'Shell'));
       });
     }
 
@@ -9842,17 +9606,38 @@
       // so that the last milestone (highest floor) is at DOM index 0 (top).
       const reversed = [...milestones].reverse();
 
-      const slabRows = reversed.map(m => {
+      const slabRows = reversed.map((m, idx) => {
         const actualDate    = parseDate(m.ActualDate);
         const projectedDate = parseDate(m.ProjectedDate);
         const baselineDate  = parseDate(m.BaselinePlan);
         const hasActual     = !!actualDate;
         const hasProjected  = !!projectedDate;
 
-        // Actual / Projected column:
-        //   If actual date exists → show in green as "Completed"
-        //   Else if projected date exists → show in grey italic as projected
-        //   Otherwise → '—'
+        // ── Duration = diff between this milestone's date and the previous one ──
+        // Uses the ORIGINAL (non-reversed) order: reversed[idx+1] is the item
+        // that precedes this one in the original sheet (i.e. the one built before).
+        let durationText = '—';
+        const prevM = reversed[idx + 1];
+        if (prevM) {
+          let thisDate = null, prevDate = null;
+          if (_shellDateBasis === 'actual') {
+            thisDate = actualDate || projectedDate;
+            prevDate = parseDate(prevM.ActualDate) || parseDate(prevM.ProjectedDate);
+          } else {
+            thisDate = baselineDate;
+            prevDate = parseDate(prevM.BaselinePlan);
+          }
+          if (thisDate && prevDate) {
+            const diffMs   = thisDate.getTime() - prevDate.getTime();
+            const diffDays = Math.round(diffMs / 86400000);
+            if (!isNaN(diffDays)) {
+              const col = diffDays < 0 ? '#dc2626' : diffDays === 0 ? '#64748b' : '#059669';
+              durationText = `<span style="color:${col};font-weight:700;">${diffDays > 0 ? '+' : ''}${diffDays}d</span>`;
+            }
+          }
+        }
+
+        // Actual / Projected column
         let dateText, dateClass;
         if (hasActual) {
           dateText  = `<i class="bi bi-check-circle-fill" style="color:#059669;margin-right:3px;font-size:0.65rem;"></i>${formatDateDDMMMYY(actualDate)}`;
@@ -9868,7 +9653,6 @@
         const baselineText = baselineDate ? formatDateDDMMMYY(baselineDate) : '—';
         const statusClass  = hasActual ? 'slab-actual' : 'slab-projected';
 
-        // Amount in Crs — blank if zero or missing
         const amtDisplay = (m.DetailAmt && m.DetailAmt > 0)
           ? `₹${(m.DetailAmt / 10000000).toFixed(2)}<br>Cr`
           : '';
@@ -9877,6 +9661,7 @@
           <div class="shell-slab ${statusClass}">
             <div class="shell-slab-accent"></div>
             <div class="shell-slab-name"><span>${m.MilestoneName || m.Category || '—'}</span></div>
+            <div class="shell-slab-duration">${durationText}</div>
             <div class="shell-slab-baseline">${baselineText}</div>
             <div class="shell-slab-date ${dateClass}">${dateText}</div>
             <div class="shell-slab-level">${amtDisplay}</div>
@@ -9888,6 +9673,7 @@
         <div class="shell-slab-header">
           <div class="shell-hdr-accent"></div>
           <div class="shell-hdr-name">Milestone Name</div>
+          <div class="shell-hdr-col">Duration<br>(Days)</div>
           <div class="shell-hdr-col">Baseline<br>Plan</div>
           <div class="shell-hdr-col">Actual /<br>Projected</div>
           <div class="shell-hdr-col">Value<br>(₹ Cr)</div>
@@ -9919,15 +9705,9 @@
 
     if (_drpFromShell || _drpToShell) {
       rows = rows.filter(r => {
-        if (_shellDateBasis === 'baseline') {
-          const pd = parseDate(r.PlanDate || r.BaselinePlan);
-          return pd && drpInRange(pd, 'Shell');
-        } else {
-          const ad   = parseDate(r.ActualDate);
-          const proj = parseDate(r.ProjectedDate);
-          const d    = ad || proj;
-          return d && drpInRange(d, 'Shell');
-        }
+        const pd = parseDate(r.PlanDate);
+        const ad = parseDate(r.ActualDate);
+        return (pd && drpInRange(pd, 'Shell')) || (ad && drpInRange(ad, 'Shell'));
       });
     }
 
@@ -9994,15 +9774,6 @@
     if (tab === 'users') renderUsersTable();
   }
 
-  // All 4 tabs available — same keys used in tab navigation onclick attrs
-  const ALL_TABS = ['milestone','planactual','tower','shelltracker'];
-  const TAB_LABELS = {
-    milestone:    'Project Milestone',
-    planactual:   'Plan Vs Actuals',
-    tower:        'Graphical Representation',
-    shelltracker: 'Shell Tracker'
-  };
-
   async function createUser() {
     const name = document.getElementById('newUserName').value.trim();
     const pin  = document.getElementById('newUserPin').value.trim();
@@ -10023,23 +9794,16 @@
     if (users.find(u => u.username.toLowerCase() === name.toLowerCase()))
       return showMsg('This username already exists.', false);
 
-    // Collect tab access from chips
-    const tabs = [...document.querySelectorAll('#newUserTabGrid input[type=checkbox]')]
-      .filter(cb => cb.checked).map(cb => cb.value);
-    if (tabs.length === 0) return showMsg('Grant at least one tab.', false);
-
     const hash = await sha256(name.toLowerCase() + ':' + pin);
-    users.push({ username: name, hash, tabs, createdAt: new Date().toISOString() });
+    users.push({ username: name, hash, createdAt: new Date().toISOString() });
     saveUsers(users);
     renderUsersTable();
     showMsg(`Saving user "${name}" to GitHub...`, true);
     await persistGitHubDB();
-    showMsg(`User "${name}" created. Works in any browser!`, true);
+    showMsg(`User "${name}" created successfully. Works in any browser!`, true);
 
     document.getElementById('newUserName').value = '';
     document.getElementById('newUserPin').value  = '';
-    // Reset checkboxes to all-checked
-    document.querySelectorAll('#newUserTabGrid input[type=checkbox]').forEach(cb => cb.checked = true);
   }
 
   async function deleteUser(username) {
@@ -10050,113 +9814,13 @@
     await persistGitHubDB();
   }
 
-  // Toggle inline edit row for a user
-  function toggleEditRow(username) {
-    const existingRow = document.getElementById('editrow-' + CSS.escape(username));
-    if (existingRow) { existingRow.remove(); return; }
-
-    const users = getUsers();
-    const u = users.find(x => x.username === username);
-    if (!u) return;
-
-    const tabs = u.tabs || ALL_TABS;  // default: all tabs if not set
-    const tabChips = ALL_TABS.map(t => `
-      <label class="tab-access-chip">
-        <input type="checkbox" value="${t}" ${tabs.includes(t) ? 'checked' : ''}>
-        ${TAB_LABELS[t]}
-      </label>`).join('');
-
-    const tr = document.getElementById('userrow-' + CSS.escape(username));
-    if (!tr) return;
-    const editRow = document.createElement('tr');
-    editRow.id = 'editrow-' + username;
-    editRow.className = 'user-edit-row';
-    editRow.innerHTML = `
-      <td colspan="6">
-        <div class="user-edit-section-title" style="margin-bottom:0.6rem;"><i class="bi bi-pencil-square" style="margin-right:4px;"></i>Editing: <strong>${username}</strong></div>
-        <div class="user-edit-section" style="display:flex;flex-wrap:wrap;gap:1.5rem;align-items:flex-start;">
-          <div>
-            <div class="user-edit-section-title">Reset PIN</div>
-            <div style="display:flex;gap:0.5rem;align-items:center;margin-top:4px;">
-              <input type="password" id="resetPin-${username}" placeholder="New 4-digit PIN" maxlength="4" inputmode="numeric"
-                style="padding:0.4rem 0.7rem;border:1.5px solid #e2e8f0;border-radius:7px;font-size:0.82rem;width:140px;outline:none;">
-              <button class="btn-save-user" onclick="saveResetPin('${username}')"><i class="bi bi-key"></i> Save PIN</button>
-            </div>
-            <div id="pinMsg-${username}" style="font-size:0.75rem;font-weight:600;margin-top:4px;display:none;"></div>
-          </div>
-          <div style="flex:1;min-width:260px;">
-            <div class="user-edit-section-title">Tab Access</div>
-            <div class="tab-access-grid" id="tabgrid-${username}" style="margin-top:4px;">${tabChips}</div>
-            <button class="btn-save-user" style="margin-top:0.6rem;" onclick="saveTabAccess('${username}')">
-              <i class="bi bi-shield-check"></i> Save Access
-            </button>
-            <span id="accessMsg-${username}" style="font-size:0.75rem;font-weight:600;margin-left:0.5rem;display:none;"></span>
-          </div>
-        </div>
-      </td>`;
-    tr.insertAdjacentElement('afterend', editRow);
-  }
-
-  async function saveResetPin(username) {
-    const input = document.getElementById('resetPin-' + username);
-    const msgEl = document.getElementById('pinMsg-' + username);
-    const pin = (input.value || '').trim();
-
-    function showPinMsg(text, ok) {
-      msgEl.style.display = 'inline';
-      msgEl.style.color = ok ? '#059669' : '#dc2626';
-      msgEl.textContent = text;
-      setTimeout(() => { msgEl.style.display = 'none'; }, 3500);
-    }
-
-    if (!/^\d{4}$/.test(pin)) return showPinMsg('PIN must be exactly 4 digits.', false);
-
-    const users = getUsers();
-    const u = users.find(x => x.username === username);
-    if (!u) return showPinMsg('User not found.', false);
-
-    u.hash = await sha256(username.toLowerCase() + ':' + pin);
-    saveUsers(users);
-    showPinMsg('PIN updated! Syncing...', true);
-    await persistGitHubDB();
-    showPinMsg('PIN saved successfully.', true);
-    input.value = '';
-  }
-
-  async function saveTabAccess(username) {
-    const msgEl = document.getElementById('accessMsg-' + username);
-    const grid  = document.getElementById('tabgrid-' + username);
-
-    function showAccessMsg(text, ok) {
-      msgEl.style.display = 'inline';
-      msgEl.style.color = ok ? '#059669' : '#dc2626';
-      msgEl.textContent = text;
-      setTimeout(() => { msgEl.style.display = 'none'; }, 3500);
-    }
-
-    const tabs = [...grid.querySelectorAll('input[type=checkbox]')]
-      .filter(cb => cb.checked).map(cb => cb.value);
-    if (tabs.length === 0) return showAccessMsg('Grant at least one tab.', false);
-
-    const users = getUsers();
-    const u = users.find(x => x.username === username);
-    if (!u) return;
-
-    u.tabs = tabs;
-    saveUsers(users);
-    renderUsersTable();  // refresh table to show updated access badges
-    showAccessMsg('Access saved! Syncing...', true);
-    await persistGitHubDB();
-    showAccessMsg('Access saved successfully.', true);
-  }
-
   function renderUsersTable() {
     const users = getUsers();
     const log   = getLog();
     const tbody = document.getElementById('usersTableBody');
 
     if (users.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:1.5rem;">No users created yet</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">No users created yet</td></tr>';
       return;
     }
 
@@ -10166,20 +9830,12 @@
         ? new Date(lastLogin.ts).toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
         : '—';
       const created = new Date(u.createdAt).toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
-      const tabs = u.tabs || ALL_TABS;
-      const tabBadges = tabs.map(t =>
-        `<span style="display:inline-block;padding:1px 6px;border-radius:10px;font-size:0.65rem;font-weight:700;background:rgba(198,89,17,0.1);color:#C65911;margin:1px;">${TAB_LABELS[t] || t}</span>`
-      ).join('');
-      return `<tr id="userrow-${u.username}">
+      return `<tr>
         <td style="color:#94a3b8;font-weight:700;">${i + 1}</td>
         <td><i class="bi bi-person-circle" style="color:#C65911;margin-right:6px;"></i><strong>${u.username}</strong></td>
         <td>${created}</td>
         <td>${lastLoginStr}</td>
-        <td>${tabBadges}</td>
-        <td style="white-space:nowrap;">
-          <button class="btn-edit-user" onclick="toggleEditRow('${u.username}')"><i class="bi bi-pencil"></i> Edit</button>
-          <button class="btn-del-user" onclick="deleteUser('${u.username}')"><i class="bi bi-trash3"></i> Delete</button>
-        </td>
+        <td><button class="btn-del-user" onclick="deleteUser('${u.username}')"><i class="bi bi-trash3"></i> Delete</button></td>
       </tr>`;
     }).join('');
   }
@@ -10219,38 +9875,20 @@
   // COLUMN CUSTOMISER — state & pane logic
   // ═══════════════════════════════════════════════════════
   const OPTIONAL_COLS = [
-    { id: 'IDSADate',   label: 'IDSA',                field: 'IDSADate',   type: 'status' },
-    { id: 'GFC',        label: 'GFC',                 field: 'GFC',        type: 'status' },
-    { id: 'Plaster',    label: 'Plaster',             field: 'Plaster',    type: 'status' },
-    { id: 'DryFloor',   label: 'Dry Flooring',        field: 'DryFloor',   type: 'status' },
-    { id: 'WetFloor',   label: 'Wet Flooring & Dado', field: 'WetFloor',   type: 'status' },
-    { id: 'Fenest',     label: 'Fenestration',        field: 'Fenest',     type: 'status' },
-    { id: 'Masonry',    label: 'Masonry',             field: 'Masonry',    type: 'status' },
-    { id: 'Conduiting', label: 'Conduiting',          field: 'Conduiting', type: 'status' },
-    { id: 'ToiletWP',   label: 'Toilet W/P',          field: 'ToiletWP',   type: 'status' },
-    { id: 'Plumbing',   label: 'Plumbing',            field: 'Plumbing',   type: 'status' },
-    { id: 'HvacOpt',    label: 'HVAC',                field: 'HvacOpt',    type: 'status' },
-    { id: 'FalseCeil',  label: 'False Ceiling',       field: 'FalseCeil',  type: 'status' },
-    { id: 'Furniture',  label: 'Furniture',           field: 'Furniture',  type: 'status' },
-    { id: 'Kitchen',    label: 'Kitchen',             field: 'Kitchen',    type: 'status' },
-    // ── CTG measure columns (shown in pane only when CTG toggle is ON) ──
-    { id: 'ctg_ms_BP',  label: 'Misc Works CTG (₹Cr)',       type: 'ctg', calc: u => u.Masonry    ? 0 : (u.CtgBP||0) },
-    { id: 'ctg_ms_BQ',  label: 'Masonry CTG (₹Cr)',          type: 'ctg', calc: u => u.Masonry    ? 0 : (u.CtgBQ||0) },
-    { id: 'ctg_ms_BR',  label: 'Conduiting CTG (₹Cr)',       type: 'ctg', calc: u => u.Conduiting ? 0 : (u.CtgBR||0) },
-    { id: 'ctg_ms_BS',  label: 'Plaster CTG (₹Cr)',          type: 'ctg', calc: u => u.Plaster    ? 0 : (u.CtgBS||0) },
-    { id: 'ctg_ms_BU',  label: 'Toilet W/P CTG (₹Cr)',       type: 'ctg', calc: u => u.ToiletWP   ? 0 : (u.CtgBU||0) },
-    { id: 'ctg_ms_BT',  label: 'Toilet Plumbing CTG (₹Cr)', type: 'ctg', calc: u => u.Plumbing   ? 0 : (u.CtgBT||0) },
-    { id: 'ctg_ms_BV',  label: 'Dry Flooring CTG (₹Cr)',    type: 'ctg', calc: u => u.DryFloor   ? 0 : (u.CtgBV||0) },
-    { id: 'ctg_ms_BW',  label: 'Wet Flooring CTG (₹Cr)',    type: 'ctg', calc: u => u.WetFloor   ? 0 : (u.CtgBW||0) },
-    { id: 'ctg_ms_BX',  label: 'HVAC CTG (₹Cr)',            type: 'ctg', calc: u => u.HVAC       ? 0 : (u.CtgBX||0) },
-    { id: 'ctg_ms_CB',  label: 'False Ceiling CTG (₹Cr)',   type: 'ctg', calc: u => u.False      ? 0 : (u.CtgCB||0) },
-    { id: 'ctg_ms_CE',  label: 'Fenestration CTG (₹Cr)',    type: 'ctg', calc: u => u.Fenest     ? 0 : (u.CtgCE||0) },
-    { id: 'ctg_ms_CI',  label: 'Furniture CTG (₹Cr)',       type: 'ctg', calc: u => u.Furniture  ? 0 : (u.CtgCI||0) },
-    { id: 'ctg_ms_CJ',  label: 'Kitchen CTG (₹Cr)',         type: 'ctg', calc: u => u.Kitchen    ? 0 : (u.CtgCJ||0) },
-    // ── Aggregate CTG totals — one per activity, injected automatically when CTG is ON ──
-    { id: 'ctg_ms_PLASTER_TOTAL',  label: 'CTG till Plaster (₹Cr)',          type: 'ctg', calc: u => computeCtgUnit(u) },
-    { id: 'ctg_ms_FLOOR_TOTAL',    label: 'CTG till Flooring & Dado (₹Cr)',  type: 'ctg', calc: u => computeCtgFloorUnit(u) },
-    { id: 'ctg_ms_HAND_TOTAL',     label: 'CTG till Handover (₹Cr)',         type: 'ctg', calc: u => computeCtgHandoverUnit(u) },
+    { id: 'IDSADate',   label: 'IDSA',              field: 'IDSADate'   },
+    { id: 'GFC',        label: 'GFC',               field: 'GFC'        },
+    { id: 'Plaster',    label: 'Plaster',           field: 'Plaster'    },
+    { id: 'DryFloor',   label: 'Dry Flooring',      field: 'DryFloor'   },
+    { id: 'WetFloor',   label: 'Wet Flooring & Dado', field: 'WetFloor' },
+    { id: 'Fenest',     label: 'Fenestration',      field: 'Fenest'     },
+    { id: 'Masonry',    label: 'Masonry',           field: 'Masonry'    },
+    { id: 'Conduiting', label: 'Conduiting',        field: 'Conduiting' },
+    { id: 'ToiletWP',   label: 'Toilet W/P',        field: 'ToiletWP'   },
+    { id: 'Plumbing',   label: 'Plumbing',          field: 'Plumbing'   },
+    { id: 'HvacOpt',    label: 'HVAC',              field: 'HvacOpt'    },
+    { id: 'FalseCeil',  label: 'False Ceiling',     field: 'FalseCeil'  },
+    { id: 'Furniture',  label: 'Furniture',         field: 'Furniture'  },
+    { id: 'Kitchen',    label: 'Kitchen',           field: 'Kitchen'    },
   ];
   const DEFAULT_ACTIVE_COLS = ['IDSADate', 'GFC', 'Plaster', 'DryFloor', 'WetFloor', 'Fenest']; // fallback
 
@@ -10265,31 +9903,14 @@
     return 'milestoneActiveCols_' + (activityName || 'default').replace(/\s+/g, '_');
   }
 
-  // Map activity → which aggregate CTG column to auto-inject when CTG toggle is ON
-  const ACTIVITY_CTG_COL = {
-    'Plaster':            'ctg_ms_PLASTER_TOTAL',
-    'Flooring & Dado':    'ctg_ms_FLOOR_TOTAL',
-    'Ready for Handover': 'ctg_ms_HAND_TOTAL',
-  };
-
   function _loadActiveCols(activityName) {
-    let cols;
     try {
       const key = _activityStorageKey(activityName);
       const s = sessionStorage.getItem(key);
-      cols = s ? JSON.parse(s) : null;
-    } catch(e) { cols = null; }
-    if (!cols) cols = [...(ACTIVITY_DEFAULT_COLS[activityName] || DEFAULT_ACTIVE_COLS)];
-
-    // Strip any aggregate CTG cols that no longer apply (stale from previous session)
-    cols = cols.filter(id => !id.startsWith('ctg_ms_') || id === ACTIVITY_CTG_COL[activityName]);
-
-    // Inject the correct aggregate CTG col at end when CTG toggle is ON
-    const ctgCol = ACTIVITY_CTG_COL[activityName];
-    if (ctgVisible && ctgCol && !cols.includes(ctgCol)) {
-      cols.push(ctgCol);
-    }
-    return cols;
+      if (s) return JSON.parse(s);
+    } catch(e) {}
+    // Fall back to per-activity default, or global default
+    return [...(ACTIVITY_DEFAULT_COLS[activityName] || DEFAULT_ACTIVE_COLS)];
   }
 
   function _saveActiveCols(ids, activityName) {
@@ -10338,55 +9959,23 @@
         activeEl.appendChild(el);
       });
     }
-
     const availEl = document.getElementById('colAvailableList');
     availEl.innerHTML = '';
-
-    // Status cols always available; CTG cols only when CTG toggle is on
-    const statusInactive = OPTIONAL_COLS.filter(c => c.type !== 'ctg' && !_paneWork.includes(c.id));
-    const ctgInactive    = ctgVisible
-      ? OPTIONAL_COLS.filter(c => c.type === 'ctg' && !_paneWork.includes(c.id))
-      : [];
-
-    const allInactive = [...statusInactive, ...ctgInactive];
-
-    if (allInactive.length === 0) {
+    const inactive = OPTIONAL_COLS.filter(c => !_paneWork.includes(c.id));
+    if (inactive.length === 0) {
       availEl.innerHTML = '<div style="font-size:0.78rem;color:var(--gray-400);padding:0.45rem 0.7rem;">All columns are active</div>';
     } else {
-      // Status columns section
-      if (statusInactive.length > 0) {
-        const hdr = document.createElement('div');
-        hdr.style.cssText = 'font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;padding:0.3rem 0.7rem 0.15rem;';
-        hdr.textContent = 'Status Columns';
-        availEl.appendChild(hdr);
-        statusInactive.forEach(col => _appendAvailItem(availEl, col));
-      }
-      // CTG columns section (only when CTG toggle is ON)
-      if (ctgInactive.length > 0) {
-        const hdr = document.createElement('div');
-        hdr.style.cssText = 'font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:#C65911;padding:0.3rem 0.7rem 0.15rem;margin-top:0.4rem;';
-        hdr.innerHTML = '<i class="bi bi-sigma" style="margin-right:3px;"></i>CTG Columns';
-        availEl.appendChild(hdr);
-        ctgInactive.forEach(col => _appendAvailItem(availEl, col));
-      }
-      if (!ctgVisible) {
-        const note = document.createElement('div');
-        note.style.cssText = 'font-size:0.72rem;color:#94a3b8;padding:0.35rem 0.7rem;font-style:italic;';
-        note.textContent = 'Enable CTG toggle to add CTG columns';
-        availEl.appendChild(note);
-      }
+      inactive.forEach(col => {
+        const el = document.createElement('div');
+        el.className = 'col-available-item';
+        el.innerHTML = `<span>${col.label}</span>
+          <button class="add-col-btn" data-id="${col.id}" title="Add"><i class="bi bi-plus-lg"></i></button>`;
+        el.querySelector('.add-col-btn').addEventListener('click', function() {
+          _paneWork.push(this.dataset.id); _renderPaneContent();
+        });
+        availEl.appendChild(el);
+      });
     }
-  }
-
-  function _appendAvailItem(availEl, col) {
-    const el = document.createElement('div');
-    el.className = 'col-available-item';
-    el.innerHTML = `<span>${col.label}</span>
-      <button class="add-col-btn" data-id="${col.id}" title="Add"><i class="bi bi-plus-lg"></i></button>`;
-    el.querySelector('.add-col-btn').addEventListener('click', function() {
-      _paneWork.push(this.dataset.id); _renderPaneContent();
-    });
-    availEl.appendChild(el);
   }
   function _pDragStart(e) { _paneDragSrc = e.currentTarget; e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
   function _pDragOver(e) {
@@ -10426,7 +10015,8 @@
     if (!sortRow) return;
     const fixed = [
       {label:'Project',ci:0},{label:'Phase',ci:1},{label:'Tower',ci:2},
-      {label:'Unit No.',ci:3},{label:'Customer Name',ci:4},{label:'Revenue (₹ Cr)',ci:5}
+      {label:'Unit No.',ci:3},{label:'Customer Name',ci:4},{label:'Revenue (₹ Cr)',ci:5},
+      {label:'Inventory',ci:6}
     ];
     let h = fixed.map(f => `
       <th class="sortable" onclick="sortTable(${f.ci})">${f.label}
@@ -10434,7 +10024,7 @@
       </th>`).join('');
     activeColIds.forEach((id, i) => {
       const col = OPTIONAL_COLS.find(c => c.id === id); if (!col) return;
-      const ci = 6 + i;
+      const ci = 7 + i;
       h += `<th class="sortable" onclick="sortTable(${ci})" style="text-align:center;">${col.label}
         <button class="col-filter-btn" data-table="milestone" data-col="${ci}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button>
       </th>`;
@@ -10498,29 +10088,16 @@
 
   function toggleCTGColumn() {
     ctgVisible = !ctgVisible;
+    // Sync header toggle (small track in top bar)
     const hTrack = document.getElementById('ctgToggleTrack');
     const hThumb = document.getElementById('ctgToggleThumb');
     if (hTrack) hTrack.style.background = ctgVisible ? '#C65911' : 'rgba(255,255,255,0.2)';
     if (hThumb) hThumb.style.left = ctgVisible ? '19px' : '3px';
-
-    // Re-render PA details table if open
+    // Re-render PA details table if currently open (Plaster, Flooring or Handover)
     const isAnyCtgActivity = ['PlasterRev','FloorRev','HandRev'].includes(currentPlanActualRevField);
     if (isAnyCtgActivity &&
         document.getElementById('planActualDetailsSection').classList.contains('visible')) {
       renderPlanActualDetailsTable();
-    }
-
-    // Refresh col pane if open
-    if (document.getElementById('colPane').classList.contains('open')) {
-      _renderPaneContent();
-    }
-
-    // Refresh Milestone unit details if visible — re-load cols so CTG aggregate appears/disappears
-    if (document.getElementById('detailsSection').classList.contains('visible') && currentActivityName) {
-      activeColIds = _loadActiveCols(currentActivityName);
-      _saveActiveCols(activeColIds, currentActivityName);
-      rebuildMilestoneTableHeader();
-      renderDetailsTable();
     }
   }
   // ===== END CTG HELPERS =====
@@ -10768,16 +10345,6 @@
             </div>
             <button class="btn-create-user" onclick="createUser()"><i class="bi bi-person-plus-fill"></i> Create</button>
           </div>
-          <!-- Tab access chips for new user -->
-          <div style="margin-top:0.9rem;">
-            <div class="user-edit-section-title"><i class="bi bi-shield-check" style="margin-right:3px;"></i>Tab Access (all granted by default)</div>
-            <div class="tab-access-grid" id="newUserTabGrid">
-              <label class="tab-access-chip"><input type="checkbox" value="milestone" checked> <i class="bi bi-buildings"></i> Project Milestone</label>
-              <label class="tab-access-chip"><input type="checkbox" value="planactual" checked> <i class="bi bi-graph-up-arrow"></i> Plan Vs Actuals</label>
-              <label class="tab-access-chip"><input type="checkbox" value="tower" checked> <i class="bi bi-building"></i> Graphical Representation</label>
-              <label class="tab-access-chip"><input type="checkbox" value="shelltracker" checked> <i class="bi bi-building-fill-gear"></i> Shell Tracker</label>
-            </div>
-          </div>
           <div id="createUserMsg" style="margin-top:0.75rem;font-size:0.82rem;font-weight:600;display:none;"></div>
         </div>
 
@@ -10792,12 +10359,11 @@
                 <th>Username</th>
                 <th>Created On</th>
                 <th>Last Login</th>
-                <th>Tab Access</th>
-                <th>Actions</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody id="usersTableBody">
-              <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:1.5rem;">No users created yet</td></tr>
+              <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:1.5rem;">No users created yet</td></tr>
             </tbody>
           </table>
         </div>
@@ -10917,59 +10483,74 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// DATE RANGE PICKER — v4 (no DOM rebuild on hover; click-safe)
-// Root-cause fix: hover NEVER replaces innerHTML; only CSS toggled.
+// DATE RANGE PICKER ENGINE  — v2 (single-month, fixed-position)
 // ═══════════════════════════════════════════════════════════════
 (function () {
   const MONTHS       = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const WD           = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 
-  let _context = null, _start = null, _end = null, _hover = null;
-  let _picking = 0, _viewYear = new Date().getFullYear(), _viewMonth = new Date().getMonth();
+  // ── State ────────────────────────────────────────────────────
+  let _context  = null;   // 'PA' | 'Shell'
+  let _start    = null;   // Date | null
+  let _end      = null;   // Date | null
+  let _hover    = null;   // Date | null  (range preview while picking end)
+  let _picking  = 0;      // 0 = waiting for start, 1 = waiting for end
+  let _viewYear = new Date().getFullYear();
+  let _viewMonth = new Date().getMonth();   // 0-11
 
+  // Applied ranges survive close/reopen (per context)
   const _applied = { PA: { from: null, to: null }, Shell: { from: null, to: null } };
 
-  // ── Open ─────────────────────────────────────────────────────
+  // ── Public API ───────────────────────────────────────────────
+
   window.drpOpen = function(ctx) {
     _context = ctx;
-    _applied.PA.from    = _drpFromPA    || null;
-    _applied.PA.to      = _drpToPA      || null;
-    _applied.Shell.from = _drpFromShell || null;
-    _applied.Shell.to   = _drpToShell   || null;
 
-    _start = _applied[ctx].from ? new Date(_applied[ctx].from) : null;
-    _end   = _applied[ctx].to   ? new Date(_applied[ctx].to)   : null;
-    _hover = null; _picking = 0;
+    // Restore previously applied range into picker state
+    _start   = _applied[ctx].from ? new Date(_applied[ctx].from) : null;
+    _end     = _applied[ctx].to   ? new Date(_applied[ctx].to)   : null;
+    _hover   = null;
+    _picking = (_start && !_end) ? 1 : 0;
 
+    // Navigate to the month of the from-date (or current month)
     const seed = _start || new Date();
-    _viewYear = seed.getFullYear(); _viewMonth = seed.getMonth();
+    _viewYear  = seed.getFullYear();
+    _viewMonth = seed.getMonth();
 
+    // Mark open state on trigger
     document.querySelectorAll('.drp-trigger').forEach(b => b.classList.remove('open'));
     const trig = document.getElementById('drpTrigger' + ctx);
     if (trig) trig.classList.add('open');
+
+    // Position panel fixed, just below the trigger button
     _positionPanel(trig);
 
+    // Show overlay + animate in
     document.getElementById('drpOverlay').style.display = 'block';
-    requestAnimationFrame(() => requestAnimationFrame(() =>
-      document.getElementById('drpPanel').classList.add('open')
-    ));
-    _buildCalendar(); _paintDays(); _paintFooter();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.getElementById('drpPanel').classList.add('open');
+      });
+    });
+
+    _render();
   };
 
-  // ── Close / Apply ─────────────────────────────────────────────
   window.drpClose = function() {
-    document.getElementById('drpPanel').classList.remove('open');
+    const panel = document.getElementById('drpPanel');
+    panel.classList.remove('open');
     document.getElementById('drpOverlay').style.display = 'none';
     document.querySelectorAll('.drp-trigger').forEach(b => b.classList.remove('open'));
-    _hover = null;
     setTimeout(() => { _context = null; }, 240);
   };
 
   window.drpApply = function() {
     if (!_start) { drpClose(); return; }
+    // End date defaults to start date if user only picked one day
     const from = new Date(_start);
     const to   = _end ? new Date(_end) : new Date(_start);
+    // Ensure correct order
     const [f, t] = from <= to ? [from, to] : [to, from];
     _applied[_context] = { from: _dayStart(f), to: _dayEnd(t) };
     _updateTriggerLabel(_context);
@@ -10977,134 +10558,146 @@
     drpClose();
   };
 
-  // ── Presets ───────────────────────────────────────────────────
   window.drpPreset = function(key) {
     const { from, to } = _presetRange(key);
-    _start = from; _end = to; _hover = null; _picking = 0;
+    _start   = from;
+    _end     = to;
+    _hover   = null;
+    _picking = 0;
     document.querySelectorAll('.drp-preset-btn').forEach(b => b.classList.remove('selected'));
     if (event && event.currentTarget) event.currentTarget.classList.add('selected');
-    _viewYear = from.getFullYear(); _viewMonth = from.getMonth();
-    _buildCalendar(); _paintDays(); _paintFooter();
+    // Navigate to from-month
+    _viewYear  = from.getFullYear();
+    _viewMonth = from.getMonth();
+    _render();
   };
 
   window.drpNavMonth = function(dir) {
     _viewMonth += dir;
-    if (_viewMonth > 11) { _viewMonth = 0; _viewYear++; }
+    if (_viewMonth > 11) { _viewMonth = 0;  _viewYear++; }
     if (_viewMonth < 0)  { _viewMonth = 11; _viewYear--; }
-    _hover = null;
-    _buildCalendar(); _paintDays(); _paintFooter();
+    _render();
   };
 
-  // ── Build calendar HTML — called ONLY on open / month nav ─────
-  // Hover and click NEVER rebuild HTML. Stable elements = reliable clicks.
-  function _buildCalendar() {
-    const label = document.getElementById('drpMonthLabel');
-    if (label) label.textContent = MONTHS[_viewMonth] + ' ' + _viewYear;
+  // ── Day click — fixed two-click start→end selection ──────────
+  window._drpDayClick = function(y, m, d) {
+    const clicked = new Date(y, m, d);
+    clicked.setHours(0, 0, 0, 0);
 
-    const today       = new Date(); today.setHours(0,0,0,0);
-    const first       = new Date(_viewYear, _viewMonth, 1);
-    const startWD     = first.getDay();
-    const daysInMonth = new Date(_viewYear, _viewMonth + 1, 0).getDate();
-
-    let html = '<div class="drp-cal-grid"><div class="drp-cal-weekdays">'
-      + WD.map(w => '<div class="drp-cal-wd">' + w + '</div>').join('')
-      + '</div><div class="drp-cal-days" id="drpDaysGrid">';
-
-    for (let i = 0; i < startWD; i++)
-      html += '<div class="drp-day drp-day-other"></div>';
-
-    for (let d = 1; d <= daysInMonth; d++) {
-      const isToday = _sameDay(new Date(_viewYear, _viewMonth, d), today);
-      html += '<div class="drp-day' + (isToday ? ' drp-day-today' : '') + '" data-y="'
-        + _viewYear + '" data-m="' + _viewMonth + '" data-d="' + d + '">' + d + '</div>';
+    if (_picking === 0) {
+      // First click → set start, clear end, wait for end
+      _start   = clicked;
+      _end     = null;
+      _hover   = null;
+      _picking = 1;
+    } else {
+      // Second click → set end (swap if needed), done picking
+      if (clicked < _start) {
+        _end   = new Date(_start);
+        _start = clicked;
+      } else {
+        _end = clicked;
+      }
+      _hover   = null;
+      _picking = 0;
+      // Clear any preset highlight since user manually selected
+      document.querySelectorAll('.drp-preset-btn').forEach(b => b.classList.remove('selected'));
     }
+    _render();
+  };
 
-    const total = startWD + daysInMonth;
-    const trailing = total % 7 === 0 ? 0 : 7 - (total % 7);
-    for (let i = 0; i < trailing; i++)
-      html += '<div class="drp-day drp-day-other"></div>';
+  window._drpDayHover = function(y, m, d) {
+    if (_picking === 1) {
+      _hover = new Date(y, m, d);
+      _hover.setHours(0, 0, 0, 0);
+      _render();
+    }
+  };
 
-    html += '</div></div>';
+  // ── Private helpers ──────────────────────────────────────────
+
+  function _render() {
+    _renderCalendar();
+    _renderFooter();
+  }
+
+  // Single-month calendar render
+  function _renderCalendar() {
+    const label = document.getElementById('drpMonthLabel');
+    label.textContent = `${MONTHS[_viewMonth]} ${_viewYear}`;
 
     const container = document.getElementById('drpCalMonths');
-    container.innerHTML = html;
+    container.innerHTML = _buildMonthGrid(_viewYear, _viewMonth);
 
-    // ── Single delegated listener per grid rebuild ─────────────
-    const grid = document.getElementById('drpDaysGrid');
-
-    // CLICK — fires on stable elements; no hover-rebuild race possible
-    grid.addEventListener('click', function(e) {
-      const el = e.target.closest('[data-d]');
-      if (!el || el.classList.contains('drp-day-other')) return;
-      const clicked = new Date(+el.dataset.y, +el.dataset.m, +el.dataset.d);
-      clicked.setHours(0,0,0,0);
-
-      if (_picking === 0) {
-        // First click — set start, await end
-        _start = clicked; _end = null; _hover = null; _picking = 1;
-      } else {
-        // Second click — commit end date (swap if backwards)
-        if (clicked < _start) { _end = new Date(_start); _start = clicked; }
-        else                   { _end = clicked; }
-        _hover = null; _picking = 0;
-        document.querySelectorAll('.drp-preset-btn').forEach(b => b.classList.remove('selected'));
-      }
-      _paintDays(); _paintFooter();   // CSS-only update, no innerHTML change
-    });
-
-    // MOUSEMOVE — only paints CSS classes; never touches innerHTML
-    grid.addEventListener('mousemove', function(e) {
-      if (_picking !== 1) return;
-      const el = e.target.closest('[data-d]');
-      if (!el || el.classList.contains('drp-day-other')) return;
-      const hov = new Date(+el.dataset.y, +el.dataset.m, +el.dataset.d);
-      hov.setHours(0,0,0,0);
-      if (_hover && _sameDay(hov, _hover)) return;
-      _hover = hov; _paintDays(); _paintFooter();
-    });
-
-    grid.addEventListener('mouseleave', function() {
-      if (_picking !== 1 || !_hover) return;
-      _hover = null; _paintDays(); _paintFooter();
+    // Wire hover events after DOM insertion (mouseover on the grid is simpler + reliable)
+    container.querySelectorAll('.drp-day:not(.drp-day-other):not(.drp-day-disabled)').forEach(el => {
+      el.addEventListener('mouseenter', () => _drpDayHover(+el.dataset.y, +el.dataset.m, +el.dataset.d));
     });
   }
 
-  // ── Paint CSS classes on existing day elements (no innerHTML) ─
-  function _paintDays() {
-    const grid = document.getElementById('drpDaysGrid');
-    if (!grid) return;
+  function _buildMonthGrid(year, month) {
+    const today       = new Date(); today.setHours(0,0,0,0);
+    const first       = new Date(year, month, 1);
+    const startWD     = first.getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // When picking end date, show hover preview; otherwise show committed end
     const rangeEnd = (_picking === 1 && _hover) ? _hover : _end;
-    const lo = (_start && rangeEnd) ? (_start <= rangeEnd ? _start : rangeEnd) : null;
+
+    // Normalise start/end for range comparison (always have lo ≤ hi)
+    const lo = (_start && rangeEnd) ? (_start <= rangeEnd ? _start : rangeEnd) : _start;
     const hi = (_start && rangeEnd) ? (_start <= rangeEnd ? rangeEnd : _start) : null;
-    grid.querySelectorAll('[data-d]').forEach(function(el) {
-      if (el.classList.contains('drp-day-other')) return;
-      const date = new Date(+el.dataset.y, +el.dataset.m, +el.dataset.d);
-      el.classList.toggle('drp-day-start',    !!(_start   && _sameDay(date, _start)));
-      el.classList.toggle('drp-day-end',      !!(rangeEnd && _sameDay(date, rangeEnd)));
-      el.classList.toggle('drp-day-in-range', !!(lo && hi && date > lo && date < hi));
-    });
+
+    let html = `<div class="drp-cal-grid">
+      <div class="drp-cal-weekdays">${WD.map(w => `<div class="drp-cal-wd">${w}</div>`).join('')}</div>
+      <div class="drp-cal-days">`;
+
+    // Leading blank cells
+    for (let i = 0; i < startWD; i++) html += `<div class="drp-day drp-day-other"></div>`;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date    = new Date(year, month, d);
+      const isToday = _sameDay(date, today);
+      const isStart = _start    && _sameDay(date, _start);
+      const isEnd   = rangeEnd  && _sameDay(date, rangeEnd);
+      // inRange = strictly between lo and hi
+      const inRange = lo && hi && date > lo && date < hi;
+
+      let cls = 'drp-day';
+      if (isToday)  cls += ' drp-day-today';
+      if (isStart)  cls += ' drp-day-start';
+      if (isEnd)    cls += ' drp-day-end';
+      if (inRange)  cls += ' drp-day-in-range';
+
+      html += `<div class="${cls}" data-y="${year}" data-m="${month}" data-d="${d}"
+        onclick="_drpDayClick(${year},${month},${d})">${d}</div>`;
+    }
+
+    // Trailing blanks
+    const total    = startWD + daysInMonth;
+    const trailing = total % 7 === 0 ? 0 : 7 - (total % 7);
+    for (let i = 0; i < trailing; i++) html += `<div class="drp-day drp-day-other"></div>`;
+
+    html += `</div></div>`;
+    return html;
   }
 
-  // ── Footer display ────────────────────────────────────────────
-  function _paintFooter() {
+  function _renderFooter() {
     const disp = document.getElementById('drpRangeDisplay');
-    if (!disp) return;
     if (!_start) {
       disp.innerHTML = '<span style="opacity:.6">Click a start date</span>';
     } else if (_picking === 1) {
-      disp.innerHTML = '<strong>' + _fmt(_start) + '</strong>'
-        + (_hover ? ' → <strong>' + _fmt(_hover) + '</strong>'
-                  : ' → <em style="opacity:.55">click an end date</em>');
+      const hoverStr = _hover ? ` → <strong>${_fmt(_hover)}</strong>` : ' → <em style="opacity:.55">click an end date</em>';
+      disp.innerHTML = `<strong>${_fmt(_start)}</strong>${hoverStr}`;
     } else if (_end) {
-      disp.innerHTML = '<strong>' + _fmt(_start) + '</strong> &mdash; <strong>' + _fmt(_end) + '</strong>';
+      disp.innerHTML = `<strong>${_fmt(_start)}</strong> &mdash; <strong>${_fmt(_end)}</strong>`;
     } else {
-      disp.innerHTML = '<strong>' + _fmt(_start) + '</strong>';
+      disp.innerHTML = `<strong>${_fmt(_start)}</strong>`;
     }
   }
 
-  // ── Trigger labels / clear btn ────────────────────────────────
   function _updateTriggerLabel(ctx) {
-    const lbl  = document.getElementById('drpLabel'   + ctx);
+    const lbl  = document.getElementById('drpLabel' + ctx);
     const trig = document.getElementById('drpTrigger' + ctx);
     const { from, to } = _applied[ctx];
     if (!from && !to) {
@@ -11112,14 +10705,17 @@
       if (trig) { trig.classList.remove('active'); _removeClearBtn(ctx); }
     } else {
       const text = (to && !_sameDay(from, to))
-        ? _fmtShort(from) + ' – ' + _fmtShort(to) : _fmtShort(from);
+        ? `${_fmtShort(from)} – ${_fmtShort(to)}`
+        : _fmtShort(from);
       if (lbl)  lbl.textContent = text;
       if (trig) { trig.classList.add('active'); _addClearBtn(ctx); }
     }
   }
+
   function _addClearBtn(ctx) {
     const trig = document.getElementById('drpTrigger' + ctx);
-    if (!trig || trig.querySelector('.drp-clear-btn')) return;
+    if (!trig) return;
+    if (trig.querySelector('.drp-clear-btn')) return;
     const btn = document.createElement('button');
     btn.className = 'drp-clear-btn';
     btn.innerHTML = '<i class="bi bi-x"></i>';
@@ -11132,30 +10728,52 @@
     const btn = trig.querySelector('.drp-clear-btn');
     if (btn) btn.remove();
   }
+
   window.drpClear = function(ctx) {
     _applied[ctx] = { from: null, to: null };
-    _updateTriggerLabel(ctx); _dispatchChange(ctx);
+    _updateTriggerLabel(ctx);
+    _dispatchChange(ctx);
   };
+
   function _dispatchChange(ctx) {
     const { from, to } = _applied[ctx];
-    if (ctx === 'PA')         drpApplyPA(from, to);
+    if (ctx === 'PA')    drpApplyPA(from, to);
     else if (ctx === 'Shell') drpApplyShell(from, to);
   }
 
-  // ── Panel position ────────────────────────────────────────────
+  // ── Panel positioning — fixed to viewport, anchored below trigger ──
   function _positionPanel(trig) {
     const panel = document.getElementById('drpPanel');
-    if (!trig || !panel) return;
-    const rect = trig.getBoundingClientRect();
-    let left = rect.left, top = rect.bottom + 8;
-    if (left + 380 > window.innerWidth  - 12) left = rect.right - 380;
-    if (left < 8) left = 8;
-    if (top  + 430 > window.innerHeight - 12) top  = rect.top - 430 - 8;
-    if (top  < 8)  top  = 8;
-    panel.style.top = top + 'px'; panel.style.left = left + 'px';
+    if (!trig) return;
+
+    const rect      = trig.getBoundingClientRect();
+    const panelW    = 380;
+    const gap       = 8;
+    const topPos    = rect.bottom + gap;
+
+    // Default: align left edge with trigger
+    let leftPos = rect.left;
+
+    // Flip left if panel would overflow right edge
+    if (leftPos + panelW > window.innerWidth - 12) {
+      leftPos = rect.right - panelW;
+    }
+    // Never go off the left edge
+    if (leftPos < 8) leftPos = 8;
+
+    // If panel would go below viewport, flip above the trigger
+    const panelH = 420; // estimated height
+    let finalTop = topPos;
+    if (topPos + panelH > window.innerHeight - 12) {
+      finalTop = rect.top - panelH - gap;
+      if (finalTop < 8) finalTop = 8;
+    }
+
+    panel.style.top  = finalTop + 'px';
+    panel.style.left = leftPos + 'px';
   }
 
-  // ── Preset ranges ─────────────────────────────────────────────
+  // ── Preset ranges ────────────────────────────────────────────
   function _presetRange(key) {
     const now = new Date(); now.setHours(0,0,0,0);
     const y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
@@ -11166,8 +10784,15 @@
       case 'last30':    return { from: new Date(y,m,d-29), to: new Date(y,m,d) };
       case 'thisMonth': return { from: new Date(y,m,1),    to: new Date(y,m+1,0) };
       case 'lastMonth': return { from: new Date(y,m-1,1),  to: new Date(y,m,0) };
-      case 'thisQ': { const qs=Math.floor(m/3)*3; return {from:new Date(y,qs,1),to:new Date(y,qs+3,0)}; }
-      case 'lastQ': { const qs=Math.floor(m/3)*3-3, qy=qs<0?y-1:y, qm=qs<0?qs+12:qs; return {from:new Date(qy,qm,1),to:new Date(qy,qm+3,0)}; }
+      case 'thisQ': {
+        const qs = Math.floor(m/3)*3;
+        return { from: new Date(y,qs,1), to: new Date(y,qs+3,0) };
+      }
+      case 'lastQ': {
+        const qs = Math.floor(m/3)*3 - 3;
+        const qy = qs < 0 ? y-1 : y; const qm = qs < 0 ? qs+12 : qs;
+        return { from: new Date(qy,qm,1), to: new Date(qy,qm+3,0) };
+      }
       case 'thisYear':  return { from: new Date(y,0,1),   to: new Date(y,11,31) };
       case 'lastYear':  return { from: new Date(y-1,0,1), to: new Date(y-1,11,31) };
       case 'next3M':    return { from: new Date(y,m,d),   to: new Date(y,m+3,d) };
@@ -11177,79 +10802,54 @@
     }
   }
 
-  // ── Helpers ───────────────────────────────────────────────────
-  function _sameDay(a,b) { return a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate(); }
-  function _dayStart(d) { const x=new Date(d); x.setHours(0,0,0,0); return x; }
-  function _dayEnd(d)   { const x=new Date(d); x.setHours(23,59,59,999); return x; }
-  function _fmt(d)      { return d ? d.getDate()+' '+MONTHS_SHORT[d.getMonth()]+' '+d.getFullYear() : ''; }
-  function _fmtShort(d) { return d ? d.getDate()+'-'+MONTHS_SHORT[d.getMonth()]+'-'+String(d.getFullYear()).slice(2) : ''; }
+  // ── Tiny helpers ─────────────────────────────────────────────
+  function _sameDay(a, b)  {
+    return a.getFullYear()===b.getFullYear() &&
+           a.getMonth()===b.getMonth()       &&
+           a.getDate()===b.getDate();
+  }
+  function _dayStart(d)  { const x=new Date(d); x.setHours(0,0,0,0);       return x; }
+  function _dayEnd(d)    { const x=new Date(d); x.setHours(23,59,59,999);   return x; }
+  function _fmt(d)       { return d ? `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}` : ''; }
+  function _fmtShort(d)  { return d ? `${d.getDate()}-${MONTHS_SHORT[d.getMonth()]}-${String(d.getFullYear()).slice(2)}` : ''; }
 
-  // ── Integrations ──────────────────────────────────────────────
+  // ── Integration — PA tab ──────────────────────────────────────
   window.drpApplyPA = function(from, to) {
-    _drpFromPA = from; _drpToPA = to;
-    const s = document.getElementById('structureDetailsSection');
-    const p = document.getElementById('planActualDetailsSection');
-    if (s) s.classList.remove('visible');
-    if (p) p.classList.remove('visible');
+    _drpFromPA = from;
+    _drpToPA   = to;
+    document.getElementById('structureDetailsSection').classList.remove('visible');
+    document.getElementById('planActualDetailsSection').classList.remove('visible');
     document.querySelectorAll('.plan-actual-card').forEach(c => c.classList.remove('selected'));
     generatePlanVsActuals();
   };
+
+  // ── Integration — Shell tab ───────────────────────────────────
   window.drpApplyShell = function(from, to) {
-    _drpFromShell = from; _drpToShell = to;
-    updateShellKPIs(); renderShellTracker();
+    _drpFromShell = from;
+    _drpToShell   = to;
+    updateShellKPIs();
+    renderShellTracker();
   };
 
 })();
 
-// ── Global date range state ───────────────────────────────────
+// Global date range state (accessed by filter functions)
 var _drpFromPA    = null;
 var _drpToPA      = null;
 var _drpFromShell = null;
 var _drpToShell   = null;
 
-// ── Shell date-basis: 'baseline' (default) | 'actual' ────────
-var _shellDateBasis = 'baseline';
-
-window.setShellDateBasis = function(basis) {
-  _shellDateBasis = basis;
-  document.getElementById('shellBasisBaseline').classList.toggle('active', basis === 'baseline');
-  document.getElementById('shellBasisActual').classList.toggle('active',   basis === 'actual');
-  updateShellKPIs();
-  renderShellTracker();
-};
-
-// ── Range check helper ────────────────────────────────────────
+// Helper: test if a date falls within the active date range for a given context
+// Uses day-level granularity: _dayStart(from) ≤ date ≤ _dayEnd(to) — end date is INCLUSIVE
 function drpInRange(date, ctx) {
   const from = ctx === 'PA' ? _drpFromPA : _drpFromShell;
   const to   = ctx === 'PA' ? _drpToPA   : _drpToShell;
-  if (!from && !to) return true;
+  if (!from && !to) return true;    // no filter active
   if (!date)        return false;
   const t = date instanceof Date ? date.getTime() : new Date(date).getTime();
   const f = from ? from.getTime() : -Infinity;
-  const e = to   ? to.getTime()   :  Infinity;
+  const e = to   ? to.getTime()   : Infinity;
   return t >= f && t <= e;
-}
-
-// ── "This Year" default applied when data loads ───────────────
-function _applyThisYearDefault() {
-  const now = new Date(); now.setHours(0,0,0,0);
-  const y   = now.getFullYear();
-  function _ds(d) { const x = new Date(d); x.setHours(0,0,0,0);       return x; }
-  function _de(d) { const x = new Date(d); x.setHours(23,59,59,999);   return x; }
-  const from = new Date(y, 0, 1);
-  const to   = new Date(y, 11, 31);
-  _drpFromPA    = _ds(from); _drpToPA    = _de(to);
-  _drpFromShell = _ds(from); _drpToShell = _de(to);
-  // Update trigger labels
-  const MS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  const fmt = d => `${d.getDate()}-${MS[d.getMonth()]}-${String(d.getFullYear()).slice(2)}`;
-  const label = fmt(from) + ' – ' + fmt(to);
-  ['PA','Shell'].forEach(function(ctx) {
-    const lbl  = document.getElementById('drpLabel'  + ctx);
-    const trig = document.getElementById('drpTrigger' + ctx);
-    if (lbl)  lbl.textContent = label;
-    if (trig) trig.classList.add('active');
-  });
 }
 </script>
 
