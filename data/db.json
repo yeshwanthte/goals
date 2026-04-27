@@ -6,56 +6,5 @@
       "createdAt": "2026-03-23T07:11:13.247Z"
     }
   ],
-  "log": [
-    {
-      "username": "Yeshwanth",
-      "event": "login",
-      "ts": "2026-04-27T04:49:57.248Z"
-    },
-    {
-      "username": "Yeshwanth",
-      "event": "login",
-      "ts": "2026-04-23T11:31:46.088Z"
-    },
-    {
-      "username": "Yeshwanth",
-      "event": "login",
-      "ts": "2026-04-23T04:50:52.868Z"
-    },
-    {
-      "username": "Karthick",
-      "event": "login",
-      "ts": "2026-04-22T05:41:28.636Z"
-    },
-    {
-      "username": "Yeshwanth",
-      "event": "login",
-      "ts": "2026-04-22T05:39:26.797Z"
-    },
-    {
-      "username": "Yeshwanth",
-      "event": "login",
-      "ts": "2026-04-21T09:07:30.148Z"
-    },
-    {
-      "username": "Yeshwanth",
-      "event": "login",
-      "ts": "2026-04-21T08:41:47.474Z"
-    },
-    {
-      "username": "Yeshwanth",
-      "event": "login",
-      "ts": "2026-04-21T04:46:30.416Z"
-    },
-    {
-      "username": "Yeshwanth",
-      "event": "login",
-      "ts": "2026-04-20T13:00:32.155Z"
-    },
-    {
-      "username": "Yeshwanth",
-      "event": "login",
-      "ts": "2026-04-20T12:59:52.612Z"
-    }
-  ]
+  "log": []
 }
