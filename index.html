@@ -4363,6 +4363,10 @@
           <div class="filter-card-header"><i class="bi bi-patch-check"></i> OC Status<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
           <div class="filter-card-body"><div id="ocSlicer" class="slicer"></div></div>
         </div>
+        <div class="filter-card">
+          <div class="filter-card-header"><i class="bi bi-tag"></i> Product Type<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
+          <div class="filter-card-body"><div id="productTypeSlicer" class="slicer"></div></div>
+        </div>
       </div>
     </section>
 
@@ -4504,10 +4508,11 @@
                   <th class="sortable" onclick="sortTable(0)">Project<button class="col-filter-btn" data-table="milestone" data-col="0" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(1)">Phase<button class="col-filter-btn" data-table="milestone" data-col="1" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(2)">Tower<button class="col-filter-btn" data-table="milestone" data-col="2" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(3)">Unit No.<button class="col-filter-btn" data-table="milestone" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(4)">Customer Name<button class="col-filter-btn" data-table="milestone" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(5)">Revenue (₹ Cr)<button class="col-filter-btn" data-table="milestone" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(6)">Inventory<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(3)">Product Type<button class="col-filter-btn" data-table="milestone" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(4)">Unit No.<button class="col-filter-btn" data-table="milestone" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(5)">Customer Name<button class="col-filter-btn" data-table="milestone" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(6)">Revenue (₹ Cr)<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(7)">Inventory<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(7)" style="text-align:center;">IDSA<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(8)" style="text-align:center;">GFC<button class="col-filter-btn" data-table="milestone" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(9)" style="text-align:center;">Plaster<button class="col-filter-btn" data-table="milestone" data-col="9" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
@@ -5592,7 +5597,8 @@
   let sortColumn = -1;
   let sortAscending = true;
   let projectSel = new Set(), towerSel = new Set(), phaseSel = new Set(),
-      inventorySel = new Set(), idsaSel = new Set(), gfcSel = new Set(), ocSel = new Set();
+      inventorySel = new Set(), idsaSel = new Set(), gfcSel = new Set(), ocSel = new Set(),
+      productTypeSel = new Set();
   
   // Plan vs Actuals filters
   let projectSelPA = new Set(), towerSelPA = new Set(), phaseSelPA = new Set(),
@@ -6011,7 +6017,8 @@
     // Get current filtered data
     const hasActiveFilters = projectSel.size > 0 || towerSel.size > 0 || 
                              phaseSel.size > 0 || inventorySel.size > 0 || 
-                             idsaSel.size > 0 || gfcSel.size > 0 || ocSel.size > 0;
+                             idsaSel.size > 0 || gfcSel.size > 0 || ocSel.size > 0 ||
+                             productTypeSel.size > 0;
     
     if (!hasActiveFilters) {
       // Remove all highlighting if no filters
@@ -6029,7 +6036,8 @@
       (!inventorySel.size || inventorySel.has(r.Inventory)) &&
       (!idsaSel.size || idsaSel.has(r.IDSADate ? "Yes" : "No")) &&
       (!gfcSel.size || gfcSel.has(r.GFC ? "Yes" : "No")) &&
-      (!ocSel.size || ocSel.has(r.OC))
+      (!ocSel.size || ocSel.has(r.OC)) &&
+      (!productTypeSel.size || productTypeSel.has(r.ProductType))
     );
 
     const availableProjects = new Set(d.map(x => x.Project));
@@ -6048,6 +6056,8 @@
     updateSlicerButtons('idsaSlicer', availableIDSA, idsaSel);
     updateSlicerButtons('gfcSlicer', availableGFC, gfcSel);
     updateSlicerButtons('ocSlicer', availableOC, ocSel);
+    const availableProductTypes = new Set(d.map(x => x.ProductType));
+    updateSlicerButtons('productTypeSlicer', availableProductTypes, productTypeSel);
   }
 
   function updateSlicerButtons(slicerId, availableValues, activeStore) {
@@ -6082,6 +6092,7 @@
     buildSlicer("idsaSlicer", ["Yes", "No"], idsaSel);
     buildSlicer("gfcSlicer", ["Yes", "No"], gfcSel);
     buildSlicer("ocSlicer", ["OC recvd", "OC not recvd"], ocSel);
+    buildSlicer("productTypeSlicer", [...new Set(raw.map(r => r.ProductType).filter(Boolean))].sort(), productTypeSel);
   }
 
   function buildPlanActualSlicers() {
@@ -6236,7 +6247,7 @@
   }
 
   function clearAllFilters() {
-    [projectSel, towerSel, phaseSel, inventorySel, idsaSel, gfcSel, ocSel].forEach(s => s.clear());
+    [projectSel, towerSel, phaseSel, inventorySel, idsaSel, gfcSel, ocSel, productTypeSel].forEach(s => s.clear());
     document.querySelectorAll(".slicer button").forEach(b => {
       b.classList.remove("active", "dimmed", "highlighted");
     });
@@ -6252,7 +6263,8 @@
       (!inventorySel.size || inventorySel.has(r.Inventory)) &&
       (!idsaSel.size || idsaSel.has(r.IDSADate ? "Yes" : "No")) &&
       (!gfcSel.size || gfcSel.has(r.GFC ? "Yes" : "No")) &&
-      (!ocSel.size || ocSel.has(r.OC))
+      (!ocSel.size || ocSel.has(r.OC)) &&
+      (!productTypeSel.size || productTypeSel.has(r.ProductType))
     );
 
     currentFilteredData = d;
@@ -6396,8 +6408,8 @@
     // Reset filters whenever a new activity is opened
     clearMilestoneColumnFilters();
     
-    // Set default sort to revenue column (index 5) in descending order
-    sortColumn = 5;
+    // Set default sort to revenue column (index 6) in descending order
+    sortColumn = 6;
     sortAscending = false;
     
     // Sort by revenue descending initially
@@ -6506,7 +6518,7 @@
 
   function renderDetailsTable() {
     const tbody = document.getElementById("detailsTableBody");
-    const totalCols = 7 + activeColIds.length;
+    const totalCols = 8 + activeColIds.length;
 
     if (currentDetailsData.length === 0) {
       tbody.innerHTML = `
@@ -6538,7 +6550,7 @@
 
     const rows = [`
       <tr class="total-row">
-        <td colspan="5">
+        <td colspan="6">
           <span class="total-label">
             <i class="bi bi-calculator"></i>
             <strong>TOTAL - ${displayData.length} Units</strong>
@@ -6547,7 +6559,7 @@
         <td class="revenue-cell" style="font-size:1.1rem;">
           <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
         </td>
-        <td style="font-size:0.78rem;color:var(--gray-500);text-align:center;">—</td>
+        <td style="font-size:0.78rem;font-weight:700;color:#446A2C;text-align:center;">${displayData.filter(u => u.Inventory === 'Sold' || u.Inventory === 'LL Sold').length}</td>
         ${statusTotals.map(t => {
           if (t === null) return '<td></td>';
           if (typeof t === 'object' && t.ctg) return `<td style="text-align:right;font-weight:700;color:#C65911;">₹${t.val.toFixed(2)}</td>`;
@@ -6571,6 +6583,7 @@
           <td>${unit.Project || 'N/A'}</td>
           <td>${unit.Phase || 'N/A'}</td>
           <td>${unit.Tower || 'N/A'}</td>
+          <td style="font-size:0.78rem;">${unit.ProductType || '—'}</td>
           <td class="unit-number">${unit.UnitNo}</td>
           <td class="customer-name">${unit.Customer}</td>
           <td class="revenue-cell">₹${revenue}</td>
@@ -6596,18 +6609,19 @@
         case 0: valA = a.Project  || ''; valB = b.Project  || ''; break;
         case 1: valA = a.Phase    || ''; valB = b.Phase    || ''; break;
         case 2: valA = a.Tower    || ''; valB = b.Tower    || ''; break;
-        case 3: valA = a.UnitNo   || ''; valB = b.UnitNo   || ''; break;
-        case 4: valA = a.Customer || ''; valB = b.Customer || ''; break;
-        case 5: valA = a[currentRevenueField] || 0; valB = b[currentRevenueField] || 0; break;
-        case 6: valA = (a.Inventory || '').toLowerCase(); valB = (b.Inventory || '').toLowerCase(); break;
+        case 3: valA = (a.ProductType || '').toLowerCase(); valB = (b.ProductType || '').toLowerCase(); break;
+        case 4: valA = a.UnitNo   || ''; valB = b.UnitNo   || ''; break;
+        case 5: valA = a.Customer || ''; valB = b.Customer || ''; break;
+        case 6: valA = a[currentRevenueField] || 0; valB = b[currentRevenueField] || 0; break;
+        case 7: valA = (a.Inventory || '').toLowerCase(); valB = (b.Inventory || '').toLowerCase(); break;
         default: {
-          const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 7]);
+          const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 8]);
           if (col && col.type === 'ctg') { valA = col.calc(a); valB = col.calc(b); }
           else { valA = col && a[col.field] ? 1 : 0; valB = col && b[col.field] ? 1 : 0; }
           break;
         }
       }
-      if (columnIndex >= 5 && columnIndex !== 6) return sortAscending ? valA - valB : valB - valA;
+      if (columnIndex === 6 || columnIndex >= 8) return sortAscending ? valA - valB : valB - valA;
       if (valA < valB) return sortAscending ? -1 : 1;
       if (valA > valB) return sortAscending ? 1 : -1;
       return 0;
@@ -6672,17 +6686,17 @@
     if (currentDetailsData.length === 0) { alert('No data to download'); return; }
 
     const optLabels = activeColIds.map(id => (OPTIONAL_COLS.find(c => c.id === id) || {label: id}).label);
-    const headers = ['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', 'Inventory', ...optLabels];
+    const headers = ['Project', 'Phase', 'Tower', 'Product Type', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', 'Inventory', ...optLabels];
 
     // schema: 't'=text, 'n'=number, 'd'=date, 's'=status-text
-    const schema = ['t','t','t','t','t','n','t', ...activeColIds.map(id => {
+    const schema = ['t','t','t','t','t','t','n','t', ...activeColIds.map(id => {
       const col = OPTIONAL_COLS.find(c => c.id === id);
       return (col && col.type === 'ctg') ? 'n' : 't';
     })];
 
     const excelData = [headers];
     const totalRevenue = currentDetailsData.reduce((s, u) => s + (u[currentRevenueField] || 0), 0) / 10000000;
-    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue, '', ...activeColIds.map(() => '')]);
+    excelData.push(['TOTAL', '', '', '', `${currentDetailsData.length} Units`, '', totalRevenue, '', ...activeColIds.map(() => '')]);
 
     currentDetailsData.forEach(unit => {
       const revenue = (unit[currentRevenueField] || 0) / 10000000;
@@ -6693,7 +6707,7 @@
         return unit[col.field] ? 'Done' : 'Pending';
       });
       excelData.push([unit.Project||'N/A', unit.Phase||'N/A', unit.Tower||'N/A',
-        unit.UnitNo, unit.Customer, revenue, unit.Inventory||'', ...optVals]);
+        unit.ProductType||'', unit.UnitNo, unit.Customer, revenue, unit.Inventory||'', ...optVals]);
     });
 
     const wb = XLSX.utils.book_new();
@@ -7322,12 +7336,13 @@
       case 0: return (unit.Project  || '').toString();
       case 1: return (unit.Phase    || '').toString();
       case 2: return (unit.Tower    || '').toString();
-      case 3: return (unit.UnitNo   || '').toString();
-      case 4: return (unit.Customer || '').toString();
-      case 5: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
-      case 6: return (unit.Inventory || '').toString();
+      case 3: return (unit.ProductType || '').toString();
+      case 4: return (unit.UnitNo   || '').toString();
+      case 5: return (unit.Customer || '').toString();
+      case 6: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
+      case 7: return (unit.Inventory || '').toString();
       default: {
-        const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - 7]);
+        const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - 8]);
         if (!col) return '';
         if (col.type === 'ctg') return (col.calc(unit) / 10000000).toFixed(2);
         return col.field ? (unit[col.field] ? 'Done' : 'Pending') : '';
@@ -10490,8 +10505,8 @@
     if (!sortRow) return;
     const fixed = [
       {label:'Project',ci:0},{label:'Phase',ci:1},{label:'Tower',ci:2},
-      {label:'Unit No.',ci:3},{label:'Customer Name',ci:4},{label:'Revenue (₹ Cr)',ci:5},
-      {label:'Inventory',ci:6}
+      {label:'Product Type',ci:3},{label:'Unit No.',ci:4},{label:'Customer Name',ci:5},
+      {label:'Revenue (₹ Cr)',ci:6},{label:'Inventory',ci:7}
     ];
     let h = fixed.map(f => `
       <th class="sortable" onclick="sortTable(${f.ci})">${f.label}
@@ -10499,7 +10514,7 @@
       </th>`).join('');
     activeColIds.forEach((id, i) => {
       const col = OPTIONAL_COLS.find(c => c.id === id); if (!col) return;
-      const ci = 7 + i;
+      const ci = 8 + i;
       h += `<th class="sortable" onclick="sortTable(${ci})" style="text-align:center;">${col.label}
         <button class="col-filter-btn" data-table="milestone" data-col="${ci}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button>
       </th>`;
