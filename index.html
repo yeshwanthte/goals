@@ -1896,7 +1896,6 @@
     /* Fixed column widths — used identically in header + every data row */
     :root {
       --shell-col-name:     1fr;      /* Milestone Name — grows to fill */
-      --shell-col-duration: 62px;     /* Duration (days) */
       --shell-col-baseline: 82px;     /* Baseline Plan */
       --shell-col-date:     100px;    /* Actual / Projected */
       --shell-col-amt:      58px;     /* Value */
@@ -1910,24 +1909,11 @@
       grid-template-columns:
         var(--shell-accent)
         var(--shell-col-name)
-	var(--shell-col-duration)
         var(--shell-col-baseline)
         var(--shell-col-date)
         var(--shell-col-amt);
       align-items: stretch;
       width: 100%;
-    }
-
-  /* Duration cell */
-    .shell-slab-duration {
-      width: var(--shell-col-duration);
-      padding: 0.5rem 0.3rem;
-      font-size: 0.7rem;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-left: 1px solid #f1f5f9;
     }
 
     /* ── Data rows ── */
@@ -4499,7 +4485,6 @@
                   <th class="sortable" onclick="sortTable(3)">Unit No.<button class="col-filter-btn" data-table="milestone" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(4)">Customer Name<button class="col-filter-btn" data-table="milestone" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(5)">Revenue (₹ Cr)<button class="col-filter-btn" data-table="milestone" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-		  <th class="sortable" onclick="sortTable(6)">Inventory<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(6)" style="text-align:center;">IDSA<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(7)" style="text-align:center;">GFC<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(8)" style="text-align:center;">Plaster<button class="col-filter-btn" data-table="milestone" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
@@ -4899,7 +4884,6 @@
                     <th class="sortable" onclick="sortPlanActualTable(6)">Plan Amt (₹ Cr)<button class="col-filter-btn" data-table="pa" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                     <th class="sortable" onclick="sortPlanActualTable(7)">Actual Date<button class="col-filter-btn" data-table="pa" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                     <th class="sortable" onclick="sortPlanActualTable(8)">Actual Amt (₹ Cr)<button class="col-filter-btn" data-table="pa" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-		    <th class="sortable ctg-col-header" id="ctgColHeader" onclick="sortPlanActualTable(9)" style="display:none;"><i class="bi bi-sigma"></i> <span id="ctgColHeaderLabel">CTG (₹ Cr)</span></th>
                     <th class="sortable ctg-col-header" id="ctgColHeader" onclick="sortPlanActualTable(9)" style="display:none;"><i class="bi bi-sigma"></i> <span id="ctgColHeaderLabel">CTG (₹ Cr)</span><button class="col-filter-btn" data-table="pa" data-col="9" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   </tr>
                 </thead>
@@ -5119,12 +5103,6 @@
 
       <!-- Filters Row -->
       <section class="filter-section" style="margin-bottom:1rem;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-          <span style="font-size:0.78rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;"><i class="bi bi-funnel-fill" style="margin-right:4px;color:#C65911;"></i>Filters</span>
-          <button onclick="clearAllShellFilters()" style="display:flex;align-items:center;gap:0.35rem;padding:0.3rem 0.75rem;background:rgba(198,89,17,0.08);border:1.5px solid rgba(198,89,17,0.25);border-radius:7px;font-size:0.74rem;font-weight:700;color:#C65911;cursor:pointer;transition:all 0.18s;" onmouseover="this.style.background='rgba(198,89,17,0.18)'" onmouseout="this.style.background='rgba(198,89,17,0.08)'">
-            <i class="bi bi-x-circle"></i> Clear All
-          </button>
-        </div>
         <div class="filter-grid" style="grid-template-columns: repeat(2, 1fr);">
           <div class="filter-card">
             <div class="filter-card-header"><i class="bi bi-folder"></i> Project<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
@@ -6490,7 +6468,7 @@
 
   function renderDetailsTable() {
     const tbody = document.getElementById("detailsTableBody");
-    const totalCols = 7 + activeColIds.length;
+    const totalCols = 6 + activeColIds.length;
 
     if (currentDetailsData.length === 0) {
       tbody.innerHTML = `
@@ -6557,7 +6535,6 @@
           <td class="unit-number">${unit.UnitNo}</td>
           <td class="customer-name">${unit.Customer}</td>
           <td class="revenue-cell">₹${revenue}</td>
-	  <td style="font-size:0.78rem;color:#475569;">${unit.Inventory || '—'}</td>
           ${optCells}
         </tr>`);
     });
@@ -6582,17 +6559,14 @@
         case 3: valA = a.UnitNo   || ''; valB = b.UnitNo   || ''; break;
         case 4: valA = a.Customer || ''; valB = b.Customer || ''; break;
         case 5: valA = a[currentRevenueField] || 0; valB = b[currentRevenueField] || 0; break;
-	case 6: valA = a.Inventory || ''; valB = b.Inventory || ''; break;
         default: {
-          const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 7]);
+          const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 6]);
           if (col && col.type === 'ctg') { valA = col.calc(a); valB = col.calc(b); }
           else { valA = col && a[col.field] ? 1 : 0; valB = col && b[col.field] ? 1 : 0; }
           break;
         }
       }
-      if (columnIndex === 5 || (columnIndex >= 7 && OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 7] && c.type === 'ctg')))
-        return sortAscending ? valA - valB : valB - valA;
-      if (columnIndex === 5) return sortAscending ? valA - valB : valB - valA;
+      if (columnIndex >= 5) return sortAscending ? valA - valB : valB - valA;
       if (valA < valB) return sortAscending ? -1 : 1;
       if (valA > valB) return sortAscending ? 1 : -1;
       return 0;
@@ -6657,17 +6631,17 @@
     if (currentDetailsData.length === 0) { alert('No data to download'); return; }
 
     const optLabels = activeColIds.map(id => (OPTIONAL_COLS.find(c => c.id === id) || {label: id}).label);
-    const headers = ['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', 'Inventory', ...optLabels];
+    const headers = ['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', ...optLabels];
 
-     // schema: 't'=text, 'n'=number
-    const schema = ['t','t','t','t','t','n','t', ...activeColIds.map(id => {
+    // schema: 't'=text, 'n'=number, 'd'=date, 's'=status-text
+    const schema = ['t','t','t','t','t','n', ...activeColIds.map(id => {
       const col = OPTIONAL_COLS.find(c => c.id === id);
       return (col && col.type === 'ctg') ? 'n' : 't';
     })];
 
     const excelData = [headers];
     const totalRevenue = currentDetailsData.reduce((s, u) => s + (u[currentRevenueField] || 0), 0) / 10000000;
-    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue, '', ...activeColIds.map(() => '')]);
+    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue, ...activeColIds.map(() => '')]);
 
     currentDetailsData.forEach(unit => {
       const revenue = (unit[currentRevenueField] || 0) / 10000000;
@@ -6678,7 +6652,7 @@
         return unit[col.field] ? 'Done' : 'Pending';
       });
       excelData.push([unit.Project||'N/A', unit.Phase||'N/A', unit.Tower||'N/A',
-        unit.UnitNo, unit.Customer, revenue, unit.Inventory||'', ...optVals]);
+        unit.UnitNo, unit.Customer, revenue, ...optVals]);
     });
 
     const wb = XLSX.utils.book_new();
@@ -7037,12 +7011,6 @@
 
   // Returns all unique cell values for a given column + table from FULL (unfiltered) master data
   function getCFDAllValues(tableType, colIdx) {
-	const source = tableType === 'pa'     ? currentPlanActualData
-                 : tableType === 'struct' ? currentStructureData
-                 :                          currentDetailsData;   // 'milestone'
-    const getter = tableType === 'pa'     ? getPACellText
-                 : tableType === 'struct' ? getStructCellText
-                 :                          getMilestoneCellText;
     // ── Excel-style cascading filter ──────────────────────────
     // Show only values that exist in rows still visible after all OTHER active filters.
     const fullSource = tableType === 'pa'     ? currentPlanActualData
@@ -7069,7 +7037,7 @@
     const vals = new Set();
     source.forEach(row => {
       const v = getter(row, colIdx);
-      if (v && v !== 'N/A' && v !== '-') vals.add(v);
+      if (v !== undefined && v !== null && v !== '' && v !== 'N/A' && v !== '-') vals.add(v);
     });
     return [...vals].sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
   }
@@ -7092,7 +7060,7 @@
     // Date columns in PA table (5=Plan Date, 7=Actual Date) get a hierarchy filter
     const isDateHierarchy = tableType === 'pa' && (colIdx === 5 || colIdx === 7);
 
-    const activeFilters = tableType === 'pa' ? paColumnFilters : structColumnFilters;
+    const activeFilters = tableType === 'pa'     ? paColumnFilters
                         : tableType === 'struct' ? structColumnFilters
                         :                          milestoneColumnFilters;
     const existingFilter = activeFilters[colIdx];
@@ -7316,9 +7284,8 @@
       case 3: return (unit.UnitNo   || '').toString();
       case 4: return (unit.Customer || '').toString();
       case 5: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
-      case 6: return (unit.Inventory || '').toString();
       default: {
-        const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - 7]);
+        const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - 6]);
         if (!col) return '';
         if (col.type === 'ctg') return (col.calc(unit) / 10000000).toFixed(2);
         return col.field ? (unit[col.field] ? 'Done' : 'Pending') : '';
@@ -8450,7 +8417,6 @@
   }
   
   function renderTowerVisualization() {
-// When selectedProjectTower is null → All projects selected
     const projectData = raw.filter(r => {
       if (selectedProjectTower && r.Project !== selectedProjectTower) return false;
       if (selectedTowerViz.size > 0 && !selectedTowerViz.has(r.Tower)) return false;
@@ -8460,8 +8426,8 @@
 
     if (projectData.length === 0) {
       document.getElementById('towerVizContainer').innerHTML = `
-        <div style="text-align: center; padding: 3rem; color: var(--gray-400); width: 100%;">
-          <i class="bi bi-building" style="font-size: 3rem; margin-bottom: 1rem; display: block;"></i>
+        <div style="text-align:center;padding:3rem;color:var(--gray-400);width:100%;">
+          <i class="bi bi-building" style="font-size:3rem;margin-bottom:1rem;display:block;"></i>
           <p>No units found for ${selectedProjectTower ? `project "${selectedProjectTower}"` : 'the selected filters'}</p>
         </div>`;
       document.getElementById('stageKpiGrid').innerHTML = '';
@@ -8470,15 +8436,9 @@
 
     // Show KPI bar
     const kpiGrid = document.getElementById('stageKpiGrid');
-    const parentBar = kpiGrid.parentElement;
-    if (parentBar && parentBar.classList.contains('stage-kpi-bar')) {
-      parentBar.style.display = 'block';
-    }
-    
-    // Render Stage KPIs
+    const parentBar = kpiGrid ? kpiGrid.parentElement : null;
+    if (parentBar && parentBar.classList.contains('stage-kpi-bar')) parentBar.style.display = 'block';
     renderStageKPIs(projectData);
-    
-    // Initialize search
     initializeSearch();
 
     const container = document.getElementById('towerVizContainer');
@@ -8529,25 +8489,6 @@
       parsed: parseUnitNumber(u.UnitNo),
       stage: getUnitStage(u)
     })).filter(u => u.parsed !== null);
-
-    // Group by tower
-    const towerMap = {};
-    parsed.forEach(u => {
-      const t = u.parsed.tower;
-      if (!towerMap[t]) towerMap[t] = [];
-      towerMap[t].push(u);
-    });
-    
-    // Sort tower numbers
-    const towerNumbers = Object.keys(towerMap).map(Number).sort((a, b) => a - b);
-    
-    // Render each tower
-    const container = document.getElementById('towerVizContainer');
-    container.innerHTML = '';
-    
-    // Check if villa project — render villa (tower=0) units, then still render any tower units
-    if (isVillaProject(selectedProjectTower)) {
-      const villaUnits  = parsed.filter(u => u.parsed.tower === 0);
 
     if (isVillaProject(projName)) {
       const villaUnits    = parsed.filter(u => u.parsed.tower === 0);
@@ -9703,28 +9644,6 @@
     updateShellKPIs();
   }
 
-function clearAllShellFilters() {
-    // Reset project → All
-    shellSelectedProject = null;
-    const projEl = document.getElementById('shellProjectSlicer');
-    if (projEl) {
-      projEl.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-      const allBtn = projEl.querySelector('button');
-      if (allBtn) allBtn.classList.add('active');
-    }
-    // Reset tower slicer
-    shellSelectedTowers.clear();
-    buildShellTowerSlicer(null);
-    // Reset date range (use drpClear which updates label + globals)
-    _drpFromShell = null; _drpToShell = null;
-    if (typeof drpClear === 'function') drpClear('Shell');
-    // Reset basis toggle to baseline
-    if (typeof setShellDateBasis === 'function') setShellDateBasis('baseline');
-    // Re-render
-    updateShellKPIs();
-    renderShellTracker();
-  }
-
   function buildShellQuarterSlicer() {
     const el = document.getElementById('shellQuarterSlicer');
     if (!el) return;
@@ -9930,31 +9849,7 @@ function clearAllShellFilters() {
         const hasActual     = !!actualDate;
         const hasProjected  = !!projectedDate;
 
-// ── Duration = diff between this milestone's date and the previous one ──
-        // Uses the ORIGINAL (non-reversed) order: reversed[idx+1] is the item
-        // that precedes this one in the original sheet (i.e. the one built before).
-        let durationText = '—';
-        const prevM = reversed[idx + 1];
-        if (prevM) {
-          let thisDate = null, prevDate = null;
-          if (_shellDateBasis === 'actual') {
-            thisDate = actualDate || projectedDate;
-            prevDate = parseDate(prevM.ActualDate) || parseDate(prevM.ProjectedDate);
-          } else {
-            thisDate = baselineDate;
-            prevDate = parseDate(prevM.BaselinePlan);
-          }
-          if (thisDate && prevDate) {
-            const diffMs   = thisDate.getTime() - prevDate.getTime();
-            const diffDays = Math.round(diffMs / 86400000);
-            if (!isNaN(diffDays)) {
-              const col = diffDays < 0 ? '#dc2626' : diffDays === 0 ? '#64748b' : '#059669';
-              durationText = `<span style="color:${col};font-weight:700;">${diffDays > 0 ? '+' : ''}${diffDays}d</span>`;
-            }
-          }
-        }
-
-        // Actual / Projected column
+        // Actual / Projected column:
         //   If actual date exists → show in green as "Completed"
         //   Else if projected date exists → show in grey italic as projected
         //   Otherwise → '—'
