@@ -4507,11 +4507,12 @@
                   <th class="sortable" onclick="sortTable(3)">Unit No.<button class="col-filter-btn" data-table="milestone" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(4)">Customer Name<button class="col-filter-btn" data-table="milestone" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(5)">Revenue (₹ Cr)<button class="col-filter-btn" data-table="milestone" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(6)" style="text-align:center;">IDSA<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(7)" style="text-align:center;">GFC<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(8)" style="text-align:center;">Plaster<button class="col-filter-btn" data-table="milestone" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(9)" style="text-align:center;">Flooring<button class="col-filter-btn" data-table="milestone" data-col="9" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(10)" style="text-align:center;">Fenestration<button class="col-filter-btn" data-table="milestone" data-col="10" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(6)">Inventory<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(7)" style="text-align:center;">IDSA<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(8)" style="text-align:center;">GFC<button class="col-filter-btn" data-table="milestone" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(9)" style="text-align:center;">Plaster<button class="col-filter-btn" data-table="milestone" data-col="9" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(10)" style="text-align:center;">Flooring<button class="col-filter-btn" data-table="milestone" data-col="10" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(11)" style="text-align:center;">Fenestration<button class="col-filter-btn" data-table="milestone" data-col="11" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                 </tr>
               </thead>
               <tbody id="detailsTableBody"></tbody>
@@ -6505,7 +6506,7 @@
 
   function renderDetailsTable() {
     const tbody = document.getElementById("detailsTableBody");
-    const totalCols = 6 + activeColIds.length;
+    const totalCols = 7 + activeColIds.length;
 
     if (currentDetailsData.length === 0) {
       tbody.innerHTML = `
@@ -6546,6 +6547,7 @@
         <td class="revenue-cell" style="font-size:1.1rem;">
           <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
         </td>
+        <td style="font-size:0.78rem;color:var(--gray-500);text-align:center;">—</td>
         ${statusTotals.map(t => {
           if (t === null) return '<td></td>';
           if (typeof t === 'object' && t.ctg) return `<td style="text-align:right;font-weight:700;color:#C65911;">₹${t.val.toFixed(2)}</td>`;
@@ -6572,6 +6574,7 @@
           <td class="unit-number">${unit.UnitNo}</td>
           <td class="customer-name">${unit.Customer}</td>
           <td class="revenue-cell">₹${revenue}</td>
+          <td style="font-size:0.78rem;">${unit.Inventory || '—'}</td>
           ${optCells}
         </tr>`);
     });
@@ -6596,14 +6599,15 @@
         case 3: valA = a.UnitNo   || ''; valB = b.UnitNo   || ''; break;
         case 4: valA = a.Customer || ''; valB = b.Customer || ''; break;
         case 5: valA = a[currentRevenueField] || 0; valB = b[currentRevenueField] || 0; break;
+        case 6: valA = (a.Inventory || '').toLowerCase(); valB = (b.Inventory || '').toLowerCase(); break;
         default: {
-          const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 6]);
+          const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 7]);
           if (col && col.type === 'ctg') { valA = col.calc(a); valB = col.calc(b); }
           else { valA = col && a[col.field] ? 1 : 0; valB = col && b[col.field] ? 1 : 0; }
           break;
         }
       }
-      if (columnIndex >= 5) return sortAscending ? valA - valB : valB - valA;
+      if (columnIndex >= 5 && columnIndex !== 6) return sortAscending ? valA - valB : valB - valA;
       if (valA < valB) return sortAscending ? -1 : 1;
       if (valA > valB) return sortAscending ? 1 : -1;
       return 0;
@@ -6668,17 +6672,17 @@
     if (currentDetailsData.length === 0) { alert('No data to download'); return; }
 
     const optLabels = activeColIds.map(id => (OPTIONAL_COLS.find(c => c.id === id) || {label: id}).label);
-    const headers = ['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', ...optLabels];
+    const headers = ['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', 'Inventory', ...optLabels];
 
     // schema: 't'=text, 'n'=number, 'd'=date, 's'=status-text
-    const schema = ['t','t','t','t','t','n', ...activeColIds.map(id => {
+    const schema = ['t','t','t','t','t','n','t', ...activeColIds.map(id => {
       const col = OPTIONAL_COLS.find(c => c.id === id);
       return (col && col.type === 'ctg') ? 'n' : 't';
     })];
 
     const excelData = [headers];
     const totalRevenue = currentDetailsData.reduce((s, u) => s + (u[currentRevenueField] || 0), 0) / 10000000;
-    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue, ...activeColIds.map(() => '')]);
+    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue, '', ...activeColIds.map(() => '')]);
 
     currentDetailsData.forEach(unit => {
       const revenue = (unit[currentRevenueField] || 0) / 10000000;
@@ -6689,7 +6693,7 @@
         return unit[col.field] ? 'Done' : 'Pending';
       });
       excelData.push([unit.Project||'N/A', unit.Phase||'N/A', unit.Tower||'N/A',
-        unit.UnitNo, unit.Customer, revenue, ...optVals]);
+        unit.UnitNo, unit.Customer, revenue, unit.Inventory||'', ...optVals]);
     });
 
     const wb = XLSX.utils.book_new();
@@ -7321,8 +7325,9 @@
       case 3: return (unit.UnitNo   || '').toString();
       case 4: return (unit.Customer || '').toString();
       case 5: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
+      case 6: return (unit.Inventory || '').toString();
       default: {
-        const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - 6]);
+        const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - 7]);
         if (!col) return '';
         if (col.type === 'ctg') return (col.calc(unit) / 10000000).toFixed(2);
         return col.field ? (unit[col.field] ? 'Done' : 'Pending') : '';
@@ -10485,7 +10490,8 @@
     if (!sortRow) return;
     const fixed = [
       {label:'Project',ci:0},{label:'Phase',ci:1},{label:'Tower',ci:2},
-      {label:'Unit No.',ci:3},{label:'Customer Name',ci:4},{label:'Revenue (₹ Cr)',ci:5}
+      {label:'Unit No.',ci:3},{label:'Customer Name',ci:4},{label:'Revenue (₹ Cr)',ci:5},
+      {label:'Inventory',ci:6}
     ];
     let h = fixed.map(f => `
       <th class="sortable" onclick="sortTable(${f.ci})">${f.label}
@@ -10493,7 +10499,7 @@
       </th>`).join('');
     activeColIds.forEach((id, i) => {
       const col = OPTIONAL_COLS.find(c => c.id === id); if (!col) return;
-      const ci = 6 + i;
+      const ci = 7 + i;
       h += `<th class="sortable" onclick="sortTable(${ci})" style="text-align:center;">${col.label}
         <button class="col-filter-btn" data-table="milestone" data-col="${ci}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button>
       </th>`;
