@@ -5004,7 +5004,7 @@
             <div class="filter-card-body"><div id="phaseSlicerViz" class="slicer"></div></div>
           </div>
           <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-house-door"></i> Product Type<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
+            <div class="filter-card-header"><i class="bi bi-house-door"></i> Product Type<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span><span id="ptHighlightCount" style="display:none;margin-left:auto;background:linear-gradient(135deg,#833C0C,#C65911);color:#fff;font-size:0.7rem;font-weight:700;padding:0.18rem 0.6rem;border-radius:50px;letter-spacing:0.03em;white-space:nowrap;box-shadow:0 2px 6px rgba(198,89,17,0.35);"></span></div>
             <div class="filter-card-body"><div id="productTypeSlicerViz" class="slicer"></div></div>
           </div>
         </div>
@@ -8470,20 +8470,29 @@
 
   function applyProductTypeHighlight() {
     const allUnits = document.querySelectorAll('.tower-unit:not(.empty), .villa-unit');
+    const badge = document.getElementById('ptHighlightCount');
     if (selectedProductTypeViz.size === 0) {
       allUnits.forEach(u => { u.classList.remove('pt-highlighted', 'pt-dimmed'); });
+      if (badge) badge.style.display = 'none';
       return;
     }
+    let highlightedCount = 0;
     allUnits.forEach(u => {
       const pt = (u.dataset.producttype || '').trim();
       if (selectedProductTypeViz.has(pt)) {
         u.classList.add('pt-highlighted');
         u.classList.remove('pt-dimmed');
+        highlightedCount++;
       } else {
         u.classList.add('pt-dimmed');
         u.classList.remove('pt-highlighted');
       }
     });
+    if (badge) {
+      const label = highlightedCount === 1 ? '1 unit' : `${highlightedCount} units`;
+      badge.textContent = '⬡ ' + label;
+      badge.style.display = 'inline-flex';
+    }
   }
 
   function showEmptyState() {
