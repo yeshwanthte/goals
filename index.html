@@ -5325,32 +5325,15 @@
 
 <script>
   // ========================================
-  // ONEDRIVE BUSINESS CONFIGURATION
-  // ═══════════════════════════════════════════════════════════════════════
-  //  HOW TO SET UP YOUR ONEDRIVE SHARE LINKS:
-  //
-  //  1. Open your Excel file in OneDrive Business (SharePoint)
-  //  2. Click Share → "Anyone with the link can view" → Copy Link
-  //  3. The share URL looks like:
-  //       https://TENANT-my.sharepoint.com/:x:/g/personal/USER/FILEID?e=TOKEN
-  //  4. Append  &download=1  to that URL and paste it below.
-  //
-  //  SAME FILE, TWO SHEETS? → Set both URLs to the same share link.
-  //  TWO SEPARATE FILES?    → Use different share links for each.
-  // ═══════════════════════════════════════════════════════════════════════
+  // GOOGLE SHEETS CONFIGURATION
+  // ========================================
+  const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRrl7XNihStokkflZZ2gfCKtnh3woP_Z-WphBEQziue2SgygVeAOESNAygsCDY6hGnc0-9tbE-m9dA/pub?output=csv';
+  // Shell - Master sheet: append &gid=<SHEET_GID> for the correct tab
+  // Replace SHELL_GID_HERE with the numeric gid of the "Shell - Master" tab
+  const SHELL_MASTER_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRRrl7XNihStokkflZZ2gfCKtnh3woP_Z-WphBEQziue2SgygVeAOESNAygsCDY6hGnc0-9tbE-m9dA/pub?output=csv&gid=1913984627';
 
-  // Main data sheet (unit tracking data)
-  const ONEDRIVE_EXCEL_URL = 'https://totalenvmt-my.sharepoint.com/:x:/g/personal/karthick_dhanasekaran_total-environment_com/IQDInPJ-48rWRLtrNZ6Mli9wAXOaeBEioDH7HQBywcBcyzg?e=rEONty&download=1';
-
-  // Shell Master sheet (structure / slab tracker data)
-  // ↓ Same as above if both sheets live in one Excel file
-  const ONEDRIVE_SHELL_URL = 'https://totalenvmt-my.sharepoint.com/:x:/g/personal/karthick_dhanasekaran_total-environment_com/IQDInPJ-48rWRLtrNZ6Mli9wAXOaeBEioDH7HQBywcBcyzg?e=rEONty&download=1';
-
-  // Exact worksheet (tab) names inside the Excel file  ← MUST MATCH EXACTLY
-  const MAIN_SHEET_NAME  = 'Goals Dashboard - Master';  // e.g. 'Master Data', 'Units'
-  const SHELL_SHEET_NAME = 'Shell - Master';            // e.g. 'Shell - Master', 'Slab Tracker'
-
-  //// AUTH GATE — credentials
+  // ========================================
+  // AUTH GATE — credentials
   // ========================================
   // ===== SECURE AUTH SYSTEM =====
   // Credentials are NEVER stored as plain text.
@@ -5520,110 +5503,63 @@
   });
 
   // Function to load data from Google Sheets
-  async function loadDataFromOneDrive() {
+  async function loadDataFromGoogleSheets() {
     try {
-      console.log('Fetching data from OneDrive Business...');
+      console.log('Fetching data from Google Sheets...');
 
-      // ── CORS-safe fetch helper ─────────────────────────────────────────────
-      // OneDrive Business share links block direct cross-origin requests from
-      // GitHub Pages (CORS policy). We route through corsproxy.io which adds
-      // the necessary Access-Control-Allow-Origin header.
-      // corsproxy.io is a free, open-source proxy — no sign-up required.
-      async function proxyFetch(url) {
-        const PROXY = 'https://corsproxy.io/?url=';
-        try {
-          // Try direct first (works if tenant allows CORS)
-          const direct = await fetch(url, { cache: 'no-cache' });
-          if (direct.ok) return direct;
-          throw new Error('Direct fetch returned: ' + direct.status);
-        } catch (_) {
-          console.warn('Direct fetch blocked (likely CORS). Retrying via corsproxy.io...');
-          return fetch(PROXY + encodeURIComponent(url), { cache: 'no-cache' });
-        }
-      }
-
-      // ── Step 1: Fetch Excel file(s) as binary buffers ──────────────────
+      // Google Sheets published CSV URLs natively support CORS — no proxy needed
       const [mainResponse, shellResponse] = await Promise.all([
-        proxyFetch(ONEDRIVE_EXCEL_URL),
-        proxyFetch(ONEDRIVE_SHELL_URL).catch(err => {
+        fetch(GOOGLE_SHEETS_CSV_URL, { cache: 'no-cache' }),
+        fetch(SHELL_MASTER_CSV_URL,  { cache: 'no-cache' }).catch(err => {
           console.warn('Shell Master fetch error:', err);
           return null;
         })
       ]);
 
-      if (!mainResponse || !mainResponse.ok)
-        throw new Error(`Failed to fetch main Excel file: HTTP ${mainResponse?.status || 'network error'}`);
-
-      if (!shellResponse || !shellResponse.ok)
-        console.warn('Shell Master Excel could not be reached. Status:', shellResponse?.status);
-
-      // ── Step 2: Read as ArrayBuffer (required by SheetJS) ───────────────
-      const mainBuffer  = await mainResponse.arrayBuffer();
-      const shellBuffer = (shellResponse && shellResponse.ok)
-                            ? await shellResponse.arrayBuffer()
-                            : null;
-
-      if (!shellBuffer)
-        console.warn('No Shell Master Excel data – Structures table will be empty.');
-
-      console.log('Excel file(s) fetched. Parsing with SheetJS...');
-
-      // ── Step 3: Parse MAIN sheet ─────────────────────────────────────────
-      //   XLSX.read with raw:false + dateNF → dates come out as "DD-MM-YYYY"
-      //   strings, which the existing parseDate() function already handles.
-      const mainWb = XLSX.read(mainBuffer, { type: 'array', cellDates: false, raw: false });
-      const mainWs = mainWb.Sheets[MAIN_SHEET_NAME] || mainWb.Sheets[mainWb.SheetNames[0]];
-      if (!mainWs)
-        throw new Error(
-          `Sheet "${MAIN_SHEET_NAME}" not found. ` +
-          `Available sheets: ${mainWb.SheetNames.join(', ')}`
-        );
-      // header:1 → array-of-arrays — identical to PapaParse { header: false }
-      const mainData = XLSX.utils.sheet_to_json(mainWs, {
-        header: 1, raw: false, dateNF: 'DD-MM-YYYY', defval: ''
-      });
-
-      // ── Step 4: Parse SHELL sheet ────────────────────────────────────────
-      let shellData = null;
-      if (shellBuffer) {
-        const shellWb = XLSX.read(shellBuffer, { type: 'array', cellDates: false, raw: false });
-        const shellWs = shellWb.Sheets[SHELL_SHEET_NAME] || shellWb.Sheets[shellWb.SheetNames[0]];
-        if (shellWs) {
-          shellData = XLSX.utils.sheet_to_json(shellWs, {
-            header: 1, raw: false, dateNF: 'DD-MM-YYYY', defval: ''
-          });
-          console.log(`Shell sheet loaded: ${shellData.length} rows from "${SHELL_SHEET_NAME}"`);
-        } else {
-          console.warn(
-            `Shell sheet "${SHELL_SHEET_NAME}" not found. ` +
-            `Available sheets: ${shellWb.SheetNames.join(', ')}`
-          );
-        }
+      if (!mainResponse || !mainResponse.ok) {
+        throw new Error('Failed to fetch main sheet (HTTP ' + (mainResponse?.status || 'network error') + ')');
       }
 
-      console.log(`Main sheet loaded: ${mainData.length} rows from "${MAIN_SHEET_NAME}"`);
-      console.log('Parsing complete. Processing dashboard data...');
+      if (!shellResponse || !shellResponse.ok) {
+        console.warn('Shell Master sheet could not be reached — status:', shellResponse?.status);
+      }
 
-      // ── Step 5: Hand off to existing data-processing functions ───────────
-      //   (prepareShell / prepare are unchanged – they work with array-of-arrays)
-      if (shellData) prepareShell(shellData);
-      else { rawShell = []; console.warn('Shell Master data is null – Structures will show no data.'); }
+      const mainCsvText  = await mainResponse.text();
+      const shellCsvText = (shellResponse && shellResponse.ok) ? await shellResponse.text() : null;
 
+      if (!shellCsvText) console.warn('No Shell Master CSV — Structures table will be empty.');
+
+      console.log('Data fetched successfully, parsing CSV...');
+
+      const mainPromise = new Promise((resolve, reject) => {
+        Papa.parse(mainCsvText, {
+          header: false, skipEmptyLines: true,
+          complete: res => resolve(res.data), error: err => reject(err)
+        });
+      });
+
+      const shellPromise = shellCsvText ? new Promise((resolve, reject) => {
+        Papa.parse(shellCsvText, {
+          header: false, skipEmptyLines: true,
+          complete: res => resolve(res.data), error: err => reject(err)
+        });
+      }) : Promise.resolve(null);
+
+      const [mainData, shellData] = await Promise.all([mainPromise, shellPromise]);
+
+      console.log('CSV parsed successfully, processing data...');
+      if (shellData) {
+        prepareShell(shellData);
+      } else {
+        rawShell = [];
+        console.warn('Shell Master data is null — Structures will show no data.');
+      }
       prepare(mainData);
-      console.log('Dashboard loaded successfully from OneDrive Business!');
+      console.log('Dashboard loaded successfully!');
 
     } catch (error) {
-      console.error('Error loading data from OneDrive:', error);
-      showError(
-        'Failed to load data from OneDrive Business.<br><br>' +
-        '<strong>Error:</strong> ' + error.message +
-        '<br><br><strong>Checklist:</strong><ul>' +
-        '<li>Share link is correct and not expired</li>' +
-        '<li><code>&amp;download=1</code> is appended to the URL</li>' +
-        '<li>File is shared as <em>"Anyone with the link can view"</em></li>' +
-        '<li>MAIN_SHEET_NAME / SHELL_SHEET_NAME match the exact tab names</li>' +
-        '</ul>'
-      );
+      console.error('Error loading data:', error);
+      showError('Failed to load data. Please check your internet connection and try again.');
     }
   }
 
@@ -5655,7 +5591,7 @@
     document.getElementById('planActualDataSection').classList.remove('visible');
 
     // Reload data
-    loadDataFromOneDrive();
+    loadDataFromGoogleSheets();
   }
 
   // Update date/time
@@ -8272,7 +8208,7 @@
         overlay.style.opacity = '0';
         overlay.style.transition = 'opacity 0.4s ease';
         setTimeout(function() { overlay.style.display = 'none'; }, 400);
-        loadDataFromOneDrive();
+        loadDataFromGoogleSheets();
       } else {
         showErr('Invalid username or password.');
         passEl.value = '';
