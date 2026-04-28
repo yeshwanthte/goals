@@ -4134,6 +4134,22 @@
     }
     .shell-basis-pill i { font-size: 0.68rem; flex-shrink: 0; }
 
+  
+    /* ── Product Type Slicer: highlight / dim ───────────────── */
+    .tower-unit.pt-dimmed,
+    .villa-unit.pt-dimmed {
+      opacity: 0.12;
+      filter: grayscale(80%);
+      transition: opacity 0.2s ease, filter 0.2s ease;
+      pointer-events: none;
+    }
+    .tower-unit.pt-highlighted,
+    .villa-unit.pt-highlighted {
+      box-shadow: 0 0 0 2.5px #C65911, 0 4px 14px rgba(198,89,17,0.45);
+      z-index: 5;
+      transform: scale(1.10);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
   </style>
 </head>
 
@@ -4974,7 +4990,7 @@
       
       <!-- Project / Tower / Phase Slicers -->
       <section class="filter-section">
-        <div class="filter-grid" style="grid-template-columns: repeat(3,1fr);">
+        <div class="filter-grid" style="grid-template-columns: repeat(4,1fr);">
           <div class="filter-card">
             <div class="filter-card-header"><i class="bi bi-folder"></i> Project<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="projectSlicerTower" class="slicer"></div></div>
@@ -4986,6 +5002,10 @@
           <div class="filter-card">
             <div class="filter-card-header"><i class="bi bi-layers"></i> Phase<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="phaseSlicerViz" class="slicer"></div></div>
+          </div>
+          <div class="filter-card">
+            <div class="filter-card-header"><i class="bi bi-house-door"></i> Product Type<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
+            <div class="filter-card-body"><div id="productTypeSlicerViz" class="slicer"></div></div>
           </div>
         </div>
       </section>
@@ -8293,6 +8313,7 @@
   // Build tower project slicer
   let selectedTowerViz = new Set();
   let selectedPhaseViz = new Set();
+  let selectedProductTypeViz = new Set();
 
   function buildTowerProjectSlicer() {
     const projects = [...new Set(raw.map(r => r.Project))].filter(Boolean).sort();
@@ -8309,8 +8330,10 @@
       selectedProjectTower = null;
       selectedTowerViz.clear();
       selectedPhaseViz.clear();
+      selectedProductTypeViz.clear();
       buildVizTowerSlicer(null, true);  // all-projects mode
       buildVizPhaseSlicer(null, true);
+      buildVizProductTypeSlicer(null, true);
       renderTowerVisualization();
     };
     el.appendChild(allBtn);
@@ -8325,16 +8348,19 @@
         selectedProjectTower = proj;
         selectedTowerViz.clear();
         selectedPhaseViz.clear();
+        selectedProductTypeViz.clear();
         buildVizTowerSlicer(proj);
         buildVizPhaseSlicer(proj);
+        buildVizProductTypeSlicer(proj);
         renderTowerVisualization();
       };
       el.appendChild(btn);
     });
 
-    // Default: All selected → populate Tower/Phase slicers across all projects and render
+    // Default: All selected → populate Tower/Phase/ProductType slicers across all projects and render
     buildVizTowerSlicer(null, true);
     buildVizPhaseSlicer(null, true);
+    buildVizProductTypeSlicer(null, true);
     renderTowerVisualization();
   }
 
@@ -8406,6 +8432,60 @@
     });
   }
   
+  function buildVizProductTypeSlicer(project, allProjects) {
+    const el = document.getElementById('productTypeSlicerViz');
+    if (!el) return;
+    el.innerHTML = '';
+    const sourceData = allProjects ? raw : (project ? raw.filter(r => r.Project === project) : []);
+    if (!allProjects && !project) return;
+    const types = [...new Set(sourceData.map(r => r.ProductType).filter(Boolean))].sort();
+    const allBtn = document.createElement('button');
+    allBtn.textContent = 'All'; allBtn.classList.add('active');
+    allBtn.onclick = () => {
+      selectedProductTypeViz.clear();
+      el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      allBtn.classList.add('active');
+      applyProductTypeHighlight();
+    };
+    el.appendChild(allBtn);
+    types.forEach(t => {
+      const btn = document.createElement('button');
+      btn.textContent = t; btn.dataset.value = t;
+      btn.onclick = (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          if (selectedProductTypeViz.has(t)) { selectedProductTypeViz.delete(t); btn.classList.remove('active'); }
+          else { selectedProductTypeViz.add(t); btn.classList.add('active'); }
+        } else {
+          selectedProductTypeViz.clear();
+          el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+          selectedProductTypeViz.add(t);
+          btn.classList.add('active');
+        }
+        allBtn.classList.toggle('active', selectedProductTypeViz.size === 0);
+        applyProductTypeHighlight();
+      };
+      el.appendChild(btn);
+    });
+  }
+
+  function applyProductTypeHighlight() {
+    const allUnits = document.querySelectorAll('.tower-unit:not(.empty), .villa-unit');
+    if (selectedProductTypeViz.size === 0) {
+      allUnits.forEach(u => { u.classList.remove('pt-highlighted', 'pt-dimmed'); });
+      return;
+    }
+    allUnits.forEach(u => {
+      const pt = (u.dataset.producttype || '').trim();
+      if (selectedProductTypeViz.has(pt)) {
+        u.classList.add('pt-highlighted');
+        u.classList.remove('pt-dimmed');
+      } else {
+        u.classList.add('pt-dimmed');
+        u.classList.remove('pt-highlighted');
+      }
+    });
+  }
+
   function showEmptyState() {
     const container = document.getElementById('towerVizContainer');
     const kpiGrid = document.getElementById('stageKpiGrid');
@@ -8505,6 +8585,7 @@
     // ── Single project selected → existing behaviour ──────────
     if (selectedProjectTower) {
       _renderProjectUnits(container, projectData, selectedProjectTower);
+      applyProductTypeHighlight();
       return;
     }
 
@@ -8537,6 +8618,7 @@
       const body = section.querySelector('.proj-section-body');
       _renderProjectUnits(body, units, projName);
     });
+    applyProductTypeHighlight();
   }
 
   // ── Internal: render one project's units into a container ───
@@ -8646,8 +8728,9 @@
               towerHTML += `
                 <div class="tower-unit ${stageClass} ${soldClass}" 
                      data-unit="${unitNoDisplay}"
+                     data-producttype="${unit.ProductType || ''}"
                      onclick='showUnitDetail(${unitJson})'
-                     title="${unitNoDisplay}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}">
+                     title="${unitNoDisplay}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}&#10;Type: ${unit.ProductType || 'N/A'}">
                   ${unitNoDisplay}
                 </div>`;
             });
@@ -8991,8 +9074,9 @@
           blockHTML += `
             <div class="villa-unit ${stageClass}" 
                  data-unit="${unit.UnitNo}"
+                 data-producttype="${unit.ProductType || ''}"
                  onclick='showUnitDetail(${unitJson})'
-                 title="${unit.UnitNo}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}">
+                 title="${unit.UnitNo}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}&#10;Type: ${unit.ProductType || 'N/A'}">
               ${unit.UnitNo}
             </div>`;
         }
