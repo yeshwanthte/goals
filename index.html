@@ -1896,7 +1896,28 @@
     /* Fixed column widths — used identically in header + every data row */
     :root {
       --shell-col-name:     1fr;      /* Milestone Name — grows to fill */
-      --shell-col-baseline: 82px;     /* Baseline Plan */
+      --shell-col-duration: 55px;     /* Duration (days) */
+      --shell-col-baseline: 82px; 
+    /* ── Duration (days between activities) ── */
+    .shell-slab-duration {
+      width: var(--shell-col-duration);
+      padding: 0.4rem 0.3rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #475569;
+      background: #f0f4ff;
+      border-left: 1px solid #e9eef4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.25;
+    }
+    .shell-slab-duration.dur-positive { color: #059669; }
+    .shell-slab-duration.dur-negative { color: #dc2626; }
+    .shell-slab-duration.dur-neutral  { color: #94a3b8; }
+
+        /* Baseline Plan */
       --shell-col-date:     100px;    /* Actual / Projected */
       --shell-col-amt:      58px;     /* Value */
       --shell-accent:       4px;      /* Left accent bar */
@@ -1909,6 +1930,7 @@
       grid-template-columns:
         var(--shell-accent)
         var(--shell-col-name)
+        var(--shell-col-duration)
         var(--shell-col-baseline)
         var(--shell-col-date)
         var(--shell-col-amt);
@@ -3599,19 +3621,6 @@
       z-index: 100 !important;
       animation: stagePulse 1.5s ease-in-out infinite;
     }
-.tower-unit.pt-highlighted,
-.villa-unit.pt-highlighted {
-  outline: 2.5px solid #f59e0b !important;
-  outline-offset: -2px;
-  box-shadow: 0 0 0 3px rgba(245,158,11,0.35), inset 0 0 0 2px rgba(245,158,11,0.15) !important;
-  z-index: 2;
-  position: relative;
-}
-.tower-unit.pt-dimmed,
-.villa-unit.pt-dimmed {
-  opacity: 0.22 !important;
-  filter: grayscale(60%) !important;
-}
     
     .tower-unit.stage-dimmed,
     .villa-unit.stage-dimmed {
@@ -4354,6 +4363,10 @@
           <div class="filter-card-header"><i class="bi bi-patch-check"></i> OC Status<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
           <div class="filter-card-body"><div id="ocSlicer" class="slicer"></div></div>
         </div>
+        <div class="filter-card">
+          <div class="filter-card-header"><i class="bi bi-tag"></i> Product Type<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
+          <div class="filter-card-body"><div id="productTypeSlicer" class="slicer"></div></div>
+        </div>
       </div>
     </section>
 
@@ -4495,14 +4508,16 @@
                   <th class="sortable" onclick="sortTable(0)">Project<button class="col-filter-btn" data-table="milestone" data-col="0" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(1)">Phase<button class="col-filter-btn" data-table="milestone" data-col="1" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(2)">Tower<button class="col-filter-btn" data-table="milestone" data-col="2" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(3)">Unit No.<button class="col-filter-btn" data-table="milestone" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(4)">Customer Name<button class="col-filter-btn" data-table="milestone" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(5)">Revenue (₹ Cr)<button class="col-filter-btn" data-table="milestone" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(6)" style="text-align:center;">IDSA<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(7)" style="text-align:center;">GFC<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(8)" style="text-align:center;">Plaster<button class="col-filter-btn" data-table="milestone" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(9)" style="text-align:center;">Flooring<button class="col-filter-btn" data-table="milestone" data-col="9" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(10)" style="text-align:center;">Fenestration<button class="col-filter-btn" data-table="milestone" data-col="10" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(3)">Product Type<button class="col-filter-btn" data-table="milestone" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(4)">Unit No.<button class="col-filter-btn" data-table="milestone" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(5)">Customer Name<button class="col-filter-btn" data-table="milestone" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(6)">Revenue (₹ Cr)<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(7)">Inventory<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(7)" style="text-align:center;">IDSA<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(8)" style="text-align:center;">GFC<button class="col-filter-btn" data-table="milestone" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(9)" style="text-align:center;">Plaster<button class="col-filter-btn" data-table="milestone" data-col="9" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(10)" style="text-align:center;">Flooring<button class="col-filter-btn" data-table="milestone" data-col="10" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(11)" style="text-align:center;">Fenestration<button class="col-filter-btn" data-table="milestone" data-col="11" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                 </tr>
               </thead>
               <tbody id="detailsTableBody"></tbody>
@@ -4959,7 +4974,7 @@
       
       <!-- Project / Tower / Phase Slicers -->
       <section class="filter-section">
-        <div class="filter-grid" style="grid-template-columns: repeat(4,1fr);">
+        <div class="filter-grid" style="grid-template-columns: repeat(3,1fr);">
           <div class="filter-card">
             <div class="filter-card-header"><i class="bi bi-folder"></i> Project<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="projectSlicerTower" class="slicer"></div></div>
@@ -4971,10 +4986,6 @@
           <div class="filter-card">
             <div class="filter-card-header"><i class="bi bi-layers"></i> Phase<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="phaseSlicerViz" class="slicer"></div></div>
-          </div>
-          <div class="filter-card">
-            <div class="filter-card-header"><i class="bi bi-tag"></i> Product Type<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
-            <div class="filter-card-body"><div id="productTypeSlicerViz" class="slicer"></div></div>
           </div>
         </div>
       </section>
@@ -5120,6 +5131,12 @@
 
       <!-- Filters Row -->
       <section class="filter-section" style="margin-bottom:1rem;">
+        <div class="filter-toggle">
+          <h6><i class="bi bi-funnel"></i> Filters</h6>
+          <button class="btn-clear-filters" onclick="clearAllFiltersShell()">
+            <i class="bi bi-x-circle"></i> Clear All
+          </button>
+        </div>
         <div class="filter-grid" style="grid-template-columns: repeat(2, 1fr);">
           <div class="filter-card">
             <div class="filter-card-header"><i class="bi bi-folder"></i> Project<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
@@ -5580,7 +5597,8 @@
   let sortColumn = -1;
   let sortAscending = true;
   let projectSel = new Set(), towerSel = new Set(), phaseSel = new Set(),
-      inventorySel = new Set(), idsaSel = new Set(), gfcSel = new Set(), ocSel = new Set();
+      inventorySel = new Set(), idsaSel = new Set(), gfcSel = new Set(), ocSel = new Set(),
+      productTypeSel = new Set();
   
   // Plan vs Actuals filters
   let projectSelPA = new Set(), towerSelPA = new Set(), phaseSelPA = new Set(),
@@ -5999,7 +6017,8 @@
     // Get current filtered data
     const hasActiveFilters = projectSel.size > 0 || towerSel.size > 0 || 
                              phaseSel.size > 0 || inventorySel.size > 0 || 
-                             idsaSel.size > 0 || gfcSel.size > 0 || ocSel.size > 0;
+                             idsaSel.size > 0 || gfcSel.size > 0 || ocSel.size > 0 ||
+                             productTypeSel.size > 0;
     
     if (!hasActiveFilters) {
       // Remove all highlighting if no filters
@@ -6017,7 +6036,8 @@
       (!inventorySel.size || inventorySel.has(r.Inventory)) &&
       (!idsaSel.size || idsaSel.has(r.IDSADate ? "Yes" : "No")) &&
       (!gfcSel.size || gfcSel.has(r.GFC ? "Yes" : "No")) &&
-      (!ocSel.size || ocSel.has(r.OC))
+      (!ocSel.size || ocSel.has(r.OC)) &&
+      (!productTypeSel.size || productTypeSel.has(r.ProductType))
     );
 
     const availableProjects = new Set(d.map(x => x.Project));
@@ -6036,6 +6056,8 @@
     updateSlicerButtons('idsaSlicer', availableIDSA, idsaSel);
     updateSlicerButtons('gfcSlicer', availableGFC, gfcSel);
     updateSlicerButtons('ocSlicer', availableOC, ocSel);
+    const availableProductTypes = new Set(d.map(x => x.ProductType));
+    updateSlicerButtons('productTypeSlicer', availableProductTypes, productTypeSel);
   }
 
   function updateSlicerButtons(slicerId, availableValues, activeStore) {
@@ -6070,6 +6092,7 @@
     buildSlicer("idsaSlicer", ["Yes", "No"], idsaSel);
     buildSlicer("gfcSlicer", ["Yes", "No"], gfcSel);
     buildSlicer("ocSlicer", ["OC recvd", "OC not recvd"], ocSel);
+    buildSlicer("productTypeSlicer", [...new Set(raw.map(r => r.ProductType).filter(Boolean))].sort(), productTypeSel);
   }
 
   function buildPlanActualSlicers() {
@@ -6196,6 +6219,15 @@
     });
   }
 
+  function clearAllFiltersShell() {
+    shellSelectedProject = null;
+    shellSelectedTowers.clear();
+    buildShellTrackerSlicers();  // rebuilds both slicers, resets All to active
+    drpClear('Shell');           // clears date range picker
+    updateShellKPIs();
+    renderShellTracker();
+  }
+
   function clearAllFiltersPlanActual() {
     [projectSelPA, towerSelPA, phaseSelPA, inventorySelPA, idsaSelPA, gfcSelPA, ocSelPA].forEach(s => s.clear());
     document.querySelectorAll("#planActualDataSection .slicer button").forEach(b => {
@@ -6215,7 +6247,7 @@
   }
 
   function clearAllFilters() {
-    [projectSel, towerSel, phaseSel, inventorySel, idsaSel, gfcSel, ocSel].forEach(s => s.clear());
+    [projectSel, towerSel, phaseSel, inventorySel, idsaSel, gfcSel, ocSel, productTypeSel].forEach(s => s.clear());
     document.querySelectorAll(".slicer button").forEach(b => {
       b.classList.remove("active", "dimmed", "highlighted");
     });
@@ -6231,7 +6263,8 @@
       (!inventorySel.size || inventorySel.has(r.Inventory)) &&
       (!idsaSel.size || idsaSel.has(r.IDSADate ? "Yes" : "No")) &&
       (!gfcSel.size || gfcSel.has(r.GFC ? "Yes" : "No")) &&
-      (!ocSel.size || ocSel.has(r.OC))
+      (!ocSel.size || ocSel.has(r.OC)) &&
+      (!productTypeSel.size || productTypeSel.has(r.ProductType))
     );
 
     currentFilteredData = d;
@@ -6375,8 +6408,8 @@
     // Reset filters whenever a new activity is opened
     clearMilestoneColumnFilters();
     
-    // Set default sort to revenue column (index 5) in descending order
-    sortColumn = 5;
+    // Set default sort to revenue column (index 6) in descending order
+    sortColumn = 6;
     sortAscending = false;
     
     // Sort by revenue descending initially
@@ -6425,37 +6458,37 @@
 
   function generateActivitySummary(projects, data, activityField, revenueField, tbodyId, countId) {
     const tbody = document.getElementById(tbodyId);
-    tbody.innerHTML = "";
-    
+    tbody.innerHTML = '';
+
     let totalBalance = 0;
     let totalBillable = 0;
     let totalNonBillable = 0;
     let totalRevenue = 0;
-    
+
     projects.forEach(project => {
       // Filter units for this project
       const projectUnits = data.filter(x => x.Project === project);
-      
+
       // Calculate balance units (units without this activity completed)
       const balanceUnits = projectUnits.filter(x => !x[activityField]);
       const balanceCount = balanceUnits.length;
-      
+
       // Calculate billable (balance units with revenue > 0)
       const billableUnits = balanceUnits.filter(x => x[revenueField] > 0);
       const billableCount = billableUnits.length;
-      
+
       // Calculate non-billable
       const nonBillableCount = balanceCount - billableCount;
-      
+
       // Calculate revenue (sum of revenue for balance units)
       const revenue = balanceUnits.reduce((sum, x) => sum + (x[revenueField] || 0), 0) / 10000000;
-      
+
       // Update totals
       totalBalance += balanceCount;
       totalBillable += billableCount;
       totalNonBillable += nonBillableCount;
       totalRevenue += revenue;
-      
+
       // Add row
       tbody.innerHTML += `
         <tr>
@@ -6466,7 +6499,7 @@
           <td class="summary-revenue">₹${revenue.toFixed(2)}</td>
         </tr>`;
     });
-    
+
     // Add total row
     if (projects.length > 0) {
       tbody.innerHTML += `
@@ -6478,14 +6511,14 @@
           <td><strong>₹${totalRevenue.toFixed(2)}</strong></td>
         </tr>`;
     }
-    
+
     // Update count badge
     document.getElementById(countId).textContent = `${projects.length} Project${projects.length !== 1 ? 's' : ''}`;
   }
 
   function renderDetailsTable() {
     const tbody = document.getElementById("detailsTableBody");
-    const totalCols = 6 + activeColIds.length;
+    const totalCols = 8 + activeColIds.length;
 
     if (currentDetailsData.length === 0) {
       tbody.innerHTML = `
@@ -6517,7 +6550,7 @@
 
     const rows = [`
       <tr class="total-row">
-        <td colspan="5">
+        <td colspan="6">
           <span class="total-label">
             <i class="bi bi-calculator"></i>
             <strong>TOTAL - ${displayData.length} Units</strong>
@@ -6526,6 +6559,7 @@
         <td class="revenue-cell" style="font-size:1.1rem;">
           <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
         </td>
+        <td style="font-size:0.78rem;font-weight:700;color:#446A2C;text-align:center;">${displayData.filter(u => u.Inventory === 'Sold' || u.Inventory === 'LL Sold').length}</td>
         ${statusTotals.map(t => {
           if (t === null) return '<td></td>';
           if (typeof t === 'object' && t.ctg) return `<td style="text-align:right;font-weight:700;color:#C65911;">₹${t.val.toFixed(2)}</td>`;
@@ -6549,9 +6583,11 @@
           <td>${unit.Project || 'N/A'}</td>
           <td>${unit.Phase || 'N/A'}</td>
           <td>${unit.Tower || 'N/A'}</td>
+          <td style="font-size:0.78rem;">${unit.ProductType || '—'}</td>
           <td class="unit-number">${unit.UnitNo}</td>
           <td class="customer-name">${unit.Customer}</td>
           <td class="revenue-cell">₹${revenue}</td>
+          <td style="font-size:0.78rem;">${unit.Inventory || '—'}</td>
           ${optCells}
         </tr>`);
     });
@@ -6573,17 +6609,19 @@
         case 0: valA = a.Project  || ''; valB = b.Project  || ''; break;
         case 1: valA = a.Phase    || ''; valB = b.Phase    || ''; break;
         case 2: valA = a.Tower    || ''; valB = b.Tower    || ''; break;
-        case 3: valA = a.UnitNo   || ''; valB = b.UnitNo   || ''; break;
-        case 4: valA = a.Customer || ''; valB = b.Customer || ''; break;
-        case 5: valA = a[currentRevenueField] || 0; valB = b[currentRevenueField] || 0; break;
+        case 3: valA = (a.ProductType || '').toLowerCase(); valB = (b.ProductType || '').toLowerCase(); break;
+        case 4: valA = a.UnitNo   || ''; valB = b.UnitNo   || ''; break;
+        case 5: valA = a.Customer || ''; valB = b.Customer || ''; break;
+        case 6: valA = a[currentRevenueField] || 0; valB = b[currentRevenueField] || 0; break;
+        case 7: valA = (a.Inventory || '').toLowerCase(); valB = (b.Inventory || '').toLowerCase(); break;
         default: {
-          const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 6]);
+          const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 8]);
           if (col && col.type === 'ctg') { valA = col.calc(a); valB = col.calc(b); }
           else { valA = col && a[col.field] ? 1 : 0; valB = col && b[col.field] ? 1 : 0; }
           break;
         }
       }
-      if (columnIndex >= 5) return sortAscending ? valA - valB : valB - valA;
+      if (columnIndex === 6 || columnIndex >= 8) return sortAscending ? valA - valB : valB - valA;
       if (valA < valB) return sortAscending ? -1 : 1;
       if (valA > valB) return sortAscending ? 1 : -1;
       return 0;
@@ -6648,17 +6686,17 @@
     if (currentDetailsData.length === 0) { alert('No data to download'); return; }
 
     const optLabels = activeColIds.map(id => (OPTIONAL_COLS.find(c => c.id === id) || {label: id}).label);
-    const headers = ['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', ...optLabels];
+    const headers = ['Project', 'Phase', 'Tower', 'Product Type', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', 'Inventory', ...optLabels];
 
     // schema: 't'=text, 'n'=number, 'd'=date, 's'=status-text
-    const schema = ['t','t','t','t','t','n', ...activeColIds.map(id => {
+    const schema = ['t','t','t','t','t','t','n','t', ...activeColIds.map(id => {
       const col = OPTIONAL_COLS.find(c => c.id === id);
       return (col && col.type === 'ctg') ? 'n' : 't';
     })];
 
     const excelData = [headers];
     const totalRevenue = currentDetailsData.reduce((s, u) => s + (u[currentRevenueField] || 0), 0) / 10000000;
-    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue, ...activeColIds.map(() => '')]);
+    excelData.push(['TOTAL', '', '', '', `${currentDetailsData.length} Units`, '', totalRevenue, '', ...activeColIds.map(() => '')]);
 
     currentDetailsData.forEach(unit => {
       const revenue = (unit[currentRevenueField] || 0) / 10000000;
@@ -6669,7 +6707,7 @@
         return unit[col.field] ? 'Done' : 'Pending';
       });
       excelData.push([unit.Project||'N/A', unit.Phase||'N/A', unit.Tower||'N/A',
-        unit.UnitNo, unit.Customer, revenue, ...optVals]);
+        unit.ProductType||'', unit.UnitNo, unit.Customer, revenue, unit.Inventory||'', ...optVals]);
     });
 
     const wb = XLSX.utils.book_new();
@@ -7298,11 +7336,13 @@
       case 0: return (unit.Project  || '').toString();
       case 1: return (unit.Phase    || '').toString();
       case 2: return (unit.Tower    || '').toString();
-      case 3: return (unit.UnitNo   || '').toString();
-      case 4: return (unit.Customer || '').toString();
-      case 5: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
+      case 3: return (unit.ProductType || '').toString();
+      case 4: return (unit.UnitNo   || '').toString();
+      case 5: return (unit.Customer || '').toString();
+      case 6: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
+      case 7: return (unit.Inventory || '').toString();
       default: {
-        const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - 6]);
+        const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - 8]);
         if (!col) return '';
         if (col.type === 'ctg') return (col.calc(unit) / 10000000).toFixed(2);
         return col.field ? (unit[col.field] ? 'Done' : 'Pending') : '';
@@ -8253,7 +8293,6 @@
   // Build tower project slicer
   let selectedTowerViz = new Set();
   let selectedPhaseViz = new Set();
-  let selectedProductTypeViz = new Set();
 
   function buildTowerProjectSlicer() {
     const projects = [...new Set(raw.map(r => r.Project))].filter(Boolean).sort();
@@ -8270,10 +8309,8 @@
       selectedProjectTower = null;
       selectedTowerViz.clear();
       selectedPhaseViz.clear();
-      selectedProductTypeViz.clear();
       buildVizTowerSlicer(null, true);  // all-projects mode
       buildVizPhaseSlicer(null, true);
-      buildVizProductTypeSlicer(null, true);
       renderTowerVisualization();
     };
     el.appendChild(allBtn);
@@ -8288,19 +8325,16 @@
         selectedProjectTower = proj;
         selectedTowerViz.clear();
         selectedPhaseViz.clear();
-        selectedProductTypeViz.clear();
         buildVizTowerSlicer(proj);
         buildVizPhaseSlicer(proj);
-        buildVizProductTypeSlicer(proj);
         renderTowerVisualization();
       };
       el.appendChild(btn);
     });
 
-    // Default: All selected → populate Tower/Phase/ProductType slicers across all projects and render
+    // Default: All selected → populate Tower/Phase slicers across all projects and render
     buildVizTowerSlicer(null, true);
     buildVizPhaseSlicer(null, true);
-    buildVizProductTypeSlicer(null, true);
     renderTowerVisualization();
   }
 
@@ -8471,7 +8505,6 @@
     // ── Single project selected → existing behaviour ──────────
     if (selectedProjectTower) {
       _renderProjectUnits(container, projectData, selectedProjectTower);
-      applyProductTypeHighlight();
       return;
     }
 
@@ -8504,7 +8537,6 @@
       const body = section.querySelector('.proj-section-body');
       _renderProjectUnits(body, units, projName);
     });
-    applyProductTypeHighlight();
   }
 
   // ── Internal: render one project's units into a container ───
@@ -8614,7 +8646,6 @@
               towerHTML += `
                 <div class="tower-unit ${stageClass} ${soldClass}" 
                      data-unit="${unitNoDisplay}"
-                     data-producttype="${unit.ProductType || ''}"
                      onclick='showUnitDetail(${unitJson})'
                      title="${unitNoDisplay}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}">
                   ${unitNoDisplay}
@@ -8637,69 +8668,7 @@
       container.innerHTML += towerHTML;
   }
   
-  function buildVizProductTypeSlicer(project, allProjects) {
-    const el = document.getElementById('productTypeSlicerViz');
-    if (!el) return;
-    el.innerHTML = '';
-    const sourceData = allProjects ? raw : (project ? raw.filter(r => r.Project === project) : []);
-    if (!allProjects && !project) return;
-    const ptypes = [...new Set(sourceData.map(r => r.ProductType).filter(Boolean))].sort();
-
-    const allBtn = document.createElement('button');
-    allBtn.textContent = 'All';
-    allBtn.classList.add('active');
-    allBtn.onclick = () => {
-      selectedProductTypeViz.clear();
-      el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-      allBtn.classList.add('active');
-      applyProductTypeHighlight();
-    };
-    el.appendChild(allBtn);
-
-    ptypes.forEach(pt => {
-      const btn = document.createElement('button');
-      btn.textContent = pt;
-      btn.dataset.value = pt;
-      btn.onclick = (e) => {
-        if (e.ctrlKey || e.metaKey) {
-          if (selectedProductTypeViz.has(pt)) {
-            selectedProductTypeViz.delete(pt);
-            btn.classList.remove('active');
-          } else {
-            selectedProductTypeViz.add(pt);
-            btn.classList.add('active');
-          }
-        } else {
-          selectedProductTypeViz.clear();
-          el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-          selectedProductTypeViz.add(pt);
-          btn.classList.add('active');
-        }
-        allBtn.classList.toggle('active', selectedProductTypeViz.size === 0);
-        applyProductTypeHighlight();
-      };
-      el.appendChild(btn);
-    });
-  }
-
-  function applyProductTypeHighlight() {
-    const allUnits = document.querySelectorAll('.tower-unit:not(.empty), .villa-unit:not(.empty)');
-    if (selectedProductTypeViz.size === 0) {
-      allUnits.forEach(u => u.classList.remove('pt-highlighted', 'pt-dimmed'));
-      return;
-    }
-    allUnits.forEach(u => {
-      const pt = u.dataset.producttype || '';
-      u.classList.remove('pt-highlighted', 'pt-dimmed');
-      if (selectedProductTypeViz.has(pt)) {
-        u.classList.add('pt-highlighted');
-      } else {
-        u.classList.add('pt-dimmed');
-      }
-    });
-  }
-
-    function getStageName(stage) {
+  function getStageName(stage) {
     const names = {
       0: 'Scope',
       1: 'Sold',
@@ -9022,7 +8991,6 @@
           blockHTML += `
             <div class="villa-unit ${stageClass}" 
                  data-unit="${unit.UnitNo}"
-                 data-producttype="${unit.ProductType || ''}"
                  onclick='showUnitDetail(${unitJson})'
                  title="${unit.UnitNo}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}">
               ${unit.UnitNo}
@@ -9931,7 +9899,7 @@
       // so that the last milestone (highest floor) is at DOM index 0 (top).
       const reversed = [...milestones].reverse();
 
-      const slabRows = reversed.map(m => {
+      const slabRows = reversed.map((m, i) => {
         const actualDate    = parseDate(m.ActualDate);
         const projectedDate = parseDate(m.ProjectedDate);
         const baselineDate  = parseDate(m.BaselinePlan);
@@ -9957,6 +9925,26 @@
         const baselineText = baselineDate ? formatDateDDMMMYY(baselineDate) : '—';
         const statusClass  = hasActual ? 'slab-actual' : 'slab-projected';
 
+        // ── Duration: days between this activity and the previous one ──
+        let durationText  = '—';
+        let durationClass = 'dur-neutral';
+        if (i < reversed.length - 1) {
+          const prev = reversed[i + 1];
+          let currDate, prevDate;
+          if (_shellDateBasis === 'baseline') {
+            currDate = parseDate(m.BaselinePlan   || m.PlanDate);
+            prevDate = parseDate(prev.BaselinePlan || prev.PlanDate);
+          } else {
+            currDate = parseDate(m.ActualDate)    || parseDate(m.ProjectedDate);
+            prevDate = parseDate(prev.ActualDate) || parseDate(prev.ProjectedDate);
+          }
+          if (currDate && prevDate) {
+            const diffDays = Math.round((currDate - prevDate) / 86400000);
+            durationText  = diffDays + 'd';
+            durationClass = diffDays >= 0 ? 'dur-positive' : 'dur-negative';
+          }
+        }
+
         // Amount in Crs — blank if zero or missing
         const amtDisplay = (m.DetailAmt && m.DetailAmt > 0)
           ? `₹${(m.DetailAmt / 10000000).toFixed(2)}<br>Cr`
@@ -9966,6 +9954,7 @@
           <div class="shell-slab ${statusClass}">
             <div class="shell-slab-accent"></div>
             <div class="shell-slab-name"><span>${m.MilestoneName || m.Category || '—'}</span></div>
+            <div class="shell-slab-duration ${durationClass}">${durationText}</div>
             <div class="shell-slab-baseline">${baselineText}</div>
             <div class="shell-slab-date ${dateClass}">${dateText}</div>
             <div class="shell-slab-level">${amtDisplay}</div>
@@ -9977,6 +9966,7 @@
         <div class="shell-slab-header">
           <div class="shell-hdr-accent"></div>
           <div class="shell-hdr-name">Milestone Name</div>
+          <div class="shell-hdr-col">Duration<br>(Days)</div>
           <div class="shell-hdr-col">Baseline<br>Plan</div>
           <div class="shell-hdr-col">Actual /<br>Projected</div>
           <div class="shell-hdr-col">Value<br>(₹ Cr)</div>
@@ -10515,7 +10505,8 @@
     if (!sortRow) return;
     const fixed = [
       {label:'Project',ci:0},{label:'Phase',ci:1},{label:'Tower',ci:2},
-      {label:'Unit No.',ci:3},{label:'Customer Name',ci:4},{label:'Revenue (₹ Cr)',ci:5}
+      {label:'Product Type',ci:3},{label:'Unit No.',ci:4},{label:'Customer Name',ci:5},
+      {label:'Revenue (₹ Cr)',ci:6},{label:'Inventory',ci:7}
     ];
     let h = fixed.map(f => `
       <th class="sortable" onclick="sortTable(${f.ci})">${f.label}
@@ -10523,7 +10514,7 @@
       </th>`).join('');
     activeColIds.forEach((id, i) => {
       const col = OPTIONAL_COLS.find(c => c.id === id); if (!col) return;
-      const ci = 6 + i;
+      const ci = 8 + i;
       h += `<th class="sortable" onclick="sortTable(${ci})" style="text-align:center;">${col.label}
         <button class="col-filter-btn" data-table="milestone" data-col="${ci}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button>
       </th>`;
