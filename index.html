@@ -1265,23 +1265,6 @@
       text-align: center;
     }
 
-    .summary-inventory {
-      font-size: 0.72rem;
-      vertical-align: middle;
-    }
-    .inv-pill {
-      display: inline-block;
-      padding: 0.1rem 0.32rem;
-      background: rgba(198,89,17,0.08);
-      color: var(--primary);
-      border-radius: 4px;
-      font-size: 0.66rem;
-      font-weight: 600;
-      margin: 1px 2px;
-      white-space: nowrap;
-      border: 1px solid rgba(198,89,17,0.15);
-    }
-
     .summary-total-row {
       background: linear-gradient(135deg, var(--primary-light) 0%, rgba(198, 89, 17, 0.2) 100%);
       font-weight: 700;
@@ -1913,28 +1896,7 @@
     /* Fixed column widths — used identically in header + every data row */
     :root {
       --shell-col-name:     1fr;      /* Milestone Name — grows to fill */
-      --shell-col-duration: 55px;     /* Duration (days) */
-      --shell-col-baseline: 82px; 
-    /* ── Duration (days between activities) ── */
-    .shell-slab-duration {
-      width: var(--shell-col-duration);
-      padding: 0.4rem 0.3rem;
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: #475569;
-      background: #f0f4ff;
-      border-left: 1px solid #e9eef4;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      line-height: 1.25;
-    }
-    .shell-slab-duration.dur-positive { color: #059669; }
-    .shell-slab-duration.dur-negative { color: #dc2626; }
-    .shell-slab-duration.dur-neutral  { color: #94a3b8; }
-
-        /* Baseline Plan */
+      --shell-col-baseline: 82px;     /* Baseline Plan */
       --shell-col-date:     100px;    /* Actual / Projected */
       --shell-col-amt:      58px;     /* Value */
       --shell-accent:       4px;      /* Left accent bar */
@@ -1947,7 +1909,6 @@
       grid-template-columns:
         var(--shell-accent)
         var(--shell-col-name)
-        var(--shell-col-duration)
         var(--shell-col-baseline)
         var(--shell-col-date)
         var(--shell-col-amt);
@@ -4393,10 +4354,6 @@
           <div class="filter-card-header"><i class="bi bi-patch-check"></i> OC Status<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
           <div class="filter-card-body"><div id="ocSlicer" class="slicer"></div></div>
         </div>
-        <div class="filter-card">
-          <div class="filter-card-header"><i class="bi bi-tag"></i> Product Type<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
-          <div class="filter-card-body"><div id="productTypeSlicer" class="slicer"></div></div>
-        </div>
       </div>
     </section>
 
@@ -4454,7 +4411,6 @@
                   <th>Billable</th>
                   <th>Non-Bill</th>
                   <th>Revenue (₹ Cr)</th>
-                  <th>Inventory</th>
                 </tr>
               </thead>
               <tbody id="plasterSummaryBody"></tbody>
@@ -4477,7 +4433,6 @@
                   <th>Billable</th>
                   <th>Non-Bill</th>
                   <th>Revenue (₹ Cr)</th>
-                  <th>Inventory</th>
                 </tr>
               </thead>
               <tbody id="flooringSummaryBody"></tbody>
@@ -4500,7 +4455,6 @@
                   <th>Billable</th>
                   <th>Non-Bill</th>
                   <th>Revenue (₹ Cr)</th>
-                  <th>Inventory</th>
                 </tr>
               </thead>
               <tbody id="handoverSummaryBody"></tbody>
@@ -5166,12 +5120,6 @@
 
       <!-- Filters Row -->
       <section class="filter-section" style="margin-bottom:1rem;">
-        <div class="filter-toggle">
-          <h6><i class="bi bi-funnel"></i> Filters</h6>
-          <button class="btn-clear-filters" onclick="clearAllFiltersShell()">
-            <i class="bi bi-x-circle"></i> Clear All
-          </button>
-        </div>
         <div class="filter-grid" style="grid-template-columns: repeat(2, 1fr);">
           <div class="filter-card">
             <div class="filter-card-header"><i class="bi bi-folder"></i> Project<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
@@ -5632,8 +5580,7 @@
   let sortColumn = -1;
   let sortAscending = true;
   let projectSel = new Set(), towerSel = new Set(), phaseSel = new Set(),
-      inventorySel = new Set(), idsaSel = new Set(), gfcSel = new Set(), ocSel = new Set(),
-      productTypeSel = new Set();
+      inventorySel = new Set(), idsaSel = new Set(), gfcSel = new Set(), ocSel = new Set();
   
   // Plan vs Actuals filters
   let projectSelPA = new Set(), towerSelPA = new Set(), phaseSelPA = new Set(),
@@ -6052,8 +5999,7 @@
     // Get current filtered data
     const hasActiveFilters = projectSel.size > 0 || towerSel.size > 0 || 
                              phaseSel.size > 0 || inventorySel.size > 0 || 
-                             idsaSel.size > 0 || gfcSel.size > 0 || ocSel.size > 0 ||
-                             productTypeSel.size > 0;
+                             idsaSel.size > 0 || gfcSel.size > 0 || ocSel.size > 0;
     
     if (!hasActiveFilters) {
       // Remove all highlighting if no filters
@@ -6071,8 +6017,7 @@
       (!inventorySel.size || inventorySel.has(r.Inventory)) &&
       (!idsaSel.size || idsaSel.has(r.IDSADate ? "Yes" : "No")) &&
       (!gfcSel.size || gfcSel.has(r.GFC ? "Yes" : "No")) &&
-      (!ocSel.size || ocSel.has(r.OC)) &&
-      (!productTypeSel.size || productTypeSel.has(r.ProductType))
+      (!ocSel.size || ocSel.has(r.OC))
     );
 
     const availableProjects = new Set(d.map(x => x.Project));
@@ -6091,8 +6036,6 @@
     updateSlicerButtons('idsaSlicer', availableIDSA, idsaSel);
     updateSlicerButtons('gfcSlicer', availableGFC, gfcSel);
     updateSlicerButtons('ocSlicer', availableOC, ocSel);
-    const availableProductTypes = new Set(d.map(x => x.ProductType));
-    updateSlicerButtons('productTypeSlicer', availableProductTypes, productTypeSel);
   }
 
   function updateSlicerButtons(slicerId, availableValues, activeStore) {
@@ -6127,7 +6070,6 @@
     buildSlicer("idsaSlicer", ["Yes", "No"], idsaSel);
     buildSlicer("gfcSlicer", ["Yes", "No"], gfcSel);
     buildSlicer("ocSlicer", ["OC recvd", "OC not recvd"], ocSel);
-    buildSlicer("productTypeSlicer", [...new Set(raw.map(r => r.ProductType).filter(Boolean))].sort(), productTypeSel);
   }
 
   function buildPlanActualSlicers() {
@@ -6254,15 +6196,6 @@
     });
   }
 
-  function clearAllFiltersShell() {
-    shellSelectedProject = null;
-    shellSelectedTowers.clear();
-    buildShellTrackerSlicers();  // rebuilds both slicers, resets All to active
-    drpClear('Shell');           // clears date range picker
-    updateShellKPIs();
-    renderShellTracker();
-  }
-
   function clearAllFiltersPlanActual() {
     [projectSelPA, towerSelPA, phaseSelPA, inventorySelPA, idsaSelPA, gfcSelPA, ocSelPA].forEach(s => s.clear());
     document.querySelectorAll("#planActualDataSection .slicer button").forEach(b => {
@@ -6282,7 +6215,7 @@
   }
 
   function clearAllFilters() {
-    [projectSel, towerSel, phaseSel, inventorySel, idsaSel, gfcSel, ocSel, productTypeSel].forEach(s => s.clear());
+    [projectSel, towerSel, phaseSel, inventorySel, idsaSel, gfcSel, ocSel].forEach(s => s.clear());
     document.querySelectorAll(".slicer button").forEach(b => {
       b.classList.remove("active", "dimmed", "highlighted");
     });
@@ -6298,8 +6231,7 @@
       (!inventorySel.size || inventorySel.has(r.Inventory)) &&
       (!idsaSel.size || idsaSel.has(r.IDSADate ? "Yes" : "No")) &&
       (!gfcSel.size || gfcSel.has(r.GFC ? "Yes" : "No")) &&
-      (!ocSel.size || ocSel.has(r.OC)) &&
-      (!productTypeSel.size || productTypeSel.has(r.ProductType))
+      (!ocSel.size || ocSel.has(r.OC))
     );
 
     currentFilteredData = d;
@@ -6493,37 +6425,38 @@
 
   function generateActivitySummary(projects, data, activityField, revenueField, tbodyId, countId) {
     const tbody = document.getElementById(tbodyId);
-    tbody.innerHTML = '';
-
-    let totalBalance = 0, totalBillable = 0, totalNonBillable = 0, totalRevenue = 0;
-    const totalInventoryMap = {};
-
+    tbody.innerHTML = "";
+    
+    let totalBalance = 0;
+    let totalBillable = 0;
+    let totalNonBillable = 0;
+    let totalRevenue = 0;
+    
     projects.forEach(project => {
-      const projectUnits     = data.filter(x => x.Project === project);
-      const balanceUnits     = projectUnits.filter(x => !x[activityField]);
-      const balanceCount     = balanceUnits.length;
-      const billableUnits    = balanceUnits.filter(x => x[revenueField] > 0);
-      const billableCount    = billableUnits.length;
+      // Filter units for this project
+      const projectUnits = data.filter(x => x.Project === project);
+      
+      // Calculate balance units (units without this activity completed)
+      const balanceUnits = projectUnits.filter(x => !x[activityField]);
+      const balanceCount = balanceUnits.length;
+      
+      // Calculate billable (balance units with revenue > 0)
+      const billableUnits = balanceUnits.filter(x => x[revenueField] > 0);
+      const billableCount = billableUnits.length;
+      
+      // Calculate non-billable
       const nonBillableCount = balanceCount - billableCount;
-      const revenue          = balanceUnits.reduce((sum, x) => sum + (x[revenueField] || 0), 0) / 10000000;
-
-      // Build per-row inventory breakdown
-      const rowInventoryMap = {};
-      balanceUnits.forEach(x => {
-        const inv = x.Inventory || 'N/A';
-        rowInventoryMap[inv]   = (rowInventoryMap[inv]   || 0) + 1;
-        totalInventoryMap[inv] = (totalInventoryMap[inv] || 0) + 1;
-      });
-      const inventoryDisplay = Object.entries(rowInventoryMap)
-        .sort((a, b) => b[1] - a[1])
-        .map(([k, v]) => `<span class="inv-pill">${k}: ${v}</span>`)
-        .join('');
-
-      totalBalance     += balanceCount;
-      totalBillable    += billableCount;
+      
+      // Calculate revenue (sum of revenue for balance units)
+      const revenue = balanceUnits.reduce((sum, x) => sum + (x[revenueField] || 0), 0) / 10000000;
+      
+      // Update totals
+      totalBalance += balanceCount;
+      totalBillable += billableCount;
       totalNonBillable += nonBillableCount;
-      totalRevenue     += revenue;
-
+      totalRevenue += revenue;
+      
+      // Add row
       tbody.innerHTML += `
         <tr>
           <td class="summary-project-name">${project}</td>
@@ -6531,16 +6464,11 @@
           <td><span class="summary-billable">${billableCount}</span></td>
           <td><span class="summary-non-billable">${nonBillableCount}</span></td>
           <td class="summary-revenue">₹${revenue.toFixed(2)}</td>
-          <td class="summary-inventory">${inventoryDisplay || '—'}</td>
         </tr>`;
     });
-
+    
     // Add total row
     if (projects.length > 0) {
-      const totalInventoryDisplay = Object.entries(totalInventoryMap)
-        .sort((a, b) => b[1] - a[1])
-        .map(([k, v]) => `<span class="inv-pill">${k}: ${v}</span>`)
-        .join('');
       tbody.innerHTML += `
         <tr class="summary-total-row">
           <td><strong>TOTAL</strong></td>
@@ -6548,10 +6476,9 @@
           <td><strong>${totalBillable}</strong></td>
           <td><strong>${totalNonBillable}</strong></td>
           <td><strong>₹${totalRevenue.toFixed(2)}</strong></td>
-          <td>${totalInventoryDisplay || '—'}</td>
         </tr>`;
     }
-
+    
     // Update count badge
     document.getElementById(countId).textContent = `${projects.length} Project${projects.length !== 1 ? 's' : ''}`;
   }
@@ -6590,7 +6517,7 @@
 
     const rows = [`
       <tr class="total-row">
-        <td colspan="6">
+        <td colspan="5">
           <span class="total-label">
             <i class="bi bi-calculator"></i>
             <strong>TOTAL - ${displayData.length} Units</strong>
@@ -6599,7 +6526,6 @@
         <td class="revenue-cell" style="font-size:1.1rem;">
           <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
         </td>
-        <td style="font-size:0.78rem;font-weight:700;color:#446A2C;text-align:center;">${displayData.filter(u => u.Inventory === 'Sold' || u.Inventory === 'LL Sold').length}</td>
         ${statusTotals.map(t => {
           if (t === null) return '<td></td>';
           if (typeof t === 'object' && t.ctg) return `<td style="text-align:right;font-weight:700;color:#C65911;">₹${t.val.toFixed(2)}</td>`;
@@ -8347,7 +8273,7 @@
       selectedProductTypeViz.clear();
       buildVizTowerSlicer(null, true);  // all-projects mode
       buildVizPhaseSlicer(null, true);
-      buildVizProductTypeSlicer();
+      buildVizProductTypeSlicer(null, true);
       renderTowerVisualization();
     };
     el.appendChild(allBtn);
@@ -8365,7 +8291,7 @@
         selectedProductTypeViz.clear();
         buildVizTowerSlicer(proj);
         buildVizPhaseSlicer(proj);
-        buildVizProductTypeSlicer();
+        buildVizProductTypeSlicer(proj);
         renderTowerVisualization();
       };
       el.appendChild(btn);
@@ -8374,7 +8300,7 @@
     // Default: All selected → populate Tower/Phase/ProductType slicers across all projects and render
     buildVizTowerSlicer(null, true);
     buildVizPhaseSlicer(null, true);
-    buildVizProductTypeSlicer();
+    buildVizProductTypeSlicer(null, true);
     renderTowerVisualization();
   }
 
@@ -8711,11 +8637,13 @@
       container.innerHTML += towerHTML;
   }
   
-  function buildVizProductTypeSlicer() {
+  function buildVizProductTypeSlicer(project, allProjects) {
     const el = document.getElementById('productTypeSlicerViz');
     if (!el) return;
     el.innerHTML = '';
-    const ptypes = [...new Set(raw.map(r => r.ProductType).filter(Boolean))].sort();
+    const sourceData = allProjects ? raw : (project ? raw.filter(r => r.Project === project) : []);
+    if (!allProjects && !project) return;
+    const ptypes = [...new Set(sourceData.map(r => r.ProductType).filter(Boolean))].sort();
 
     const allBtn = document.createElement('button');
     allBtn.textContent = 'All';
@@ -10003,7 +9931,7 @@
       // so that the last milestone (highest floor) is at DOM index 0 (top).
       const reversed = [...milestones].reverse();
 
-      const slabRows = reversed.map((m, i) => {
+      const slabRows = reversed.map(m => {
         const actualDate    = parseDate(m.ActualDate);
         const projectedDate = parseDate(m.ProjectedDate);
         const baselineDate  = parseDate(m.BaselinePlan);
@@ -10029,26 +9957,6 @@
         const baselineText = baselineDate ? formatDateDDMMMYY(baselineDate) : '—';
         const statusClass  = hasActual ? 'slab-actual' : 'slab-projected';
 
-        // ── Duration: days between this activity and the previous one ──
-        let durationText  = '—';
-        let durationClass = 'dur-neutral';
-        if (i < reversed.length - 1) {
-          const prev = reversed[i + 1];
-          let currDate, prevDate;
-          if (_shellDateBasis === 'baseline') {
-            currDate = parseDate(m.BaselinePlan   || m.PlanDate);
-            prevDate = parseDate(prev.BaselinePlan || prev.PlanDate);
-          } else {
-            currDate = parseDate(m.ActualDate)    || parseDate(m.ProjectedDate);
-            prevDate = parseDate(prev.ActualDate) || parseDate(prev.ProjectedDate);
-          }
-          if (currDate && prevDate) {
-            const diffDays = Math.round((currDate - prevDate) / 86400000);
-            durationText  = diffDays + 'd';
-            durationClass = diffDays >= 0 ? 'dur-positive' : 'dur-negative';
-          }
-        }
-
         // Amount in Crs — blank if zero or missing
         const amtDisplay = (m.DetailAmt && m.DetailAmt > 0)
           ? `₹${(m.DetailAmt / 10000000).toFixed(2)}<br>Cr`
@@ -10058,7 +9966,6 @@
           <div class="shell-slab ${statusClass}">
             <div class="shell-slab-accent"></div>
             <div class="shell-slab-name"><span>${m.MilestoneName || m.Category || '—'}</span></div>
-            <div class="shell-slab-duration ${durationClass}">${durationText}</div>
             <div class="shell-slab-baseline">${baselineText}</div>
             <div class="shell-slab-date ${dateClass}">${dateText}</div>
             <div class="shell-slab-level">${amtDisplay}</div>
@@ -10070,7 +9977,6 @@
         <div class="shell-slab-header">
           <div class="shell-hdr-accent"></div>
           <div class="shell-hdr-name">Milestone Name</div>
-          <div class="shell-hdr-col">Duration<br>(Days)</div>
           <div class="shell-hdr-col">Baseline<br>Plan</div>
           <div class="shell-hdr-col">Actual /<br>Projected</div>
           <div class="shell-hdr-col">Value<br>(₹ Cr)</div>
