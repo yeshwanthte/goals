@@ -1265,6 +1265,23 @@
       text-align: center;
     }
 
+    .summary-inventory {
+      font-size: 0.72rem;
+      vertical-align: middle;
+    }
+    .inv-pill {
+      display: inline-block;
+      padding: 0.1rem 0.32rem;
+      background: rgba(198,89,17,0.08);
+      color: var(--primary);
+      border-radius: 4px;
+      font-size: 0.66rem;
+      font-weight: 600;
+      margin: 1px 2px;
+      white-space: nowrap;
+      border: 1px solid rgba(198,89,17,0.15);
+    }
+
     .summary-total-row {
       background: linear-gradient(135deg, var(--primary-light) 0%, rgba(198, 89, 17, 0.2) 100%);
       font-weight: 700;
@@ -3621,6 +3638,19 @@
       z-index: 100 !important;
       animation: stagePulse 1.5s ease-in-out infinite;
     }
+.tower-unit.pt-highlighted,
+.villa-unit.pt-highlighted {
+  outline: 2.5px solid #f59e0b !important;
+  outline-offset: -2px;
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.35), inset 0 0 0 2px rgba(245,158,11,0.15) !important;
+  z-index: 2;
+  position: relative;
+}
+.tower-unit.pt-dimmed,
+.villa-unit.pt-dimmed {
+  opacity: 0.22 !important;
+  filter: grayscale(60%) !important;
+}
     
     .tower-unit.stage-dimmed,
     .villa-unit.stage-dimmed {
@@ -4424,6 +4454,7 @@
                   <th>Billable</th>
                   <th>Non-Bill</th>
                   <th>Revenue (₹ Cr)</th>
+                  <th>Inventory</th>
                 </tr>
               </thead>
               <tbody id="plasterSummaryBody"></tbody>
@@ -4446,6 +4477,7 @@
                   <th>Billable</th>
                   <th>Non-Bill</th>
                   <th>Revenue (₹ Cr)</th>
+                  <th>Inventory</th>
                 </tr>
               </thead>
               <tbody id="flooringSummaryBody"></tbody>
@@ -4468,6 +4500,7 @@
                   <th>Billable</th>
                   <th>Non-Bill</th>
                   <th>Revenue (₹ Cr)</th>
+                  <th>Inventory</th>
                 </tr>
               </thead>
               <tbody id="handoverSummaryBody"></tbody>
@@ -4508,16 +4541,14 @@
                   <th class="sortable" onclick="sortTable(0)">Project<button class="col-filter-btn" data-table="milestone" data-col="0" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(1)">Phase<button class="col-filter-btn" data-table="milestone" data-col="1" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                   <th class="sortable" onclick="sortTable(2)">Tower<button class="col-filter-btn" data-table="milestone" data-col="2" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(3)">Product Type<button class="col-filter-btn" data-table="milestone" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(4)">Unit No.<button class="col-filter-btn" data-table="milestone" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(5)">Customer Name<button class="col-filter-btn" data-table="milestone" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(6)">Revenue (₹ Cr)<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(7)">Inventory<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(7)" style="text-align:center;">IDSA<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(8)" style="text-align:center;">GFC<button class="col-filter-btn" data-table="milestone" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(9)" style="text-align:center;">Plaster<button class="col-filter-btn" data-table="milestone" data-col="9" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(10)" style="text-align:center;">Flooring<button class="col-filter-btn" data-table="milestone" data-col="10" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
-                  <th class="sortable" onclick="sortTable(11)" style="text-align:center;">Fenestration<button class="col-filter-btn" data-table="milestone" data-col="11" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(3)">Unit No.<button class="col-filter-btn" data-table="milestone" data-col="3" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(4)">Customer Name<button class="col-filter-btn" data-table="milestone" data-col="4" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(5)">Revenue (₹ Cr)<button class="col-filter-btn" data-table="milestone" data-col="5" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(6)" style="text-align:center;">IDSA<button class="col-filter-btn" data-table="milestone" data-col="6" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(7)" style="text-align:center;">GFC<button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(8)" style="text-align:center;">Plaster<button class="col-filter-btn" data-table="milestone" data-col="8" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(9)" style="text-align:center;">Flooring<button class="col-filter-btn" data-table="milestone" data-col="9" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
+                  <th class="sortable" onclick="sortTable(10)" style="text-align:center;">Fenestration<button class="col-filter-btn" data-table="milestone" data-col="10" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button></th>
                 </tr>
               </thead>
               <tbody id="detailsTableBody"></tbody>
@@ -4974,7 +5005,7 @@
       
       <!-- Project / Tower / Phase Slicers -->
       <section class="filter-section">
-        <div class="filter-grid" style="grid-template-columns: repeat(3,1fr);">
+        <div class="filter-grid" style="grid-template-columns: repeat(4,1fr);">
           <div class="filter-card">
             <div class="filter-card-header"><i class="bi bi-folder"></i> Project<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="projectSlicerTower" class="slicer"></div></div>
@@ -4986,6 +5017,10 @@
           <div class="filter-card">
             <div class="filter-card-header"><i class="bi bi-layers"></i> Phase<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
             <div class="filter-card-body"><div id="phaseSlicerViz" class="slicer"></div></div>
+          </div>
+          <div class="filter-card">
+            <div class="filter-card-header"><i class="bi bi-tag"></i> Product Type<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
+            <div class="filter-card-body"><div id="productTypeSlicerViz" class="slicer"></div></div>
           </div>
         </div>
       </section>
@@ -6408,8 +6443,8 @@
     // Reset filters whenever a new activity is opened
     clearMilestoneColumnFilters();
     
-    // Set default sort to revenue column (index 6) in descending order
-    sortColumn = 6;
+    // Set default sort to revenue column (index 5) in descending order
+    sortColumn = 5;
     sortAscending = false;
     
     // Sort by revenue descending initially
@@ -6460,36 +6495,35 @@
     const tbody = document.getElementById(tbodyId);
     tbody.innerHTML = '';
 
-    let totalBalance = 0;
-    let totalBillable = 0;
-    let totalNonBillable = 0;
-    let totalRevenue = 0;
+    let totalBalance = 0, totalBillable = 0, totalNonBillable = 0, totalRevenue = 0;
+    const totalInventoryMap = {};
 
     projects.forEach(project => {
-      // Filter units for this project
-      const projectUnits = data.filter(x => x.Project === project);
-
-      // Calculate balance units (units without this activity completed)
-      const balanceUnits = projectUnits.filter(x => !x[activityField]);
-      const balanceCount = balanceUnits.length;
-
-      // Calculate billable (balance units with revenue > 0)
-      const billableUnits = balanceUnits.filter(x => x[revenueField] > 0);
-      const billableCount = billableUnits.length;
-
-      // Calculate non-billable
+      const projectUnits     = data.filter(x => x.Project === project);
+      const balanceUnits     = projectUnits.filter(x => !x[activityField]);
+      const balanceCount     = balanceUnits.length;
+      const billableUnits    = balanceUnits.filter(x => x[revenueField] > 0);
+      const billableCount    = billableUnits.length;
       const nonBillableCount = balanceCount - billableCount;
+      const revenue          = balanceUnits.reduce((sum, x) => sum + (x[revenueField] || 0), 0) / 10000000;
 
-      // Calculate revenue (sum of revenue for balance units)
-      const revenue = balanceUnits.reduce((sum, x) => sum + (x[revenueField] || 0), 0) / 10000000;
+      // Build per-row inventory breakdown
+      const rowInventoryMap = {};
+      balanceUnits.forEach(x => {
+        const inv = x.Inventory || 'N/A';
+        rowInventoryMap[inv]   = (rowInventoryMap[inv]   || 0) + 1;
+        totalInventoryMap[inv] = (totalInventoryMap[inv] || 0) + 1;
+      });
+      const inventoryDisplay = Object.entries(rowInventoryMap)
+        .sort((a, b) => b[1] - a[1])
+        .map(([k, v]) => `<span class="inv-pill">${k}: ${v}</span>`)
+        .join('');
 
-      // Update totals
-      totalBalance += balanceCount;
-      totalBillable += billableCount;
+      totalBalance     += balanceCount;
+      totalBillable    += billableCount;
       totalNonBillable += nonBillableCount;
-      totalRevenue += revenue;
+      totalRevenue     += revenue;
 
-      // Add row
       tbody.innerHTML += `
         <tr>
           <td class="summary-project-name">${project}</td>
@@ -6497,11 +6531,16 @@
           <td><span class="summary-billable">${billableCount}</span></td>
           <td><span class="summary-non-billable">${nonBillableCount}</span></td>
           <td class="summary-revenue">₹${revenue.toFixed(2)}</td>
+          <td class="summary-inventory">${inventoryDisplay || '—'}</td>
         </tr>`;
     });
 
     // Add total row
     if (projects.length > 0) {
+      const totalInventoryDisplay = Object.entries(totalInventoryMap)
+        .sort((a, b) => b[1] - a[1])
+        .map(([k, v]) => `<span class="inv-pill">${k}: ${v}</span>`)
+        .join('');
       tbody.innerHTML += `
         <tr class="summary-total-row">
           <td><strong>TOTAL</strong></td>
@@ -6509,6 +6548,7 @@
           <td><strong>${totalBillable}</strong></td>
           <td><strong>${totalNonBillable}</strong></td>
           <td><strong>₹${totalRevenue.toFixed(2)}</strong></td>
+          <td>${totalInventoryDisplay || '—'}</td>
         </tr>`;
     }
 
@@ -6518,7 +6558,7 @@
 
   function renderDetailsTable() {
     const tbody = document.getElementById("detailsTableBody");
-    const totalCols = 8 + activeColIds.length;
+    const totalCols = 6 + activeColIds.length;
 
     if (currentDetailsData.length === 0) {
       tbody.innerHTML = `
@@ -6583,11 +6623,9 @@
           <td>${unit.Project || 'N/A'}</td>
           <td>${unit.Phase || 'N/A'}</td>
           <td>${unit.Tower || 'N/A'}</td>
-          <td style="font-size:0.78rem;">${unit.ProductType || '—'}</td>
           <td class="unit-number">${unit.UnitNo}</td>
           <td class="customer-name">${unit.Customer}</td>
           <td class="revenue-cell">₹${revenue}</td>
-          <td style="font-size:0.78rem;">${unit.Inventory || '—'}</td>
           ${optCells}
         </tr>`);
     });
@@ -6609,19 +6647,17 @@
         case 0: valA = a.Project  || ''; valB = b.Project  || ''; break;
         case 1: valA = a.Phase    || ''; valB = b.Phase    || ''; break;
         case 2: valA = a.Tower    || ''; valB = b.Tower    || ''; break;
-        case 3: valA = (a.ProductType || '').toLowerCase(); valB = (b.ProductType || '').toLowerCase(); break;
-        case 4: valA = a.UnitNo   || ''; valB = b.UnitNo   || ''; break;
-        case 5: valA = a.Customer || ''; valB = b.Customer || ''; break;
-        case 6: valA = a[currentRevenueField] || 0; valB = b[currentRevenueField] || 0; break;
-        case 7: valA = (a.Inventory || '').toLowerCase(); valB = (b.Inventory || '').toLowerCase(); break;
+        case 3: valA = a.UnitNo   || ''; valB = b.UnitNo   || ''; break;
+        case 4: valA = a.Customer || ''; valB = b.Customer || ''; break;
+        case 5: valA = a[currentRevenueField] || 0; valB = b[currentRevenueField] || 0; break;
         default: {
-          const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 8]);
+          const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 6]);
           if (col && col.type === 'ctg') { valA = col.calc(a); valB = col.calc(b); }
           else { valA = col && a[col.field] ? 1 : 0; valB = col && b[col.field] ? 1 : 0; }
           break;
         }
       }
-      if (columnIndex === 6 || columnIndex >= 8) return sortAscending ? valA - valB : valB - valA;
+      if (columnIndex >= 5) return sortAscending ? valA - valB : valB - valA;
       if (valA < valB) return sortAscending ? -1 : 1;
       if (valA > valB) return sortAscending ? 1 : -1;
       return 0;
@@ -6686,17 +6722,17 @@
     if (currentDetailsData.length === 0) { alert('No data to download'); return; }
 
     const optLabels = activeColIds.map(id => (OPTIONAL_COLS.find(c => c.id === id) || {label: id}).label);
-    const headers = ['Project', 'Phase', 'Tower', 'Product Type', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', 'Inventory', ...optLabels];
+    const headers = ['Project', 'Phase', 'Tower', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', ...optLabels];
 
     // schema: 't'=text, 'n'=number, 'd'=date, 's'=status-text
-    const schema = ['t','t','t','t','t','t','n','t', ...activeColIds.map(id => {
+    const schema = ['t','t','t','t','t','n', ...activeColIds.map(id => {
       const col = OPTIONAL_COLS.find(c => c.id === id);
       return (col && col.type === 'ctg') ? 'n' : 't';
     })];
 
     const excelData = [headers];
     const totalRevenue = currentDetailsData.reduce((s, u) => s + (u[currentRevenueField] || 0), 0) / 10000000;
-    excelData.push(['TOTAL', '', '', '', `${currentDetailsData.length} Units`, '', totalRevenue, '', ...activeColIds.map(() => '')]);
+    excelData.push(['TOTAL', '', '', `${currentDetailsData.length} Units`, '', totalRevenue, ...activeColIds.map(() => '')]);
 
     currentDetailsData.forEach(unit => {
       const revenue = (unit[currentRevenueField] || 0) / 10000000;
@@ -6707,7 +6743,7 @@
         return unit[col.field] ? 'Done' : 'Pending';
       });
       excelData.push([unit.Project||'N/A', unit.Phase||'N/A', unit.Tower||'N/A',
-        unit.ProductType||'', unit.UnitNo, unit.Customer, revenue, unit.Inventory||'', ...optVals]);
+        unit.UnitNo, unit.Customer, revenue, ...optVals]);
     });
 
     const wb = XLSX.utils.book_new();
@@ -7336,13 +7372,11 @@
       case 0: return (unit.Project  || '').toString();
       case 1: return (unit.Phase    || '').toString();
       case 2: return (unit.Tower    || '').toString();
-      case 3: return (unit.ProductType || '').toString();
-      case 4: return (unit.UnitNo   || '').toString();
-      case 5: return (unit.Customer || '').toString();
-      case 6: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
-      case 7: return (unit.Inventory || '').toString();
+      case 3: return (unit.UnitNo   || '').toString();
+      case 4: return (unit.Customer || '').toString();
+      case 5: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
       default: {
-        const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - 8]);
+        const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - 6]);
         if (!col) return '';
         if (col.type === 'ctg') return (col.calc(unit) / 10000000).toFixed(2);
         return col.field ? (unit[col.field] ? 'Done' : 'Pending') : '';
@@ -8293,6 +8327,7 @@
   // Build tower project slicer
   let selectedTowerViz = new Set();
   let selectedPhaseViz = new Set();
+  let selectedProductTypeViz = new Set();
 
   function buildTowerProjectSlicer() {
     const projects = [...new Set(raw.map(r => r.Project))].filter(Boolean).sort();
@@ -8309,8 +8344,10 @@
       selectedProjectTower = null;
       selectedTowerViz.clear();
       selectedPhaseViz.clear();
+      selectedProductTypeViz.clear();
       buildVizTowerSlicer(null, true);  // all-projects mode
       buildVizPhaseSlicer(null, true);
+      buildVizProductTypeSlicer();
       renderTowerVisualization();
     };
     el.appendChild(allBtn);
@@ -8325,16 +8362,19 @@
         selectedProjectTower = proj;
         selectedTowerViz.clear();
         selectedPhaseViz.clear();
+        selectedProductTypeViz.clear();
         buildVizTowerSlicer(proj);
         buildVizPhaseSlicer(proj);
+        buildVizProductTypeSlicer();
         renderTowerVisualization();
       };
       el.appendChild(btn);
     });
 
-    // Default: All selected → populate Tower/Phase slicers across all projects and render
+    // Default: All selected → populate Tower/Phase/ProductType slicers across all projects and render
     buildVizTowerSlicer(null, true);
     buildVizPhaseSlicer(null, true);
+    buildVizProductTypeSlicer();
     renderTowerVisualization();
   }
 
@@ -8505,6 +8545,7 @@
     // ── Single project selected → existing behaviour ──────────
     if (selectedProjectTower) {
       _renderProjectUnits(container, projectData, selectedProjectTower);
+      applyProductTypeHighlight();
       return;
     }
 
@@ -8537,6 +8578,7 @@
       const body = section.querySelector('.proj-section-body');
       _renderProjectUnits(body, units, projName);
     });
+    applyProductTypeHighlight();
   }
 
   // ── Internal: render one project's units into a container ───
@@ -8646,6 +8688,7 @@
               towerHTML += `
                 <div class="tower-unit ${stageClass} ${soldClass}" 
                      data-unit="${unitNoDisplay}"
+                     data-producttype="${unit.ProductType || ''}"
                      onclick='showUnitDetail(${unitJson})'
                      title="${unitNoDisplay}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}">
                   ${unitNoDisplay}
@@ -8668,7 +8711,67 @@
       container.innerHTML += towerHTML;
   }
   
-  function getStageName(stage) {
+  function buildVizProductTypeSlicer() {
+    const el = document.getElementById('productTypeSlicerViz');
+    if (!el) return;
+    el.innerHTML = '';
+    const ptypes = [...new Set(raw.map(r => r.ProductType).filter(Boolean))].sort();
+
+    const allBtn = document.createElement('button');
+    allBtn.textContent = 'All';
+    allBtn.classList.add('active');
+    allBtn.onclick = () => {
+      selectedProductTypeViz.clear();
+      el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      allBtn.classList.add('active');
+      applyProductTypeHighlight();
+    };
+    el.appendChild(allBtn);
+
+    ptypes.forEach(pt => {
+      const btn = document.createElement('button');
+      btn.textContent = pt;
+      btn.dataset.value = pt;
+      btn.onclick = (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          if (selectedProductTypeViz.has(pt)) {
+            selectedProductTypeViz.delete(pt);
+            btn.classList.remove('active');
+          } else {
+            selectedProductTypeViz.add(pt);
+            btn.classList.add('active');
+          }
+        } else {
+          selectedProductTypeViz.clear();
+          el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+          selectedProductTypeViz.add(pt);
+          btn.classList.add('active');
+        }
+        allBtn.classList.toggle('active', selectedProductTypeViz.size === 0);
+        applyProductTypeHighlight();
+      };
+      el.appendChild(btn);
+    });
+  }
+
+  function applyProductTypeHighlight() {
+    const allUnits = document.querySelectorAll('.tower-unit:not(.empty), .villa-unit:not(.empty)');
+    if (selectedProductTypeViz.size === 0) {
+      allUnits.forEach(u => u.classList.remove('pt-highlighted', 'pt-dimmed'));
+      return;
+    }
+    allUnits.forEach(u => {
+      const pt = u.dataset.producttype || '';
+      u.classList.remove('pt-highlighted', 'pt-dimmed');
+      if (selectedProductTypeViz.has(pt)) {
+        u.classList.add('pt-highlighted');
+      } else {
+        u.classList.add('pt-dimmed');
+      }
+    });
+  }
+
+    function getStageName(stage) {
     const names = {
       0: 'Scope',
       1: 'Sold',
@@ -8991,6 +9094,7 @@
           blockHTML += `
             <div class="villa-unit ${stageClass}" 
                  data-unit="${unit.UnitNo}"
+                 data-producttype="${unit.ProductType || ''}"
                  onclick='showUnitDetail(${unitJson})'
                  title="${unit.UnitNo}&#10;Customer: ${unit.Customer || 'N/A'}&#10;Stage: ${getStageName(unit.stage)}">
               ${unit.UnitNo}
@@ -10505,8 +10609,7 @@
     if (!sortRow) return;
     const fixed = [
       {label:'Project',ci:0},{label:'Phase',ci:1},{label:'Tower',ci:2},
-      {label:'Product Type',ci:3},{label:'Unit No.',ci:4},{label:'Customer Name',ci:5},
-      {label:'Revenue (₹ Cr)',ci:6},{label:'Inventory',ci:7}
+      {label:'Unit No.',ci:3},{label:'Customer Name',ci:4},{label:'Revenue (₹ Cr)',ci:5}
     ];
     let h = fixed.map(f => `
       <th class="sortable" onclick="sortTable(${f.ci})">${f.label}
@@ -10514,7 +10617,7 @@
       </th>`).join('');
     activeColIds.forEach((id, i) => {
       const col = OPTIONAL_COLS.find(c => c.id === id); if (!col) return;
-      const ci = 8 + i;
+      const ci = 6 + i;
       h += `<th class="sortable" onclick="sortTable(${ci})" style="text-align:center;">${col.label}
         <button class="col-filter-btn" data-table="milestone" data-col="${ci}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button>
       </th>`;
