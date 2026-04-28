@@ -5347,8 +5347,8 @@
   const ONEDRIVE_SHELL_URL = 'https://totalenvmt-my.sharepoint.com/:x:/g/personal/karthick_dhanasekaran_total-environment_com/IQDInPJ-48rWRLtrNZ6Mli9wAXOaeBEioDH7HQBywcBcyzg?e=rEONty&download=1';
 
   // Exact worksheet (tab) names inside the Excel file  ← MUST MATCH EXACTLY
-  const MAIN_SHEET_NAME  = 'Goals Dashboard - Master';           // e.g. 'Master Data', 'Units'
-  const SHELL_SHEET_NAME = 'Shell - Master';   // e.g. 'Shell - Master', 'Slab Tracker'
+  const MAIN_SHEET_NAME  = 'Goals Dashboard - Master';  // e.g. 'Master Data', 'Units'
+  const SHELL_SHEET_NAME = 'Shell - Master';            // e.g. 'Shell - Master', 'Slab Tracker'
 
   //// AUTH GATE — credentials
   // ========================================
@@ -5524,10 +5524,28 @@
     try {
       console.log('Fetching data from OneDrive Business...');
 
+      // ── CORS-safe fetch helper ─────────────────────────────────────────────
+      // OneDrive Business share links block direct cross-origin requests from
+      // GitHub Pages (CORS policy). We route through corsproxy.io which adds
+      // the necessary Access-Control-Allow-Origin header.
+      // corsproxy.io is a free, open-source proxy — no sign-up required.
+      async function proxyFetch(url) {
+        const PROXY = 'https://corsproxy.io/?url=';
+        try {
+          // Try direct first (works if tenant allows CORS)
+          const direct = await fetch(url, { cache: 'no-cache' });
+          if (direct.ok) return direct;
+          throw new Error('Direct fetch returned: ' + direct.status);
+        } catch (_) {
+          console.warn('Direct fetch blocked (likely CORS). Retrying via corsproxy.io...');
+          return fetch(PROXY + encodeURIComponent(url), { cache: 'no-cache' });
+        }
+      }
+
       // ── Step 1: Fetch Excel file(s) as binary buffers ──────────────────
       const [mainResponse, shellResponse] = await Promise.all([
-        fetch(ONEDRIVE_EXCEL_URL, { cache: 'no-cache' }),
-        fetch(ONEDRIVE_SHELL_URL, { cache: 'no-cache' }).catch(err => {
+        proxyFetch(ONEDRIVE_EXCEL_URL),
+        proxyFetch(ONEDRIVE_SHELL_URL).catch(err => {
           console.warn('Shell Master fetch error:', err);
           return null;
         })
