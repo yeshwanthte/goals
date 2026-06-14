@@ -1005,6 +1005,69 @@
       transition: width 0.6s ease;
     }
 
+    /* --- Activity Summary: CTG + Billable/Non-Billable columns --- */
+    .cell-ctg {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0.5rem;
+      display: inline-block;
+    }
+    .cell-ctg-bill {
+      background: var(--success-light);
+      color: var(--success);
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0.5rem;
+      display: inline-block;
+    }
+    .cell-ctg-nonbill {
+      background: var(--gray-100);
+      color: var(--gray-600);
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0.5rem;
+      display: inline-block;
+    }
+
+    /* Total CTG header toggle — inherits the existing th typography */
+    .ctg-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font: inherit;
+      color: inherit;
+      text-transform: inherit;
+      letter-spacing: inherit;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .ctg-toggle:hover { color: var(--primary); }
+    .ctg-toggle-icon { font-size: 0.8rem; transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+    #activitySummaryTable.ctg-expanded .ctg-toggle-icon { transform: rotate(90deg); }
+
+    /* Collapsible split columns — smooth, minimal reveal */
+    .activity-table .ctg-split {
+      max-width: 0;
+      padding-left: 0;
+      padding-right: 0;
+      opacity: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.3s ease,
+                  padding 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #activitySummaryTable.ctg-expanded .ctg-split {
+      max-width: 160px;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      opacity: 1;
+    }
+
     /* Details Table */
     .details-section {
       margin-top: 1.5rem;
@@ -4408,15 +4471,26 @@
         <div class="card-header-custom">
           <h5><i class="bi bi-clipboard-data"></i> Activity Summary</h5>
         </div>
-        <div class="card-body-custom" style="padding: 0;">
-          <table class="activity-table">
+        <div class="card-body-custom" style="padding: 0; overflow-x: auto;">
+          <table class="activity-table" id="activitySummaryTable">
             <thead>
               <tr>
                 <th>Activity</th>
                 <th>Scope</th>
                 <th>Done</th>
                 <th>Balance</th>
+                <th>Billable</th>
+                <th>Non-Billable</th>
                 <th>Revenue (₹ Cr)</th>
+                <th class="ctg-total-th">
+                  <button type="button" class="ctg-toggle" onclick="toggleActivityCTG()"
+                          title="Show Billable / Non-Billable split" aria-label="Toggle CTG split">
+                    <span>Total CTG</span>
+                    <i class="bi bi-chevron-right ctg-toggle-icon"></i>
+                  </button>
+                </th>
+                <th class="ctg-split">CTG – Billable</th>
+                <th class="ctg-split">CTG – Non-Billable</th>
               </tr>
             </thead>
             <tbody id="activityTable"></tbody>
@@ -6329,17 +6403,47 @@
       ["Ready for Handover", scope, d.filter(x => x.Hand).length, d.filter(x => !x.Hand).reduce((s, x) => s + x.HandRev, 0), "Hand"]
     ];
 
+    // Billable / Non-Billable + CTG apply only to these three milestones.
+    const ctgConfig = {
+      Plaster: { field: "Plaster", revField: "PlasterRev", ctgFn: computeCtgUnit },
+      Floor:   { field: "Floor",   revField: "FloorRev",   ctgFn: computeCtgFloorUnit },
+      Hand:    { field: "Hand",    revField: "HandRev",    ctgFn: computeCtgHandoverUnit }
+    };
+    const dash = '<span style="color:#ccc">—</span>';
+
     const tb = document.getElementById("activityTable");
     tb.innerHTML = "";
     rows.forEach(r => {
       const bal = r[1] - r[2];
       const rev = r[3] != null ? (r[3] / 10000000).toFixed(2) : "";
       const pct = r[1] > 0 ? Math.round((r[2] / r[1]) * 100) : 0;
-      
+
       // Check if activity is clickable
       const isClickable = ["Plaster", "Flooring & Dado", "Ready for Handover"].includes(r[0]);
       const activityKey = r[4];
-      
+
+      // Billable / Non-Billable counts + CTG amounts (revenue milestones only)
+      const cfg = ctgConfig[activityKey];
+      let billableCell = dash, nonBillableCell = dash;
+      let ctgTotalCell = dash, ctgBillCell = dash, ctgNonBillCell = dash;
+
+      if (cfg) {
+        const balanceUnits = d.filter(x => !x[cfg.field]);
+        const billUnits    = balanceUnits.filter(x => x[cfg.revField] > 0);
+        const billCount    = billUnits.length;
+        const nonBillCount = balanceUnits.length - billCount;
+
+        const ctgBill    = billUnits.reduce((s, x) => s + cfg.ctgFn(x), 0);
+        const ctgTotal   = balanceUnits.reduce((s, x) => s + cfg.ctgFn(x), 0);
+        const ctgNonBill = ctgTotal - ctgBill;
+
+        billableCell    = `<span class="summary-billable">${billCount}</span>`;
+        nonBillableCell = `<span class="summary-non-billable">${nonBillCount}</span>`;
+        ctgTotalCell    = `<span class="cell-ctg">₹${(ctgTotal   / 10000000).toFixed(2)}</span>`;
+        ctgBillCell     = `<span class="cell-ctg-bill">₹${(ctgBill    / 10000000).toFixed(2)}</span>`;
+        ctgNonBillCell  = `<span class="cell-ctg-nonbill">₹${(ctgNonBill / 10000000).toFixed(2)}</span>`;
+      }
+
       tb.innerHTML += `
         <tr class="${isClickable ? 'clickable' : ''}" ${isClickable ? `onclick="showDetails('${activityKey}', '${r[0]}')"` : ''}>
           <td>
@@ -6354,7 +6458,12 @@
           <td class="cell-scope">${r[1]}</td>
           <td class="cell-complete">${r[2]}</td>
           <td><span class="cell-balance">${bal}</span></td>
-          <td>${rev ? `<span class="cell-revenue">₹${rev}</span>` : '<span style="color:#ccc">—</span>'}</td>
+          <td>${billableCell}</td>
+          <td>${nonBillableCell}</td>
+          <td>${rev ? `<span class="cell-revenue">₹${rev}</span>` : dash}</td>
+          <td class="ctg-total-cell">${ctgTotalCell}</td>
+          <td class="ctg-split">${ctgBillCell}</td>
+          <td class="ctg-split">${ctgNonBillCell}</td>
         </tr>`;
     });
 
@@ -6396,6 +6505,14 @@
     
     // Update slicer highlighting
     updateSlicerHighlighting();
+  }
+
+  // Activity Summary — expand/collapse the CTG Billable / Non-Billable split
+  var activityCtgExpanded = false;
+  function toggleActivityCTG() {
+    activityCtgExpanded = !activityCtgExpanded;
+    var tbl = document.getElementById('activitySummaryTable');
+    if (tbl) tbl.classList.toggle('ctg-expanded', activityCtgExpanded);
   }
 
   function showDetails(activityKey, activityName) {
