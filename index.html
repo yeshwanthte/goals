@@ -1068,6 +1068,28 @@
       opacity: 1;
     }
 
+    /* Balance group toggle — Billable / Non-Billable collapse under Balance */
+    .bal-toggle-icon { font-size: 0.8rem; transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+    #activitySummaryTable.bal-expanded .bal-toggle-icon { transform: rotate(90deg); }
+
+    .activity-table .bal-split {
+      max-width: 0;
+      padding-left: 0;
+      padding-right: 0;
+      opacity: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.3s ease,
+                  padding 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #activitySummaryTable.bal-expanded .bal-split {
+      max-width: 160px;
+      padding-left: 1rem;
+      padding-right: 1rem;
+      opacity: 1;
+    }
+
     /* Details Table */
     .details-section {
       margin-top: 1.5rem;
@@ -4478,9 +4500,15 @@
                 <th>Activity</th>
                 <th>Scope</th>
                 <th>Done</th>
-                <th>Balance</th>
-                <th>Billable</th>
-                <th>Non-Billable</th>
+                <th class="bal-total-th">
+                  <button type="button" class="ctg-toggle" onclick="toggleActivityBalance()"
+                          title="Show Billable / Non-Billable split" aria-label="Toggle Balance split">
+                    <span>Balance</span>
+                    <i class="bi bi-chevron-right bal-toggle-icon"></i>
+                  </button>
+                </th>
+                <th class="bal-split">Billable</th>
+                <th class="bal-split">Non-Billable</th>
                 <th>Revenue (₹ Cr)</th>
                 <th class="ctg-total-th">
                   <button type="button" class="ctg-toggle" onclick="toggleActivityCTG()"
@@ -6458,8 +6486,8 @@
           <td class="cell-scope">${r[1]}</td>
           <td class="cell-complete">${r[2]}</td>
           <td><span class="cell-balance">${bal}</span></td>
-          <td>${billableCell}</td>
-          <td>${nonBillableCell}</td>
+          <td class="bal-split">${billableCell}</td>
+          <td class="bal-split">${nonBillableCell}</td>
           <td>${rev ? `<span class="cell-revenue">₹${rev}</span>` : dash}</td>
           <td class="ctg-total-cell">${ctgTotalCell}</td>
           <td class="ctg-split">${ctgBillCell}</td>
@@ -6513,6 +6541,14 @@
     activityCtgExpanded = !activityCtgExpanded;
     var tbl = document.getElementById('activitySummaryTable');
     if (tbl) tbl.classList.toggle('ctg-expanded', activityCtgExpanded);
+  }
+
+  // Activity Summary — expand/collapse the Billable / Non-Billable split under Balance
+  var activityBalExpanded = false;
+  function toggleActivityBalance() {
+    activityBalExpanded = !activityBalExpanded;
+    var tbl = document.getElementById('activitySummaryTable');
+    if (tbl) tbl.classList.toggle('bal-expanded', activityBalExpanded);
   }
 
   function showDetails(activityKey, activityName) {
