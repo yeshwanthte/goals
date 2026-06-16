@@ -4239,6 +4239,200 @@
       transform: scale(1.10);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
+    /* ════════ PROJECT SUMMARY TAB ════════ */
+    .ps-wrap { display: flex; flex-direction: column; gap: 1.25rem; }
+    .ps-card {
+      background: #fff;
+      border: 1px solid var(--gray-200, #e5e7eb);
+      border-radius: var(--radius, 14px);
+      box-shadow: 0 1px 3px rgba(16,24,40,0.04), 0 1px 2px rgba(16,24,40,0.06);
+      overflow: hidden;
+    }
+    .ps-card-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--gray-100, #f1f3f5);
+      background: linear-gradient(180deg, #fff 0%, #fcfcfd 100%);
+    }
+    .ps-card-head h5 {
+      margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--gray-800, #1f2937);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .ps-card-head h5 i { color: var(--primary, #C65911); }
+    .ps-count-badge {
+      background: var(--primary-light, #FCE7DC); color: var(--primary-dark, #833C0C);
+      font-size: 0.72rem; font-weight: 700; padding: 2px 9px; border-radius: 999px; margin-left: 4px;
+    }
+
+    /* Slicers */
+    .ps-slicer-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem 1.5rem; padding: 1.25rem;
+    }
+    .ps-slicer label {
+      display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--gray-500, #6b7280); margin-bottom: 0.5rem;
+    }
+    .ps-chiprow { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .ps-chip {
+      font-size: 0.78rem; font-weight: 600; padding: 0.34rem 0.7rem; border-radius: 999px;
+      border: 1px solid var(--gray-200, #e5e7eb); background: #fff; color: var(--gray-600, #4b5563);
+      cursor: pointer; transition: all 0.2s cubic-bezier(0.4,0,0.2,1); white-space: nowrap;
+    }
+    .ps-chip:hover { border-color: var(--primary, #C65911); color: var(--primary, #C65911); }
+    .ps-chip.active {
+      background: var(--primary, #C65911); border-color: var(--primary, #C65911); color: #fff;
+      box-shadow: 0 2px 6px rgba(198,89,17,0.25);
+    }
+    .ps-search, .ps-daterow {
+      display: flex; align-items: center; gap: 0.5rem;
+      border: 1px solid var(--gray-200, #e5e7eb); border-radius: 10px; padding: 0.5rem 0.7rem; background: #fff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .ps-search:focus-within, .ps-daterow:focus-within {
+      border-color: var(--primary, #C65911); box-shadow: 0 0 0 3px rgba(198,89,17,0.1);
+    }
+    .ps-search i { color: var(--gray-400, #9ca3af); font-size: 0.85rem; }
+    .ps-search input, .ps-daterow input {
+      border: none; outline: none; font-size: 0.85rem; color: var(--gray-800, #1f2937);
+      background: transparent; width: 100%; font-family: inherit;
+    }
+    .ps-daterow input[type="date"] { width: auto; flex: 1; color: var(--gray-700, #374151); }
+    .ps-dash { color: var(--gray-400, #9ca3af); }
+    .ps-date-clear {
+      border: none; background: var(--gray-100, #f1f3f5); color: var(--gray-500, #6b7280);
+      width: 24px; height: 24px; border-radius: 6px; cursor: pointer; flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center; font-size: 0.7rem;
+    }
+    .ps-date-clear:hover { background: var(--primary-light, #FCE7DC); color: var(--primary, #C65911); }
+    .ps-clear-btn {
+      border: 1px solid var(--gray-200, #e5e7eb); background: #fff; color: var(--gray-600, #4b5563);
+      font-size: 0.78rem; font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 8px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.2s;
+    }
+    .ps-clear-btn:hover { border-color: var(--primary, #C65911); color: var(--primary, #C65911); }
+    .ps-daterange-note {
+      margin: 0 1.25rem 1rem; padding: 0.6rem 0.9rem; border-radius: 8px;
+      background: var(--primary-light, #FCE7DC); color: var(--primary-dark, #833C0C);
+      font-size: 0.78rem; font-weight: 600;
+    }
+
+    /* KPI section */
+    .ps-kpi-head { display: flex; align-items: center; justify-content: space-between; margin-top: 0.25rem; }
+    .ps-section-label {
+      font-size: 0.95rem; font-weight: 700; color: var(--gray-800, #1f2937);
+      display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .ps-section-label i { color: var(--primary, #C65911); }
+    .ps-customize-btn {
+      border: 1px solid var(--primary, #C65911); background: #fff; color: var(--primary, #C65911);
+      font-size: 0.8rem; font-weight: 600; padding: 0.45rem 0.9rem; border-radius: 8px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.45rem; transition: all 0.2s;
+    }
+    .ps-customize-btn:hover { background: var(--primary, #C65911); color: #fff; }
+    .ps-kpi-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 0.9rem;
+    }
+    .ps-kpi {
+      background: #fff; border: 1px solid var(--gray-200, #e5e7eb); border-radius: 14px;
+      padding: 1rem 1.1rem; cursor: pointer; position: relative; overflow: hidden;
+      transition: transform 0.18s cubic-bezier(0.4,0,0.2,1), box-shadow 0.18s, border-color 0.18s;
+    }
+    .ps-kpi::before {
+      content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+      background: var(--primary, #C65911); opacity: 0; transition: opacity 0.18s;
+    }
+    .ps-kpi:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(16,24,40,0.08); }
+    .ps-kpi.selected { border-color: var(--primary, #C65911); box-shadow: 0 6px 18px rgba(198,89,17,0.18); }
+    .ps-kpi.selected::before { opacity: 1; }
+    .ps-kpi-label {
+      font-size: 0.74rem; font-weight: 600; color: var(--gray-500, #6b7280);
+      text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 0.5rem; line-height: 1.3;
+    }
+    .ps-kpi-value { font-size: 1.7rem; font-weight: 800; color: var(--gray-900, #111827); line-height: 1; }
+    .ps-kpi-tag {
+      position: absolute; top: 0.7rem; right: 0.7rem; font-size: 0.6rem; font-weight: 700;
+      padding: 1px 6px; border-radius: 5px; background: #FCE7DC; color: #C65911; letter-spacing: 0.03em;
+    }
+
+    /* Table */
+    .ps-table-scroll { overflow-x: auto; }
+    .ps-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .ps-table thead th {
+      position: sticky; top: 0; background: var(--gray-50, #f9fafb); z-index: 1;
+      text-align: left; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em;
+      text-transform: uppercase; color: var(--gray-500, #6b7280);
+      padding: 0.8rem 1rem; border-bottom: 1px solid var(--gray-200, #e5e7eb);
+      cursor: pointer; user-select: none; white-space: nowrap;
+    }
+    .ps-table thead th:hover { color: var(--primary, #C65911); }
+    .ps-sort-ico { font-size: 0.7rem; opacity: 0.5; margin-left: 2px; }
+    .ps-table tbody td {
+      padding: 0.72rem 1rem; border-bottom: 1px solid var(--gray-100, #f1f3f5); color: var(--gray-700, #374151);
+    }
+    .ps-table tbody tr:hover { background: var(--primary-light, #FCE7DC); }
+    .ps-table tbody tr:hover td { color: var(--primary-dark, #833C0C); }
+    .ps-ctg-cell { text-align: right; font-weight: 700; color: var(--primary-dark, #833C0C); font-variant-numeric: tabular-nums; }
+    .ps-table tfoot td {
+      padding: 0.8rem 1rem; font-weight: 800; color: var(--gray-900, #111827);
+      border-top: 2px solid var(--gray-200, #e5e7eb); background: var(--gray-50, #f9fafb);
+    }
+    .ps-empty { text-align: center; color: var(--gray-400, #9ca3af); padding: 2.5rem 1rem; font-size: 0.9rem; }
+    .ps-excel-btn {
+      border: none; background: #1d6f42; color: #fff; font-size: 0.8rem; font-weight: 600;
+      padding: 0.5rem 0.95rem; border-radius: 8px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.45rem; transition: background 0.2s, transform 0.1s;
+    }
+    .ps-excel-btn:hover { background: #18603a; }
+    .ps-excel-btn:active { transform: scale(0.97); }
+
+    /* Slide pane */
+    .ps-pane-overlay {
+      position: fixed; inset: 0; background: rgba(17,24,39,0.35); opacity: 0; visibility: hidden;
+      transition: opacity 0.3s; z-index: 1200;
+    }
+    .ps-pane-overlay.open { opacity: 1; visibility: visible; }
+    .ps-pane {
+      position: fixed; top: 0; right: 0; height: 100%; width: 360px; max-width: 88vw; background: #fff;
+      box-shadow: -8px 0 32px rgba(16,24,40,0.18); z-index: 1201;
+      transform: translateX(100%); transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+      display: flex; flex-direction: column;
+    }
+    .ps-pane.open { transform: translateX(0); }
+    .ps-pane-head {
+      display: flex; align-items: center; justify-content: space-between; padding: 1.25rem;
+      border-bottom: 1px solid var(--gray-100, #f1f3f5);
+    }
+    .ps-pane-head h5 { margin: 0; font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+    .ps-pane-head h5 i { color: var(--primary, #C65911); }
+    .ps-pane-x { border: none; background: var(--gray-100, #f1f3f5); width: 30px; height: 30px; border-radius: 8px; cursor: pointer; color: var(--gray-600, #4b5563); }
+    .ps-pane-x:hover { background: var(--primary-light, #FCE7DC); color: var(--primary, #C65911); }
+    .ps-pane-sub { padding: 0.9rem 1.25rem 0.3rem; font-size: 0.8rem; color: var(--gray-500, #6b7280); }
+    .ps-pane-list { flex: 1; overflow-y: auto; padding: 0.5rem 1.25rem; }
+    .ps-pane-item {
+      display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 0.2rem;
+      border-bottom: 1px solid var(--gray-100, #f1f3f5);
+    }
+    .ps-pane-item span { font-size: 0.86rem; color: var(--gray-700, #374151); font-weight: 500; }
+    .ps-toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+    .ps-toggle input { opacity: 0; width: 0; height: 0; }
+    .ps-toggle-track {
+      position: absolute; inset: 0; background: var(--gray-300, #d1d5db); border-radius: 999px;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .ps-toggle-track::before {
+      content: ""; position: absolute; left: 3px; top: 3px; width: 16px; height: 16px;
+      background: #fff; border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .ps-toggle input:checked + .ps-toggle-track { background: var(--primary, #C65911); }
+    .ps-toggle input:checked + .ps-toggle-track::before { transform: translateX(18px); }
+    .ps-pane-foot { display: flex; gap: 0.6rem; padding: 1rem 1.25rem; border-top: 1px solid var(--gray-100, #f1f3f5); }
+    .ps-pane-reset { flex: 1; border: 1px solid var(--gray-200, #e5e7eb); background: #fff; color: var(--gray-600, #4b5563); font-weight: 600; padding: 0.6rem; border-radius: 8px; cursor: pointer; }
+    .ps-pane-reset:hover { border-color: var(--primary, #C65911); color: var(--primary, #C65911); }
+    .ps-pane-apply { flex: 2; border: none; background: var(--primary, #C65911); color: #fff; font-weight: 700; padding: 0.6rem; border-radius: 8px; cursor: pointer; }
+    .ps-pane-apply:hover { background: var(--primary-dark, #833C0C); }
+
+    @media (max-width: 900px) { .ps-slicer-grid { grid-template-columns: 1fr; } }
+
   </style>
 </head>
 
@@ -4379,6 +4573,10 @@
     <button class="tab-button" onclick="switchTab('shelltracker')">
       <i class="bi bi-building-fill-gear"></i>
       Shell Tracker
+    </button>
+    <button class="tab-button" onclick="switchTab('projectsummary')">
+      <i class="bi bi-clipboard2-data"></i>
+      Project Summary
     </button>
   </div>
 
@@ -5297,6 +5495,104 @@
   </div>
   <!-- End Shell Tracker Tab -->
 
+  <!-- Project Summary Tab Content -->
+  <div class="tab-content" id="projectSummaryTab">
+    <div class="ps-wrap">
+
+      <!-- Slicers -->
+      <div class="ps-card ps-slicer-card">
+        <div class="ps-card-head">
+          <h5><i class="bi bi-funnel"></i> Filters</h5>
+          <button class="ps-clear-btn" onclick="psClearAll()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+        </div>
+        <div class="ps-slicer-grid">
+          <div class="ps-slicer">
+            <label>Project</label>
+            <div class="ps-chiprow" id="psProjectChips"></div>
+          </div>
+          <div class="ps-slicer">
+            <label>Tower</label>
+            <div class="ps-chiprow" id="psTowerChips"></div>
+          </div>
+          <div class="ps-slicer">
+            <label>Phase</label>
+            <div class="ps-chiprow" id="psPhaseChips"></div>
+          </div>
+          <div class="ps-slicer">
+            <label>Search by Unit Number</label>
+            <div class="ps-search"><i class="bi bi-search"></i>
+              <input type="text" id="psUnitSearch" placeholder="e.g. A-1203" oninput="renderProjectSummary()">
+            </div>
+          </div>
+          <div class="ps-slicer">
+            <label>Search by Customer Name</label>
+            <div class="ps-search"><i class="bi bi-search"></i>
+              <input type="text" id="psCustSearch" placeholder="Customer name" oninput="renderProjectSummary()">
+            </div>
+          </div>
+          <div class="ps-slicer">
+            <label>Date Range</label>
+            <div class="ps-daterow">
+              <input type="date" id="psDateFrom" onchange="renderProjectSummary()">
+              <span class="ps-dash">–</span>
+              <input type="date" id="psDateTo" onchange="renderProjectSummary()">
+              <button class="ps-date-clear" onclick="psClearDates()" title="Clear dates"><i class="bi bi-x-lg"></i></button>
+            </div>
+          </div>
+        </div>
+        <div class="ps-daterange-note" id="psDateNote" style="display:none;"></div>
+      </div>
+
+      <!-- KPI Section -->
+      <div class="ps-kpi-head">
+        <span class="ps-section-label"><i class="bi bi-speedometer2"></i> Key Metrics</span>
+        <button class="ps-customize-btn" onclick="psOpenPane()"><i class="bi bi-sliders"></i> Customize KPIs</button>
+      </div>
+      <div class="ps-kpi-grid" id="psKpiGrid"></div>
+
+      <!-- Table -->
+      <div class="ps-card ps-table-card">
+        <div class="ps-card-head">
+          <h5><i class="bi bi-table"></i> Units <span class="ps-count-badge" id="psRowCount">0</span></h5>
+          <button class="ps-excel-btn" onclick="psExportExcel()"><i class="bi bi-file-earmark-excel"></i> Download Excel</button>
+        </div>
+        <div class="ps-table-scroll">
+          <table class="ps-table" id="psTable">
+            <thead>
+              <tr>
+                <th onclick="psSortBy(0)">Project <i class="bi ps-sort-ico" data-c="0"></i></th>
+                <th onclick="psSortBy(1)">Phase <i class="bi ps-sort-ico" data-c="1"></i></th>
+                <th onclick="psSortBy(2)">Tower <i class="bi ps-sort-ico" data-c="2"></i></th>
+                <th onclick="psSortBy(3)">Unit No. <i class="bi ps-sort-ico" data-c="3"></i></th>
+                <th onclick="psSortBy(4)">Customer Name <i class="bi ps-sort-ico" data-c="4"></i></th>
+                <th onclick="psSortBy(5)" style="text-align:right;">Total CTG (₹ Cr) <i class="bi ps-sort-ico" data-c="5"></i></th>
+              </tr>
+            </thead>
+            <tbody id="psTableBody"></tbody>
+            <tfoot id="psTableFoot"></tfoot>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Custom KPI Slide Pane -->
+    <div class="ps-pane-overlay" id="psPaneOverlay" onclick="psClosePane()"></div>
+    <div class="ps-pane" id="psPane">
+      <div class="ps-pane-head">
+        <h5><i class="bi bi-sliders"></i> Customize KPIs</h5>
+        <button class="ps-pane-x" onclick="psClosePane()"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="ps-pane-sub">Toggle the optional metrics you want to see on the dashboard.</div>
+      <div class="ps-pane-list" id="psPaneList"></div>
+      <div class="ps-pane-foot">
+        <button class="ps-pane-reset" onclick="psResetPane()">Reset</button>
+        <button class="ps-pane-apply" onclick="psApplyPane()">Apply</button>
+      </div>
+    </div>
+  </div>
+  <!-- End Project Summary Tab -->
+
 
   <!-- Empty State -->
   <div class="empty-state" id="emptyState">
@@ -6051,6 +6347,9 @@
 
     // Build shell tracker
     buildShellTrackerSlicers();
+
+    // Build Project Summary tab
+    buildProjectSummary();
   }
 
   // ===== SHELL MASTER SHEET PARSER =====
@@ -6917,6 +7216,9 @@
       document.getElementById('towerTab').classList.add('active');
     } else if (tabName === 'shelltracker') {
       document.getElementById('shellTrackerTab').classList.add('active');
+    } else if (tabName === 'projectsummary') {
+      document.getElementById('projectSummaryTab').classList.add('active');
+      renderProjectSummary();
     }
   }
 
@@ -11020,6 +11322,281 @@
   // ===== END PA COLUMN CUSTOMISER =====
 
   // ===== END SETTINGS MODAL =====
+
+  // ═══════════════════════════════════════════════════════════
+  // PROJECT SUMMARY TAB
+  // Reuses global `raw`, parseDate(), computeCtg*() and XLSX.
+  // ═══════════════════════════════════════════════════════════
+  // KPI catalogue. kind: scope | bool | date.
+  // core   → always shown in default view
+  // optional → shown in default view only when toggled on in the pane
+  // dateShow → shown when a date range is active
+  var PS_KPIS = [
+    { id:'scope',     label:'Scope',               kind:'scope',                core:true,  optional:false, dateShow:false },
+    { id:'sold',      label:'Sold',                kind:'bool', field:'Sold',   core:true,  optional:false, dateShow:false },
+    { id:'idsa',      label:'IDSA',                kind:'date', field:'IDSADate',    core:false, optional:true,  dateShow:true },
+    { id:'gfc',       label:'GFC Released',        kind:'date', field:'GFC',         core:true,  optional:false, dateShow:true },
+    { id:'masonry',   label:'Masonry',             kind:'date', field:'Masonry',     core:false, optional:true,  dateShow:true },
+    { id:'plaster',   label:'Plaster',             kind:'date', field:'Plaster',     core:true,  optional:false, dateShow:true },
+    { id:'dryfloor',  label:'Dry Flooring',        kind:'date', field:'DryFloor',    core:false, optional:true,  dateShow:true },
+    { id:'toiletwp',  label:'Toilet W/P',          kind:'date', field:'ToiletWP',    core:false, optional:true,  dateShow:true },
+    { id:'plumbing',  label:'Plumbing',            kind:'date', field:'Plumbing',    core:false, optional:true,  dateShow:true },
+    { id:'flooring',  label:'Flooring & Dado',     kind:'date', field:'Floor',       core:true,  optional:false, dateShow:false },
+    { id:'wetfloor',  label:'Wet Flooring & Dado', kind:'date', field:'WetFloorDate',core:false, optional:true,  dateShow:true },
+    { id:'hvac',      label:'HVAC Installed',      kind:'date', field:'HVAC',        core:true,  optional:false, dateShow:true },
+    { id:'false',     label:'False Ceiling',       kind:'date', field:'False',       core:true,  optional:false, dateShow:true },
+    { id:'fenest',    label:'Fenestration',        kind:'date', field:'Fenest',      core:true,  optional:false, dateShow:true },
+    { id:'furniture', label:'Furniture',           kind:'date', field:'Furniture',   core:false, optional:true,  dateShow:true },
+    { id:'kitchen',   label:'Kitchen',             kind:'date', field:'Kitchen',     core:false, optional:true,  dateShow:true },
+    { id:'handover',  label:'Ready for Handover',  kind:'date', field:'Hand',        core:true,  optional:false, dateShow:true }
+  ];
+
+  var psSel        = { Project: new Set(), Tower: new Set(), Phase: new Set() };
+  var psOptionalOn = new Set();          // optional KPI ids switched on
+  var psPaneWork   = new Set();
+  var psSelectedKpi = null;              // currently selected KPI id (filters table)
+  var psSort       = { col: 3, dir: 1 }; // default sort by Unit No. ascending
+
+  function psUniq(key) {
+    var s = new Set();
+    raw.forEach(u => { var v = (u[key] || '').toString().trim(); if (v && v !== 'N/A') s.add(v); });
+    return Array.from(s).sort((a,b) => a.localeCompare(b, undefined, {numeric:true}));
+  }
+
+  function psBuildChips(containerId, key) {
+    var box = document.getElementById(containerId);
+    if (!box) return;
+    box.innerHTML = '';
+    psUniq(key).forEach(val => {
+      var chip = document.createElement('button');
+      chip.className = 'ps-chip' + (psSel[key].has(val) ? ' active' : '');
+      chip.textContent = val;
+      chip.addEventListener('click', function() {
+        if (psSel[key].has(val)) psSel[key].delete(val); else psSel[key].add(val);
+        chip.classList.toggle('active');
+        renderProjectSummary();
+      });
+      box.appendChild(chip);
+    });
+  }
+
+  function buildProjectSummary() {
+    psBuildChips('psProjectChips', 'Project');
+    psBuildChips('psTowerChips',   'Tower');
+    psBuildChips('psPhaseChips',   'Phase');
+    renderProjectSummary();
+  }
+
+  // Date helpers
+  function psInputDate(v, endOfDay) {
+    if (!v) return null;
+    var p = v.split('-'); if (p.length !== 3) return null;
+    return endOfDay ? new Date(+p[0], +p[1]-1, +p[2], 23, 59, 59) : new Date(+p[0], +p[1]-1, +p[2]);
+  }
+  function psHasDate(u, field) { return !!parseDate(u[field]); }
+  function psInRange(u, field, from, to) { var d = parseDate(u[field]); return d && d >= from && d <= to; }
+  function psTotalCtg(u) {
+    return (computeCtgUnit(u) + computeCtgFloorUnit(u) + computeCtgHandoverUnit(u)) / 10000000;
+  }
+
+  // Units matching slicers + search (KPI selection applied separately)
+  function psBaseUnits() {
+    var uq = (document.getElementById('psUnitSearch') || {}).value || '';
+    var cq = (document.getElementById('psCustSearch') || {}).value || '';
+    uq = uq.trim().toLowerCase(); cq = cq.trim().toLowerCase();
+    return raw.filter(u => {
+      if (psSel.Project.size && !psSel.Project.has((u.Project||'').toString().trim())) return false;
+      if (psSel.Tower.size   && !psSel.Tower.has((u.Tower||'').toString().trim()))   return false;
+      if (psSel.Phase.size   && !psSel.Phase.has((u.Phase||'').toString().trim()))   return false;
+      if (uq && !(u.UnitNo||'').toString().toLowerCase().includes(uq)) return false;
+      if (cq && !(u.Customer||'').toString().toLowerCase().includes(cq)) return false;
+      return true;
+    });
+  }
+
+  function psKpiCount(kpi, units, dateMode, from, to) {
+    if (kpi.kind === 'scope') return units.length;
+    if (kpi.kind === 'bool')  return units.filter(u => u[kpi.field]).length;
+    // date kind
+    if (dateMode) return units.filter(u => psInRange(u, kpi.field, from, to)).length;
+    return units.filter(u => psHasDate(u, kpi.field)).length;
+  }
+
+  // Does a unit belong to the selected KPI's set?
+  function psKpiMatch(kpi, u, dateMode, from, to) {
+    if (kpi.kind === 'scope') return true;
+    if (kpi.kind === 'bool')  return !!u[kpi.field];
+    if (dateMode) return psInRange(u, kpi.field, from, to);
+    return psHasDate(u, kpi.field);
+  }
+
+  function psVisibleKpis(dateMode) {
+    if (dateMode) return PS_KPIS.filter(k => k.dateShow);
+    return PS_KPIS.filter(k => k.core || (k.optional && psOptionalOn.has(k.id)));
+  }
+
+  function renderProjectSummary() {
+    if (typeof raw === 'undefined' || !raw || !raw.length) return;
+    var from = psInputDate((document.getElementById('psDateFrom')||{}).value, false);
+    var to   = psInputDate((document.getElementById('psDateTo')||{}).value, true);
+    var dateMode = !!(from && to && from <= to);
+
+    var note = document.getElementById('psDateNote');
+    if (note) {
+      if (dateMode) {
+        var f = document.getElementById('psDateFrom').value, t = document.getElementById('psDateTo').value;
+        note.style.display = 'block';
+        note.innerHTML = '<i class="bi bi-calendar-range"></i> Date range active — KPIs now show the count of activities completed between ' + f + ' and ' + t + '. (Scope is hidden in this mode.)';
+      } else { note.style.display = 'none'; }
+    }
+
+    var base = psBaseUnits();
+    var kpis = psVisibleKpis(dateMode);
+
+    // If the currently selected KPI is no longer visible, clear it
+    if (psSelectedKpi && !kpis.some(k => k.id === psSelectedKpi)) psSelectedKpi = null;
+
+    // KPI cards
+    var grid = document.getElementById('psKpiGrid');
+    grid.innerHTML = '';
+    kpis.forEach(kpi => {
+      var val = psKpiCount(kpi, base, dateMode, from, to);
+      var card = document.createElement('div');
+      card.className = 'ps-kpi' + (psSelectedKpi === kpi.id ? ' selected' : '');
+      card.innerHTML =
+        (kpi.optional ? '<span class="ps-kpi-tag">CUSTOM</span>' : '') +
+        '<div class="ps-kpi-label">' + kpi.label + '</div>' +
+        '<div class="ps-kpi-value">' + val.toLocaleString() + '</div>';
+      card.title = 'Click to filter the table by ' + kpi.label;
+      card.addEventListener('click', function() {
+        psSelectedKpi = (psSelectedKpi === kpi.id) ? null : kpi.id;
+        renderProjectSummary();
+      });
+      grid.appendChild(card);
+    });
+
+    // Table rows
+    var rowsUnits = base;
+    if (psSelectedKpi) {
+      var sk = PS_KPIS.find(k => k.id === psSelectedKpi);
+      if (sk) rowsUnits = base.filter(u => psKpiMatch(sk, u, dateMode, from, to));
+    }
+
+    var rows = rowsUnits.map(u => [
+      u.Project || '', u.Phase || '', u.Tower || '', u.UnitNo || '', u.Customer || '', psTotalCtg(u)
+    ]);
+
+    // Sort
+    var c = psSort.col, dir = psSort.dir;
+    rows.sort((a, b) => {
+      if (c === 5) return (a[5] - b[5]) * dir;
+      return a[c].toString().localeCompare(b[c].toString(), undefined, {numeric:true}) * dir;
+    });
+
+    var body = document.getElementById('psTableBody');
+    if (!rows.length) {
+      body.innerHTML = '<tr><td colspan="6" class="ps-empty"><i class="bi bi-inbox"></i> No units match the current filters.</td></tr>';
+    } else {
+      body.innerHTML = rows.map(r =>
+        '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td>' + r[3] +
+        '</td><td>' + r[4] + '</td><td class="ps-ctg-cell">₹' + r[5].toFixed(2) + '</td></tr>'
+      ).join('');
+    }
+
+    var totalCtg = rows.reduce((s, r) => s + r[5], 0);
+    var foot = document.getElementById('psTableFoot');
+    foot.innerHTML = rows.length
+      ? '<tr><td colspan="5">Total — ' + rows.length + ' unit' + (rows.length===1?'':'s') +
+        '</td><td class="ps-ctg-cell">₹' + totalCtg.toFixed(2) + '</td></tr>'
+      : '';
+
+    var badge = document.getElementById('psRowCount');
+    if (badge) badge.textContent = rows.length.toLocaleString();
+
+    // sort indicators
+    document.querySelectorAll('#psTable .ps-sort-ico').forEach(function(i){
+      var col = +i.getAttribute('data-c');
+      i.className = 'bi ps-sort-ico ' + (col === psSort.col ? (psSort.dir === 1 ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-arrow-down-up');
+    });
+  }
+
+  function psSortBy(col) {
+    if (psSort.col === col) psSort.dir *= -1; else { psSort.col = col; psSort.dir = 1; }
+    renderProjectSummary();
+  }
+
+  function psClearDates() {
+    var f = document.getElementById('psDateFrom'), t = document.getElementById('psDateTo');
+    if (f) f.value = ''; if (t) t.value = '';
+    renderProjectSummary();
+  }
+
+  function psClearAll() {
+    psSel.Project.clear(); psSel.Tower.clear(); psSel.Phase.clear();
+    psSelectedKpi = null;
+    ['psUnitSearch','psCustSearch','psDateFrom','psDateTo'].forEach(function(id){
+      var el = document.getElementById(id); if (el) el.value = '';
+    });
+    buildProjectSummary();
+  }
+
+  // ── Custom KPI slide pane ──
+  function psOpenPane() {
+    psPaneWork = new Set(psOptionalOn);
+    var list = document.getElementById('psPaneList');
+    list.innerHTML = '';
+    PS_KPIS.filter(k => k.optional).forEach(k => {
+      var row = document.createElement('div');
+      row.className = 'ps-pane-item';
+      row.innerHTML = '<span>' + k.label + '</span>' +
+        '<label class="ps-toggle"><input type="checkbox" ' + (psPaneWork.has(k.id) ? 'checked' : '') +
+        '><span class="ps-toggle-track"></span></label>';
+      row.querySelector('input').addEventListener('change', function() {
+        if (this.checked) psPaneWork.add(k.id); else psPaneWork.delete(k.id);
+      });
+      list.appendChild(row);
+    });
+    document.getElementById('psPaneOverlay').classList.add('open');
+    document.getElementById('psPane').classList.add('open');
+  }
+  function psClosePane() {
+    document.getElementById('psPaneOverlay').classList.remove('open');
+    document.getElementById('psPane').classList.remove('open');
+  }
+  function psResetPane() {
+    psPaneWork = new Set();
+    document.querySelectorAll('#psPaneList input').forEach(i => i.checked = false);
+  }
+  function psApplyPane() {
+    psOptionalOn = new Set(psPaneWork);
+    psClosePane();
+    renderProjectSummary();
+  }
+
+  // ── Excel export ──
+  function psExportExcel() {
+    if (typeof XLSX === 'undefined') { alert('Excel library not available.'); return; }
+    var rows = [];
+    document.querySelectorAll('#psTableBody tr').forEach(function(tr){
+      var tds = tr.querySelectorAll('td');
+      if (tds.length === 6) {
+        rows.push([ tds[0].textContent, tds[1].textContent, tds[2].textContent,
+                    tds[3].textContent, tds[4].textContent,
+                    parseFloat((tds[5].textContent || '').replace(/[₹,]/g,'')) || 0 ]);
+      }
+    });
+    if (!rows.length) { alert('No data to export.'); return; }
+    var aoa = [['Project','Phase','Tower','Unit No.','Customer Name','Total CTG (₹ Cr)']];
+    aoa = aoa.concat(rows);
+    var total = rows.reduce((s, r) => s + (r[5]||0), 0);
+    aoa.push(['TOTAL','','','','', +total.toFixed(2)]);
+    var ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = [{wch:18},{wch:12},{wch:12},{wch:14},{wch:26},{wch:16}];
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Project Summary');
+    XLSX.writeFile(wb, 'Project_Summary.xlsx');
+  }
+
 </script>
 
 <!-- ═══ COLUMN CUSTOMISER SIDE PANE ═══ -->
