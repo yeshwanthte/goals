@@ -4266,8 +4266,10 @@
 
     /* Slicers */
     .ps-slicer-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem 1.5rem; padding: 1.25rem;
+      display: grid; gap: 1.1rem 1.5rem; padding: 1.25rem;
     }
+    .ps-slicer-grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .ps-slicer-grid-3 { grid-template-columns: repeat(3, 1fr); padding-top: 0; }
     .ps-slicer label {
       display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
       text-transform: uppercase; color: var(--gray-500, #6b7280); margin-bottom: 0.5rem;
@@ -4283,6 +4285,8 @@
       background: var(--primary, #C65911); border-color: var(--primary, #C65911); color: #fff;
       box-shadow: 0 2px 6px rgba(198,89,17,0.25);
     }
+    .ps-chip.highlighted { border-color: var(--primary, #C65911); color: var(--primary, #C65911); background: var(--primary-light, #FCE7DC); }
+    .ps-chip.dimmed { opacity: 0.32; }
     .ps-search, .ps-daterow {
       display: flex; align-items: center; gap: 0.5rem;
       border: 1px solid var(--gray-200, #e5e7eb); border-radius: 10px; padding: 0.5rem 0.7rem; background: #fff;
@@ -4355,7 +4359,7 @@
     }
 
     /* Table */
-    .ps-table-scroll { overflow-x: auto; }
+    .ps-table-scroll { max-height: 60vh; overflow: auto; }
     .ps-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
     .ps-table thead th {
       position: sticky; top: 0; background: var(--gray-50, #f9fafb); z-index: 1;
@@ -4431,7 +4435,7 @@
     .ps-pane-apply { flex: 2; border: none; background: var(--primary, #C65911); color: #fff; font-weight: 700; padding: 0.6rem; border-radius: 8px; cursor: pointer; }
     .ps-pane-apply:hover { background: var(--primary-dark, #833C0C); }
 
-    @media (max-width: 900px) { .ps-slicer-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .ps-slicer-grid-4, .ps-slicer-grid-3 { grid-template-columns: 1fr; } }
 
   </style>
 </head>
@@ -5505,7 +5509,7 @@
           <h5><i class="bi bi-funnel"></i> Filters</h5>
           <button class="ps-clear-btn" onclick="psClearAll()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
         </div>
-        <div class="ps-slicer-grid">
+        <div class="ps-slicer-grid ps-slicer-grid-4">
           <div class="ps-slicer">
             <label>Project</label>
             <div class="ps-chiprow" id="psProjectChips"></div>
@@ -5518,6 +5522,12 @@
             <label>Phase</label>
             <div class="ps-chiprow" id="psPhaseChips"></div>
           </div>
+          <div class="ps-slicer">
+            <label>Product Type</label>
+            <div class="ps-chiprow" id="psProductChips"></div>
+          </div>
+        </div>
+        <div class="ps-slicer-grid ps-slicer-grid-3">
           <div class="ps-slicer">
             <label>Search by Unit Number</label>
             <div class="ps-search"><i class="bi bi-search"></i>
@@ -5532,11 +5542,12 @@
           </div>
           <div class="ps-slicer">
             <label>Date Range</label>
-            <div class="ps-daterow">
-              <input type="date" id="psDateFrom" onchange="renderProjectSummary()">
-              <span class="ps-dash">–</span>
-              <input type="date" id="psDateTo" onchange="renderProjectSummary()">
-              <button class="ps-date-clear" onclick="psClearDates()" title="Clear dates"><i class="bi bi-x-lg"></i></button>
+            <div class="drp-wrapper" id="drpWrapperPS">
+              <button class="drp-trigger" id="drpTriggerPS" onclick="drpOpen('PS')">
+                <i class="bi bi-calendar2-range drp-icon"></i>
+                <span id="drpLabelPS">All Dates</span>
+                <i class="bi bi-chevron-down drp-caret"></i>
+              </button>
             </div>
           </div>
         </div>
@@ -11351,7 +11362,7 @@
     { id:'handover',  label:'Ready for Handover',  kind:'date', field:'Hand',        core:true,  optional:false, dateShow:true }
   ];
 
-  var psSel        = { Project: new Set(), Tower: new Set(), Phase: new Set() };
+  var psSel        = { Project: new Set(), Tower: new Set(), Phase: new Set(), ProductType: new Set() };
   var psOptionalOn = new Set();          // optional KPI ids switched on
   var psPaneWork   = new Set();
   var psSelectedKpi = null;              // currently selected KPI id (filters table)
@@ -11371,6 +11382,7 @@
       var chip = document.createElement('button');
       chip.className = 'ps-chip' + (psSel[key].has(val) ? ' active' : '');
       chip.textContent = val;
+      chip.dataset.value = val;
       chip.addEventListener('click', function() {
         if (psSel[key].has(val)) psSel[key].delete(val); else psSel[key].add(val);
         chip.classList.toggle('active');
@@ -11384,6 +11396,7 @@
     psBuildChips('psProjectChips', 'Project');
     psBuildChips('psTowerChips',   'Tower');
     psBuildChips('psPhaseChips',   'Phase');
+    psBuildChips('psProductChips', 'ProductType');
     renderProjectSummary();
   }
 
@@ -11408,6 +11421,7 @@
       if (psSel.Project.size && !psSel.Project.has((u.Project||'').toString().trim())) return false;
       if (psSel.Tower.size   && !psSel.Tower.has((u.Tower||'').toString().trim()))   return false;
       if (psSel.Phase.size   && !psSel.Phase.has((u.Phase||'').toString().trim()))   return false;
+      if (psSel.ProductType.size && !psSel.ProductType.has((u.ProductType||'').toString().trim())) return false;
       if (uq && !(u.UnitNo||'').toString().toLowerCase().includes(uq)) return false;
       if (cq && !(u.Customer||'').toString().toLowerCase().includes(cq)) return false;
       return true;
@@ -11431,22 +11445,25 @@
   }
 
   function psVisibleKpis(dateMode) {
-    if (dateMode) return PS_KPIS.filter(k => k.dateShow);
+    if (dateMode) return PS_KPIS.filter(k => k.dateShow && (k.core || (k.optional && psOptionalOn.has(k.id))));
     return PS_KPIS.filter(k => k.core || (k.optional && psOptionalOn.has(k.id)));
   }
 
+  var PS_MS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function psFmtDate(d) { return d.getDate() + '-' + PS_MS[d.getMonth()] + '-' + String(d.getFullYear()).slice(2); }
+
   function renderProjectSummary() {
     if (typeof raw === 'undefined' || !raw || !raw.length) return;
-    var from = psInputDate((document.getElementById('psDateFrom')||{}).value, false);
-    var to   = psInputDate((document.getElementById('psDateTo')||{}).value, true);
-    var dateMode = !!(from && to && from <= to);
+    var from = (typeof _drpFromPS !== 'undefined') ? _drpFromPS : null;
+    var to   = (typeof _drpToPS   !== 'undefined') ? _drpToPS   : null;
+    var dateMode = !!(from && to);
 
     var note = document.getElementById('psDateNote');
     if (note) {
       if (dateMode) {
-        var f = document.getElementById('psDateFrom').value, t = document.getElementById('psDateTo').value;
         note.style.display = 'block';
-        note.innerHTML = '<i class="bi bi-calendar-range"></i> Date range active — KPIs now show the count of activities completed between ' + f + ' and ' + t + '. (Scope is hidden in this mode.)';
+        note.innerHTML = '<i class="bi bi-calendar-range"></i> Date range active — KPIs now show the count of activities completed between <strong>' +
+          psFmtDate(from) + '</strong> and <strong>' + psFmtDate(to) + '</strong>. (Scope is hidden in this mode.)';
       } else { note.style.display = 'none'; }
     }
 
@@ -11464,7 +11481,6 @@
       var card = document.createElement('div');
       card.className = 'ps-kpi' + (psSelectedKpi === kpi.id ? ' selected' : '');
       card.innerHTML =
-        (kpi.optional ? '<span class="ps-kpi-tag">CUSTOM</span>' : '') +
         '<div class="ps-kpi-label">' + kpi.label + '</div>' +
         '<div class="ps-kpi-value">' + val.toLocaleString() + '</div>';
       card.title = 'Click to filter the table by ' + kpi.label;
@@ -11518,6 +11534,42 @@
       var col = +i.getAttribute('data-c');
       i.className = 'bi ps-sort-ico ' + (col === psSort.col ? (psSort.dir === 1 ? 'bi-caret-up-fill' : 'bi-caret-down-fill') : 'bi-arrow-down-up');
     });
+
+    psHighlightChips();
+  }
+
+  // Cross-highlight slicer chips based on co-occurring data (Milestone-tab behaviour)
+  function psHighlightChips() {
+    var keys = [['Project','psProjectChips'],['Tower','psTowerChips'],['Phase','psPhaseChips'],['ProductType','psProductChips']];
+    var anyFilter = psSel.Project.size || psSel.Tower.size || psSel.Phase.size || psSel.ProductType.size;
+    if (!anyFilter) {
+      keys.forEach(function(k){
+        var box = document.getElementById(k[1]);
+        if (box) box.querySelectorAll('.ps-chip').forEach(function(c){ c.classList.remove('dimmed','highlighted'); });
+      });
+      return;
+    }
+    var d = raw.filter(function(r){
+      return (!psSel.Project.size || psSel.Project.has((r.Project||'').toString().trim()))
+          && (!psSel.Tower.size   || psSel.Tower.has((r.Tower||'').toString().trim()))
+          && (!psSel.Phase.size   || psSel.Phase.has((r.Phase||'').toString().trim()))
+          && (!psSel.ProductType.size || psSel.ProductType.has((r.ProductType||'').toString().trim()));
+    });
+    var avail = {
+      Project:     new Set(d.map(function(x){ return (x.Project||'').toString().trim(); })),
+      Tower:       new Set(d.map(function(x){ return (x.Tower||'').toString().trim(); })),
+      Phase:       new Set(d.map(function(x){ return (x.Phase||'').toString().trim(); })),
+      ProductType: new Set(d.map(function(x){ return (x.ProductType||'').toString().trim(); }))
+    };
+    keys.forEach(function(k){
+      var box = document.getElementById(k[1]); if (!box) return;
+      box.querySelectorAll('.ps-chip').forEach(function(c){
+        var val = c.dataset.value || c.textContent;
+        if (c.classList.contains('active')) { c.classList.remove('dimmed','highlighted'); return; }
+        if (avail[k[0]].has(val)) { c.classList.remove('dimmed'); c.classList.add('highlighted'); }
+        else { c.classList.remove('highlighted'); c.classList.add('dimmed'); }
+      });
+    });
   }
 
   function psSortBy(col) {
@@ -11526,17 +11578,16 @@
   }
 
   function psClearDates() {
-    var f = document.getElementById('psDateFrom'), t = document.getElementById('psDateTo');
-    if (f) f.value = ''; if (t) t.value = '';
-    renderProjectSummary();
+    if (window.drpClear) drpClear('PS');
   }
 
   function psClearAll() {
-    psSel.Project.clear(); psSel.Tower.clear(); psSel.Phase.clear();
+    psSel.Project.clear(); psSel.Tower.clear(); psSel.Phase.clear(); psSel.ProductType.clear();
     psSelectedKpi = null;
-    ['psUnitSearch','psCustSearch','psDateFrom','psDateTo'].forEach(function(id){
+    ['psUnitSearch','psCustSearch'].forEach(function(id){
       var el = document.getElementById(id); if (el) el.value = '';
     });
+    if (window.drpClear) drpClear('PS');
     buildProjectSummary();
   }
 
@@ -11840,7 +11891,7 @@
   let _context = null, _start = null, _end = null, _hover = null;
   let _picking = 0, _viewYear = new Date().getFullYear(), _viewMonth = new Date().getMonth();
 
-  const _applied = { PA: { from: null, to: null }, Shell: { from: null, to: null } };
+  const _applied = { PA: { from: null, to: null }, Shell: { from: null, to: null }, PS: { from: null, to: null } };
 
   // ── Open ─────────────────────────────────────────────────────
   window.drpOpen = function(ctx) {
@@ -11849,6 +11900,8 @@
     _applied.PA.to      = _drpToPA      || null;
     _applied.Shell.from = _drpFromShell || null;
     _applied.Shell.to   = _drpToShell   || null;
+    _applied.PS.from    = (typeof _drpFromPS !== 'undefined' ? _drpFromPS : null) || null;
+    _applied.PS.to      = (typeof _drpToPS   !== 'undefined' ? _drpToPS   : null) || null;
 
     _start = _applied[ctx].from ? new Date(_applied[ctx].from) : null;
     _end   = _applied[ctx].to   ? new Date(_applied[ctx].to)   : null;
@@ -12052,6 +12105,7 @@
     const { from, to } = _applied[ctx];
     if (ctx === 'PA')         drpApplyPA(from, to);
     else if (ctx === 'Shell') drpApplyShell(from, to);
+    else if (ctx === 'PS')    drpApplyPS(from, to);
   }
 
   // ── Panel position ────────────────────────────────────────────
@@ -12118,6 +12172,13 @@ var _drpFromPA    = null;
 var _drpToPA      = null;
 var _drpFromShell = null;
 var _drpToShell   = null;
+var _drpFromPS    = null;
+var _drpToPS      = null;
+
+window.drpApplyPS = function(from, to) {
+  _drpFromPS = from; _drpToPS = to;
+  if (typeof renderProjectSummary === 'function') renderProjectSummary();
+};
 
 // ── Shell date-basis: 'baseline' (default) | 'actual' ────────
 var _shellDateBasis = 'baseline';
