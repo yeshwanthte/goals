@@ -17,5 +17,11 @@
       "createdAt": "2026-05-12T19:29:25.313Z"
     }
   ],
-  "log": []
+  "log": [
+    {
+      "username": "Yeshwanth",
+      "event": "login",
+      "ts": "2026-06-17T06:54:46.859Z"
+    }
+  ]
 }
