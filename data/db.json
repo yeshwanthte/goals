@@ -19,6 +19,11 @@
   ],
   "log": [
     {
+      "username": "Karthick",
+      "event": "login",
+      "ts": "2026-08-08T05:46:52.408Z"
+    },
+    {
       "username": "Yeshwanth",
       "event": "login",
       "ts": "2026-07-14T10:01:56.311Z"
