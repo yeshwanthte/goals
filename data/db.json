@@ -31,6 +31,11 @@
   "log": [
     {
       "username": "Kamal",
+      "event": "logout",
+      "ts": "2026-08-08T05:58:32.775Z"
+    },
+    {
+      "username": "Kamal",
       "event": "login",
       "ts": "2026-08-08T05:58:27.122Z"
     },
