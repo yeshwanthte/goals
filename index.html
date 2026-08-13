@@ -7087,23 +7087,31 @@
 
     currentDetailsData.sort((a, b) => {
       let valA, valB;
-      switch (columnIndex) {
-        case 0: valA = a.Project  || ''; valB = b.Project  || ''; break;
-        case 1: valA = a.Phase    || ''; valB = b.Phase    || ''; break;
-        case 2: valA = a.Tower    || ''; valB = b.Tower    || ''; break;
-        case 3: valA = (a.ProductType || '').toLowerCase(); valB = (b.ProductType || '').toLowerCase(); break;
-        case 4: valA = a.UnitNo   || ''; valB = b.UnitNo   || ''; break;
-        case 5: valA = a.Customer || ''; valB = b.Customer || ''; break;
-        case 6: valA = a[currentRevenueField] || 0; valB = b[currentRevenueField] || 0; break;
-        case 7: valA = (a.Inventory || '').toLowerCase(); valB = (b.Inventory || '').toLowerCase(); break;
-        default: {
-          const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - 8]);
-          if (col && col.type === 'ctg') { valA = col.calc(a); valB = col.calc(b); }
-          else { valA = col && a[col.field] ? 1 : 0; valB = col && b[col.field] ? 1 : 0; }
-          break;
+      const _ctgCol  = _milestoneCtgCol();
+      const _invCi   = _ctgCol ? 8 : 7;
+      const _optBase = _ctgCol ? 9 : 8;
+      let numeric = false;
+      if (columnIndex <= 5) {
+        switch (columnIndex) {
+          case 0: valA = a.Project  || ''; valB = b.Project  || ''; break;
+          case 1: valA = a.Phase    || ''; valB = b.Phase    || ''; break;
+          case 2: valA = a.Tower    || ''; valB = b.Tower    || ''; break;
+          case 3: valA = (a.ProductType || '').toLowerCase(); valB = (b.ProductType || '').toLowerCase(); break;
+          case 4: valA = a.UnitNo   || ''; valB = b.UnitNo   || ''; break;
+          case 5: valA = a.Customer || ''; valB = b.Customer || ''; break;
         }
+      } else if (columnIndex === 6) {
+        valA = a[currentRevenueField] || 0; valB = b[currentRevenueField] || 0; numeric = true;
+      } else if (_ctgCol && columnIndex === 7) {
+        valA = _ctgCol.calc(a); valB = _ctgCol.calc(b); numeric = true;
+      } else if (columnIndex === _invCi) {
+        valA = (a.Inventory || '').toLowerCase(); valB = (b.Inventory || '').toLowerCase();
+      } else {
+        const col = OPTIONAL_COLS.find(c => c.id === activeColIds[columnIndex - _optBase]);
+        if (col && col.type === 'ctg') { valA = col.calc(a); valB = col.calc(b); numeric = true; }
+        else { valA = col && a[col.field] ? 1 : 0; valB = col && b[col.field] ? 1 : 0; numeric = true; }
       }
-      if (columnIndex === 6 || columnIndex >= 8) return sortAscending ? valA - valB : valB - valA;
+      if (numeric) return sortAscending ? valA - valB : valB - valA;
       if (valA < valB) return sortAscending ? -1 : 1;
       if (valA > valB) return sortAscending ? 1 : -1;
       return 0;
@@ -7820,6 +7828,9 @@
   }
 
   function getMilestoneCellText(unit, colIdx) {
+    const ctgCol  = _milestoneCtgCol();
+    const invCi   = ctgCol ? 8 : 7;
+    const optBase = ctgCol ? 9 : 8;
     switch (colIdx) {
       case 0: return (unit.Project  || '').toString();
       case 1: return (unit.Phase    || '').toString();
@@ -7828,14 +7839,13 @@
       case 4: return (unit.UnitNo   || '').toString();
       case 5: return (unit.Customer || '').toString();
       case 6: return ((unit[currentRevenueField] || 0) / 10000000).toFixed(2);
-      case 7: return (unit.Inventory || '').toString();
-      default: {
-        const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - 8]);
-        if (!col) return '';
-        if (col.type === 'ctg') return (col.calc(unit) / 10000000).toFixed(2);
-        return col.field ? (unit[col.field] ? 'Done' : 'Pending') : '';
-      }
     }
+    if (ctgCol && colIdx === 7) return (ctgCol.calc(unit) / 10000000).toFixed(2);
+    if (colIdx === invCi) return (unit.Inventory || '').toString();
+    const col = OPTIONAL_COLS.find(c => c.id === activeColIds[colIdx - optBase]);
+    if (!col) return '';
+    if (col.type === 'ctg') return (col.calc(unit) / 10000000).toFixed(2);
+    return col.field ? (unit[col.field] ? 'Done' : 'Pending') : '';
   }
 
   // ---- apply filters ----
@@ -11081,18 +11091,33 @@
   function rebuildMilestoneTableHeader() {
     const sortRow = document.querySelector('#milestoneDetailsTable thead tr.sort-row');
     if (!sortRow) return;
+    const ctgCol = _milestoneCtgCol();
+    // Column indices:  0-6 fixed (Project..Revenue), 7 = CTG (when present),
+    // then Inventory, then optional columns.
+    const invCi   = ctgCol ? 8 : 7;
+    const optBase = ctgCol ? 9 : 8;
     const fixed = [
       {label:'Project',ci:0},{label:'Phase',ci:1},{label:'Tower',ci:2},
       {label:'Product Type',ci:3},{label:'Unit No.',ci:4},{label:'Customer Name',ci:5},
-      {label:'Revenue (₹ Cr)',ci:6},{label:'Inventory',ci:7}
+      {label:'Revenue (₹ Cr)',ci:6}
     ];
     let h = fixed.map(f => `
       <th class="sortable" onclick="sortTable(${f.ci})">${f.label}
         <button class="col-filter-btn" data-table="milestone" data-col="${f.ci}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button>
-      </th>${f.ci === 6 ? _milestoneCtgHeaderCell() : ''}`).join('');
+      </th>`).join('');
+    if (ctgCol) {
+      h += `
+      <th class="sortable ctg-fixed-col" style="text-align:right;color:#fff;white-space:nowrap;" onclick="sortTable(7)">${ctgCol.label}
+        <button class="col-filter-btn" data-table="milestone" data-col="7" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button>
+      </th>`;
+    }
+    h += `
+      <th class="sortable" onclick="sortTable(${invCi})">Inventory
+        <button class="col-filter-btn" data-table="milestone" data-col="${invCi}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button>
+      </th>`;
     activeColIds.forEach((id, i) => {
       const col = OPTIONAL_COLS.find(c => c.id === id); if (!col) return;
-      const ci = 8 + i;
+      const ci = optBase + i;
       h += `<th class="sortable" onclick="sortTable(${ci})" style="text-align:center;">${col.label}
         <button class="col-filter-btn" data-table="milestone" data-col="${ci}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button>
       </th>`;
