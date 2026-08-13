@@ -1619,6 +1619,141 @@
       font-size: 1.1rem;
     }
 
+    /* ═══════════════════════════════════════════════════════════════════
+       MILESTONE "UNIT DETAILS" TABLE — compact layout + frozen columns
+       Scoped to #milestoneDetailsTable ONLY, so the Plan vs Actuals and
+       Structures tables keep their existing look.
+
+       Columns 1-6 (Project, Phase, Tower, Product Type, Unit No.,
+       Customer Name) are frozen. Revenue / CTG / Inventory / optional
+       columns scroll horizontally.
+
+       Selector note: data-cell rules are scoped to
+       `tbody tr:not(.total-row) td:not([colspan])` so the TOTAL row's
+       merged cell and the "no data" cell are never treated as columns.
+       --fz-2 … --fz-6 (left offsets), --fz-m6 and --mds-head-h are
+       measured and published by syncMilestoneFrozenCols().
+       ═══════════════════════════════════════════════════════════════════ */
+
+    /* Content-sized columns instead of stretched-to-fit */
+    #milestoneDetailsTable {
+      width: max-content;
+      min-width: 100%;
+    }
+
+    /* ── Compact header ── */
+    #milestoneDetailsTable thead tr.sort-row th {
+      padding: 0.5rem 0.55rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.2px;
+    }
+    #milestoneDetailsTable thead tr.sort-row th.sortable {
+      padding-right: 2.15rem;              /* room for sort arrow + filter icon */
+    }
+    #milestoneDetailsTable thead tr.sort-row th.sortable::after {
+      right: 1.25rem;
+      font-size: 0.62rem;
+    }
+    #milestoneDetailsTable .col-filter-btn {
+      right: 0.2rem;
+      width: 17px;
+      height: 17px;
+      font-size: 0.58rem;
+      border-radius: 3px;
+    }
+
+    /* ── Compact body ── */
+    #milestoneDetailsTable tbody td {
+      padding: 0.42rem 0.55rem;
+      font-size: 0.78rem;
+      white-space: nowrap;                 /* keeps every column content-tight */
+    }
+    #milestoneDetailsTable tbody tr.total-row td {
+      padding: 0.55rem 0.55rem !important;
+      font-size: 0.85rem;
+    }
+    #milestoneDetailsTable tbody tr.total-row td.revenue-cell { font-size: 0.95rem !important; }
+
+    /* Long text fields stay readable — wrap instead of stretching the column */
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(1),
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(4),
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(6) {
+      white-space: normal;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(1),
+    #milestoneDetailsTable thead tr.sort-row th:nth-child(1) { max-width: 140px; }
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(4),
+    #milestoneDetailsTable thead tr.sort-row th:nth-child(4) { max-width: 120px; }
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(6),
+    #milestoneDetailsTable thead tr.sort-row th:nth-child(6) { max-width: 190px; min-width: 125px; }
+
+    /* ── Frozen columns 1-6 ── */
+    #milestoneDetailsTable thead tr.sort-row th:nth-child(-n+6) {
+      z-index: 34;                         /* above the scrolling header cells (22) */
+    }
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(-n+6) {
+      position: sticky;
+      z-index: 12;                         /* above the scrolling body cells */
+      background: #ffffff;                 /* opaque — nothing shows through */
+    }
+    #milestoneDetailsTable tbody tr:not(.total-row):nth-child(even) td:not([colspan]):nth-child(-n+6) {
+      background: #fefcfa;                 /* opaque match of the striped row tint */
+    }
+    #milestoneDetailsTable tbody tr:not(.total-row):hover td:not([colspan]):nth-child(-n+6) {
+      background: var(--gray-50);
+    }
+
+    /* Sticky left offsets (cumulative header widths, published from JS) */
+    #milestoneDetailsTable thead tr.sort-row th:nth-child(1),
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(1) { left: 0; }
+    #milestoneDetailsTable thead tr.sort-row th:nth-child(2),
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(2) { left: var(--fz-2, 0px); }
+    #milestoneDetailsTable thead tr.sort-row th:nth-child(3),
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(3) { left: var(--fz-3, 0px); }
+    #milestoneDetailsTable thead tr.sort-row th:nth-child(4),
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(4) { left: var(--fz-4, 0px); }
+    #milestoneDetailsTable thead tr.sort-row th:nth-child(5),
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(5) { left: var(--fz-5, 0px); }
+    #milestoneDetailsTable thead tr.sort-row th:nth-child(6),
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(6) { left: var(--fz-6, 0px); }
+
+    /* TOTAL row — stays frozen under the header; its merged label cell spans
+       exactly the 6 frozen columns, so that one cell is the frozen block. */
+    #milestoneDetailsTable tbody tr.total-row {
+      top: var(--mds-head-h, 38px);
+    }
+    #milestoneDetailsTable tbody tr.total-row td[colspan="6"] {
+      position: sticky;
+      left: 0;
+      z-index: 2;                          /* inside the row's own stacking context */
+      background: #d1fae5;                 /* opaque version of the total-row tint */
+    }
+
+    /* Edge of the frozen block — separator + soft depth while scrolling */
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(6),
+    #milestoneDetailsTable tbody tr.total-row td[colspan="6"] {
+      box-shadow: inset -1px 0 0 rgba(0,0,0,0.08), 5px 0 6px -5px rgba(0,0,0,0.16);
+    }
+    #milestoneDetailsTable thead tr.sort-row th:nth-child(6) {
+      box-shadow: inset -1px 0 0 rgba(255,255,255,0.28), 5px 0 6px -5px rgba(0,0,0,0.24);
+    }
+
+    @media (max-width: 768px) {
+      /* Narrow screens: freeze only Unit No. + Customer Name so the frozen
+         block never eats the viewport. NOTE: thead cells keep position:sticky
+         (frozen header row) — only their horizontal offset is released. */
+      #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(-n+4) { position: static; }
+      #milestoneDetailsTable thead tr.sort-row th:nth-child(-n+4) { left: auto; z-index: 22; }
+      #milestoneDetailsTable thead tr.sort-row th:nth-child(5),
+      #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(5) { left: 0; }
+      #milestoneDetailsTable thead tr.sort-row th:nth-child(6),
+      #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(6) { left: var(--fz-m6, 0px); }
+      #milestoneDetailsTable tbody tr.total-row td[colspan="6"] { position: static; box-shadow: none; }
+    }
+    /* ══════════════ END compact + frozen columns ══════════════ */
+
     .unit-number {
       font-weight: 600;
       color: var(--primary);
@@ -7107,7 +7242,83 @@
       th.classList.remove('asc', 'desc');
       if (idx === sortColumn) th.classList.add(sortAscending ? 'asc' : 'desc');
     });
+
+    syncMilestoneFrozenCols();
+    // re-measure once the browser has finished laying the new rows out
+    requestAnimationFrame(syncMilestoneFrozenCols);
   }
+
+  // ── Frozen-column geometry for the Unit Details table ──────────────
+  // Measures the real header-cell widths and publishes them as CSS vars so
+  // the sticky columns (Project → Customer Name) line up with no gaps or
+  // overlaps, whatever the content or the active optional columns.
+  let _mdsRetry = 0;
+  function syncMilestoneFrozenCols() {
+    const table = document.getElementById('milestoneDetailsTable');
+    if (!table) return;
+    const row = table.querySelector('thead tr.sort-row');
+    if (!row || !row.children.length) return;
+
+    const cells = row.children;
+    const n = Math.min(6, cells.length);
+    let x = 0;
+    for (let i = 0; i < n; i++) {
+      table.style.setProperty('--fz-' + (i + 1), x.toFixed(2) + 'px');
+      x += cells[i].getBoundingClientRect().width;
+    }
+
+    // Rendered while the section was still hidden → widths are 0. Retry once
+    // the browser has laid the table out (also covered by the ResizeObserver).
+    if (x === 0) {
+      if (_mdsRetry < 20) { _mdsRetry++; requestAnimationFrame(syncMilestoneFrozenCols); }
+      return;
+    }
+    _mdsRetry = 0;
+    // narrow-screen variant: Unit No. (col 5) becomes the first frozen column
+    if (cells[4]) {
+      table.style.setProperty('--fz-m6', cells[4].getBoundingClientRect().width.toFixed(2) + 'px');
+    }
+    // keep the sticky TOTAL row parked exactly under the frozen header
+    if (table.tHead) {
+      table.style.setProperty('--mds-head-h',
+        table.tHead.getBoundingClientRect().height.toFixed(2) + 'px');
+    }
+  }
+
+  // Re-measure whenever the layout can change: window resize / zoom, the
+  // section being opened, or the column customiser changing the header.
+  (function () {
+    let t = null;
+    const debounced = () => { clearTimeout(t); t = setTimeout(syncMilestoneFrozenCols, 60); };
+    window.addEventListener('resize', debounced);
+
+    function watchTable() {
+      const table = document.getElementById('milestoneDetailsTable');
+      if (!table) return false;
+      if (typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver(debounced);
+        ro.observe(table);
+        if (table.tHead) ro.observe(table.tHead);
+      }
+      // keep offsets exact while the user scrolls (rAF-coalesced, no layout churn)
+      const cont = table.closest('.details-table-container');
+      if (cont) {
+        let queued = false;
+        cont.addEventListener('scroll', () => {
+          if (queued) return;
+          queued = true;
+          requestAnimationFrame(() => { queued = false; syncMilestoneFrozenCols(); });
+        }, { passive: true });
+      }
+      return true;
+    }
+    if (!watchTable()) document.addEventListener('DOMContentLoaded', watchTable);
+
+    // webfonts can change cell metrics after the first paint
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => syncMilestoneFrozenCols()).catch(() => {});
+    }
+  })();
 
   function sortTable(columnIndex) {
     if (sortColumn === columnIndex) { sortAscending = !sortAscending; }
