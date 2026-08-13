@@ -3503,6 +3503,34 @@
       overflow: visible !important;
     }
 
+    /* ── PDF pagination stage (offscreen) — v4 ── */
+    .rpt-pdf-stage {
+      position: fixed;
+      left: -20000px;
+      top: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+    .rpt-pdf-page {
+      background: #ffffff;
+      font-family: var(--rpt-font-body);
+      color: #374151;
+      font-size: 14px;
+      line-height: 1.6;
+      border: 1px solid #eef0f3;
+      border-radius: var(--rpt-radius);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .rpt-pdf-page .rpt-section:last-child { border-bottom: none; }
+    .rpt-pdf-page .rpt-contd {
+      font-size: 0.55rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: none;
+      color: #9ca3af;
+    }
+
     /* Keep legacy animation names */
     @keyframes fadeIn  { from{opacity:0}to{opacity:1} }
     @keyframes slideUp { from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)} }
@@ -9828,8 +9856,185 @@
   }
 
   // ══════════════════════════════════════════════════════════════
-  //  PDF EXPORT  — html2canvas → jsPDF  (A4, paginated, complete)
+  //  PDF EXPORT  — html2canvas → jsPDF
+  //  v4 — block-aware pagination:
+  //       • never splits a table row / field row across pages
+  //       • repeats the section heading with "(contd.)" when a
+  //         section continues on the next page
+  //       • shrink-to-fit when the report is only slightly over
+  //         one page, so short reports stay on a single A4 page
   // ══════════════════════════════════════════════════════════════
+  const RPT_PDF_CFG = {
+    A4W: 210, A4H: 297, MG: 10,   // mm
+    PX_W: 760,                    // px render width of one page
+    SCALE: 2,                     // html2canvas scale
+    // ≤115% of one page → shrink slightly and keep the report on a single sheet.
+    // Raise (e.g. 1.30) to force more reports onto one page; lower to 1.0 to always
+    // paginate at full size.
+    FIT_TOL: 1.15
+  };
+
+  function _rptStripIds(node) {
+    if (node.removeAttribute) node.removeAttribute('id');
+    if (node.querySelectorAll) node.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+    return node;
+  }
+
+  function _rptNewPage(stage, pxW, pages) {
+    const p = document.createElement('div');
+    p.className = 'rpt-pdf-page';
+    p.style.width = pxW + 'px';
+    stage.appendChild(p);
+    pages.push(p);
+    return p;
+  }
+
+  // Shallow section clone (keeps classes/padding/borders) + heading
+  function _rptSectionShell(srcSection, contd) {
+    const sec = srcSection.cloneNode(false);
+    sec.removeAttribute('id');
+    const h = srcSection.querySelector('.rpt-section-heading');
+    if (h) {
+      const hc = _rptStripIds(h.cloneNode(true));
+      if (contd) {
+        const t = hc.querySelector('h4');
+        if (t) t.insertAdjacentHTML('beforeend', ' <span class="rpt-contd">(contd.)</span>');
+      }
+      sec.appendChild(hc);
+    }
+    return sec;
+  }
+
+  // Empty content holder — for tables keep <thead> (repeats on each page)
+  function _rptHolder(srcNode) {
+    const holder = _rptStripIds(srcNode.cloneNode(false));
+    if (holder.tagName === 'TABLE') {
+      if (srcNode.tHead) holder.appendChild(_rptStripIds(srcNode.tHead.cloneNode(true)));
+      holder.appendChild(document.createElement('tbody'));
+    }
+    return holder;
+  }
+  function _rptTarget(holder) {
+    return holder.tagName === 'TABLE' ? holder.tBodies[0] : holder;
+  }
+
+  // Rows that may be distributed across pages (null ⇒ atomic block)
+  function _rptSplitRows(srcNode) {
+    if (srcNode.tagName === 'TABLE') {
+      const tb = srcNode.tBodies[0];
+      return tb && tb.rows.length ? Array.from(tb.rows) : null;
+    }
+    if (srcNode.classList && (srcNode.classList.contains('rpt-dates-list') ||
+                              srcNode.classList.contains('rpt-unit-grid'))) {
+      const kids = Array.from(srcNode.children);
+      return kids.length > 3 ? kids : null;
+    }
+    return null;
+  }
+
+  // Pack header + sections into page-sized blocks. pageH = Infinity ⇒ single page.
+  function _rptBuildPages(card, stage, pxW, pageH) {
+    const pages = [];
+    let page = _rptNewPage(stage, pxW, pages);
+    const over = () => page.getBoundingClientRect().height > pageH + 0.5;
+    const aloneOnPage = sec => page.children.length === 1 && page.firstElementChild === sec;
+
+    // ── Header (page 1 only) ──
+    const header = card.querySelector('.rpt-header');
+    if (header) {
+      const hc = _rptStripIds(header.cloneNode(true));
+      hc.querySelectorAll('button').forEach(b => b.remove());
+      page.appendChild(hc);
+    }
+
+    // ── Sections ──
+    const sections = Array.from(card.querySelectorAll('.rpt-body > .rpt-section'));
+    sections.forEach(src => {
+      let emitted = false;                         // has any content of this section been placed?
+      let sec = _rptSectionShell(src, false);
+      page.appendChild(sec);
+      if (over() && !aloneOnPage(sec)) {           // heading would be orphaned
+        sec.remove();
+        page = _rptNewPage(stage, pxW, pages);
+        sec = _rptSectionShell(src, false);
+        page.appendChild(sec);
+      }
+
+      const contentNodes = Array.from(src.children)
+        .filter(k => !k.classList.contains('rpt-section-heading'));
+
+      contentNodes.forEach(cNode => {
+        const rows = _rptSplitRows(cNode);
+
+        // ── Atomic block: move whole block (with its heading) if it won't fit ──
+        if (!rows) {
+          const clone = _rptStripIds(cNode.cloneNode(true));
+          sec.appendChild(clone);
+          if (over() && !aloneOnPage(sec)) {
+            clone.remove();
+            sec.remove();
+            page = _rptNewPage(stage, pxW, pages);
+            sec = _rptSectionShell(src, emitted);
+            page.appendChild(sec);
+            sec.appendChild(clone);
+          }
+          emitted = true;
+          return;
+        }
+
+        // ── Row-by-row: break only between whole rows ──
+        let holder = _rptHolder(cNode);
+        sec.appendChild(holder);
+        let target = _rptTarget(holder);
+
+        rows.forEach(row => {
+          const rc = _rptStripIds(row.cloneNode(true));
+          target.appendChild(rc);
+          if (!over()) { emitted = true; return; }
+
+          rc.remove();
+          // A single row taller than a whole page — keep it rather than loop forever
+          if (!target.children.length && aloneOnPage(sec)) { target.appendChild(rc); emitted = true; return; }
+          if (!target.children.length) { holder.remove(); sec.remove(); }
+
+          page = _rptNewPage(stage, pxW, pages);
+          sec = _rptSectionShell(src, emitted);    // "(contd.)" only if the section really continues
+          page.appendChild(sec);
+          holder = _rptHolder(cNode);              // repeat thead
+          sec.appendChild(holder);
+          target = _rptTarget(holder);
+          target.appendChild(rc);
+          emitted = true;
+        });
+      });
+    });
+
+    // Drop pages / trailing shells left empty by a break
+    pages.forEach(p => {
+      Array.from(p.querySelectorAll('.rpt-section')).forEach(s => {
+        const hasContent = Array.from(s.children)
+          .some(c => !c.classList.contains('rpt-section-heading') &&
+                     (c.tagName === 'TABLE'
+                        ? (c.tBodies[0] && c.tBodies[0].rows.length)
+                        : c.children.length || (c.textContent || '').trim()));
+        if (!hasContent) s.remove();
+      });
+    });
+    return pages.filter(p => p.children.length && p.getBoundingClientRect().height > 4);
+  }
+
+  async function _rptCapture(el, scale) {
+    return html2canvas(el, {
+      scale:           scale,
+      useCORS:         true,
+      allowTaint:      true,
+      backgroundColor: '#ffffff',
+      logging:         false,
+      removeContainer: true,
+      imageTimeout:    0
+    });
+  }
+
   async function downloadUnitDetailPDF() {
     if (!currentUnitData) return;
     const btn = document.getElementById('rptPdfBtn');
@@ -9838,75 +10043,70 @@
     btn.disabled = true;
     btn.innerHTML = '<span class="rpt-pdf-spinner"></span> Generating…';
 
-    const card = document.getElementById('unitDetailCard');
-    const body = document.getElementById('rptBody');
+    const card  = document.getElementById('unitDetailCard');
+    const C     = RPT_PDF_CFG;
+    const stage = document.createElement('div');
+    stage.className = 'rpt-pdf-stage';
 
     try {
       const { jsPDF } = window.jspdf;
 
-      // ── Expand to full height for capture ───────────────────
-      const savedCardMaxH = card.style.maxHeight;
-      const savedCardOvY  = card.style.overflowY;
-      const savedBodyOvY  = body ? body.style.overflowY : '';
-      const savedBodyMaxH = body ? body.style.maxHeight  : '';
-
-      card.classList.add('rpt-pdf-mode');
-      card.style.maxHeight  = 'none';
-      card.style.overflowY  = 'visible';
-      if (body) { body.style.overflowY = 'visible'; body.style.maxHeight = 'none'; }
-
-      // One frame for repaint
-      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-      await new Promise(r => setTimeout(r, 60));
-
-      // ── html2canvas capture ──────────────────────────────────
-      const canvas = await html2canvas(card, {
-        scale:           2,
-        useCORS:         true,
-        allowTaint:      true,
-        backgroundColor: '#ffffff',
-        logging:         false,
-        removeContainer: false,
-        ignoreElements:  el => el.id === 'rptPdfBtn',  // hide the button in PDF
+      // Carry the project accent colour over to the offscreen pages
+      ['--rpt-accent', '--rpt-accent-rgb', '--report-accent'].forEach(v => {
+        const val = card.style.getPropertyValue(v);
+        if (val) stage.style.setProperty(v, val);
       });
+      document.body.appendChild(stage);
 
-      // ── Restore ──────────────────────────────────────────────
-      card.classList.remove('rpt-pdf-mode');
-      card.style.maxHeight = savedCardMaxH;
-      card.style.overflowY = savedCardOvY;
-      if (body) { body.style.overflowY = savedBodyOvY; body.style.maxHeight = savedBodyMaxH; }
+      const CONTENT_MM = C.A4W - C.MG * 2;              // 190 mm
+      const PAGE_MM    = C.A4H - C.MG * 2;              // 277 mm
 
-      // ── Build A4 PDF ─────────────────────────────────────────
-      const A4W = 210, A4H = 297, MG = 10;
-      const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+      // 1) Lay the whole report out on one tall page
+      let effW   = C.PX_W;
+      let pageEls = _rptBuildPages(card, stage, effW, Number.POSITIVE_INFINITY);
 
-      const imgW  = canvas.width;
-      const imgH  = canvas.height;
-      const pxPerMm = imgW / (A4W - MG*2);
-      const contentMmH = imgH / pxPerMm;
-      const sliceMmH   = A4H - MG*2;
-      const pages      = Math.ceil(contentMmH / sliceMmH);
-
-      for (let p = 0; p < pages; p++) {
-        if (p > 0) pdf.addPage();
-
-        const slicePxY  = Math.round(p * sliceMmH * pxPerMm);
-        const slicePxH  = Math.min(Math.round(sliceMmH * pxPerMm), imgH - slicePxY);
-        if (slicePxH <= 0) break;
-
-        const sliceCanvas = document.createElement('canvas');
-        sliceCanvas.width  = imgW;
-        sliceCanvas.height = slicePxH;
-        sliceCanvas.getContext('2d').drawImage(
-          canvas, 0, slicePxY, imgW, slicePxH, 0, 0, imgW, slicePxH
-        );
-
-        const mmH = slicePxH / pxPerMm;
-        pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.94),
-          'JPEG', MG, MG, A4W - MG*2, mmH);
+      // 1a) Safety net: if anything is wider than the page (very long labels, or a
+      //     webfont that failed to load), widen the sheet so nothing is clipped.
+      const needW = pageEls[0] ? Math.ceil(pageEls[0].scrollWidth) : effW;
+      if (needW > effW + 1) {
+        effW = needW;
+        stage.innerHTML = '';
+        pageEls = _rptBuildPages(card, stage, effW, Number.POSITIVE_INFINITY);
       }
 
-      // ── Page footers ─────────────────────────────────────────
+      const PAGE_PX_H = PAGE_MM * (effW / CONTENT_MM);
+      const fullH     = pageEls[0] ? pageEls[0].getBoundingClientRect().height : 0;
+
+      // 2) Too tall to shrink gracefully → paginate on block boundaries
+      if (fullH > PAGE_PX_H * C.FIT_TOL) {
+        stage.innerHTML = '';
+        pageEls = _rptBuildPages(card, stage, effW, PAGE_PX_H);
+      }
+
+      // Let fonts / icons settle before capture
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+      if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch(e) {} }
+      await new Promise(r => setTimeout(r, 60));
+
+      // 3) Capture each page and place it on its own A4 sheet
+      const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+
+      for (let i = 0; i < pageEls.length; i++) {
+        if (i > 0) pdf.addPage();
+        const cv = await _rptCapture(pageEls[i], C.SCALE);
+
+        let drawW = CONTENT_MM;
+        let drawH = (cv.height / cv.width) * CONTENT_MM;
+        if (drawH > PAGE_MM) {                     // shrink-to-fit (single-page case)
+          const s = PAGE_MM / drawH;
+          drawW *= s; drawH *= s;
+        }
+        const x = C.MG + (CONTENT_MM - drawW) / 2;
+
+        pdf.addImage(cv.toDataURL('image/jpeg', 0.95), 'JPEG', x, C.MG, drawW, drawH);
+      }
+
+      // 4) Footers
       const totalPages = pdf.internal.getNumberOfPages();
       const ts = new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
       for (let p = 1; p <= totalPages; p++) {
@@ -9914,8 +10114,8 @@
         pdf.setFontSize(6.5);
         pdf.setTextColor(170, 170, 170);
         pdf.text(`Unit ${currentUnitData.UnitNo}  |  ${selectedProjectTower||''}  |  Generated: ${ts}`,
-          MG, A4H - 5);
-        pdf.text(`${p} / ${totalPages}`, A4W - MG, A4H - 5, { align:'right' });
+          C.MG, C.A4H - 5);
+        pdf.text(`${p} / ${totalPages}`, C.A4W - C.MG, C.A4H - 5, { align:'right' });
       }
 
       pdf.save(`Unit_${currentUnitData.UnitNo}_Report.pdf`);
@@ -9924,6 +10124,7 @@
       console.error('PDF error:', err);
       alert('PDF export failed — ' + err.message);
     } finally {
+      if (stage.parentNode) stage.parentNode.removeChild(stage);
       btn.disabled = false;
       btn.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Download PDF';
     }
