@@ -4525,14 +4525,6 @@
           onmouseover="this.style.background='rgba(198,89,17,0.35)'" onmouseout="this.style.background='rgba(131,60,12,0.18)'">
           <i class="bi bi-gear-fill"></i> Settings
         </button>
-        <!-- CTG Toggle Switch -->
-        <div id="ctgToggleBtn" onclick="toggleCTGColumn()" title="Show / Hide CTG column in Unit Details" style="display:flex;align-items:center;gap:0.45rem;background:rgba(131,60,12,0.18);border:1.5px solid rgba(198,89,17,0.5);padding:0.4rem 0.85rem;border-radius:8px;cursor:pointer;user-select:none;transition:all 0.3s;">
-          <i class="bi bi-calculator" style="color:#FCE7DC;font-size:0.9rem;"></i>
-          <span style="color:#FCE7DC;font-size:0.8rem;font-weight:600;white-space:nowrap;">CTG</span>
-          <div id="ctgToggleTrack" style="position:relative;width:36px;height:20px;background:rgba(255,255,255,0.2);border-radius:10px;transition:background 0.25s;flex-shrink:0;">
-            <div id="ctgToggleThumb" style="position:absolute;top:3px;left:3px;width:14px;height:14px;background:white;border-radius:50%;transition:left 0.25s;"></div>
-          </div>
-        </div>
         <button onclick="logoutAdmin()" style="background: rgba(131,60,12,0.18); border: 1.5px solid rgba(198,89,17,0.5); color: #FCE7DC; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.3s; white-space: nowrap;"
           onmouseover="this.style.background='rgba(198,89,17,0.35)';this.style.borderColor='rgba(198,89,17,0.8)'"
           onmouseout="this.style.background='rgba(131,60,12,0.18)';this.style.borderColor='rgba(198,89,17,0.5)'"
@@ -5444,10 +5436,10 @@
               <div class="shell-basis-row">
                 <span class="shell-basis-lbl">Filter by</span>
                 <div class="shell-basis-pills">
-                  <button class="shell-basis-pill active" id="shellBasisBaseline" onclick="setShellDateBasis('baseline')">
+                  <button class="shell-basis-pill" id="shellBasisBaseline" onclick="setShellDateBasis('baseline')">
                     <i class="bi bi-calendar-check"></i> Baseline
                   </button>
-                  <button class="shell-basis-pill" id="shellBasisActual" onclick="setShellDateBasis('actual')">
+                  <button class="shell-basis-pill active" id="shellBasisActual" onclick="setShellDateBasis('actual')">
                     <i class="bi bi-calendar2-event"></i> Actual/Proj
                   </button>
                 </div>
@@ -6038,7 +6030,7 @@
       inventorySelPA = new Set(), idsaSelPA = new Set(), gfcSelPA = new Set(), ocSelPA = new Set();
   let selectedYearPA = ''; // kept for legacy reference — date range replaces year filter
   // CTG visibility toggle (controls CTG column in PA Unit Details table)
-  let ctgVisible = false;
+  let ctgVisible = true;
   
   // Plan Actual Details (Plaster / Flooring / Handover)
   let currentPlanActualData = [];
@@ -7005,7 +6997,8 @@
 
   function renderDetailsTable() {
     const tbody = document.getElementById("detailsTableBody");
-    const totalCols = 8 + activeColIds.length;
+    const ctgCol = _milestoneCtgCol();
+    const totalCols = 8 + activeColIds.length + (ctgCol ? 1 : 0);
 
     if (currentDetailsData.length === 0) {
       tbody.innerHTML = `
@@ -7046,6 +7039,7 @@
         <td class="revenue-cell" style="font-size:1.1rem;">
           <strong>₹${totalRevenue.toFixed(2)} Cr</strong>
         </td>
+        ${ctgCol ? `<td style="text-align:right;font-weight:700;color:#C65911;">₹${(displayData.reduce((s, u) => s + ctgCol.calc(u), 0) / 10000000).toFixed(2)}</td>` : ''}
         <td style="font-size:0.78rem;font-weight:700;color:#446A2C;text-align:center;">${displayData.filter(u => u.Inventory === 'Sold' || u.Inventory === 'LL Sold').length}</td>
         ${statusTotals.map(t => {
           if (t === null) return '<td></td>';
@@ -7074,6 +7068,7 @@
           <td class="unit-number">${unit.UnitNo}</td>
           <td class="customer-name">${unit.Customer}</td>
           <td class="revenue-cell">₹${revenue}</td>
+          ${ctgCol ? `<td style="text-align:right;color:#C65911;font-weight:600;">₹${(ctgCol.calc(unit) / 10000000).toFixed(2)}</td>` : ''}
           <td style="font-size:0.78rem;">${unit.Inventory || '—'}</td>
           ${optCells}
         </tr>`);
@@ -7173,17 +7168,19 @@
     if (currentDetailsData.length === 0) { alert('No data to download'); return; }
 
     const optLabels = activeColIds.map(id => (OPTIONAL_COLS.find(c => c.id === id) || {label: id}).label);
-    const headers = ['Project', 'Phase', 'Tower', 'Product Type', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', 'Inventory', ...optLabels];
+    const ctgCol = _milestoneCtgCol();
+    const headers = ['Project', 'Phase', 'Tower', 'Product Type', 'Unit No.', 'Customer Name', 'Revenue (₹ Cr)', ...(ctgCol ? [ctgCol.label] : []), 'Inventory', ...optLabels];
 
     // schema: 't'=text, 'n'=number, 'd'=date, 's'=status-text
-    const schema = ['t','t','t','t','t','t','n','t', ...activeColIds.map(id => {
+    const schema = ['t','t','t','t','t','t','n', ...(ctgCol ? ['n'] : []), 't', ...activeColIds.map(id => {
       const col = OPTIONAL_COLS.find(c => c.id === id);
       return (col && col.type === 'ctg') ? 'n' : 't';
     })];
 
     const excelData = [headers];
     const totalRevenue = currentDetailsData.reduce((s, u) => s + (u[currentRevenueField] || 0), 0) / 10000000;
-    excelData.push(['TOTAL', '', '', '', `${currentDetailsData.length} Units`, '', totalRevenue, '', ...activeColIds.map(() => '')]);
+    const totalCtg = ctgCol ? currentDetailsData.reduce((s, u) => s + ctgCol.calc(u), 0) / 10000000 : null;
+    excelData.push(['TOTAL', '', '', '', `${currentDetailsData.length} Units`, '', totalRevenue, ...(ctgCol ? [totalCtg] : []), '', ...activeColIds.map(() => '')]);
 
     currentDetailsData.forEach(unit => {
       const revenue = (unit[currentRevenueField] || 0) / 10000000;
@@ -7194,7 +7191,8 @@
         return unit[col.field] ? 'Done' : 'Pending';
       });
       excelData.push([unit.Project||'N/A', unit.Phase||'N/A', unit.Tower||'N/A',
-        unit.ProductType||'', unit.UnitNo, unit.Customer, revenue, unit.Inventory||'', ...optVals]);
+        unit.ProductType||'', unit.UnitNo, unit.Customer, revenue,
+        ...(ctgCol ? [ctgCol.calc(unit) / 10000000] : []), unit.Inventory||'', ...optVals]);
     });
 
     const wb = XLSX.utils.book_new();
@@ -8741,6 +8739,7 @@
       planactual:   { btn: 'switchTab(\'planactual\')',   content: 'planActualTab' },
       tower:        { btn: 'switchTab(\'tower\')',         content: 'towerTab' },
       shelltracker: { btn: 'switchTab(\'shelltracker\')', content: 'shellTrackerTab' },
+      projectsummary: { btn: 'switchTab(\'projectsummary\')', content: 'projectSummaryTab' },
     };
 
     // Admin: always show all
@@ -8752,7 +8751,7 @@
     // Find user record to get their tabs list
     const users = getUsers();
     const record = users.find(u => u.username === user.username);
-    const allowed = (record && record.tabs && record.tabs.length > 0) ? record.tabs : ['milestone','planactual','tower','shelltracker'];
+    const allowed = (record && record.tabs && record.tabs.length > 0) ? record.tabs : ['milestone','planactual','tower','shelltracker','projectsummary'];
 
     // Show/hide each tab button
     document.querySelectorAll('#tabNavigation .tab-button').forEach(btn => {
@@ -10642,12 +10641,13 @@
   }
 
   // All 4 tabs available — same keys used in tab navigation onclick attrs
-  const ALL_TABS = ['milestone','planactual','tower','shelltracker'];
+  const ALL_TABS = ['milestone','planactual','tower','shelltracker','projectsummary'];
   const TAB_LABELS = {
-    milestone:    'Project Milestone',
-    planactual:   'Plan Vs Actuals',
-    tower:        'Graphical Representation',
-    shelltracker: 'Shell Tracker'
+    milestone:     'Project Milestone',
+    planactual:    'Plan Vs Actuals',
+    tower:         'Graphical Representation',
+    shelltracker:  'Shell Tracker',
+    projectsummary:'Project Summary'
   };
 
   async function createUser() {
@@ -10919,6 +10919,16 @@
     'Ready for Handover': 'ctg_ms_HAND_TOTAL',
   };
 
+  // The aggregate CTG-till-milestone column for the activity currently shown (or null)
+  function _milestoneCtgCol() {
+    const id = ACTIVITY_CTG_COL[currentActivityName];
+    return id ? OPTIONAL_COLS.find(c => c.id === id) : null;
+  }
+  function _milestoneCtgHeaderCell() {
+    const c = _milestoneCtgCol();
+    return c ? `<th class="ctg-fixed-col" style="text-align:right;white-space:nowrap;color:#C65911;">${c.label}</th>` : '';
+  }
+
   function _loadActiveCols(activityName) {
     let cols;
     try {
@@ -10931,11 +10941,11 @@
     // Strip any aggregate CTG cols that no longer apply (stale from previous session)
     cols = cols.filter(id => !id.startsWith('ctg_ms_') || id === ACTIVITY_CTG_COL[activityName]);
 
-    // Inject the correct aggregate CTG col at end when CTG toggle is ON
-    const ctgCol = ACTIVITY_CTG_COL[activityName];
-    if (ctgVisible && ctgCol && !cols.includes(ctgCol)) {
-      cols.push(ctgCol);
-    }
+    // Aggregate CTG totals are no longer part of the optional-column stream —
+    // they render as a dedicated fixed column immediately after Revenue.
+    const AGG_CTG_IDS = ['ctg_ms_PLASTER_TOTAL','ctg_ms_FLOOR_TOTAL','ctg_ms_HAND_TOTAL'];
+    cols = cols.filter(id => !AGG_CTG_IDS.includes(id));
+
     return cols;
   }
 
@@ -11079,7 +11089,7 @@
     let h = fixed.map(f => `
       <th class="sortable" onclick="sortTable(${f.ci})">${f.label}
         <button class="col-filter-btn" data-table="milestone" data-col="${f.ci}" onclick="openCFD(event,this)" title="Filter"><i class="bi bi-funnel-fill"></i></button>
-      </th>`).join('');
+      </th>${f.ci === 6 ? _milestoneCtgHeaderCell() : ''}`).join('');
     activeColIds.forEach((id, i) => {
       const col = OPTIONAL_COLS.find(c => c.id === id); if (!col) return;
       const ci = 8 + i;
@@ -11739,6 +11749,7 @@
               <label class="tab-access-chip"><input type="checkbox" value="planactual" checked> <i class="bi bi-graph-up-arrow"></i> Plan Vs Actuals</label>
               <label class="tab-access-chip"><input type="checkbox" value="tower" checked> <i class="bi bi-building"></i> Graphical Representation</label>
               <label class="tab-access-chip"><input type="checkbox" value="shelltracker" checked> <i class="bi bi-building-fill-gear"></i> Shell Tracker</label>
+              <label class="tab-access-chip"><input type="checkbox" value="projectsummary" checked> <i class="bi bi-clipboard2-data"></i> Project Summary</label>
             </div>
           </div>
           <div id="createUserMsg" style="margin-top:0.75rem;font-size:0.82rem;font-weight:600;display:none;"></div>
@@ -12181,7 +12192,7 @@ window.drpApplyPS = function(from, to) {
 };
 
 // ── Shell date-basis: 'baseline' (default) | 'actual' ────────
-var _shellDateBasis = 'baseline';
+var _shellDateBasis = 'actual';
 
 window.setShellDateBasis = function(basis) {
   _shellDateBasis = basis;
@@ -12212,12 +12223,12 @@ function _applyThisYearDefault() {
   const from = new Date(y, 0, 1);
   const to   = new Date(y, 11, 31);
   _drpFromPA    = _ds(from); _drpToPA    = _de(to);
-  _drpFromShell = _ds(from); _drpToShell = _de(to);
+  // Shell Tracker intentionally left with NO date range by default (All Dates)
   // Update trigger labels
   const MS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const fmt = d => `${d.getDate()}-${MS[d.getMonth()]}-${String(d.getFullYear()).slice(2)}`;
   const label = fmt(from) + ' – ' + fmt(to);
-  ['PA','Shell'].forEach(function(ctx) {
+  ['PA'].forEach(function(ctx) {
     const lbl  = document.getElementById('drpLabel'  + ctx);
     const trig = document.getElementById('drpTrigger' + ctx);
     if (lbl)  lbl.textContent = label;
