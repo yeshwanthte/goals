@@ -1620,74 +1620,196 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════════
-       MILESTONE "UNIT DETAILS" TABLE — compact layout + frozen columns
-       Scoped to #milestoneDetailsTable ONLY, so the Plan vs Actuals and
-       Structures tables keep their existing look.
+       MILESTONE "UNIT DETAILS" TABLE  —  premium compact data grid
+       Scoped to #detailsSection / #milestoneDetailsTable ONLY, so the
+       Plan vs Actuals and Structures tables keep their existing look.
 
-       Columns 1-6 (Project, Phase, Tower, Product Type, Unit No.,
-       Customer Name) are frozen. Revenue / CTG / Inventory / optional
-       columns scroll horizontally.
-
-       Selector note: data-cell rules are scoped to
-       `tbody tr:not(.total-row) td:not([colspan])` so the TOTAL row's
-       merged cell and the "no data" cell are never treated as columns.
-       --fz-2 … --fz-6 (left offsets), --fz-m6 and --mds-head-h are
-       measured and published by syncMilestoneFrozenCols().
+       • columns 1-6 (Project → Customer Name) are frozen; Revenue / CTG /
+         Inventory / optional columns scroll horizontally
+       • headers wrap to 2 lines; sort caret shows on hover / active column
+       • data-cell rules are scoped to
+         `tbody tr:not(.total-row) td:not([colspan])` so the TOTAL row's
+         merged cell and the "no data" cell are never treated as columns
+       • --fz-2 … --fz-6, --fz-m6 and --mds-head-h are measured and
+         published by syncMilestoneFrozenCols()
        ═══════════════════════════════════════════════════════════════════ */
+
+    #detailsSection {
+      --mds-ink:        #344054;   /* body text            */
+      --mds-ink-soft:   #667085;   /* secondary text       */
+      --mds-line:       #EFF1F4;   /* row separator        */
+      --mds-line-soft:  #F5F6F8;
+      --mds-zebra:      #FDFAF7;   /* barely-there warm tint */
+      --mds-hover:      #FEF4EC;
+      --mds-brand:      #C65911;
+      --mds-brand-deep: #833C0C;
+      --mds-green:      #047857;
+      --mds-green-soft: #E9FAF1;
+    }
+
+    /* ── Shell: soft border, restrained depth, quiet scrollbars ── */
+    #detailsSection .details-table-container {
+      background: #fff;
+      border: 1px solid rgba(198, 89, 17, 0.10);
+      border-radius: 14px;
+      box-shadow:
+        0 1px 2px rgba(16, 24, 40, 0.04),
+        0 10px 26px -14px rgba(16, 24, 40, 0.16);
+      scrollbar-width: thin;
+      scrollbar-color: #D9DDE3 transparent;
+    }
+    #detailsSection .details-table-container::-webkit-scrollbar { width: 9px; height: 9px; }
+    #detailsSection .details-table-container::-webkit-scrollbar-track { background: transparent; }
+    #detailsSection .details-table-container::-webkit-scrollbar-thumb {
+      background: #DCE0E6;
+      border: 2px solid #fff;
+      border-radius: 10px;
+    }
+    #detailsSection .details-table-container::-webkit-scrollbar-thumb:hover { background: #C3C9D2; }
+    #detailsSection .details-table-container::-webkit-scrollbar-corner { background: #fff; }
 
     /* Content-sized columns instead of stretched-to-fit */
     #milestoneDetailsTable {
       width: max-content;
       min-width: 100%;
+      font-variant-numeric: tabular-nums;
     }
 
-    /* ── Compact header ── */
+    /* ── Header: 2-line wrapping, vertical gradient, hairline depth ── */
     #milestoneDetailsTable thead tr.sort-row th {
-      padding: 0.5rem 0.55rem;
-      font-size: 0.7rem;
-      letter-spacing: 0.2px;
+      height: 42px;
+      padding: 0.44rem 0.6rem;
+      font-size: 0.625rem;
+      font-weight: 600;
+      letter-spacing: 0.045em;
+      line-height: 1.2;
+      vertical-align: middle;
+      color: rgba(255, 255, 255, 0.95);
+      white-space: normal;                 /* wrap long labels onto 2 lines */
+      text-wrap: balance;                  /* … and split them evenly       */
+      hyphens: none;
+      /* 126px clears the longest single word in any column label
+         ("FENESTRATION"), so multi-word labels wrap onto 2 lines while no
+         word is ever split mid-way. */
+      max-width: 126px;
+      background:
+        linear-gradient(180deg, #C65911 0%, #A9490D 52%, #8E3D0A 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.14);
+      transition: background 0.18s ease;
     }
-    #milestoneDetailsTable thead tr.sort-row th.sortable {
-      padding-right: 2.15rem;              /* room for sort arrow + filter icon */
+    #milestoneDetailsTable thead tr.sort-row th:hover {
+      background: linear-gradient(180deg, #A9490D 0%, #8E3D0A 52%, #74310A 100%);
     }
+    /* text columns keep a comfortable cap; Phase / Tower / Unit No. are
+       already short, so they simply size to their label. */
+    #milestoneDetailsTable thead tr.sort-row th:nth-child(1) { max-width: 124px; }
+    #milestoneDetailsTable thead tr.sort-row th:nth-child(4) { max-width: 100px; }
+    #milestoneDetailsTable thead tr.sort-row th:nth-child(6) { max-width: 190px; min-width: 118px; }
+
+    /* Icon gutter: filter chip top-right, sort caret bottom-right */
+    #milestoneDetailsTable thead tr.sort-row th.sortable { padding-right: 1.15rem; }
+    #milestoneDetailsTable thead tr.sort-row th[style*="center"] { padding-left: 1.15rem; }
     #milestoneDetailsTable thead tr.sort-row th.sortable::after {
-      right: 1.25rem;
-      font-size: 0.62rem;
+      right: 3px;
+      top: auto;
+      bottom: 2px;
+      transform: none;
+      font-size: 0.56rem;
+      opacity: 0;                          /* only the active column shows it */
+      transition: opacity 0.15s ease;
     }
+    #milestoneDetailsTable thead tr.sort-row th.sortable:hover::after { opacity: 0.6; }
+    #milestoneDetailsTable thead tr.sort-row th.sortable.asc::after,
+    #milestoneDetailsTable thead tr.sort-row th.sortable.desc::after { opacity: 1; }
     #milestoneDetailsTable .col-filter-btn {
-      right: 0.2rem;
-      width: 17px;
-      height: 17px;
-      font-size: 0.58rem;
-      border-radius: 3px;
+      top: 3px;
+      right: 3px;
+      transform: none;
+      width: 15px;
+      height: 15px;
+      font-size: 0.5rem;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      opacity: 0.75;
+      transition: opacity 0.15s ease, background 0.15s ease;
+    }
+    #milestoneDetailsTable thead tr.sort-row th:hover .col-filter-btn { opacity: 1; }
+    #milestoneDetailsTable .col-filter-btn.active {
+      opacity: 1;
+      background: #FBBF24;
+      border-color: #F1A208;
+      color: #7C2D12;
+      box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.22);
     }
 
-    /* ── Compact body ── */
+    /* ── Body: compact rows, quiet separators ── */
     #milestoneDetailsTable tbody td {
-      padding: 0.42rem 0.55rem;
-      font-size: 0.78rem;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.765rem;
+      color: var(--mds-ink);
+      border-bottom: 1px solid var(--mds-line);
       white-space: nowrap;                 /* keeps every column content-tight */
     }
-    #milestoneDetailsTable tbody tr.total-row td {
-      padding: 0.55rem 0.55rem !important;
-      font-size: 0.85rem;
+    #milestoneDetailsTable tbody tr:not(.total-row):nth-child(even) { background: var(--mds-zebra); }
+    #milestoneDetailsTable tbody tr:not(.total-row):hover { background: var(--mds-hover); }
+    #milestoneDetailsTable tbody tr:not(.total-row):last-child td { border-bottom: none; }
+
+    /* typography hierarchy */
+    #milestoneDetailsTable tbody tr:not(.total-row) td:nth-child(1) {
+      font-weight: 600;
+      font-size: 0.735rem;
+      color: #5B4636;
+      letter-spacing: 0.01em;
     }
-    #milestoneDetailsTable tbody tr.total-row td.revenue-cell { font-size: 0.95rem !important; }
+    #milestoneDetailsTable tbody tr:not(.total-row) td:nth-child(2),
+    #milestoneDetailsTable tbody tr:not(.total-row) td:nth-child(3) {
+      color: #4B5563;
+      font-size: 0.74rem;
+    }
+    #milestoneDetailsTable tbody td.unit-number {
+      font-weight: 700;
+      color: var(--mds-brand);
+      letter-spacing: 0.015em;
+    }
+    #milestoneDetailsTable tbody td.customer-name {
+      color: #475467;
+      font-weight: 500;
+    }
+    #milestoneDetailsTable tbody tr:not(.total-row) td.revenue-cell {
+      font-weight: 600;
+      color: var(--mds-green);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* polished status marks */
+    #milestoneDetailsTable tbody td i.bi-check-circle-fill {
+      color: #059669 !important;
+      font-size: 0.9rem !important;
+      filter: drop-shadow(0 1px 1.5px rgba(5, 150, 105, 0.28));
+    }
+    #milestoneDetailsTable tbody td i.bi-x-circle-fill {
+      color: #DCE0E6 !important;
+      font-size: 0.88rem !important;
+    }
+
+    /* Cap the scrollable columns as well, so slack never balloons a column
+       (nowrap values always win over the cap, so nothing is ever clipped). */
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]) { max-width: 126px; }
 
     /* Long text fields stay readable — wrap instead of stretching the column */
     #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(1),
     #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(4),
     #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(6) {
       white-space: normal;
-      line-height: 1.25;
+      line-height: 1.3;
       word-break: break-word;
     }
-    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(1),
-    #milestoneDetailsTable thead tr.sort-row th:nth-child(1) { max-width: 140px; }
-    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(4),
-    #milestoneDetailsTable thead tr.sort-row th:nth-child(4) { max-width: 120px; }
-    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(6),
-    #milestoneDetailsTable thead tr.sort-row th:nth-child(6) { max-width: 190px; min-width: 125px; }
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(1) { max-width: 124px; }
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(4) { max-width: 100px; }
+    #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(6) { max-width: 190px; min-width: 118px; }
 
     /* ── Frozen columns 1-6 ── */
     #milestoneDetailsTable thead tr.sort-row th:nth-child(-n+6) {
@@ -1699,10 +1821,14 @@
       background: #ffffff;                 /* opaque — nothing shows through */
     }
     #milestoneDetailsTable tbody tr:not(.total-row):nth-child(even) td:not([colspan]):nth-child(-n+6) {
-      background: #fefcfa;                 /* opaque match of the striped row tint */
+      background: var(--mds-zebra);        /* opaque match of the striped row */
     }
     #milestoneDetailsTable tbody tr:not(.total-row):hover td:not([colspan]):nth-child(-n+6) {
-      background: var(--gray-50);
+      background: var(--mds-hover);
+    }
+    /* hover accent on the frozen edge of the row */
+    #milestoneDetailsTable tbody tr:not(.total-row):hover td:not([colspan]):nth-child(1) {
+      box-shadow: inset 2px 0 0 rgba(198, 89, 17, 0.55);
     }
 
     /* Sticky left offsets (cumulative header widths, published from JS) */
@@ -1719,25 +1845,69 @@
     #milestoneDetailsTable thead tr.sort-row th:nth-child(6),
     #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(6) { left: var(--fz-6, 0px); }
 
-    /* TOTAL row — stays frozen under the header; its merged label cell spans
-       exactly the 6 frozen columns, so that one cell is the frozen block. */
+    /* ── TOTAL row: prominent but elegant; stays frozen under the header ── */
     #milestoneDetailsTable tbody tr.total-row {
       top: var(--mds-head-h, 38px);
+      background: linear-gradient(180deg, #EDFBF3 0%, #DFF6EA 100%) !important;
+      border-top: 1px solid rgba(4, 120, 87, 0.28) !important;
+      border-bottom: 1px solid rgba(4, 120, 87, 0.28) !important;
+      box-shadow: 0 4px 10px -6px rgba(4, 120, 87, 0.35);
+    }
+    #milestoneDetailsTable tbody tr.total-row td {
+      padding: 0.5rem 0.6rem !important;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--mds-green);
+      border-bottom: none;
+      letter-spacing: 0.01em;
+    }
+    #milestoneDetailsTable tbody tr.total-row td.revenue-cell {
+      font-size: 0.85rem !important;
+      color: var(--mds-green);
+    }
+    #milestoneDetailsTable tbody tr.total-row .total-label {
+      gap: 0.4rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    #milestoneDetailsTable tbody tr.total-row .total-label i {
+      font-size: 0.85rem;
+      color: rgba(4, 120, 87, 0.75);
     }
     #milestoneDetailsTable tbody tr.total-row td[colspan="6"] {
       position: sticky;
       left: 0;
       z-index: 2;                          /* inside the row's own stacking context */
-      background: #d1fae5;                 /* opaque version of the total-row tint */
+      background: linear-gradient(180deg, #EDFBF3 0%, #DFF6EA 100%);
     }
 
-    /* Edge of the frozen block — separator + soft depth while scrolling */
+    /* ── Frozen ⇄ scrollable seam ── */
     #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(6),
     #milestoneDetailsTable tbody tr.total-row td[colspan="6"] {
-      box-shadow: inset -1px 0 0 rgba(0,0,0,0.08), 5px 0 6px -5px rgba(0,0,0,0.16);
+      box-shadow:
+        inset -1px 0 0 rgba(198, 89, 17, 0.16),
+        9px 0 10px -9px rgba(16, 24, 40, 0.30);
     }
     #milestoneDetailsTable thead tr.sort-row th:nth-child(6) {
-      box-shadow: inset -1px 0 0 rgba(255,255,255,0.28), 5px 0 6px -5px rgba(0,0,0,0.24);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.14),
+        inset -1px 0 0 rgba(255, 255, 255, 0.30),
+        9px 0 10px -9px rgba(16, 24, 40, 0.34);
+    }
+    /* keep the seam on the frozen edge while a row is hovered */
+    #milestoneDetailsTable tbody tr:not(.total-row):hover td:not([colspan]):nth-child(6) {
+      box-shadow:
+        inset -1px 0 0 rgba(198, 89, 17, 0.22),
+        9px 0 10px -9px rgba(16, 24, 40, 0.30);
+    }
+
+    /* empty state */
+    #milestoneDetailsTable tbody td[colspan]:not([colspan="6"]) {
+      color: var(--mds-ink-soft);
+      font-size: 0.8rem;
+      letter-spacing: 0.01em;
     }
 
     @media (max-width: 768px) {
@@ -1752,7 +1922,7 @@
       #milestoneDetailsTable tbody tr:not(.total-row) td:not([colspan]):nth-child(6) { left: var(--fz-m6, 0px); }
       #milestoneDetailsTable tbody tr.total-row td[colspan="6"] { position: static; box-shadow: none; }
     }
-    /* ══════════════ END compact + frozen columns ══════════════ */
+    /* ══════════════ END premium compact grid ══════════════ */
 
     .unit-number {
       font-weight: 600;
