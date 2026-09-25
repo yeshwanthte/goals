@@ -635,6 +635,13 @@
       }
     }
 
+    /* Milestone dashboard: 9 slicers laid out 5 + 4 → exactly 2 rows.
+       (id rules must restate the responsive steps, they outrank the class.) */
+    #milestoneFilterGrid { grid-template-columns: repeat(5, 1fr); }
+    @media (max-width: 1280px) { #milestoneFilterGrid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 992px)  { #milestoneFilterGrid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 576px)  { #milestoneFilterGrid { grid-template-columns: 1fr; } }
+
     .filter-card {
       background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(20px);
@@ -4966,7 +4973,7 @@
           <i class="bi bi-x-circle"></i> Clear All
         </button>
       </div>
-      <div class="filter-grid">
+      <div class="filter-grid" id="milestoneFilterGrid">
         <div class="filter-card">
           <div class="filter-card-header"><i class="bi bi-folder"></i> Project<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
           <div class="filter-card-body"><div id="projectSlicer" class="slicer"></div></div>
@@ -4990,6 +4997,10 @@
         <div class="filter-card">
           <div class="filter-card-header"><i class="bi bi-file-check"></i> GFC Status<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
           <div class="filter-card-body"><div id="gfcSlicer" class="slicer"></div></div>
+        </div>
+        <div class="filter-card">
+          <div class="filter-card-header"><i class="bi bi-bricks"></i> Shell Status<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
+          <div class="filter-card-body"><div id="shellStatusSlicer" class="slicer"></div></div>
         </div>
         <div class="filter-card">
           <div class="filter-card-header"><i class="bi bi-patch-check"></i> OC Status<span class="ctrl-hint"><kbd>Ctrl</kbd>+click multi</span></div>
@@ -6356,7 +6367,7 @@
   let sortAscending = true;
   let projectSel = new Set(), towerSel = new Set(), phaseSel = new Set(),
       inventorySel = new Set(), idsaSel = new Set(), gfcSel = new Set(), ocSel = new Set(),
-      productTypeSel = new Set();
+      productTypeSel = new Set(), shellSel = new Set();
   
   // Plan vs Actuals filters
   let projectSelPA = new Set(), towerSelPA = new Set(), phaseSelPA = new Set(),
@@ -6463,8 +6474,22 @@
     CTG_CI: 86,  // Column CI — Furniture CTG amount
     CTG_CJ: 87,  // Column CJ — Kitchen CTG amount
     CTG_CK: 88,  // Column CK — Landscape CTG amount
-    CTG_CL: 89   // Column CL — Lighting & Signage CTG amount
+    CTG_CL: 89,  // Column CL — Lighting & Signage CTG amount
+    SHELL_STATUS: 92  // Column CO — Shell Status (Completed / In Progress)
   };
+
+  // ── Shell Status (Col CO) → slicer label ───────────────────────────
+  // Accepts either a text status ("Completed" / "In Progress" / "WIP" …)
+  // or a completion date in the cell. Anything that is not a completion
+  // value is treated as still In Progress, so every unit falls in exactly
+  // one of the two buckets.
+  function shellStatusLabel(v) {
+    const s = (v === null || v === undefined ? '' : String(v)).trim().toLowerCase();
+    if (!s) return 'In Progress';
+    if (/^(comp|done|yes|y$|finish|hand)/.test(s)) return 'Completed';
+    if (/^(in[\s_-]*prog|wip|ongoing|progress|not|no$|n$|pend)/.test(s)) return 'In Progress';
+    return validDate(v) ? 'Completed' : 'In Progress';
+  }
 
   // File handling (only wire up if upload elements exist in the DOM)
   const csvFile = document.getElementById("csvFile");
@@ -6596,6 +6621,8 @@
       HOasPerAFS: r[COL.HO_AFS] || "",
       IDSADate: r[COL.IDSA_DATE] || "",
       HOasPerIDSA: r[COL.HO_IDSA] || "",
+      // Shell Status — Column CO
+      ShellStatus: shellStatusLabel(r[COL.SHELL_STATUS]),
       // Optional status fields
       Masonry:     validDate(r[COL.MASONRY]),
       Conduiting:  validDate(r[COL.CONDUITING]),
@@ -6779,7 +6806,7 @@
     const hasActiveFilters = projectSel.size > 0 || towerSel.size > 0 || 
                              phaseSel.size > 0 || inventorySel.size > 0 || 
                              idsaSel.size > 0 || gfcSel.size > 0 || ocSel.size > 0 ||
-                             productTypeSel.size > 0;
+                             productTypeSel.size > 0 || shellSel.size > 0;
     
     if (!hasActiveFilters) {
       // Remove all highlighting if no filters
@@ -6797,6 +6824,7 @@
       (!inventorySel.size || inventorySel.has(r.Inventory)) &&
       (!idsaSel.size || idsaSel.has(r.IDSADate ? "Yes" : "No")) &&
       (!gfcSel.size || gfcSel.has(r.GFC ? "Yes" : "No")) &&
+      (!shellSel.size || shellSel.has(r.ShellStatus)) &&
       (!ocSel.size || ocSel.has(r.OC)) &&
       (!productTypeSel.size || productTypeSel.has(r.ProductType))
     );
@@ -6816,6 +6844,7 @@
     updateSlicerButtons('inventorySlicer', availableInventory, inventorySel);
     updateSlicerButtons('idsaSlicer', availableIDSA, idsaSel);
     updateSlicerButtons('gfcSlicer', availableGFC, gfcSel);
+    updateSlicerButtons('shellStatusSlicer', new Set(d.map(x => x.ShellStatus)), shellSel);
     updateSlicerButtons('ocSlicer', availableOC, ocSel);
     const availableProductTypes = new Set(d.map(x => x.ProductType));
     updateSlicerButtons('productTypeSlicer', availableProductTypes, productTypeSel);
@@ -6852,6 +6881,7 @@
     buildSlicer("inventorySlicer", [...new Set(raw.map(r => r.Inventory))], inventorySel);
     buildSlicer("idsaSlicer", ["Yes", "No"], idsaSel);
     buildSlicer("gfcSlicer", ["Yes", "No"], gfcSel);
+    buildSlicer("shellStatusSlicer", ["Completed", "In Progress"], shellSel);
     buildSlicer("ocSlicer", ["OC recvd", "OC not recvd"], ocSel);
     buildSlicer("productTypeSlicer", [...new Set(raw.map(r => r.ProductType).filter(Boolean))].sort(), productTypeSel);
   }
@@ -7008,7 +7038,7 @@
   }
 
   function clearAllFilters() {
-    [projectSel, towerSel, phaseSel, inventorySel, idsaSel, gfcSel, ocSel, productTypeSel].forEach(s => s.clear());
+    [projectSel, towerSel, phaseSel, inventorySel, idsaSel, gfcSel, shellSel, ocSel, productTypeSel].forEach(s => s.clear());
     document.querySelectorAll(".slicer button").forEach(b => {
       b.classList.remove("active", "dimmed", "highlighted");
     });
@@ -7024,6 +7054,7 @@
       (!inventorySel.size || inventorySel.has(r.Inventory)) &&
       (!idsaSel.size || idsaSel.has(r.IDSADate ? "Yes" : "No")) &&
       (!gfcSel.size || gfcSel.has(r.GFC ? "Yes" : "No")) &&
+      (!shellSel.size || shellSel.has(r.ShellStatus)) &&
       (!ocSel.size || ocSel.has(r.OC)) &&
       (!productTypeSel.size || productTypeSel.has(r.ProductType))
     );
